@@ -29,6 +29,8 @@
     <ItemGroup>
       <None Remove="UserControls\TrayIconControl.xaml" />
       <None Remove="Views\MainPage.xaml" />
+      <None Remove="Views\Onboarding\SyncPage.xaml" />
+      <None Remove="Views\Onboarding\WelcomePage.xaml" />
       <None Remove="Views\SplashScreen.xaml" />
     </ItemGroup>
     
@@ -77,8 +79,19 @@
     </ItemGroup>
     
     <ItemGroup>
-      <Folder Include="Data\Models\" />
       <Folder Include="ViewModels\" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Page Update="Views\Onboarding\SyncPage.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Page Update="Views\Onboarding\WelcomePage.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
     </ItemGroup>
     
     <ItemGroup>

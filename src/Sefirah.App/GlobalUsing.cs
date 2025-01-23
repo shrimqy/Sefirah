@@ -25,4 +25,4 @@ global using global::Microsoft.Extensions.DependencyInjection;
 // Sefirah.App
 global using global::Sefirah.App.Helpers;
 
-//global using global::Sefirah.Common.Utils;
+global using global::Sefirah.Common.Utils;
