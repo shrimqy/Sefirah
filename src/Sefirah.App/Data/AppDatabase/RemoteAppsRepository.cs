@@ -1,10 +1,10 @@
 using Microsoft.Data.Sqlite;
 using Sefirah.App.Data.AppDatabase;
 using Sefirah.App.Data.AppDatabase.Models;
+using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Enums;
-using Sefirah.App.Utils;
 
-public class ApplicationInfoRepository(DatabaseContext context, ILogger logger)
+public class RemoteAppsRepository(DatabaseContext context, ILogger logger) : IRemoteAppsRepository
 {
     public async Task<List<ApplicationInfoEntity>> GetAllAsync()
     {

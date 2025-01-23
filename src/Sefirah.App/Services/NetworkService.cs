@@ -15,12 +15,12 @@ using System.Text;
 
 namespace Sefirah.App.Services;
 public class NetworkService(
-    Func<IMessageHandler> messageHandlerFactory,
+    Func<IMessageHandlerService> messageHandlerFactory,
     IDeviceManager deviceManager,
     IDiscoveryService discoveryService,
     ILogger logger) : INetworkService, ITcpServerProvider, ISessionManager, IDisposable
 {
-    private readonly Lazy<IMessageHandler> messageHandler = new(messageHandlerFactory);
+    private readonly Lazy<IMessageHandlerService> messageHandler = new(messageHandlerFactory);
     private Server? server;
     private bool isRunning;
     private int port;

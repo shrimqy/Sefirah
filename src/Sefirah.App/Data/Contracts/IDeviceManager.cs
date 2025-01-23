@@ -5,14 +5,33 @@ namespace Sefirah.App.Data.Contracts;
 
 public interface IDeviceManager
 {
+    /// <summary>
+    /// Gets the device info.
+    /// </summary>
     Task<RemoteDeviceEntity> GetDeviceInfoAsync(string deviceId);
+
+    /// <summary>
+    /// Gets the last connected device.
+    /// </summary>
     Task<RemoteDeviceEntity?> GetLastConnectedDevice();
+
+    /// <summary>
+    /// Gets the list of devices.
+    /// </summary>
     Task<List<RemoteDeviceEntity>> GetDeviceListAsync();
+
+    /// <summary>
+    /// Removes the device from the database.
+    /// </summary>
     Task RemoveDevice(RemoteDeviceEntity device);
+
+    /// <summary>
+    /// Updates the device in the database.
+    /// </summary>
     Task UpdateDevice(RemoteDeviceEntity device);
 
     /// <summary>
-    /// Updates the device status.
+    /// Updates the device properties (battery..)
     /// </summary>
     Task UpdateDeviceStatus(DeviceStatus deviceStatus);
 
@@ -21,7 +40,13 @@ public interface IDeviceManager
     /// </summary>
     Task<RemoteDeviceEntity?> VerifyDevice(DeviceInfo device);
 
+    /// <summary>
+    /// Event that is raised when the device properties (battery..) changes.
+    /// </summary>
     event EventHandler<DeviceStatus>? DeviceStatusChanged;
 
+    /// <summary>
+    /// Gets the local device.
+    /// </summary>
     Task<LocalDeviceEntity> GetLocalDeviceAsync();
 }

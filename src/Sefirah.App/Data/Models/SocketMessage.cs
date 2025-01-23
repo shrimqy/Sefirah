@@ -30,7 +30,7 @@ public class ClipboardMessage : SocketMessage
     public string ClipboardType { get; set; } = "text/plain";
 
     [JsonPropertyName("content")]
-    public string? Content { get; set; }
+    public string Content { get; set; } = string.Empty;
 }
 
 public class NotificationMessage : SocketMessage

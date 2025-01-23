@@ -4,7 +4,7 @@ using Sefirah.App.Utils.Socket;
 
 namespace Sefirah.App.Data.Contracts;
 
-public interface IMessageHandler
+public interface IMessageHandlerService
 {
     /// <summary>
     /// Handles a JSON message received from a client.
