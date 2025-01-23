@@ -1,0 +1,79 @@
+name: 🐞 Bug Report
+description: Create a report to help us improve
+labels: [Bug]
+body:
+  # Description
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of what the bug is.
+      placeholder: |
+        Example:
+          "When I click on the button, the app crashes."
+    validations:
+      required: true
+
+  # Steps To Reproduce
+  - type: textarea
+    id: reproduction_steps
+    attributes:
+      label: Steps To Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. Issue here
+    validations:
+      required: true
+
+  # Windows Version
+  - type: input
+    id: windows_version
+    attributes:
+      label: Windows Version
+      description: Which version of Windows are you using?
+      placeholder: "e.g. 10.0.22621.1848"
+    validations:
+      required: true
+  
+  # Android Version
+  - type: input
+    id: android_version
+    attributes:
+      label: Android Version
+      description: Which version of Android are you using?
+      placeholder: "Android 14"
+    validations:
+      required: true
+
+  # Android Device
+  - type: input
+    id: android_device
+    attributes:
+      label: Android Device
+      description: List your Android device and model.
+      placeholder: "Example: Google Pixel 7"
+    validations:
+      required: true
+
+  # Other details
+  - type: textarea
+    id: other-details
+    attributes:
+      label: Other details
+      placeholder: |
+        Additional details and attachments.
+
+  # Log File
+  - type: textarea
+    id: log-file
+    attributes:
+      label: Log File
+      description: |
+        Please upload the log file as an attachment, or copy and paste the contents into this field. Make sure to remove any sensitive information.
+      placeholder: |
+        To upload the log, access it from Settings -> About -> Open log location;
+    validations:
+      required: true

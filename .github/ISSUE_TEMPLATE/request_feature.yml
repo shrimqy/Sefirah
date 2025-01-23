@@ -1,0 +1,23 @@
+name: ⭐ Feature Request
+description: Suggest a feature to improve the app
+labels: [Feature Request]
+body:
+  # Description
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Describe your suggested feature
+      description: Provide a clear and concise description of the feature you'd like to see.
+      placeholder: |
+        Example:
+          "I would like to see..."
+    validations:
+      required: true
+
+  # Other details
+  - type: textarea
+    id: other-details
+    attributes:
+      label: Other details
+      placeholder: |
+        Additional information, comments or screenshots about the feature request.
