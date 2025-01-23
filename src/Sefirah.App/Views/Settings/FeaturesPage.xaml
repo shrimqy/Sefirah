@@ -1,0 +1,181 @@
+<Page
+    x:Class="Sefirah.App.Views.Settings.FeaturesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:Sefirah.App.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:data="using:Sefirah.App.Data.Models"
+    xmlns:dataEntity="using:Sefirah.App.Data.AppDatabase.Models"
+    xmlns:local="using:Sefirah.App.UserControls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:Sefirah.App.ViewModels.Settings"
+    x:Name="FeaturePage"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <converters:NotificationFilterConverter x:Key="NotificationFilterConverter" />
+            <converters:NotificationLaunchPreferenceConverter x:Key="NotificationLaunchPreferenceConverter" />
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Page.DataContext>
+        <vm:FeaturesViewModel x:Name="ViewModel" />
+    </Page.DataContext>
+
+    <ScrollViewer>
+        <StackPanel Margin="16,24,16,0" Spacing="10">
+
+            <!--  Title  -->
+            <TextBlock
+                Margin="0,0,0,8"
+                FontSize="28"
+                FontWeight="Medium"
+                Text="Features" />
+
+            <!--  Clipboard Settings  -->
+            <local:SettingsBlockControl
+                Title="Clipboard Sync"
+                Description="Sync your clipboard across devices when enabled."
+                IsExpanded="{x:Bind ViewModel.IsClipboardExpanded, Mode=TwoWay}">
+                <local:SettingsBlockControl.Icon>
+                    <FontIcon Glyph="&#xF0E3;" />
+                </local:SettingsBlockControl.Icon>
+                <ToggleSwitch Margin="-7,-3,-75,-3" IsOn="{x:Bind ViewModel.ClipboardSyncEnabled, Mode=TwoWay}" />
+                <local:SettingsBlockControl.ExpandableContent>
+                    <StackPanel Spacing="12">
+                        <CheckBox Content="Copy Received Files to Clipboard" IsChecked="{x:Bind ViewModel.ClipboardFilesEnabled, Mode=TwoWay}" />
+                        <CheckBox Content="Include images to remote clipboard" IsChecked="{x:Bind ViewModel.ImageToClipboardEnabled, Mode=TwoWay}" />
+                        <CheckBox Content="Show clipboard toasts" IsChecked="{x:Bind ViewModel.ShowClipboardToast, Mode=TwoWay}" />
+                        <CheckBox Content="Open Links in Browser" IsChecked="{x:Bind ViewModel.OpenLinksInBrowser, Mode=TwoWay}" />
+                    </StackPanel>
+                </local:SettingsBlockControl.ExpandableContent>
+            </local:SettingsBlockControl>
+
+            <!--  Notifications  -->
+            <local:SettingsBlockControl
+                Title="Notifications"
+                ContentPadding="0"
+                Description="Show notifications on your PC"
+                IsExpanded="{x:Bind ViewModel.IsNotificationExpanded, Mode=TwoWay}">
+                <local:SettingsBlockControl.Icon>
+                    <FontIcon Glyph="&#xF0E3;" />
+                </local:SettingsBlockControl.Icon>
+                <ToggleSwitch
+                    Margin="-7,-3,-75,-3"
+                    HorizontalAlignment="Right"
+                    IsOn="{x:Bind ViewModel.NotificationSyncEnabled, Mode=TwoWay}" />
+                <local:SettingsBlockControl.ExpandableContent>
+                    <StackPanel Spacing="16">
+                        <!--  General Notification Settings  -->
+                        <StackPanel
+                            Padding="16,8,16,8"
+                            Background="{ThemeResource ExpanderHeaderBackground}"
+                            BorderBrush="{ThemeResource ExpanderHeaderBorderBrush}"
+                            BorderThickness="{ThemeResource ExpanderHeaderBorderThickness}"
+                            CornerRadius="8"
+                            Spacing="12">
+                            <TextBlock
+                                Margin="0,0,0,4"
+                                FontWeight="SemiBold"
+                                Text="General Settings" />
+                            <CheckBox Content="Show notification toasts" IsChecked="{x:Bind ViewModel.ShowNotificationToast, Mode=TwoWay}" />
+                            <CheckBox Content="Show badge on taskbar" IsChecked="{x:Bind ViewModel.ShowBadge, Mode=TwoWay}" />
+                            <CheckBox Content="Ignore notifications if relevant app is active in windows" IsChecked="{x:Bind ViewModel.IgnoreWindowsApps, Mode=TwoWay}" />
+                        </StackPanel>
+
+                        <!--  App-Specific Settings  -->
+                        <local:SettingsBlockControl
+                            Title="App-Specific Settings"
+                            ContentPadding="16,12,16,12"
+                            IsExpanded="{x:Bind ViewModel.IsAppNotificationExpanded, Mode=TwoWay}">
+                            <local:SettingsBlockControl.Icon>
+                                <FontIcon Glyph="&#xE7F4;" />
+                            </local:SettingsBlockControl.Icon>
+                            <local:SettingsBlockControl.ExpandableContent>
+                                <ItemsControl ItemsSource="{x:Bind ViewModel.NotificationPreferences, Mode=OneWay}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="dataEntity:ApplicationInfoEntity">
+                                            <Grid Padding="16,12">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <Image
+                                                    Grid.Column="0"
+                                                    Width="32"
+                                                    Height="32"
+                                                    Margin="0,0,12,0"
+                                                    Source="{x:Bind AppIcon}" />
+
+                                                <TextBlock
+                                                    Grid.Column="1"
+                                                    VerticalAlignment="Center"
+                                                    Text="{x:Bind AppName}" />
+
+                                                <Button Grid.Column="2" Content="{x:Bind NotificationFilter, Mode=OneWay, Converter={StaticResource NotificationFilterConverter}}">
+                                                    <Button.Flyout>
+                                                        <MenuFlyout>
+                                                            <MenuFlyoutItem Click="OnMenuFlyoutItemClick" Text="Notification feed + toast">
+                                                                <MenuFlyoutItem.Tag>
+                                                                    <dataEntity:ApplicationInfoEntity
+                                                                        AppName="{x:Bind AppName}"
+                                                                        AppPackage="{x:Bind AppPackage}"
+                                                                        NotificationFilter="ToastFeed" />
+                                                                </MenuFlyoutItem.Tag>
+                                                            </MenuFlyoutItem>
+                                                            <MenuFlyoutItem Click="OnMenuFlyoutItemClick" Text="Notification feed">
+                                                                <MenuFlyoutItem.Tag>
+                                                                    <dataEntity:ApplicationInfoEntity
+                                                                        AppName="{x:Bind AppName}"
+                                                                        AppPackage="{x:Bind AppPackage}"
+                                                                        NotificationFilter="FEED" />
+                                                                </MenuFlyoutItem.Tag>
+                                                            </MenuFlyoutItem>
+
+                                                            <MenuFlyoutItem Click="OnMenuFlyoutItemClick" Text="Disabled">
+                                                                <MenuFlyoutItem.Tag>
+                                                                    <dataEntity:ApplicationInfoEntity
+                                                                        AppName="{x:Bind AppName}"
+                                                                        AppPackage="{x:Bind AppPackage}"
+                                                                        NotificationFilter="DISABLED" />
+                                                                </MenuFlyoutItem.Tag>
+                                                            </MenuFlyoutItem>
+                                                        </MenuFlyout>
+                                                    </Button.Flyout>
+                                                </Button>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </local:SettingsBlockControl.ExpandableContent>
+                        </local:SettingsBlockControl>
+                    </StackPanel>
+                </local:SettingsBlockControl.ExpandableContent>
+            </local:SettingsBlockControl>
+
+            <!--  Save Location  -->
+            <local:SettingsBlockControl Title="Save Location" Description="{x:Bind ViewModel.ReceivedFilesPath, Mode=OneWay}">
+                <local:SettingsBlockControl.Icon>
+                    <SymbolIcon Symbol="Folder" />
+                </local:SettingsBlockControl.Icon>
+                <local:SettingsBlockControl.SettingsActionableElement>
+                    <Button Click="SelectSaveLocation_Click" Content="Select Location" />
+                </local:SettingsBlockControl.SettingsActionableElement>
+            </local:SettingsBlockControl>
+
+            <!--  Remote Storage Location  -->
+            <local:SettingsBlockControl Title="Remote Storage Location" Description="{x:Bind ViewModel.RemoteStoragePath, Mode=OneWay}">
+                <local:SettingsBlockControl.Icon>
+                    <SymbolIcon Symbol="SyncFolder" />
+                </local:SettingsBlockControl.Icon>
+                <local:SettingsBlockControl.SettingsActionableElement>
+                    <Button Click="SelectRemoteLocation_Click" Content="Select Location" />
+                </local:SettingsBlockControl.SettingsActionableElement>
+            </local:SettingsBlockControl>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

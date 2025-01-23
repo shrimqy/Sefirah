@@ -80,7 +80,14 @@ public class Program
     {
         if (App.Current is App thisApp)
         {
-            await thisApp.OnActivatedAsync(args);
+            if (args.Kind == ExtendedActivationKind.ShareTarget)
+            {
+                await thisApp.HandleShareTargetActivation(args.Data as ShareTargetActivatedEventArgs);
+            }
+            else
+            {
+                await thisApp.OnActivatedAsync(args);
+            }
         }
     }
 }

@@ -1,5 +1,4 @@
 using Microsoft.UI.Xaml.Controls;
-using Sefirah.App.Data.Enums;
 using Sefirah.App.ViewModels.Dialogs;
 
 namespace Sefirah.App.Dialogs;

@@ -27,7 +27,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="UserControls\TrayIconControl.xaml" />
       <None Remove="Views\MainPage.xaml" />
       <None Remove="Views\Onboarding\SyncPage.xaml" />
       <None Remove="Views\Onboarding\WelcomePage.xaml" />
@@ -76,10 +75,6 @@
       <Page Update="Views\MainPage.xaml">
         <Generator>MSBuild:Compile</Generator>
       </Page>
-    </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="ViewModels\" />
     </ItemGroup>
     
     <ItemGroup>

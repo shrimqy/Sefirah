@@ -4,7 +4,9 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using Sefirah.App.Views;
+using Sefirah.App.Views.Onboarding;
 using Windows.ApplicationModel.Activation;
+using Windows.Storage;
 using WinUIEx;
 
 namespace Sefirah.App;
@@ -54,18 +56,35 @@ public sealed partial class MainWindow : WindowEx
     {
         var rootFrame = EnsureWindowIsInitialized();
 
-        // Normal app initialization without forcing window visibility
-        switch (activatedEventArgs)
+        // Check if this is first launch
+        var localSettings = ApplicationData.Current.LocalSettings;
+        bool isFirstLaunch = localSettings.Values["HasCompletedOnboarding"] == null;
+
+        if (isFirstLaunch)
         {
-            case ILaunchActivatedEventArgs launchArgs:
-                if (launchArgs != null)
-                {
+            // Navigate to onboarding page and ensure window is visible
+            rootFrame.Navigate(typeof(WelcomePage), null, new SuppressNavigationTransitionInfo());
+            if (!AppWindow.IsVisible)
+            {
+                AppWindow.Show();
+                Activate();
+            }
+        }
+        else
+        {
+            // Normal app initialization without forcing window visibility
+            switch (activatedEventArgs)
+            {
+                case ILaunchActivatedEventArgs launchArgs:
+                    if (launchArgs != null)
+                    {
+                        rootFrame.Navigate(typeof(MainPage), null, new SuppressNavigationTransitionInfo());
+                    }
+                    break;
+                default:
                     rootFrame.Navigate(typeof(MainPage), null, new SuppressNavigationTransitionInfo());
-                }
-                break;
-            default:
-                rootFrame.Navigate(typeof(MainPage), null, new SuppressNavigationTransitionInfo());
-                break;
+                    break;
+            }
         }
 
         return Task.CompletedTask;

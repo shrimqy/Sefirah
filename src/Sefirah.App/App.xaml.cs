@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
+using Sefirah.App.Data.Contracts;
+using Sefirah.App.Data.Enums;
 using Serilog;
 using System.IO;
 using Windows.ApplicationModel.Activation;
@@ -39,11 +41,16 @@ public partial class App : Application
             var activatedEventArgs = AppInstance.GetCurrent().GetActivatedEventArgs();
             var isStartupTask = activatedEventArgs.Data is IStartupTaskActivatedEventArgs;
 
+            // Handle share activation
+            if (activatedEventArgs.Kind is ExtendedActivationKind.ShareTarget)
+            {
+                Debug.WriteLine("Share Target Received");
+                await HandleShareTargetActivation(activatedEventArgs.Data as ShareTargetActivatedEventArgs);
+            }
 
             // Configure the DI container
             var host = AppLifecycleHelper.ConfigureHost();
             Ioc.Default.ConfigureServices(host.Services);
-
             await host.StartAsync();
 
             // Initialize window but don't show it yet
@@ -51,8 +58,41 @@ public partial class App : Application
 
             HookEventsForWindow();
 
-            MainWindow.Instance.Activate();
-            MainWindow.Instance.AppWindow.Show();
+            // Initialize window based on startup options
+            if (isStartupTask)
+            {
+                // Get the startup preference from user settings
+                var userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
+                var startupOption = userSettingsService.GeneralSettingsService.StartupOption;
+
+                switch (startupOption)
+                {
+                    case StartupOptions.Minimized:
+                        MainWindow.Instance.Activate();
+                        MainWindow.Instance.WindowState = WindowState.Minimized;
+                        break;
+                    case StartupOptions.InTray:
+                        // Initialize but don't show window
+                        MainWindow.Instance.Activate();
+                        MainWindow.Instance.AppWindow.Hide();
+                        break;
+                    default:
+                        MainWindow.Instance.Activate();
+                        MainWindow.Instance.AppWindow.Show();
+                        MainWindow.Instance.WindowState = WindowState.Maximized;
+                        break;
+                }
+            }
+            else
+            {
+                // For normal launch, always show the window
+                if (!MainWindow.Instance.AppWindow.IsVisible)
+                {
+                    MainWindow.Instance.Activate();
+                    MainWindow.Instance.AppWindow.Show();
+                    MainWindow.Instance.WindowState = WindowState.Maximized;
+                }
+            }
 
             // Show Splash Screen only for visible windows
             if (MainWindow.Instance.AppWindow.IsVisible)
@@ -105,6 +145,18 @@ public partial class App : Application
         // InitializeApplication accesses UI, needs to be called on UI thread
         await MainWindow.Instance.DispatcherQueue.EnqueueAsync(()
             => MainWindow.Instance.InitializeApplicationAsync(activatedEventArgsData));
+    }
+
+    public async Task HandleShareTargetActivation(ShareTargetActivatedEventArgs? args)
+    {
+        var shareOperation = args?.ShareOperation;
+        if (shareOperation == null) return;
+        var fileTransferService = Ioc.Default.GetRequiredService<IFileTransferService>();
+
+        await MainWindow.Instance.DispatcherQueue.EnqueueAsync(async () =>
+        {
+            await fileTransferService.ProcessShareAsync(shareOperation);
+        });
     }
 
     private static Serilog.ILogger GetSerilogLogger()
