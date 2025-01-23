@@ -1,5 +1,14 @@
 ﻿using Microsoft.Extensions.Hosting;
-using Sefirah.Common.Utils;
+using Sefirah.App.Data.AppDatabase;
+using Sefirah.App.Data.Contracts;
+using Sefirah.App.RemoteStorage;
+using Sefirah.App.RemoteStorage.Shell;
+using Sefirah.App.RemoteStorage.Worker;
+using Sefirah.App.Services;
+using Sefirah.App.Services.Settings;
+using Sefirah.App.Services.Socket;
+using Sefirah.App.ViewModels;
+using Sefirah.App.ViewModels.Settings;
 using Serilog;
 using Windows.ApplicationModel;
 
@@ -28,6 +37,23 @@ public static class AppLifecycleHelper
     /// </summary>
     public static async Task InitializeAppComponentsAsync()
     {
+        // Get database context and initialize it
+        var dbContext = Ioc.Default.GetRequiredService<DatabaseContext>();
+        await dbContext.InitializeAsync();
+
+        var userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
+        var generalSettingsService = userSettingsService.GeneralSettingsService;
+        var mdnsService = Ioc.Default.GetRequiredService<IMdnsService>();
+        var networkService = Ioc.Default.GetRequiredService<INetworkService>();
+        var playbackService = Ioc.Default.GetRequiredService<IPlaybackService>();
+        var fileTransferService = Ioc.Default.GetRequiredService<IFileTransferService>();
+
+        // Start all the required services for startup
+        await networkService.StartServerAsync();
+        // Initializing file transfer service here because we need it for performing notification actions.
+        await fileTransferService.InitializeAsync();
+        await playbackService.InitializeAsync();
+        mdnsService.StartDiscovery();
 
     }
 
@@ -41,6 +67,49 @@ public static class AppLifecycleHelper
             .ConfigureServices((context, services) => services
                 // Logging
                 .AddSingleton<Sefirah.Common.Utils.ILogger>(new SerilogWrapperLogger(Log.Logger))
+
+                // Settings Services
+                .AddSingleton<IUserSettingsService, UserSettingsService>()
+                .AddSingleton<IGeneralSettingsService, GeneralSettingsService>(sp => new GeneralSettingsService(((UserSettingsService)sp.GetRequiredService<IUserSettingsService>()).GetSharingContext()))
+                .AddSingleton<IFeatureSettingsService, FeaturesSettingsService>(sp => new FeaturesSettingsService(((UserSettingsService)sp.GetRequiredService<IUserSettingsService>()).GetSharingContext()))
+
+                // Remote Storage
+                .AddSftpRemoteServices()
+                .AddCloudSyncWorker()
+
+                // Shell
+                .AddCommonClassObjects()
+                .AddSingleton<ShellRegistrar>()
+                .AddHostedService<ShellWorker>()
+
+                .AddHostedService<SyncProviderWorker>()
+                .AddSingleton<ISftpService, SftpService>()
+
+                // Database
+                .AddSingleton<DatabaseContext>()
+                .AddSingleton<IRemoteAppsRepository, RemoteAppsRepository>()
+                .AddSingleton<DeviceRepository>()
+
+
+                // Services
+                .AddSingleton<IDeviceManager, DeviceManager>()
+                .AddSingleton<IDiscoveryService, DiscoveryService>()
+                .AddSingleton<INetworkService, NetworkService>()
+                .AddSingleton(sp => (ITcpServerProvider)sp.GetRequiredService<INetworkService>())
+                .AddSingleton(sp => (ISessionManager)sp.GetRequiredService<INetworkService>())
+                .AddSingleton<IFileTransferService, FileTransferService>()
+                .AddSingleton(sp => (ITcpClientProvider)sp.GetRequiredService<IFileTransferService>())
+                .AddSingleton<IMdnsService, MdnsService>()
+                .AddSingleton<IClipboardService, ClipboardService>()
+                .AddSingleton<IPlaybackService, PlaybackService>()
+                .AddSingleton<INotificationService, NotificationService>()
+
+                .AddScoped<IMessageHandlerService, MessageHandlerService>()
+                .AddSingleton<Func<IMessageHandlerService>>(sp => () => sp.GetRequiredService<IMessageHandlerService>())
+
+                // ViewModels
+                .AddSingleton<MainPageViewModel>()
+                .AddSingleton<DevicesViewModel>()
             ).Build();
     }
 
