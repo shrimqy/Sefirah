@@ -1,0 +1,170 @@
+﻿using CommunityToolkit.WinUI;
+using Microsoft.UI.Xaml.Controls;
+using Org.BouncyCastle.Crypto.Parameters;
+using Sefirah.App.Data.AppDatabase;
+using Sefirah.App.Data.AppDatabase.Models;
+using Sefirah.App.Data.Contracts;
+using Sefirah.App.Data.Models;
+using Sefirah.App.Dialogs;
+using Sefirah.App.Utils;
+using Windows.Storage;
+
+namespace Sefirah.App.Services;
+
+public class DeviceManager(DeviceRepository repository, ILogger logger) : IDeviceManager
+{
+    public event EventHandler<DeviceStatus>? DeviceStatusChanged;
+
+    public async Task<List<RemoteDeviceEntity>> GetDeviceListAsync()
+    {
+        try
+        {
+            return await repository.GetAllAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Error getting device list", ex);
+            return [];
+        }
+    }
+
+    public async Task<RemoteDeviceEntity?> GetDeviceInfoAsync(string deviceId)
+    {
+        return await repository.GetByIdAsync(deviceId);
+    }
+
+    public async Task RemoveDevice(RemoteDeviceEntity device)
+    {
+        await repository.DeleteAsync(device.DeviceId);
+    }
+
+    public async Task UpdateDevice(RemoteDeviceEntity device)
+    {
+        await repository.AddOrUpdateAsync(device);
+    }
+
+    public async Task<RemoteDeviceEntity?> VerifyDevice(DeviceInfo device)
+    {
+        try
+        {
+            var localDevice = await repository.GetLocalDevice() ?? throw new Exception("Local device not found");
+            var existingDevice = await repository.GetByIdAsync(device.DeviceId);
+            var hashedKey = Convert.FromBase64String(device.HashedSecret!.Trim());
+
+            if (existingDevice != null && existingDevice.HashedKey?.SequenceEqual(hashedKey) == true)
+            {
+                existingDevice.LastConnected = DateTime.Now;
+                
+                if (!string.IsNullOrEmpty(device.Avatar))
+                {
+                    existingDevice.WallpaperBytes = Convert.FromBase64String(device.Avatar);
+                }
+
+                return await repository.AddOrUpdateAsync(existingDevice);
+            }
+
+            if (EcdhHelper.VerifyDevice(device.PublicKey, localDevice.PrivateKey, hashedKey))
+            {
+                var tcs = new TaskCompletionSource<RemoteDeviceEntity?>();
+
+                await MainWindow.Instance.DispatcherQueue.EnqueueAsync(async () =>
+                {
+                    try
+                    {
+                        var frame = (Frame)MainWindow.Instance.Content;
+                        var dialog = new ConnectionRequestDialog(device.DeviceName, hashedKey, frame)
+                        {
+                            XamlRoot = MainWindow.Instance.Content.XamlRoot
+                        };
+
+                        var result = await dialog.ShowAsync();
+                        
+                        if (result != ContentDialogResult.Primary)
+                        {
+                            logger.Info("User declined device verification");
+                            tcs.SetResult(null);
+                            return;
+                        }
+
+                        var newDevice = new RemoteDeviceEntity
+                        {
+                            DeviceId = device.DeviceId,
+                            Name = device.DeviceName,
+                            HashedKey = hashedKey,
+                            LastConnected = DateTime.Now,
+                            WallpaperBytes = !string.IsNullOrEmpty(device.Avatar) 
+                                ? Convert.FromBase64String(device.Avatar) 
+                                : null
+                        };
+
+                        var savedDevice = await repository.AddOrUpdateAsync(newDevice);
+                        tcs.SetResult(savedDevice);
+                    }
+                    catch (Exception ex)
+                    {
+                        tcs.SetException(ex);
+                    }
+                });
+
+                return await tcs.Task;
+            }
+
+            return null;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Error verifying device", ex);
+            return null;
+        }
+    }
+
+    public Task UpdateDeviceStatus(DeviceStatus deviceStatus)
+    {
+        try
+        {
+            DeviceStatusChanged?.Invoke(this, deviceStatus);
+            return Task.CompletedTask;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Error updating device status", ex);
+            return Task.CompletedTask;
+        }
+    }
+
+    public async Task<RemoteDeviceEntity?> GetLastConnectedDevice()
+    {
+        return await repository.GetLastConnectedDeviceAsync();
+    }
+
+    public async Task<LocalDeviceEntity> GetLocalDeviceAsync()
+    {
+        try
+        {
+            var localSettings = ApplicationData.Current.LocalSettings;
+            if (localSettings?.Values["FirstLaunch"] == null)
+            {
+                var (firstName, _) = await CurrentUserInformation.GetCurrentUserInfoAsync();
+                var keyPair = EcdhHelper.GetKeyPair();
+                var localDevice = new LocalDeviceEntity
+                {
+                    DeviceId = Guid.NewGuid().ToString(),
+                    DeviceName = firstName,
+                    PublicKey = ((ECPublicKeyParameters)keyPair.Public).Q.GetEncoded(false),
+                    PrivateKey = ((ECPrivateKeyParameters)keyPair.Private).D.ToByteArrayUnsigned(),
+                };
+                localSettings!.Values["FirstLaunch"] = false;
+                return await repository.AddOrUpdateLocalDeviceAsync(localDevice);
+            }
+            else
+            {
+                return await repository.GetLocalDevice() ?? throw new Exception("Local device not found");
+            }
+        }
+        catch (Exception e)
+        {
+            logger.Error("Error getting local device", e);
+            throw;
+        }
+    }
+}
