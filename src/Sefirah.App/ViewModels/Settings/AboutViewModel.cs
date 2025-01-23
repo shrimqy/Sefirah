@@ -1,4 +1,5 @@
-﻿using Windows.ApplicationModel;
+﻿using Sefirah.App.Data.Items;
+using Windows.ApplicationModel;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
 

@@ -8,7 +8,7 @@ namespace Sefirah.App.ViewModels.Settings;
 public sealed partial class FeaturesViewModel : ObservableObject
 {
     private readonly IUserSettingsService UserSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
-    private readonly ApplicationInfoRepository ApplicationInfoRepository = Ioc.Default.GetRequiredService<ApplicationInfoRepository>();
+    private readonly IRemoteAppsRepository RemoteAppsRepository = Ioc.Default.GetRequiredService<IRemoteAppsRepository>();
     private readonly DispatcherQueue dispatcherQueue;
 
     public ObservableCollection<ApplicationInfoEntity> NotificationPreferences { get; } = [];
@@ -185,7 +185,7 @@ public sealed partial class FeaturesViewModel : ObservableObject
 
     private async void LoadNotificationPreferencesAsync()
     {
-        var preferences = await ApplicationInfoRepository.GetAllAsync();
+        var preferences = await RemoteAppsRepository.GetAllAsync();
         dispatcherQueue.TryEnqueue(() =>
         {
             NotificationPreferences.Clear();
@@ -198,7 +198,7 @@ public sealed partial class FeaturesViewModel : ObservableObject
 
     public async void ChangeNotificationFilter(ApplicationInfoEntity preferences)
     {
-        await ApplicationInfoRepository.UpdateFilterAsync(preferences.AppPackage, preferences.NotificationFilter);
+        await RemoteAppsRepository.UpdateFilterAsync(preferences.AppPackage, preferences.NotificationFilter);
         var existingItem = NotificationPreferences.FirstOrDefault(p => p.AppPackage == preferences.AppPackage);
         
         if (existingItem != null)

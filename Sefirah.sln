@@ -16,6 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "git", "git", "{6B639614-07B
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		LICENSE = LICENSE
 		Privacy.md = Privacy.md
 		README.md = README.md
 	EndProjectSection

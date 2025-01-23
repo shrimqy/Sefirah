@@ -11,7 +11,7 @@ global using global::System.ComponentModel;
 global using global::System.Diagnostics;
 global using global::System.Text.Json;
 global using global::System.Text.Json.Serialization;
-global using SystemIO = global::System.IO;
+global using global::System.IO;
 
 // CommunityToolkit.Mvvm
 global using global::CommunityToolkit.Mvvm.ComponentModel;

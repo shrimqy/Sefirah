@@ -32,7 +32,7 @@ public partial class ConnectionRequestViewModel : ObservableObject
     public void OnConnectClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
         // If we're on the onboarding page, navigate to main page
-        if (_frame.Content is OnboardingDevicePage)
+        if (_frame.Content is SyncPage)
         {
             ApplicationData.Current.LocalSettings.Values["HasCompletedOnboarding"] = true;
             _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());

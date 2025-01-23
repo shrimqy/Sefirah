@@ -1,6 +1,4 @@
 ﻿using Sefirah.App.Data.Models;
-using Sefirah.App.Services;
-using Sefirah.App.Utils.Socket;
 
 namespace Sefirah.App.Data.Contracts;
 

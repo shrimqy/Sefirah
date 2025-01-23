@@ -472,7 +472,7 @@
             </Grid>
         </Grid>
 
-        <views:TrayIconView
+        <userControls:TrayIconControl
             x:Name="TrayIcon"
             Grid.Row="1"
             CornerRadius="50" />
