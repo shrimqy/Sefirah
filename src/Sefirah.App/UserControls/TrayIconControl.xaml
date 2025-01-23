@@ -1,0 +1,34 @@
+<UserControl
+    x:Class="Sefirah.App.UserControls.TrayIconControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:Sefirah.App.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:Sefirah.App.UserControls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:tb="using:H.NotifyIcon"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <converters:BoolToImageSourceConverter
+            x:Key="BoolToImageSourceConverter"
+            FalseImage="ms-appx:///Assets/Icons/SekiDark.ico"
+            TrueImage="ms-appx:///Assets/Icons/SekiDark.ico" />
+    </UserControl.Resources>
+    <tb:TaskbarIcon
+        x:Name="TrayIcon"
+        x:FieldModifier="public"
+        ContextMenuMode="SecondWindow"
+        IconSource="{x:Bind IsWindowVisible, Converter={StaticResource BoolToImageSourceConverter}}"
+        LeftClickCommand="{x:Bind ShowHideWindowCommand}"
+        NoLeftClickDelay="True"
+        ToolTipText="Seki">
+        <tb:TaskbarIcon.ContextFlyout>
+            <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                <MenuFlyoutItem Command="{x:Bind ShowHideWindowCommand}" Text="Show/Hide Window" />
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Command="{x:Bind ExitApplicationCommand}" Text="Exit" />
+            </MenuFlyout>
+        </tb:TaskbarIcon.ContextFlyout>
+    </tb:TaskbarIcon>
+</UserControl>

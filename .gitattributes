@@ -61,3 +61,10 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+###############################################################################
+# Remove from linguist lib detectable languages
+###############################################################################
+*.html linguist-detectable=false
+*.css linguist-detectable=false
+*.ps1 linguist-detectable=false

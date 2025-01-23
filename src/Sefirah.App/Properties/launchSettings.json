@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Sefirah.App (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Sefirah.App (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

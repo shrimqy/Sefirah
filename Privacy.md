@@ -4,7 +4,7 @@
 
 ## Introduction
 
-Thank you for using our application "Seki". Your privacy is important to us. This Privacy Policy explains how our App collects, uses, and protects your information. By using our App, you agree to the practices described in this policy.
+Thank you for using our application "Sefirah". Your privacy is important to us. This Privacy Policy explains how our App collects, uses, and protects your information. By using our App, you agree to the practices described in this policy.
 
 ## Information We Collect
 
