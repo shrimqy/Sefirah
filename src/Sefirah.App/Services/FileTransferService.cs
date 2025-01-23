@@ -94,7 +94,7 @@ public class FileTransferService(
                 FileShare.None,
                 bufferSize: 81920); // 80KB buffer
 
-            var certificate = await SSLHelper.GetOrCreateCertificateAsync("Sefirah.pfx");
+            var certificate = await CertificateHelper.GetOrCreateCertificateAsync();
 
             var context = new SslContext(
                 SslProtocols.Tls12,
