@@ -34,10 +34,8 @@
     - Copy content on the desktop and it will automatically sync with your android (That is if you have enabled it from the settings).
     - To share clipboard from android you will have to manually sent it through the share sheet that shows after you perform a copy action).
 3. **File Transfer**:
-    - Use the share sheet from android/windows and select the app to share any files between the devices. 
-4. **Remote Control**:
-   - Click the button next to the connection status button which will give a prompt to cast on your phone, choose the entire screen.
-
+    - Use the share sheet from android/windows and select the app to share any files between the devices.
+     
 ## Screenshots
 
 <p align="center">
