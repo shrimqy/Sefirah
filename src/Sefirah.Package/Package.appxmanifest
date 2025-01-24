@@ -18,13 +18,13 @@
     IgnorableNamespaces="uap rescap rescap5 uap3 uap6 cloudfiles cloudfiles2">
 
 	<Identity
-    Name="ba36c9ae-13cf-42ab-8576-d28be1f70f00"
-    Publisher="CN=shrim"
+    Name="shrimqy.Seki-PhoneLink"
+    Publisher="CN=shrimqy"
     Version="0.4.0.0" />
 
   <Properties>
     <DisplayName>Sefirah</DisplayName>
-    <PublisherDisplayName>shrim</PublisherDisplayName>
+    <PublisherDisplayName>shrimqy</PublisherDisplayName>
     <Logo>Assets\AppTiles\StoreLogo.png</Logo>
   </Properties>
 
@@ -68,7 +68,7 @@
 					<uap5:StartupTask
 					TaskId="8B5D3E3F-9B69-4E8A-A9F7-BFCA793B9AF0"
 					Enabled="false"
-					DisplayName="Seki" />
+					DisplayName="Sefirah" />
 				</uap5:Extension>
 				<cloudfiles:Extension Category="windows.cloudFiles">
 					<cloudfiles:CloudFiles>
