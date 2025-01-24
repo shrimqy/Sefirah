@@ -1,6 +1,7 @@
 # Sefirah
 
 **Sefirah** is a custom-built Windows app designed to enhance your workflow by enabling seamless clipboard and notification sharing between your Windows PC and Android device. It's an alternative to existing solutions, tailored for users who want a straightforward and efficient way to keep their devices in sync.
+
 ## Features
 
 - **Clipboard Sharing**: Seamlessly share clipboard content between your Android device and Windows PC.
@@ -19,6 +20,8 @@
     </picture>
   </a>
 </p>
+
+NOTE: The app is currently delisted, will be back up when I release the new update.
 
 ## How to Use
 
