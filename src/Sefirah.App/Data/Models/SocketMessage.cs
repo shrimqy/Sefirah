@@ -305,7 +305,7 @@ public class BulkFileTransfer : SocketMessage
 public class ServerInfo
 {
     [JsonPropertyName("ipAddress")]
-    public required string IpAddress { get; set; }
+    public string IpAddress { get; set; } = string.Empty;
 
     [JsonPropertyName("port")]
     public required int Port { get; set; }
@@ -376,8 +376,8 @@ public class SftpServerInfo : SocketMessage
 
 public class UdpBroadcast : SocketMessage
 {
-    [JsonPropertyName("ipAddress")]
-    public string? IpAddress { get; set; }
+    [JsonPropertyName("ipAddresses")]
+    public List<string> IpAddresses { get; set; } = [];
 
     [JsonPropertyName("port")]
     public int? Port { get; set; }

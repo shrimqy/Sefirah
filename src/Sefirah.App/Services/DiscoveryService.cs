@@ -29,7 +29,7 @@ public class DiscoveryService(
     public ObservableCollection<DiscoveredDevice> DiscoveredDevices { get; } = [];
     public List<DiscoveredMdnsServiceArgs> DiscoveredMdnsServices { get; } = [];
 
-    public async Task StartDiscoveryAsync(string serverIpAddress, int serverPort, X509Certificate2 certificate)
+    public async Task StartDiscoveryAsync(int serverPort, X509Certificate2 certificate)
     {
         port = await NetworkHelper.FindAvailablePortAsync(8689);
         mdnsService.AdvertiseService(port);
@@ -39,7 +39,10 @@ public class DiscoveryService(
         {
             localDevice = await deviceManager.GetLocalDeviceAsync();
             var publicKey = Convert.ToBase64String(localDevice.PublicKey);
-            var localAddress = NetworkHelper.GetLocalIPAddress();
+            var localAddresses = NetworkHelper.GetAllValidAddresses();
+
+            logger.Info($"Address to advertise: {string.Join(", ", localAddresses)}");
+
             udpClient = new MulticastClient("0.0.0.0", port, this)
             {
                 OptionDualMode = true,
@@ -58,7 +61,7 @@ public class DiscoveryService(
                 var udpBroadcast = new UdpBroadcast
                 {
                     DeviceId = localDevice.DeviceId,
-                    IpAddress = serverIpAddress,
+                    IpAddresses = [.. localAddresses],
                     Port = serverPort,
                     DeviceName = username,
                     PublicKey = publicKey,

@@ -419,7 +419,6 @@ public class FileTransferService(
             return serverInfo;
         }
 
-        var (ipAddress, _) = NetworkHelper.GetBestAddress();
         var certificate = await CertificateHelper.GetOrCreateCertificateAsync();
         var port = await NetworkHelper.FindAvailablePortAsync(9040);
         var context = new SslContext(SslProtocols.Tls12, certificate);
@@ -431,7 +430,6 @@ public class FileTransferService(
         server.Start();
         serverInfo = new ServerInfo
         {
-            IpAddress = ipAddress,
             Port = port
         };
 

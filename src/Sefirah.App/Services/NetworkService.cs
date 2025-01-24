@@ -46,9 +46,6 @@ public class NetworkService(
         }
         try
         {
-            var (advertisedAddress, addressType) = NetworkHelper.GetBestAddress();
-            logger.Info($"Selected address type: {addressType}");
-            logger.Info($"Address to advertise: {advertisedAddress}");
 
             port = await NetworkHelper.FindAvailablePortAsync(5941);
             certificate = await CertificateHelper.GetOrCreateCertificateAsync();
@@ -65,10 +62,10 @@ public class NetworkService(
             {
                 isRunning = server.Start();
                 // Advertise the specific address clients should connect to
-                await discoveryService.StartDiscoveryAsync(advertisedAddress, port, certificate);
+                await discoveryService.StartDiscoveryAsync(port, certificate);
 
                 logger.Info($"Server bound to [::] (IPv6Any)");
-                logger.Info($"Clients should connect to: {advertisedAddress}:{port}");
+                logger.Info($"Clients should connect to {port}");
             }
 
             if (isRunning)
