@@ -14,6 +14,7 @@ namespace Sefirah.App.Services;
 public class NotificationService(
     ILogger logger,
     ISessionManager sessionManager,
+    IUserSettingsService userSettingsService,
     IRemoteAppsRepository remoteAppsRepository) : INotificationService
 {
     private readonly SemaphoreSlim semaphore = new(1, 1);
@@ -25,6 +26,8 @@ public class NotificationService(
 
     public async Task HandleNotificationMessage(NotificationMessage message)
     {
+        if (!userSettingsService.FeatureSettingsService.NotificationSyncEnabled) return;
+
         await semaphore.WaitAsync().ConfigureAwait(false);
         try
         {
@@ -53,15 +56,12 @@ public class NotificationService(
                         }
                         else
                         {
-                            // TODO: Add new notification at the top of the stack?
                             // Add new notification
-                            notifications.Add(message);
+                            notifications.Insert(0, message);
                         }
 
-                        if (!await IsAppActiveAsync(message.AppName!))
-                        {
-                            await ShowWindowsNotification(message);
-                        }
+                        if (userSettingsService.FeatureSettingsService.IgnoreWindowsApps && await IsAppActiveAsync(message.AppName!)) return;
+                        await ShowWindowsNotification(message);
                     });
                 }
                 else if (message.NotificationType == nameof(NotificationType.Active) && filter == NotificationFilter.Feed || filter == NotificationFilter.ToastFeed)
@@ -97,10 +97,9 @@ public class NotificationService(
         try
         {
             // Get all running apps
-            var diagnosticInfos = await AppDiagnosticInfo.RequestInfoAsync();
-            var isAppActive = diagnosticInfos.Any(info => 
+            var diagnosticInfo = await AppDiagnosticInfo.RequestInfoAsync();
+            var isAppActive = diagnosticInfo.Any(info => 
                 info.AppInfo.DisplayInfo.DisplayName.Equals(appName, StringComparison.OrdinalIgnoreCase));
-            logger.Debug("{0}: {1}", appName, isAppActive);
             return isAppActive;
         }
         catch (Exception ex)
