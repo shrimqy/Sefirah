@@ -6,10 +6,6 @@ namespace Sefirah.App.Services.Socket;
 
 public class ServerSession(SslServer server, ITcpServerProvider socketProvider, ILogger logger) : SslSession(server)
 {
-    void Send(byte[] buffer, long offset, long size)
-    {
-        SendAsync(buffer, offset, size);
-    }
 
     protected override void OnDisconnected()
     {
@@ -74,13 +70,6 @@ public class Client(SslContext context, string address, int port, ITcpClientProv
     }
 }
 
-public class MulticastServer(IPAddress address, int port) : UdpServer(address, port)
-{
-    protected override void OnError(SocketError error)
-    {
-        Debug.WriteLine($"Multicast UDP server caught an error with code {error}");
-    }
-}
 
 class MulticastClient(string address, int port, IUdpClientProvider socketProvider) : UdpClient(address, port)
 {

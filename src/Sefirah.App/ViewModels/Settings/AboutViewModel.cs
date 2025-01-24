@@ -34,31 +34,31 @@ public partial class AboutViewModel : ObservableObject
     [RelayCommand]
     private async Task OpenGitHubRepo()
     {
-        await Launcher.LaunchUriAsync(new Uri("https://github.com/yourusername/sefirah"));
+        await Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.GitHubRepoUrl)).AsTask();
     }
 
     [RelayCommand]
     private async Task OpenFeatureRequest()
     {
-        await Launcher.LaunchUriAsync(new Uri("https://github.com/yourusername/sefirah/issues/new?template=feature_request.md"));
+        await Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.FeatureRequestUrl)).AsTask();
     }
 
     [RelayCommand]
     private async Task OpenBugReport()
     {
-        await Launcher.LaunchUriAsync(new Uri("https://github.com/yourusername/sefirah/issues/new?template=bug_report.md"));
+        await Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.BugReportUrl)).AsTask();
     }
 
     [RelayCommand]
     private async Task OpenLibraryLink(string url)
     {
-        await Launcher.LaunchUriAsync(new Uri(url));
+        await Launcher.LaunchUriAsync(new Uri(url)).AsTask();
     }
 
     [RelayCommand]
     private async Task OpenDonate()
     {
-        await Launcher.LaunchUriAsync(new Uri("https://github.com/sponsors/shrimqy"));
+        await Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.DonateUrl)).AsTask();
     }
 
     [RelayCommand]
@@ -70,13 +70,13 @@ public partial class AboutViewModel : ObservableObject
     [RelayCommand]
     private async Task OpenPrivacyPolicy()
     {
-        await Launcher.LaunchUriAsync(new Uri("https://yourusername.github.io/sefirah/privacy"));
+        await Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.PrivacyPolicyUrl)).AsTask();
     }
 
     [RelayCommand]
     private async Task OpenLicense()
     {
-        await Launcher.LaunchUriAsync(new Uri("https://github.com/yourusername/sefirah/blob/main/LICENSE"));
+        await Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.LicenseUrl)).AsTask();
     }
 
     public ObservableCollection<OpenSourceLibraryItem> ThirdPartyLibraries { get; } =
@@ -98,7 +98,7 @@ public partial class AboutViewModel : ObservableObject
         
         // Networking & Server
         new("https://github.com/chronoxor/NetCoreServer", "NetCoreServer"),
-        new("https://github.com/MeaMod/dns", "MeaMod.DNS"),
+        new("https://github.com/meamod/MeaMod.DNS", "MeaMod.DNS"),
         new("https://github.com/PrimalZed/CloudSync", "CloudSync"),
         
         // Logging

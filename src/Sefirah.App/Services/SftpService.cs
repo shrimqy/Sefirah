@@ -3,7 +3,6 @@ using Sefirah.App.Data.Models;
 using Sefirah.App.RemoteStorage.Commands;
 using Sefirah.App.RemoteStorage.RemoteSftp;
 using Sefirah.App.RemoteStorage.Worker;
-using System.IO;
 using Windows.Storage;
 
 namespace Sefirah.App.Services;
@@ -20,7 +19,7 @@ public class SftpService(
     {
         try
         {
-            logger.Info("Initializing SFTP service, iP: {0}, POrt: {1}, PASS: {2}, Username: {3}", info.IpAddress, info.Port, info.Password, info.Username);
+            logger.Info("Initializing SFTP service, iP: {0}, Port: {1}, PASS: {2}, Username: {3}", info.IpAddress, info.Port, info.Password, info.Username);
             var sftpContext = new SftpContext
             {
                 Host = info.IpAddress,
@@ -59,7 +58,6 @@ public class SftpService(
                 PopulationPolicy = PopulationPolicy.Full,
             };
 
-            // Create directory using Windows Storage API
             StorageFolder parentFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(registerCommand.Directory));
             StorageFolder storageFolder;
             try

@@ -36,7 +36,7 @@
             <!--  Clipboard Settings  -->
             <local:SettingsBlockControl
                 Title="Clipboard Sync"
-                Description="Sync your clipboard across devices when enabled."
+                Description="Sync your clipboard across devices"
                 IsExpanded="{x:Bind ViewModel.IsClipboardExpanded, Mode=TwoWay}">
                 <local:SettingsBlockControl.Icon>
                     <FontIcon Glyph="&#xF0E3;" />
@@ -44,10 +44,10 @@
                 <ToggleSwitch Margin="-7,-3,-75,-3" IsOn="{x:Bind ViewModel.ClipboardSyncEnabled, Mode=TwoWay}" />
                 <local:SettingsBlockControl.ExpandableContent>
                     <StackPanel Spacing="12">
-                        <CheckBox Content="Copy Received Files to Clipboard" IsChecked="{x:Bind ViewModel.ClipboardFilesEnabled, Mode=TwoWay}" />
+                        <CheckBox Content="Add received files to clipboard" IsChecked="{x:Bind ViewModel.ClipboardFilesEnabled, Mode=TwoWay}" />
                         <CheckBox Content="Include images to remote clipboard" IsChecked="{x:Bind ViewModel.ImageToClipboardEnabled, Mode=TwoWay}" />
                         <CheckBox Content="Show clipboard toasts" IsChecked="{x:Bind ViewModel.ShowClipboardToast, Mode=TwoWay}" />
-                        <CheckBox Content="Open Links in Browser" IsChecked="{x:Bind ViewModel.OpenLinksInBrowser, Mode=TwoWay}" />
+                        <CheckBox Content="Open links in browser" IsChecked="{x:Bind ViewModel.OpenLinksInBrowser, Mode=TwoWay}" />
                     </StackPanel>
                 </local:SettingsBlockControl.ExpandableContent>
             </local:SettingsBlockControl>
@@ -56,7 +56,7 @@
             <local:SettingsBlockControl
                 Title="Notifications"
                 ContentPadding="0"
-                Description="Show notifications on your PC"
+                Description="Receive notifications from remote device"
                 IsExpanded="{x:Bind ViewModel.IsNotificationExpanded, Mode=TwoWay}">
                 <local:SettingsBlockControl.Icon>
                     <FontIcon Glyph="&#xF0E3;" />
@@ -80,7 +80,6 @@
                                 FontWeight="SemiBold"
                                 Text="General Settings" />
                             <CheckBox Content="Show notification toasts" IsChecked="{x:Bind ViewModel.ShowNotificationToast, Mode=TwoWay}" />
-                            <CheckBox Content="Show badge on taskbar" IsChecked="{x:Bind ViewModel.ShowBadge, Mode=TwoWay}" />
                             <CheckBox Content="Ignore notifications if relevant app is active in windows" IsChecked="{x:Bind ViewModel.IgnoreWindowsApps, Mode=TwoWay}" />
                         </StackPanel>
 

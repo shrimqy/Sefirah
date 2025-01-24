@@ -22,11 +22,12 @@ public static class Constants
     public static class ExternalUrl
     {
         public const string GitHubRepoUrl = @"https://github.com/shrimqy/Sefirah";
-        public const string DocumentationUrl = @"https://files.community/docs";
         public const string DiscordUrl = @"https://discord.gg/MuvMqv4MES";
-        public const string FeatureRequestUrl = @"https://github.com/files-community/Files/issues/new?labels=feature+request&template=feature_request.yml";
-        public const string BugReportUrl = @"https://github.com/files-community/Files/issues/new?labels=bug&template=bug_report.yml";
-        public const string PrivacyPolicyUrl = @"https://files.community/privacy";
+        public const string FeatureRequestUrl = @"https://github.com/shrimqy/Sefirah/issues/new?template=request_feature.yml";
+        public const string BugReportUrl = @"https://github.com/shrimqy/Sefirah/issues/new?template=report_issue.yml";
+        public const string PrivacyPolicyUrl = @"https://github.com/shrimqy/Sefirah/blob/master/.github/Privacy.md";
+        public const string LicenseUrl = @"https://github.com/shrimqy/Sefirah/blob/master/LICENSE";
+        public const string DonateUrl = @"https://github.com/sponsors/shrimqy";
     }
 
     public static class UserEnvironmentPaths

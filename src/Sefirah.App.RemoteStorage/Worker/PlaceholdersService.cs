@@ -181,17 +181,14 @@ public class PlaceholdersService(
 
         if (!CloudFilter.IsPlaceholder(clientDirectory))
         {
-            logger.Debug("Convert Directory to Placeholder");
             CloudFilter.ConvertToPlaceholder(clientDirectory);
         }
         else if (remoteDirectoryInfo.GetHashCode() == _directoryComparer.GetHashCode(clientDirectoryInfo))
         {
-            logger.Debug("UpdateDirectory - equal, ignoring {relativeDirectory}", relativeDirectory);
             CloudFilter.SetInSyncState(clientDirectory);
             return Task.CompletedTask;
         }
 
-        logger.Debug("Set Directory In-Sync");
         CloudFilter.SetInSyncState(clientDirectory);
         return Task.CompletedTask;
     }

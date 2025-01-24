@@ -54,7 +54,7 @@ public sealed class RemoteWatcher(
     private async Task HandleChanged(string relativePath)
     {
         relativePath = PathMapper.NormalizePath(relativePath);
-        logger.Debug("Changed {path}", relativePath);
+
         await taskWriter.WriteAsync(async () =>
         {
             using var locker = await fileLocker.Lock(relativePath);
@@ -95,7 +95,7 @@ public sealed class RemoteWatcher(
         await Task.Delay(1000);
         oldRelativePath = PathMapper.NormalizePath(oldRelativePath);
         newRelativePath = PathMapper.NormalizePath(newRelativePath);
-        logger.Debug("Changed {oldPath} -> {path}", oldRelativePath, newRelativePath);
+
         await taskWriter.WriteAsync(async () =>
         {
             using var oldLocker = await fileLocker.Lock(oldRelativePath);

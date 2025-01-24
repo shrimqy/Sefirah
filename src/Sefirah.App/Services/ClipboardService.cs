@@ -2,7 +2,6 @@
 using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Models;
 using Sefirah.App.Utils.Serialization;
-using System.IO;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Graphics.Imaging;
 using Windows.Storage;

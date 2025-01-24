@@ -6,7 +6,6 @@ using Sefirah.App.Data.Models;
 using Sefirah.App.Services.Socket;
 using Sefirah.App.Utils;
 using Sefirah.App.Utils.Serialization;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Authentication;
@@ -288,7 +287,6 @@ public class FileTransferService(
                 await sendTransferCompletionSource.Task;
             }
 
-            // Cleanup server if it exists
             if (server != null)
             {
                 server.Stop();
@@ -296,14 +294,12 @@ public class FileTransferService(
                 server = null;
             }
 
-            // Cleanup session
             if (session != null)
             {
                 session.Disconnect();
                 session = null;
             }
 
-            // Reset completion source
             sendTransferCompletionSource = null;
             connectionSource = null;
 
@@ -385,7 +381,7 @@ public class FileTransferService(
                 connectionSource = new TaskCompletionSource<ServerSession>();
                 // Wait for OnConnected event to trigger
                 session = await connectionSource.Task;
-                await Task.Delay(500);
+                await Task.Delay(500); // Wait a bit for android to open read channel 
             }
             
             const int ChunkSize = 81920 * 2;
