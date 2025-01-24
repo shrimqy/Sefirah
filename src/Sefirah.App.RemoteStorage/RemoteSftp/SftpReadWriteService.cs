@@ -14,6 +14,7 @@ public class SftpReadWriteService(
 #pragma warning restore CS9107
     public async Task CreateFile(FileInfo sourceFileInfo, string relativeFile)
     {
+
         var serverFile = GetSftpPath(relativeFile);
 
         if (Exists(serverFile))
@@ -47,7 +48,6 @@ public class SftpReadWriteService(
         var sftpFile = client.Get(serverFile);
         if (sourceFileInfo.LastWriteTimeUtc < sftpFile.LastWriteTimeUtc)
         {
-            logger.Debug("Update File - Server more recent or equal {relativeFile}", relativeFile);
             return;
         }
 

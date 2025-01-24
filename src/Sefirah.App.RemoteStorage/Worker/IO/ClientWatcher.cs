@@ -6,6 +6,8 @@ using Sefirah.App.RemoteStorage.Helpers;
 using Sefirah.App.RemoteStorage.Interop;
 using static Vanara.PInvoke.CldApi;
 using System.ComponentModel;
+using Vanara.PInvoke;
+using Sefirah.App.RemoteStorage.Interop.Extensions;
 
 namespace Sefirah.App.RemoteStorage.Worker.IO;
 public class ClientWatcher : IDisposable
@@ -51,76 +53,125 @@ public class ClientWatcher : IDisposable
         };
 
         watcher.Changed += async (object sender, FileSystemEventArgs e) => {
-            if (e.ChangeType != WatcherChangeTypes.Changed || 
-                !Path.Exists(e.FullPath) || 
-                FileHelper.IsSystemFile(e.FullPath))
+            try 
             {
-                return;
-            }
-
-            var fileInfo = new FileInfo(e.FullPath);
-            var state = CloudFilter.GetPlaceholderState(e.FullPath);
-
-            // More specific conditions for when to skip the change event
-            if (state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC) ||
-                state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER) ||  // Skip if it's just becoming a placeholder
-                fileInfo.Attributes.HasFlag(FileAttributes.ReparsePoint) ||  // Skip reparse point changes
-                fileInfo.LastWriteTime == fileInfo.LastAccessTime ||  // Skip metadata changes
-                e.ChangeType == WatcherChangeTypes.Changed && 
-                (state == CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_NO_STATES || 
-                 state == (CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER | CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC)))
-            {
-                return;
-            }
-
-            await _taskWriter.WriteAsync(async () => {
-                var relativePath = PathMapper.GetRelativePath(e.FullPath, _rootDirectory);
-                using var locker = await _fileLocker.Lock(relativePath);
-
-                if (fileInfo.Attributes.HasAllSyncFlags(SyncAttributes.PINNED | (int)FileAttributes.Offline))
+                if (e.ChangeType != WatcherChangeTypes.Changed || 
+                    !Path.Exists(e.FullPath) || 
+                    FileHelper.IsSystemFile(e.FullPath))
                 {
-                    if (fileInfo.Attributes.HasFlag(FileAttributes.Directory))
+                    return;
+                }
+
+                var fileInfo = new FileInfo(e.FullPath);
+                
+                CldApi.CF_PLACEHOLDER_STATE state;
+                try 
+                {
+                    state = CloudFilter.GetPlaceholderState(e.FullPath);
+                }
+                catch (HFileException)
+                {
+                    // File handle is invalid, likely due to disconnection
+                    _logger.LogWarning("Unable to get placeholder state for {path} - connection may be lost", e.FullPath);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error getting placeholder state for {path}", e.FullPath);
+                    return;
+                }
+
+                // More specific conditions for when to skip the change event
+                if (state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC) ||
+                    state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER) ||
+                    fileInfo.Attributes.HasFlag(FileAttributes.ReparsePoint) ||
+                    fileInfo.LastWriteTime == fileInfo.LastAccessTime ||
+                    e.ChangeType == WatcherChangeTypes.Changed && 
+                    (state == CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_NO_STATES || 
+                     state == (CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER | CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC)))
+                {
+                    return;
+                }
+
+                await _taskWriter.WriteAsync(async () => {
+                    var relativePath = PathMapper.GetRelativePath(e.FullPath, _rootDirectory);
+                    using var locker = await _fileLocker.Lock(relativePath);
+
+                    if (fileInfo.Attributes.HasAllSyncFlags(SyncAttributes.PINNED | (int)FileAttributes.Offline))
                     {
-                        _placeholdersService.CreateBulk(relativePath);
-                        var childItems = Directory.EnumerateFiles(e.FullPath, "*", SearchOption.AllDirectories)
-                            .Where((x) => !FileHelper.IsSystemFile(x))
-                            .ToArray();
-                        foreach (var childItem in childItems)
+                        if (fileInfo.Attributes.HasFlag(FileAttributes.Directory))
                         {
                             try
                             {
-                                CloudFilter.HydratePlaceholder(childItem);
+                                _placeholdersService.CreateBulk(relativePath);
+                                var childItems = Directory.EnumerateFiles(e.FullPath, "*", SearchOption.AllDirectories)
+                                    .Where((x) => !FileHelper.IsSystemFile(x))
+                                    .ToArray();
+                                foreach (var childItem in childItems)
+                                {
+                                    try
+                                    {
+                                        CloudFilter.HydratePlaceholder(childItem);
+                                    }
+                                    catch (HFileException)
+                                    {
+                                        _logger.LogWarning("Unable to hydrate placeholder for {path} - connection may be lost", childItem);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _logger.LogError(ex, "Hydrate file failed: {filePath}", childItem);
+                                    }
+                                }
                             }
                             catch (Exception ex)
                             {
-                                _logger.LogError(ex, "Hydate file failed: {filePath}", childItem);
+                                _logger.LogError(ex, "Error processing directory {path}", e.FullPath);
+                            }
+                        }
+                        else
+                        {
+                            try
+                            {
+                                CloudFilter.HydratePlaceholder(e.FullPath);
+                            }
+                            catch (HFileException)
+                            {
+                                _logger.LogWarning("Unable to hydrate placeholder for {path} - connection may be lost", e.FullPath);
                             }
                         }
                     }
+                    else if (
+                        fileInfo.Attributes.HasAnySyncFlag(SyncAttributes.UNPINNED)
+                        && !fileInfo.Attributes.HasFlag(FileAttributes.Offline)
+                        && !fileInfo.Attributes.HasFlag(FileAttributes.Directory)
+                    )
+                    {
+                        try
+                        {
+                            CloudFilter.DehydratePlaceholder(e.FullPath, relativePath, fileInfo.Length);
+                        }
+                        catch (HFileException)
+                        {
+                            _logger.LogWarning("Unable to dehydrate placeholder for {path} - connection may be lost", e.FullPath);
+                        }
+                    }
+
+                    if (fileInfo.Attributes.HasFlag(FileAttributes.Directory))
+                    {
+                        //var directoryInfo = new DirectoryInfo(e.FullPath);
+                        //await _serverService.UpdateDirectory(directoryInfo, relativePath);
+                    }
                     else
                     {
-                        CloudFilter.HydratePlaceholder(e.FullPath);
+                        await _remoteService.UpdateFile(fileInfo, relativePath);
                     }
-                }
-                else if (
-                    fileInfo.Attributes.HasAnySyncFlag(SyncAttributes.UNPINNED)
-                    && !fileInfo.Attributes.HasFlag(FileAttributes.Offline)
-                    && !fileInfo.Attributes.HasFlag(FileAttributes.Directory)
-                )
-                {
-                    CloudFilter.DehydratePlaceholder(e.FullPath, relativePath, fileInfo.Length);
-                }
-
-                if (fileInfo.Attributes.HasFlag(FileAttributes.Directory))
-                {
-                    //var directoryInfo = new DirectoryInfo(e.FullPath);
-                    //await _serverService.UpdateDirectory(directoryInfo, relativePath);
-                }
-                else
-                {
-                    await _remoteService.UpdateFile(fileInfo, relativePath);
-                }
-            });
+                    
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unhandled error in file system watcher for {path}", e.FullPath);
+            }
         };
 
         watcher.Created += async (object sender, FileSystemEventArgs e) => {

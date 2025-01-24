@@ -34,119 +34,185 @@ public sealed class SftpWatcher(
         }
         _running = true;
 
-        using var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
-        while (!linkedTokenSource.Token.IsCancellationRequested)
+        try
         {
-            try
+            using var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, _cancellationTokenSource.Token);
+            while (!linkedTokenSource.Token.IsCancellationRequested)
             {
-                if (!client.IsConnected)
-                {
-                    await TryReconnectAsync(linkedTokenSource.Token);
-                    continue;
-                }
-
-                var foundFiles = IsHydrated(_context.Directory)
-                                ? FindFiles(_context.Directory)
-                                : [];
-
-                var removedFiles = _knownFiles.Keys.Except(foundFiles.Keys).ToArray();
-                foreach (var removedFile in removedFiles)
-                {
-                    Deleted?.Invoke(removedFile);
-                }
-
-                var addedFiles = foundFiles.Keys.Except(_knownFiles.Keys).ToArray();
-                foreach (var addedFile in addedFiles)
-                {
-                    Created?.Invoke(addedFile);
-                }
-
-                var updatedFiles = foundFiles
-                    .Where((pair) => _knownFiles.ContainsKey(pair.Key) && _knownFiles[pair.Key] < pair.Value)
-                    .Select(pair => pair.Key)
-                    .ToArray();
-                foreach (var updatedFile in updatedFiles)
-                {
-                    Changed?.Invoke(updatedFile);
-                }
-
-                _knownFiles = foundFiles;
-
                 try
                 {
-                    // Wait until next scan
-                    await Task.Delay(_context.WatchPeriodSeconds * 1000, linkedTokenSource.Token);
+                    if (!client.IsConnected)
+                    {
+                        await TryReconnectAsync(linkedTokenSource.Token);
+                        if (!client.IsConnected)
+                        {
+                            await Task.Delay(TimeSpan.FromSeconds(5), linkedTokenSource.Token);
+                            continue;
+                        }
+                    }
+
+                    var foundFiles = IsHydrated(_context.Directory)
+                                    ? FindFiles(_context.Directory)
+                                    : [];
+
+                    if (client.IsConnected)
+                    {
+                        var removedFiles = _knownFiles.Keys.Except(foundFiles.Keys).ToArray();
+                        foreach (var removedFile in removedFiles)
+                        {
+                            Deleted?.Invoke(removedFile);
+                        }
+
+                        var addedFiles = foundFiles.Keys.Except(_knownFiles.Keys).ToArray();
+                        foreach (var addedFile in addedFiles)
+                        {
+                            Created?.Invoke(addedFile);
+                        }
+
+                        var updatedFiles = foundFiles
+                            .Where((pair) => _knownFiles.ContainsKey(pair.Key) && _knownFiles[pair.Key] < pair.Value)
+                            .Select(pair => pair.Key)
+                            .ToArray();
+                        foreach (var updatedFile in updatedFiles)
+                        {
+                            Changed?.Invoke(updatedFile);
+                        }
+
+                        _knownFiles = foundFiles;
+                    }
+
+                    try
+                    {
+                        await Task.Delay(_context.WatchPeriodSeconds * 1000, linkedTokenSource.Token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        break;
+                    }
                 }
-                catch (TaskCanceledException) { }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
+                catch (SshConnectionException ex)
+                {
+                    logger.Error("SSH connection error", ex);
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Unexpected error in SFTP watcher", ex);
+                    break;
+                }
             }
-            catch (SshConnectionException ex)
-            {
-                logger.Error("SSH connection error", ex);
-                await TryReconnectAsync(linkedTokenSource.Token);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Unexpected error in SFTP watcher", ex);
-                await Task.Delay(TimeSpan.FromSeconds(5), linkedTokenSource.Token);
-            }
+        }
+        finally
+        {
+            _running = false;
         }
     }
 
     private Dictionary<string, DateTime> FindFiles(string directory)
     {
-        if (!client.IsConnected)
+        if (!client?.IsConnected ?? true)
         {
-            return [];  
+            logger.Warn("SFTP client is not connected during FindFiles");
+            return _knownFiles;
         }
+
         try
         {
-            var sftpFiles = client.ListDirectory(directory);
+            var sftpFiles = client?.ListDirectory(directory);
+            if (sftpFiles == null)
+            {
+                logger.Warn("ListDirectory returned null for {directory}", directory);
+                return _knownFiles;  // Return existing known files instead of empty dictionary
+            }
 
-            // Get all hydrated subdirectories and recursively get their files
-            var subFiles = sftpFiles
+            // Get all directories first (including non-hydrated ones)
+            var directories = sftpFiles
                 .Where(sftpFile => sftpFile.IsDirectory && !_relativeDirectoryNames.Contains(sftpFile.Name))
-                .Where(sftpFile => IsHydrated(sftpFile.FullName))
-                .SelectMany(sftpFile => FindFiles(sftpFile.FullName))
-                .ToArray();
-
-            // Get current directory's files and hydrated directories
-            var files = sftpFiles
-                .Where(sftpFile => sftpFile.IsRegularFile || 
-                                (sftpFile.IsDirectory && 
-                                !_relativeDirectoryNames.Contains(sftpFile.Name) && 
-                                IsHydrated(sftpFile.FullName)))
                 .ToDictionary(
-                    sftpFile => sftpFile.FullName,
-                    sftpFile => sftpFile.IsDirectory ? DateTime.MaxValue : sftpFile.LastWriteTimeUtc
+                    dir => dir.FullName,
+                    _ => DateTime.MaxValue
                 );
 
-            return subFiles.Concat(files).ToDictionary();
+            // Get files from current directory
+            var files = sftpFiles
+                .Where(sftpFile => sftpFile.IsRegularFile)
+                .ToDictionary(
+                    file => file.FullName,
+                    file => file.LastWriteTimeUtc
+                );
+
+            // Recursively get files from hydrated subdirectories
+            var subFiles = directories.Keys
+                .Where(IsHydrated)
+                .SelectMany(FindFiles)
+                .ToDictionary(
+                    pair => pair.Key,
+                    pair => pair.Value
+                );
+
+            return directories
+                .Concat(files)
+                .Concat(subFiles)
+                .ToDictionary();
         }
-        catch (SshConnectionException)
+        catch (SshConnectionException ex)
         {
-            return [];
+            logger.Error("SSH connection error in FindFiles", ex);
+            return _knownFiles;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Unexpected error in FindFiles", ex);
+            return _knownFiles;
         }
     }
 
     private async Task TryReconnectAsync(CancellationToken cancellationToken)
     {
-        try
-        {
-            client.Disconnect();
-        }
-        catch (Exception ex) 
-        { 
-            logger.Error("Error disconnecting SFTP client", ex);
-        }
+        cancellationToken.ThrowIfCancellationRequested();
 
         try
         {
-            client.Connect();
+            if (client?.IsConnected ?? false)
+            {
+                try
+                {
+                    client.Disconnect();
+                }
+                catch (Exception ex) 
+                { 
+                    logger.Error("Error disconnecting SFTP client", ex);
+                }
+            }
+
+            if (client != null)
+            {
+                try
+                {
+                    client.Connect();
+                    logger.Info("Successfully reconnected to SFTP server");
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Failed to connect SFTP client", ex);
+                    // Check cancellation before delay
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
+                }
+            }
+            else
+            {
+                logger.Error("SFTP client is null during reconnection attempt");
+            }
         }
         catch (Exception ex)
         {
-            logger.Error("Failed to connect SFTP client", ex);
-            await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
+            logger.Error("Unexpected error during reconnection", ex);
+            throw;
         }
     }
 
@@ -170,8 +236,34 @@ public sealed class SftpWatcher(
 
     public void Dispose()
     {
-        logger.Debug("Disposing SFTP watcher");
-        _cancellationTokenSource.Cancel();
-        _cancellationTokenSource.Dispose();
+        if (!_cancellationTokenSource.IsCancellationRequested)
+        {
+            try
+            {
+                logger.Debug("Disposing SFTP watcher");
+                _cancellationTokenSource.Cancel();
+                
+                // Safely disconnect the client
+                try
+                {
+                    if (client?.IsConnected ?? false)
+                    {
+                        client.Disconnect();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Error disconnecting client during disposal", ex);
+                }
+            }
+            catch (ObjectDisposedException)
+            {
+                // Ignore if already disposed
+            }
+            finally
+            {
+                _cancellationTokenSource.Dispose();
+            }
+        }
     }
 }
