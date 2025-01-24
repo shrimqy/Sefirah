@@ -277,11 +277,6 @@
                                                                         </MenuFlyoutItem.Icon>
                                                                     </MenuFlyoutItem>
                                                                     <MenuFlyoutItem Icon="Pin" Text="Pin" />
-                                                                    <MenuFlyoutItem Text="Open in App">
-                                                                        <MenuFlyoutItem.Icon>
-                                                                            <FontIcon Glyph="&#xED35;" />
-                                                                        </MenuFlyoutItem.Icon>
-                                                                    </MenuFlyoutItem>
                                                                 </MenuFlyout>
                                                             </Button.Flyout>
                                                         </Button>
