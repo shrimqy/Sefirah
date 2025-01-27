@@ -165,33 +165,13 @@ public sealed class MainPageViewModel : BaseViewModel
     private void HandleNotificationAction(NotificationAction? action)
     {
         if (action == null) return;
+        NotificationService.ProcessClickAction(action.NotificationKey, action.ActionIndex);
 
-        var notificationAction = new NotificationAction
-        {
-            Label = action.Label,
-            NotificationKey = action.NotificationKey,
-            ActionIndex = action.ActionIndex,
-            IsReplyAction = action.IsReplyAction
-        };
-
-        SessionManager.SendMessage(SocketMessageSerializer.Serialize(notificationAction));
     }
 
     private void HandleNotificationReply((NotificationMessage message, string replyText) reply)
     {
         var (message, replyText) = reply;
-
-        if (!string.IsNullOrWhiteSpace(replyText) && !string.IsNullOrWhiteSpace(message.ReplyResultKey))
-        {
-            var replyAction = new ReplyAction
-            {
-                NotificationKey = message.NotificationKey,
-                ReplyResultKey = message.ReplyResultKey,
-                ReplyText = replyText,
-            };
-
-            SessionManager.SendMessage(SocketMessageSerializer.Serialize(replyAction));
-        }
+        NotificationService.ProcessReplyAction(message.NotificationKey, message.ReplyResultKey!, replyText);
     }
-
 }

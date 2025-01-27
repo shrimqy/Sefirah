@@ -248,4 +248,28 @@ public class NotificationService(
             }
         });
     }
+
+    public void ProcessReplyAction(string notificationKey, string ReplyResultKey, string replyText)
+    {
+        var replyAction = new ReplyAction
+        {
+            NotificationKey = notificationKey,
+            ReplyResultKey = ReplyResultKey,
+            ReplyText = replyText,
+        };
+
+        sessionManager.SendMessage(SocketMessageSerializer.Serialize(replyAction));
+    }
+
+    public void ProcessClickAction(string notificationKey, int actionIndex)
+    {
+        var notificationAction = new NotificationAction
+        {
+            NotificationKey = notificationKey,
+            ActionIndex = actionIndex,
+            IsReplyAction = false
+        };
+
+        sessionManager.SendMessage(SocketMessageSerializer.Serialize(notificationAction));
+    }
 }

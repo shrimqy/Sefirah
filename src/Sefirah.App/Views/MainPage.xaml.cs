@@ -170,15 +170,10 @@ public sealed partial class MainPage : Page
     {
         var textBox = sender as TextBox;
 
-        if (textBox != null && e.Key == Windows.System.VirtualKey.Enter)
+        if (textBox != null && e.Key == Windows.System.VirtualKey.Enter && textBox?.Tag is NotificationMessage message)
         {
-            // Clear the textbox after sending
+            ViewModel.NotificationReplyCommand.Execute((message, textBox.Text));
             textBox.Text = string.Empty;
-            if (textBox?.Tag is NotificationMessage message)
-            {
-                ViewModel.NotificationReplyCommand.Execute((message, textBox.Text));
-                textBox.Text = string.Empty;
-            }
         }
     }
 

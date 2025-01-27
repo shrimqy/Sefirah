@@ -24,6 +24,21 @@ public interface INotificationService
     Task RemoveNotification(string notificationKey, bool isRemote);
 
     /// <summary>
+    /// Processes a reply action.
+    /// </summary>
+    /// <param name="notificationKey">The key of the notification.</param>
+    /// <param name="replyResultKey">The key of the reply result.</param>
+    /// <param name="replyText">The text of the reply.</param>
+    void ProcessReplyAction(string notificationKey, string replyResultKey, string replyText);
+
+    /// <summary>
+    /// Processes a click action.
+    /// </summary>
+    /// <param name="notificationKey">The key of the notification.</param>
+    /// <param name="actionIndex">The index of the action.</param>
+    void ProcessClickAction(string notificationKey, int actionIndex);
+
+    /// <summary>
     /// Clears all notifications.
     /// </summary>
     Task ClearAllNotification();
