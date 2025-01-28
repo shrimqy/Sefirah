@@ -190,7 +190,7 @@ public class NotificationAction : SocketMessage
     public required string NotificationKey { get; set; }
 
     [JsonPropertyName("label")]
-    public required string Label { get; set; }
+    public string? Label { get; set; } = string.Empty;
 
     [JsonPropertyName("actionIndex")]
     public required int ActionIndex { get; set; }
@@ -225,8 +225,11 @@ public class DeviceInfo : SocketMessage
     [JsonPropertyName("avatar")]
     public string? Avatar { get; set; }
 
-    [JsonPropertyName("hashedSecret")]
-    public string? HashedSecret { get; set; }
+    [JsonPropertyName("nonce")]
+    public string? Nonce { get; set; }
+
+    [JsonPropertyName("proof")]
+    public string? Proof { get; set; }
 
     [JsonPropertyName("publicKey")]
     public string PublicKey { get; set; }

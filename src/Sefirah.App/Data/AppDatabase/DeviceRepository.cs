@@ -1,6 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
 using Sefirah.App.Data.AppDatabase.Models;
-using Sefirah.App.Utils;
 
 namespace Sefirah.App.Data.AppDatabase;
 public class DeviceRepository(DatabaseContext context, ILogger logger)
@@ -11,7 +10,7 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
         {
             var conn = await context.GetConnectionAsync();
             var command = new SqliteCommand(
-                "SELECT DeviceId, DeviceName, HashedKey, LastConnected, WallpaperBytes FROM RemoteDevice",
+                "SELECT DeviceId, DeviceName, LastConnected, WallpaperBytes FROM RemoteDevice",
                 conn);
 
             using var reader = await command.ExecuteReaderAsync();
@@ -23,9 +22,8 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
                 {
                     DeviceId = reader.GetString(0),
                     Name = reader.GetString(1),
-                    HashedKey = (byte[])reader[2],
-                    LastConnected = reader.IsDBNull(3) ? null : reader.GetDateTime(3),
-                    WallpaperBytes = reader.IsDBNull(4) ? null : (byte[])reader[4]
+                    LastConnected = reader.IsDBNull(2) ? null : reader.GetDateTime(2),
+                    WallpaperBytes = reader.IsDBNull(3) ? null : (byte[])reader[3]
                 });
             }
 
@@ -44,7 +42,7 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
         {
             var conn = await context.GetConnectionAsync();
             var command = new SqliteCommand(
-                "SELECT DeviceId, DeviceName, HashedKey, LastConnected, WallpaperBytes " +
+                "SELECT DeviceId, DeviceName, LastConnected, WallpaperBytes " +
                 "FROM RemoteDevice WHERE DeviceId = @DeviceId",
                 conn);
 
@@ -57,9 +55,8 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
                 {
                     DeviceId = reader.GetString(0),
                     Name = reader.GetString(1),
-                    HashedKey = (byte[])reader[2],
-                    LastConnected = reader.IsDBNull(3) ? null : reader.GetDateTime(3),
-                    WallpaperBytes = reader.IsDBNull(4) ? null : (byte[])reader[4]
+                    LastConnected = reader.IsDBNull(2) ? null : reader.GetDateTime(2),
+                    WallpaperBytes = reader.IsDBNull(3) ? null : (byte[])reader[3]
                 };
             }
 
@@ -79,13 +76,12 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
             var conn = await context.GetConnectionAsync();
             var command = new SqliteCommand(
                 "INSERT OR REPLACE INTO RemoteDevice " +
-                "(DeviceId, DeviceName, HashedKey, LastConnected, WallpaperBytes) " +
-                "VALUES (@DeviceId, @DeviceName, @HashedKey, @LastConnected, @WallpaperBytes)",
+                "(DeviceId, DeviceName, LastConnected, WallpaperBytes) " +
+                "VALUES (@DeviceId, @DeviceName, @LastConnected, @WallpaperBytes)",
                 conn);
 
             command.Parameters.AddWithValue("@DeviceId", device.DeviceId);
             command.Parameters.AddWithValue("@DeviceName", device.Name);
-            command.Parameters.AddWithValue("@HashedKey", device.HashedKey);
             command.Parameters.AddWithValue("@LastConnected", device.LastConnected as object ?? DBNull.Value);
             command.Parameters.AddWithValue("@WallpaperBytes", device.WallpaperBytes as object ?? DBNull.Value);
 
@@ -124,7 +120,7 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
         {
             var conn = await context.GetConnectionAsync();
             var command = new SqliteCommand(
-                "SELECT DeviceId, DeviceName, HashedKey, LastConnected, WallpaperBytes " +
+                "SELECT DeviceId, DeviceName, LastConnected, WallpaperBytes " +
                 "FROM RemoteDevice ORDER BY LastConnected DESC LIMIT 1",
                 conn);
 
@@ -132,15 +128,14 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
             
             if (await reader.ReadAsync())
             {
-                var WallpaperBytes = reader.IsDBNull(4) ? null : (byte[])reader[4];
+                var WallpaperBytes = reader.IsDBNull(3) ? null : (byte[])reader[3];
                 var WallpaperImage = WallpaperBytes?.ToBitmap();
 
                 return new RemoteDeviceEntity
                 {
                     DeviceId = reader.GetString(0),
                     Name = reader.GetString(1),
-                    HashedKey = (byte[])reader[2],
-                    LastConnected = reader.IsDBNull(3) ? null : reader.GetDateTime(3),
+                    LastConnected = reader.IsDBNull(2) ? null : reader.GetDateTime(2),
                     WallpaperBytes = WallpaperBytes,
                     WallpaperImage = WallpaperImage
                 };

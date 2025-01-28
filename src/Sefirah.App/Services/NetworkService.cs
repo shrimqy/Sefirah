@@ -55,7 +55,7 @@ public class NetworkService(
             server = new Server(context, IPAddress.Any, port, this, logger)
             {
                 OptionDualMode = true,
-                OptionReuseAddress = true
+                OptionReuseAddress = true,
             };
 
             if (server != null)
@@ -64,8 +64,7 @@ public class NetworkService(
                 // Advertise the specific address clients should connect to
                 await discoveryService.StartDiscoveryAsync(port, certificate);
 
-                logger.Info($"Server bound to [::] (IPv6Any)");
-                logger.Info($"Clients should connect to {port}");
+                logger.Info($"Server start on port: {port}");
             }
 
             if (isRunning)
@@ -260,14 +259,32 @@ public class NetworkService(
                 return;
             }
 
-            var device = await deviceManager.VerifyDevice(deviceInfo);
+            // Verify authentication data
+            if (string.IsNullOrEmpty(deviceInfo.Nonce) || string.IsNullOrEmpty(deviceInfo.Proof))
+            {
+                logger.Warn("Missing authentication data");
+                DisconnectSession(true);
+                return;
+            }
+
+            var localDevice = await deviceManager.GetLocalDeviceAsync();
+            var sharedSecret = EcdhHelper.DeriveKey(deviceInfo.PublicKey!, localDevice.PrivateKey);
+
+            if (!EcdhHelper.VerifyProof(sharedSecret, deviceInfo.Nonce, deviceInfo.Proof))
+            {
+                logger.Warn("Authentication failed");
+                DisconnectSession(true);
+                return;
+            }
+
+            var device = await deviceManager.VerifyDevice(deviceInfo, sharedSecret);
 
             if (device != null)
             {
                 isFirstMessage = false;
                 isVerified = true;
                 currentSession = session;
-                await SendDeviceInfo();
+                await SendDeviceInfo(deviceInfo.PublicKey!);
                 NotifyClientConnectionChanged(device);
             }
             else
@@ -283,15 +300,24 @@ public class NetworkService(
         }
     }
 
-    private async Task SendDeviceInfo()
+    private async Task SendDeviceInfo(string remotePublicKey)
     {
         var (_, avatar) = await CurrentUserInformation.GetCurrentUserInfoAsync();
         var localDevice = await deviceManager.GetLocalDeviceAsync();
+        
+        // Generate our authentication proof
+        var sharedSecret = EcdhHelper.DeriveKey(remotePublicKey, localDevice.PrivateKey);
+        var nonce = EcdhHelper.GenerateNonce();
+        var proof = EcdhHelper.GenerateProof(sharedSecret, nonce);
+
         SendMessage(SocketMessageSerializer.Serialize(new DeviceInfo
         {
             DeviceId = localDevice.DeviceId,
             DeviceName = localDevice.DeviceName,
             Avatar = avatar,
+            PublicKey = Convert.ToBase64String(localDevice.PublicKey),
+            Nonce = nonce,
+            Proof = proof
         }));
     }
 

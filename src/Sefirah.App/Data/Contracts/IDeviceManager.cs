@@ -38,7 +38,7 @@ public interface IDeviceManager
     /// <summary>
     /// Returns the device if it get's successfully verified and added to the database.
     /// </summary>
-    Task<RemoteDeviceEntity?> VerifyDevice(DeviceInfo device);
+    Task<RemoteDeviceEntity?> VerifyDevice(DeviceInfo device, byte[] sharedSecret);
 
     /// <summary>
     /// Event that is raised when the device properties (battery..) changes.

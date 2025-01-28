@@ -35,7 +35,8 @@ public static class NetworkHelper
 
     public static List<string> GetAllValidAddresses()
     {
-        var addresses = new List<string>();
+        var ipv4Addresses = new List<string>();
+        var ipv6Addresses = new List<string>();
         
         foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
         {
@@ -50,7 +51,7 @@ public static class NetworkHelper
                     
                     if (ip.Address.AddressFamily == AddressFamily.InterNetwork)
                     {
-                        addresses.Add(ip.Address.ToString());
+                        ipv4Addresses.Add(ip.Address.ToString());
                     }
                     else if (ip.Address.AddressFamily == AddressFamily.InterNetworkV6)
                     {
@@ -58,12 +59,13 @@ public static class NetworkHelper
                             ? $"{ip.Address}%{ip.Address.ScopeId}"
                             : ip.Address.ToString();
                             
-                        addresses.Add(ipString);
+                        ipv6Addresses.Add(ipString);
                     }
                 }
             }
         }
         
-        return addresses;
+        
+        return ipv4Addresses.Concat(ipv6Addresses).ToList();
     }
 }

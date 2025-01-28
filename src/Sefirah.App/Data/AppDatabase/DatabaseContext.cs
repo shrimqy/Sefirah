@@ -30,7 +30,6 @@ public class DatabaseContext(ILogger logger) : IDisposable
                 CREATE TABLE IF NOT EXISTS RemoteDevice (
                     DeviceId NVARCHAR(128) PRIMARY KEY,
                     DeviceName NVARCHAR(2048) NOT NULL,
-                    HashedKey BLOB,
                     LastConnected DATETIME,
                     WallpaperBytes BLOB
                 );

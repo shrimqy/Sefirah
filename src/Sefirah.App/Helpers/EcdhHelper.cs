@@ -57,4 +57,31 @@ public class EcdhHelper
         }
         return derivedHashedSecret.SequenceEqual(expectedHashedSecret);
     }
+
+    public static string GenerateNonce()
+    {
+        var nonce = new byte[32];
+        new SecureRandom().NextBytes(nonce);
+        return Convert.ToBase64String(nonce);
+    }
+
+    public static string GenerateProof(byte[] sharedSecret, string nonce)
+    {
+        var hmac = new Org.BouncyCastle.Crypto.Macs.HMac(new Sha256Digest());
+        hmac.Init(new KeyParameter(sharedSecret));
+        
+        var nonceBytes = Convert.FromBase64String(nonce);
+        hmac.BlockUpdate(nonceBytes, 0, nonceBytes.Length);
+        
+        var proof = new byte[hmac.GetMacSize()];
+        hmac.DoFinal(proof, 0);
+        
+        return Convert.ToBase64String(proof);
+    }
+
+    public static bool VerifyProof(byte[] sharedSecret, string nonce, string proof)
+    {
+        var expectedProof = GenerateProof(sharedSecret, nonce);
+        return expectedProof == proof;
+    }
 }

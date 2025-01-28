@@ -43,15 +43,15 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
         await repository.AddOrUpdateAsync(device);
     }
 
-    public async Task<RemoteDeviceEntity?> VerifyDevice(DeviceInfo device)
+    public async Task<RemoteDeviceEntity?> VerifyDevice(DeviceInfo device, byte[] sharedSecret)
     {
         try
         {
             var localDevice = await repository.GetLocalDevice() ?? throw new Exception("Local device not found");
             var existingDevice = await repository.GetByIdAsync(device.DeviceId);
-            var hashedKey = Convert.FromBase64String(device.HashedSecret!.Trim());
 
-            if (existingDevice != null && existingDevice.HashedKey?.SequenceEqual(hashedKey) == true)
+            // If device exists and we've already verified it before
+            if (existingDevice != null)
             {
                 existingDevice.LastConnected = DateTime.Now;
                 
@@ -63,53 +63,48 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
                 return await repository.AddOrUpdateAsync(existingDevice);
             }
 
-            if (EcdhHelper.VerifyDevice(device.PublicKey, localDevice.PrivateKey, hashedKey))
+            // For new devices, show connection request dialog
+            var tcs = new TaskCompletionSource<RemoteDeviceEntity?>();
+
+            await MainWindow.Instance.DispatcherQueue.EnqueueAsync(async () =>
             {
-                var tcs = new TaskCompletionSource<RemoteDeviceEntity?>();
-
-                await MainWindow.Instance.DispatcherQueue.EnqueueAsync(async () =>
+                try
                 {
-                    try
+                    var frame = (Frame)MainWindow.Instance.Content;
+                    var dialog = new ConnectionRequestDialog(device.DeviceName, sharedSecret, frame)
                     {
-                        var frame = (Frame)MainWindow.Instance.Content;
-                        var dialog = new ConnectionRequestDialog(device.DeviceName, hashedKey, frame)
-                        {
-                            XamlRoot = MainWindow.Instance.Content.XamlRoot
-                        };
+                        XamlRoot = MainWindow.Instance.Content.XamlRoot
+                    };
 
-                        var result = await dialog.ShowAsync();
-                        
-                        if (result != ContentDialogResult.Primary)
-                        {
-                            logger.Info("User declined device verification");
-                            tcs.SetResult(null);
-                            return;
-                        }
-
-                        var newDevice = new RemoteDeviceEntity
-                        {
-                            DeviceId = device.DeviceId,
-                            Name = device.DeviceName,
-                            HashedKey = hashedKey,
-                            LastConnected = DateTime.Now,
-                            WallpaperBytes = !string.IsNullOrEmpty(device.Avatar) 
-                                ? Convert.FromBase64String(device.Avatar) 
-                                : null
-                        };
-
-                        var savedDevice = await repository.AddOrUpdateAsync(newDevice);
-                        tcs.SetResult(savedDevice);
-                    }
-                    catch (Exception ex)
+                    var result = await dialog.ShowAsync();
+                    
+                    if (result != ContentDialogResult.Primary)
                     {
-                        tcs.SetException(ex);
+                        logger.Info("User declined device verification");
+                        tcs.SetResult(null);
+                        return;
                     }
-                });
 
-                return await tcs.Task;
-            }
+                    var newDevice = new RemoteDeviceEntity
+                    {
+                        DeviceId = device.DeviceId,
+                        Name = device.DeviceName,
+                        LastConnected = DateTime.Now,
+                        WallpaperBytes = !string.IsNullOrEmpty(device.Avatar) 
+                            ? Convert.FromBase64String(device.Avatar) 
+                            : null
+                    };
 
-            return null;
+                    var savedDevice = await repository.AddOrUpdateAsync(newDevice);
+                    tcs.SetResult(savedDevice);
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            });
+
+            return await tcs.Task;
         }
         catch (Exception ex)
         {
