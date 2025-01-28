@@ -7,6 +7,7 @@ using Sefirah.App.Services.Socket;
 using Sefirah.App.Utils;
 using Sefirah.App.Utils.Serialization;
 using System.Net;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Text;
@@ -79,7 +80,10 @@ public class FileTransferService(
             }
 
             ArgumentNullException.ThrowIfNull(data);
-            string fullPath = string.Empty;
+            
+            string fullPath = Path.Combine(storageLocation, data.FileMetadata.FileName);
+            
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
 
             receiveTransferCompletionSource = new TaskCompletionSource<bool>();
             var serverInfo = data.ServerInfo;
@@ -87,7 +91,7 @@ public class FileTransferService(
 
             // Open file stream
             currentFileStream = new FileStream(
-                storageLocation,
+                fullPath,
                 FileMode.Create,
                 FileAccess.Write,
                 FileShare.None,
@@ -98,7 +102,7 @@ public class FileTransferService(
             var context = new SslContext(
                 SslProtocols.Tls12,
                 certificate,
-                (sender, cert, chain, errors) => true
+                certificateValidationCallback: (sender, cert, chain, errors) => true
             );
 
             client = new Client(context, serverInfo.IpAddress, serverInfo.Port, this, logger);
@@ -112,7 +116,7 @@ public class FileTransferService(
             // Wait for transfer completion
             await receiveTransferCompletionSource.Task;
 
-            await ShowTransferNotification("File Received", $"{currentFileMetadata.FileName} has been saved successfully");
+            _ = ShowTransferNotification("File Received", $"{currentFileMetadata.FileName} has been saved successfully");
         }
         catch (Exception ex)
         {
@@ -131,16 +135,14 @@ public class FileTransferService(
     {
         logger.Info("Disconnected from file transfer server");
 
-        // Close file stream if still open
-        if (currentFileStream != null)
+        // Only cleanup if we have metadata and didn't complete the transfer
+        if (currentFileMetadata != null && 
+            currentFileStream != null && 
+            bytesReceived < currentFileMetadata.FileSize)
         {
-            currentFileStream.Close();
-            currentFileStream.Dispose();
-            currentFileStream = null;
-
             receiveTransferCompletionSource?.TrySetException(new IOException("Connection to server lost"));
+            CleanupTransfer(false);
         }
-        receiveTransferCompletionSource?.TrySetResult(true);
     }
 
     public void OnError(SocketError error)
@@ -154,19 +156,30 @@ public class FileTransferService(
     {
         try
         {
+            // Early exit if we don't have valid state
             if (currentFileStream == null || currentFileMetadata == null)
             {
-                throw new InvalidOperationException("File transfer not properly initialized");
+                return;
             }
 
             // Write received data to file
             currentFileStream.Write(buffer, (int)offset, (int)size);
             bytesReceived += size;
 
-            // Calculate progress
-            var progress = (double)bytesReceived / currentFileMetadata.FileSize * 100;
+            // Check if transfer is complete immediately after writing
+            if (bytesReceived >= currentFileMetadata.FileSize)
+            {
+                // Send acknowledgment to the server
+                var successBytes = Encoding.UTF8.GetBytes("Complete");
+                client?.SendAsync(successBytes);
 
-            // Update notification for every 1% change
+                // Perform cleanup with success flag
+                CleanupTransfer(true);
+                return; // Exit after handling completion
+            }
+
+            // Only proceed with progress update if not complete
+            var progress = (double)bytesReceived / currentFileMetadata.FileSize * 100;
             if (Math.Floor(progress) > Math.Floor((double)(bytesReceived - size) / currentFileMetadata.FileSize * 100))
             {
                 await ShowTransferNotification(
@@ -174,19 +187,6 @@ public class FileTransferService(
                     $"Receiving {currentFileMetadata.FileName}",
                     progress,
                     isReceiving: true);
-            }
-
-            // Check if transfer is complete
-            if (bytesReceived >= currentFileMetadata.FileSize)
-            {
-                logger.Info("File transfer completed successfully");
-                await ShowTransferNotification(
-                    "File Transfer Complete",
-                    $"Successfully received {currentFileMetadata.FileName}",
-                    null,
-                    isReceiving: true,
-                    silent: true);
-                CleanupTransfer(true);
             }
         }
         catch (Exception ex)
@@ -198,31 +198,41 @@ public class FileTransferService(
                 null,
                 isReceiving: true);
             CleanupTransfer(false);
-            receiveTransferCompletionSource?.TrySetException(ex);
+            if (receiveTransferCompletionSource?.Task.IsCompleted == false)
+            {
+                receiveTransferCompletionSource.TrySetException(ex);
+            }
         }
     }
 
-
-    // Receive cleanup
     private void CleanupTransfer(bool success = false)
     {
         try
         {
-            currentFileStream?.Close();
-            currentFileStream?.Dispose();
-            currentFileStream = null;
+            if (currentFileStream != null)
+            {
+                currentFileStream.Close();
+                currentFileStream.Dispose();
+                currentFileStream = null;
+            }
 
             client?.DisconnectAsync();
             client?.Dispose();
             client = null;
-            receiveTransferCompletionSource?.SetResult(true);
+
+            // Only try to complete the task if it hasn't been completed yet
+            if (receiveTransferCompletionSource?.Task.IsCompleted == false)
+            {
+                receiveTransferCompletionSource.TrySetResult(true);
+            }
 
             if (!success && currentFileMetadata != null)
             {
                 // Delete incomplete file
-                if (File.Exists(currentFileMetadata.FileName))
+                var filePath = Path.Combine(storageLocation, currentFileMetadata.FileName);
+                if (File.Exists(filePath))
                 {
-                    File.Delete(currentFileMetadata.FileName);
+                    File.Delete(filePath);
                 }
             }
         }
