@@ -10,12 +10,8 @@ public class CertificateHelper
     private static string CertificateFileName { get; } = "Sefirah.pfx";
     public static async Task<X509Certificate2> CreateECDSACertificate()
     {
-        // Create ECDiffieHellman for key agreement
-        using var ecdh = ECDiffieHellman.Create(ECCurve.NamedCurves.nistP256);
-
-        // Create ECDSA using the same parameters
-        using var ecdsa = ECDsa.Create(ecdh.ExportParameters(true));
-
+        // Create ECDSA with NIST P-256 curve
+        using var ecdsa = ECDsa.Create(ECCurve.NamedCurves.nistP256);
         var parameters = ecdsa.ExportParameters(true);
 
         var subjectName = new X500DistinguishedName("CN=SefirahCastle");
@@ -28,9 +24,10 @@ public class CertificateHelper
         certRequest.CertificateExtensions.Add(
             new X509KeyUsageExtension(X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.KeyEncipherment, true));
 
-        DateTimeOffset notBefore = DateTimeOffset.Now;
-        DateTimeOffset notAfter = DateTimeOffset.Now.AddYears(10);
-        X509Certificate2 certificate = certRequest.CreateSelfSigned(notBefore, notAfter);
+        // Create self-signed certificate valid for 10 years
+        X509Certificate2 certificate = certRequest.CreateSelfSigned(
+            DateTimeOffset.Now,
+            DateTimeOffset.Now.AddYears(10));
 
         // Ensure the certificate is exportable
         certificate = new X509Certificate2(
@@ -47,13 +44,8 @@ public class CertificateHelper
         await File.WriteAllBytesAsync(certPath, certData);
         
         Debug.WriteLine($"Certificate saved to: {certPath}");
-        StoredParameters = parameters;
-
         return certificate;
     }
-
-    // Store the parameters for ECDH operations
-    private static ECParameters? StoredParameters;
 
     public static async Task<X509Certificate2> GetOrCreateCertificateAsync()
     {
