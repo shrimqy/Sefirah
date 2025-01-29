@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
+using System.Diagnostics;
 
 namespace Sefirah.App.UserControls;
 
@@ -37,10 +38,14 @@ public sealed partial class TrayIconControl : UserControl
     [RelayCommand]
     public void ExitApplication()
     {
-        var window = MainWindow.Instance;
         App.HandleClosedEvents = false;
         TrayIcon.Dispose();
-        window.Close();
+       
+        // Close window and exit app
+        MainWindow.Instance.Close();
         App.Current.Exit();
+        
+        // Force termination if still needed
+        Process.GetCurrentProcess().Kill();
     }
 }
