@@ -81,9 +81,17 @@ public class PlaceholdersService(
     public async Task CreateFile(string relativeFile)
     {
         var fileInfo = remoteService.GetFileInfo(relativeFile);
+        var parentPath = Path.Join(rootDirectory, fileInfo.RelativeParentDirectory);
+
+        // Ensure parent directory exists first
+        if (!Directory.Exists(parentPath))
+        {
+            await CreateDirectory(fileInfo.RelativeParentDirectory);
+        }
+
         using var createInfo = new SafeCreateInfo(fileInfo, fileInfo.RelativePath);
         CldApi.CfCreatePlaceholders(
-            Path.Join(rootDirectory, fileInfo.RelativeParentDirectory),
+            parentPath,
             [createInfo],
             1u,
             CldApi.CF_CREATE_FLAGS.CF_CREATE_FLAG_NONE,
@@ -93,16 +101,32 @@ public class PlaceholdersService(
 
     public async Task CreateDirectory(string relativeDirectory)
     {
+        // Ensure parent directory exists first
         var directoryInfo = remoteService.GetDirectoryInfo(relativeDirectory);
+        var parentPath = Path.Join(rootDirectory, directoryInfo.RelativeParentDirectory);
+
+        if (!Directory.Exists(parentPath))
+        {
+            // Recursively create parent directories if needed
+            await CreateDirectory(directoryInfo.RelativeParentDirectory);
+        }
+
+        var targetPath = Path.Join(rootDirectory, relativeDirectory);
+        if (!Directory.Exists(targetPath))
+        {
+            Directory.CreateDirectory(targetPath);
+        }
+
         using var createInfo = new SafeCreateInfo(directoryInfo, directoryInfo.RelativePath);
         CldApi.CfCreatePlaceholders(
-            Path.Join(rootDirectory, directoryInfo.RelativeParentDirectory),
+            parentPath,
             [createInfo],
             1u,
             CldApi.CF_CREATE_FLAGS.CF_CREATE_FLAG_NONE,
             out var entriesProcessed
         ).ThrowIfFailed("Create placeholder failed");
     }
+
 
     private SafeCreateInfo GetFilePlaceholderCreateInfo(RemoteFileInfo remoteFileInfo) =>
         new(remoteFileInfo, remoteFileInfo.RelativePath);
