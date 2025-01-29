@@ -124,4 +124,21 @@ public static class AppLifecycleHelper
             logger.Error("Unhandled exception occurred", ex);
         }
     }
+
+
+    public static async Task HandleStartupTaskAsync(bool enable)
+    {
+        var startupTask = await StartupTask.GetAsync("8B5D3E3F-9B69-4E8A-A9F7-BFCA793B9AF0");
+        
+        if (enable)
+        {
+            if (startupTask.State == StartupTaskState.Disabled)
+                await startupTask.RequestEnableAsync();
+        }
+        else
+        {
+            if (startupTask.State == StartupTaskState.Enabled)
+                startupTask.Disable();
+        }
+    }
 }
