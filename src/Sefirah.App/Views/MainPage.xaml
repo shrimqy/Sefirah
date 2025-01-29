@@ -214,7 +214,8 @@
                                 <DataTemplate x:DataType="local:NotificationMessage">
                                     <Border
                                         Padding="10"
-                                        Background="{ThemeResource SystemAltLowColor}"
+                                        Background="{ThemeResource CardBackgroundFillColorDefault}"
+                                        BorderBrush="{ThemeResource CardStrokeColorDefault}"
                                         BorderThickness="1"
                                         CornerRadius="8"
                                         PointerEntered="OnPointerEntered"
