@@ -12,5 +12,5 @@ public interface IDiscoveryService
     /// <summary>
     /// Starts the udp discovery process.
     /// </summary>
-    Task StartDiscoveryAsync(int serverPort, X509Certificate2 certificate);
+    Task StartDiscoveryAsync(int serverPort);
 }

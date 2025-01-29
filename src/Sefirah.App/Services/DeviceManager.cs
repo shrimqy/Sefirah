@@ -43,16 +43,22 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
         await repository.AddOrUpdateAsync(device);
     }
 
-    public async Task<RemoteDeviceEntity?> VerifyDevice(DeviceInfo device, byte[] sharedSecret)
+    public async Task<RemoteDeviceEntity?> VerifyDevice(DeviceInfo device)
     {
         try
         {
-            var localDevice = await repository.GetLocalDevice() ?? throw new Exception("Local device not found");
+
+            var localDevice = await GetLocalDeviceAsync();
+
+
             var existingDevice = await repository.GetByIdAsync(device.DeviceId);
 
-            // If device exists and we've already verified it before
+            // If device exists and we've already verified it before, validate the proof
             if (existingDevice != null)
             {
+                
+                if (!EcdhHelper.VerifyProof(existingDevice.SharedSecret!, device.Nonce!, device.Proof!)) { return null; }
+
                 existingDevice.LastConnected = DateTime.Now;
                 
                 if (!string.IsNullOrEmpty(device.Avatar))
@@ -65,6 +71,10 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
 
             // For new devices, show connection request dialog
             var tcs = new TaskCompletionSource<RemoteDeviceEntity?>();
+
+            var sharedSecret = EcdhHelper.DeriveKey(device.PublicKey!, localDevice.PrivateKey);
+
+            if (!EcdhHelper.VerifyProof(sharedSecret, device.Nonce!, device.Proof!)) { return null; }
 
             await MainWindow.Instance.DispatcherQueue.EnqueueAsync(async () =>
             {
@@ -90,6 +100,7 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
                         DeviceId = device.DeviceId,
                         Name = device.DeviceName,
                         LastConnected = DateTime.Now,
+                        SharedSecret = sharedSecret,
                         WallpaperBytes = !string.IsNullOrEmpty(device.Avatar) 
                             ? Convert.FromBase64String(device.Avatar) 
                             : null
@@ -161,5 +172,11 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
             logger.Error("Error getting local device", e);
             throw;
         }
+    }
+
+    public async Task<byte[]?> GetLastConnectedDevicePublicKeyAsync()
+    {
+        var device = await GetLastConnectedDevice();
+        return device?.SharedSecret;
     }
 }

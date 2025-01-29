@@ -394,9 +394,6 @@ public class UdpBroadcast : SocketMessage
     [JsonPropertyName("publicKey")]
     public required string PublicKey { get; set; }
 
-    [JsonPropertyName("certificate")]
-    public string? Certificate { get; set; }
-
     [JsonPropertyName("timestamp")]
     public long TimeStamp { get; set; }
 }

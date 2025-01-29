@@ -1,5 +1,4 @@
 ﻿using Microsoft.Data.Sqlite;
-using Sefirah.App.Utils;
 using Windows.Storage;
 using static Sefirah.App.Constants;
 
@@ -31,6 +30,7 @@ public class DatabaseContext(ILogger logger) : IDisposable
                     DeviceId NVARCHAR(128) PRIMARY KEY,
                     DeviceName NVARCHAR(2048) NOT NULL,
                     LastConnected DATETIME,
+                    SharedSecret BLOB,
                     WallpaperBytes BLOB
                 );
 

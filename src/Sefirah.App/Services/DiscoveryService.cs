@@ -29,7 +29,7 @@ public class DiscoveryService(
     public ObservableCollection<DiscoveredDevice> DiscoveredDevices { get; } = [];
     public List<DiscoveredMdnsServiceArgs> DiscoveredMdnsServices { get; } = [];
 
-    public async Task StartDiscoveryAsync(int serverPort, X509Certificate2 certificate)
+    public async Task StartDiscoveryAsync(int serverPort)
     {
         port = await NetworkHelper.FindAvailablePortAsync(8689);
         mdnsService.AdvertiseService(port);
@@ -56,8 +56,6 @@ public class DiscoveryService(
                 udpClient.Socket.EnableBroadcast = true;
                 logger.Info("UDP Client connected successfully {0}", port);
                 var (username, avatar) = await CurrentUserInformation.GetCurrentUserInfoAsync();
-                byte[] publicCertData = certificate.Export(X509ContentType.Cert);
-                var publicCertBase64 = Convert.ToBase64String(publicCertData);
                 var udpBroadcast = new UdpBroadcast
                 {
                     DeviceId = localDevice.DeviceId,
@@ -65,7 +63,6 @@ public class DiscoveryService(
                     Port = serverPort,
                     DeviceName = username,
                     PublicKey = publicKey,
-                    Certificate = publicCertBase64,
                 };
 
                 BroadcastDeviceInfoAsync(udpBroadcast);

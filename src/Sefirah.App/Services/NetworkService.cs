@@ -62,7 +62,7 @@ public class NetworkService(
             {
                 isRunning = server.Start();
                 // Advertise the specific address clients should connect to
-                await discoveryService.StartDiscoveryAsync(port, certificate);
+                await discoveryService.StartDiscoveryAsync(port);
 
                 logger.Info($"Server start on port: {port}");
             }
@@ -267,17 +267,7 @@ public class NetworkService(
                 return;
             }
 
-            var localDevice = await deviceManager.GetLocalDeviceAsync();
-            var sharedSecret = EcdhHelper.DeriveKey(deviceInfo.PublicKey!, localDevice.PrivateKey);
-
-            if (!EcdhHelper.VerifyProof(sharedSecret, deviceInfo.Nonce, deviceInfo.Proof))
-            {
-                logger.Warn("Authentication failed");
-                DisconnectSession(true);
-                return;
-            }
-
-            var device = await deviceManager.VerifyDevice(deviceInfo, sharedSecret);
+            var device = await deviceManager.VerifyDevice(deviceInfo);
 
             if (device != null)
             {
