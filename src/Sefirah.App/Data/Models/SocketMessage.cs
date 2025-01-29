@@ -312,6 +312,9 @@ public class ServerInfo
 
     [JsonPropertyName("port")]
     public required int Port { get; set; }
+
+    [JsonPropertyName("password")]
+    public string Password { get; set; } = string.Empty;
 }
 
 public class FileMetadata

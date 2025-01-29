@@ -83,8 +83,13 @@ public class FileTransferService(
             {
                 throw new IOException("Failed to connect to file transfer server");
             }
+            logger.Info($"Connected to file transfer server at {serverInfo.IpAddress}:{serverInfo.Port}");
+
 
             await ShowTransferNotification("Receiving File", $"{currentFileMetadata.FileName}", 0);
+            await Task.Delay(200);
+            var passwordBytes = Encoding.UTF8.GetBytes(serverInfo.Password + "\n");
+            client?.SendAsync(passwordBytes);
 
             // Wait for transfer completion
             await receiveTransferCompletionSource.Task;
@@ -322,7 +327,7 @@ public class FileTransferService(
 
         try
         {
-            var serverInfo = await InitializeServer();
+            serverInfo = await InitializeServer();
             
             var transfer = new BulkFileTransfer
             {
@@ -343,7 +348,6 @@ public class FileTransferService(
 
                 // Wait for the transfer to complete before moving to next file
                 await sendTransferCompletionSource.Task;
-                
             }
 
             logger.Debug("All files transferred successfully");
@@ -362,11 +366,11 @@ public class FileTransferService(
             if (session == null)
             {
                 connectionSource = new TaskCompletionSource<ServerSession>();
-                // Wait for OnConnected event to trigger
+
+                // Wait for Authentication from onReceived event to trigger
                 session = await connectionSource.Task;
-                await Task.Delay(500); // Wait a bit for android to open read channel 
             }
-            
+
             const int ChunkSize = 81920 * 2;
 
             using (stream)
@@ -411,9 +415,11 @@ public class FileTransferService(
             OptionReuseAddress = true
         };
         server.Start();
+
         serverInfo = new ServerInfo
         {
-            Port = port
+            Port = port,
+            Password = EcdhHelper.GenerateRandomPassword()
         };
 
         logger.Info($"File transfer server initialized at {serverInfo.IpAddress}:{serverInfo.Port}");
@@ -427,16 +433,14 @@ public class FileTransferService(
         server?.Dispose();
         server = null;
         serverInfo = null;
+        connectionSource = null;
+        session = null;
     }
 
     // Server session event handlers
     public void OnConnected(ServerSession session)
     {
         logger.Info($"Client connected to file transfer server: {session.Id}");
-        if (connectionSource?.Task.IsCompleted == false)
-        {
-            connectionSource.TrySetResult(session);
-        }
     }
 
     public void OnDisconnected(ServerSession session)
@@ -445,14 +449,19 @@ public class FileTransferService(
         {
             sendTransferCompletionSource?.TrySetException(new Exception("Client disconnected"));
         }
+        logger.Info($"Client disconnected from file transfer server: {session.Id}");
         CleanupServer();
     }
 
     public void OnReceived(ServerSession session, byte[] buffer, long offset, long size)
     {
-        string Result = Encoding.UTF8.GetString(buffer, (int)offset, (int)size);
-        logger.Debug($"Received result: {Result}");
-        if (Result == "Success")
+        string message = Encoding.UTF8.GetString(buffer, (int)offset, (int)size);
+        logger.Info($"Received message from client: {message}, server password: {serverInfo?.Password}");
+        if (connectionSource?.Task.IsCompleted == false && message == serverInfo?.Password)
+        {
+            connectionSource.TrySetResult(session);
+        }
+        if (message == "Success")
         {
             sendTransferCompletionSource?.TrySetResult(true);
         }

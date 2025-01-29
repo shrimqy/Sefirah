@@ -84,4 +84,20 @@ public class EcdhHelper
         var expectedProof = GenerateProof(sharedSecret, nonce);
         return expectedProof == proof;
     }
+
+    /// <summary>
+    /// Generates a random password with 12 characters containing uppercase letters, 
+    /// lowercase letters, numbers, and special characters
+    /// </summary>
+    public static string GenerateRandomPassword()
+    {
+        const string allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+                                    "abcdefghijklmnopqrstuvwxyz" +
+                                    "0123456789" +
+                                    "!@#$%^&*";
+        
+        return new string(Enumerable.Range(1, 12)
+            .Select(_ => allowedChars[Random.Shared.Next(allowedChars.Length)])
+            .ToArray());
+    }
 }
