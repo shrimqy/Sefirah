@@ -5,9 +5,11 @@ using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Enums;
 using Sefirah.App.Data.Models;
 using Sefirah.App.Utils.Serialization;
+using System;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.System;
+using static Sefirah.App.Services.ToastNotificationService;
 
 namespace Sefirah.App.Services;
 
@@ -120,6 +122,8 @@ public class NotificationService(
                 .SetTag(message.Tag ?? string.Empty)
                 .SetGroup(message.GroupKey ?? string.Empty);
 
+
+            // Handle icons
             if (!string.IsNullOrEmpty(message.LargeIcon))
             {
                 await SetNotificationIcon(builder, message.LargeIcon, "largeIcon.png");
@@ -127,6 +131,33 @@ public class NotificationService(
             else if (!string.IsNullOrEmpty(message.AppIcon))
             {
                 await SetNotificationIcon(builder, message.AppIcon, "appIcon.png");
+            }
+
+            // Handle actions
+            foreach (var action in message.Actions)
+            {
+                logger.Debug("Adding action: {0}", action.Label);
+                if (action == null) continue;
+
+                if (action.IsReplyAction)
+                {
+                    builder
+                        .AddTextBox("textBox", "Type a reply", "")
+                        .AddButton(new AppNotificationButton("Send")
+                            .AddArgument("notificationType", ToastNotificationType.RemoteNotification)
+                            .AddArgument("notificationKey", message.NotificationKey)
+                            .AddArgument("replyResultKey", message.ReplyResultKey)
+                            .AddArgument("action", "Reply")
+                                .SetInputId("textBox"));
+                }
+                else
+                {
+                    builder.AddButton(new AppNotificationButton(action.Label)
+                        .AddArgument("notificationType", ToastNotificationType.RemoteNotification)
+                        .AddArgument("action", "Click")
+                        .AddArgument("actionIndex", action.ActionIndex.ToString())
+                        .AddArgument("notificationKey", message.NotificationKey));
+                }
             }
 
             var notification = builder.BuildNotification();
@@ -247,6 +278,45 @@ public class NotificationService(
                 throw;
             }
         });
+    }
+
+
+    public void RegisterNotifications()
+    {
+        // Register the notification manager
+        AppNotificationManager.Default.NotificationInvoked += OnNotificationInvoked;
+        AppNotificationManager.Default.Register();
+    }
+
+    private async void OnNotificationInvoked(AppNotificationManager sender, AppNotificationActivatedEventArgs args)
+    {
+        try
+        {
+            if (!args.Arguments.TryGetValue("action", out var actionType))
+                return;
+
+            var notificationKey = args.Arguments["notificationKey"];
+            var actionIndex = int.Parse(args.Arguments["actionIndex"]);
+
+            switch (actionType)
+            {
+                case "Reply" when args.UserInput.TryGetValue("textBox", out var replyText):
+                    ProcessReplyAction(notificationKey, args.Arguments["replyResultKey"], replyText);
+                    break;
+                
+                case "click":
+                    ProcessClickAction(notificationKey, actionIndex);
+                    break;
+                
+                default:
+                    logger.Warn($"Unhandled action type: {actionType}");
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Failed to handle notification action", ex);
+        }
     }
 
     public void ProcessReplyAction(string notificationKey, string ReplyResultKey, string replyText)

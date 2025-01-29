@@ -46,15 +46,13 @@ public static class AppLifecycleHelper
         var mdnsService = Ioc.Default.GetRequiredService<IMdnsService>();
         var networkService = Ioc.Default.GetRequiredService<INetworkService>();
         var playbackService = Ioc.Default.GetRequiredService<IPlaybackService>();
-        var fileTransferService = Ioc.Default.GetRequiredService<IFileTransferService>();
+        var toastNotificationService = Ioc.Default.GetRequiredService<ToastNotificationService>();
 
         // Start all the required services for startup
         await networkService.StartServerAsync();
-        // Initializing file transfer service here because we need it for performing notification actions.
-        await fileTransferService.InitializeAsync();
         await playbackService.InitializeAsync();
         mdnsService.StartDiscovery();
-
+        toastNotificationService.RegisterNotification();
     }
 
 
@@ -103,6 +101,7 @@ public static class AppLifecycleHelper
                 .AddSingleton<IClipboardService, ClipboardService>()
                 .AddSingleton<IPlaybackService, PlaybackService>()
                 .AddSingleton<INotificationService, NotificationService>()
+                .AddSingleton<ToastNotificationService>()
 
                 .AddScoped<IMessageHandlerService, MessageHandlerService>()
                 .AddSingleton<Func<IMessageHandlerService>>(sp => () => sp.GetRequiredService<IMessageHandlerService>())

@@ -14,6 +14,7 @@ using System.Text;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.ApplicationModel.DataTransfer.ShareTarget;
 using Windows.Storage;
+using static Sefirah.App.Services.ToastNotificationService;
 using Server = Sefirah.App.Services.Socket.Server;
 
 namespace Sefirah.App.Services;
@@ -35,34 +36,6 @@ public class FileTransferService(
     private uint notificationSequence = 1;
     private TaskCompletionSource<bool>? sendTransferCompletionSource;
     private TaskCompletionSource<bool>? receiveTransferCompletionSource;
-
-    public async Task InitializeAsync()
-    {
-        try
-        {
-            await RegisterNotifications();
-        }
-        catch (Exception ex)
-        {
-            logger.Error("Failed to initialize FileTransferService", ex);
-            throw;
-        }
-    }
-
-    private async Task RegisterNotifications()
-    {
-        AppNotificationManager.Default.NotificationInvoked -= OnNotificationInvoked;
-        AppNotificationManager.Default.NotificationInvoked += OnNotificationInvoked;
-
-        try
-        {
-            await Task.Run(() => AppNotificationManager.Default.Register());
-        }
-        catch (Exception ex)
-        {
-            logger.Warn("Could not register for notifications, continuing without notifications", ex);
-        }
-    }
 
     public async Task ReceiveBulkFiles(BulkFileTransfer bulkFile)
     {
@@ -102,9 +75,9 @@ public class FileTransferService(
             var context = new SslContext(
                 SslProtocols.Tls12,
                 certificate,
-                certificateValidationCallback: (sender, cert, chain, errors) => true
+                (sender, cert, chain, errors) => true
             );
-
+            
             client = new Client(context, serverInfo.IpAddress, serverInfo.Port, this, logger);
             if (!client.ConnectAsync())
             {
@@ -532,9 +505,11 @@ public class FileTransferService(
 
                     builder
                         .AddButton(new AppNotificationButton("Open File")
+                            .AddArgument("notificationType", ToastNotificationType.FileTransfer)
                             .AddArgument("action", "openFile")
                             .AddArgument("filePath", filePath))
                         .AddButton(new AppNotificationButton("Open Folder")
+                            .AddArgument("notificationType", ToastNotificationType.FileTransfer)
                             .AddArgument("action", "openFolder")
                             .AddArgument("folderPath", Path.GetDirectoryName(filePath)));
                 }
@@ -566,68 +541,6 @@ public class FileTransferService(
         catch (Exception ex)
         {
             logger.Error($"Notification failed - Tag: {tag}, Progress: {progress}, Sequence: {notificationSequence}", ex);
-        }
-    }
-
-    private async void OnNotificationInvoked(AppNotificationManager sender, AppNotificationActivatedEventArgs args)
-    {
-        try
-        {
-            logger.Debug($"Notification invoked - Arguments: {string.Join(", ", args.Arguments.Select(x => $"{x.Key}={x.Value}"))}");
-
-            try
-            {
-                await sender.RemoveByGroupAsync(Constants.Notification.NotificationGroup);
-            }
-            catch (Exception ex)
-            {
-                logger.Warn($"Failed to remove notifications: {ex.Message}");
-            }
-
-            await Task.Delay(100); // Small delay to ensure removal
-
-            if (args.Arguments.TryGetValue("action", out string? action))
-            {
-                switch (action)
-                {
-                    case "openFile":
-                        if (args.Arguments.TryGetValue("filePath", out string? filePath) && File.Exists(filePath))
-                        {
-                            logger.Debug($"Opening file: {filePath}");
-                            Process.Start(new ProcessStartInfo
-                            {
-                                FileName = filePath,
-                                UseShellExecute = true
-                            });
-                        }
-                        else
-                        {
-                            logger.Warn($"File not found or path not provided - FilePath: {filePath}");
-                        }
-                        break;
-
-                    case "openFolder":
-                        if (args.Arguments.TryGetValue("folderPath", out string? folderPath) && Directory.Exists(folderPath))
-                        {
-                            logger.Debug($"Opening folder: {folderPath}");
-                            Process.Start(new ProcessStartInfo
-                            {
-                                FileName = "explorer.exe",
-                                Arguments = $"\"{folderPath}\"",
-                                UseShellExecute = true
-                            });
-                        }
-                        else
-                        {
-                            logger.Warn($"Folder not found or path not provided - FolderPath: {folderPath}");
-                        }
-                        break;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            logger.Error($"Error handling notification action: {ex.Message}", ex);
         }
     }
 }
