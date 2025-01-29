@@ -1,5 +1,6 @@
 ﻿using Microsoft.Windows.AppNotifications;
 using Sefirah.App.Data.Contracts;
+using Windows.System;
 
 namespace Sefirah.App.Services;
 public class ToastNotificationService(ILogger logger, INotificationService notificationService)
@@ -53,8 +54,10 @@ public class ToastNotificationService(ILogger logger, INotificationService notif
                 case ToastNotificationType.RemoteNotification:
                     HandleMessageNotification(args);
                     break;
-                
-                // Add other notification types here
+
+                case ToastNotificationType.Clipboard:
+                    HandleClipboardNotification(args);
+                    break;
                 
                 default:
                     logger.Warn($"Unhandled notification type: {notificationType}");
@@ -64,6 +67,15 @@ public class ToastNotificationService(ILogger logger, INotificationService notif
         catch (Exception ex)
         {
             logger.Error($"Error handling notification action: {ex.Message}", ex);
+        }
+    }
+
+    private async void HandleClipboardNotification(AppNotificationActivatedEventArgs args)
+    {
+        Uri.TryCreate(args.Arguments["uri"], UriKind.Absolute, out Uri? uri);
+        if (uri != null && ClipboardService.IsValidWebUrl(uri))
+        {
+            await Launcher.LaunchUriAsync(uri);
         }
     }
 
@@ -131,5 +143,6 @@ public class ToastNotificationService(ILogger logger, INotificationService notif
     {
         public const string FileTransfer = "FileTransfer";
         public const string RemoteNotification = "remoteNotification";
+        public const string Clipboard = "Clipboard";
     }
 }

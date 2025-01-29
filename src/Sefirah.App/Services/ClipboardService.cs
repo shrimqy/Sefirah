@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.WinUI;
+using Microsoft.Windows.AppNotifications;
+using Microsoft.Windows.AppNotifications.Builder;
 using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Models;
 using Sefirah.App.Utils.Serialization;
@@ -7,6 +9,7 @@ using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.System;
+using static Sefirah.App.Services.ToastNotificationService;
 using DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue;
 
 namespace Sefirah.App.Services;
@@ -19,6 +22,8 @@ public class ClipboardService : IClipboardService
     private readonly IFileTransferService fileTransferService;
     private readonly DispatcherQueue dispatcher;
     private const int DirectTransferThreshold = 512 * 512; // 1MB threshold
+    
+    private bool isInternalUpdate; // To track if the clipboard change came from the remote device
 
     public ClipboardService(
         ILogger logger,
@@ -46,6 +51,10 @@ public class ClipboardService : IClipboardService
         {
             try
             {
+                if (isInternalUpdate) {
+                    isInternalUpdate = false;
+                    return;
+                }
                 var dataPackageView = Clipboard.GetContent();
                 if (dataPackageView == null) return;
 
@@ -187,12 +196,26 @@ public class ClipboardService : IClipboardService
         {
             try
             {
+                isInternalUpdate = true;
                 var dataPackage = new DataPackage();
-
+                var builder = new AppNotificationBuilder()
+                    .AddText("Clipboard data received", new AppNotificationTextProperties());
                 switch (content)
                 {
                     case string textContent:
-                        await HandleTextContentAsync(dataPackage, textContent);
+                        dataPackage.SetText(textContent);
+                        Uri.TryCreate(textContent, UriKind.Absolute, out Uri? uri);
+                        bool isValidUri = IsValidWebUrl(uri);
+                        if (userSettingsService.FeatureSettingsService.OpenLinksInBrowser && isValidUri)
+                        {
+                            await Launcher.LaunchUriAsync(uri);
+                        }
+                        else if (isValidUri && userSettingsService.FeatureSettingsService.ShowClipboardToast)
+                        {
+                            builder.AddButton(new AppNotificationButton("Open in browser")
+                                .AddArgument("notificationType", ToastNotificationType.Clipboard)
+                                .AddArgument("uri", textContent));
+                        }
                         break;
                     case StorageFile fileContent:
                         dataPackage.SetStorageItems(new List<IStorageFile> { fileContent });
@@ -203,6 +226,13 @@ public class ClipboardService : IClipboardService
 
                 Clipboard.SetContent(dataPackage);
                 logger.Info("Clipboard content set: {Content}", content);
+                var notification = builder.BuildNotification();
+
+                if (userSettingsService.FeatureSettingsService.ShowClipboardToast)
+                {
+                    notification.ExpiresOnReboot = true;
+                    AppNotificationManager.Default.Show(notification);
+                }
             }
             catch (Exception ex)
             {
@@ -214,16 +244,10 @@ public class ClipboardService : IClipboardService
 
     private async Task HandleTextContentAsync(DataPackage dataPackage, string content)
     {
-        dataPackage.SetText(content);
-        if (userSettingsService.FeatureSettingsService.OpenLinksInBrowser && 
-            Uri.TryCreate(content, UriKind.Absolute, out Uri? uri) && 
-            IsValidWebUrl(uri))
-        {
-            await Launcher.LaunchUriAsync(uri);
-        }
+
     }
 
-    private static bool IsValidWebUrl(Uri uri)
+    public static bool IsValidWebUrl(Uri uri)
     {
         return (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps) && 
                !string.IsNullOrWhiteSpace(uri.Host) &&
