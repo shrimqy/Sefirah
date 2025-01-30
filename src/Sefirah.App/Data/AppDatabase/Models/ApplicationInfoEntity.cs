@@ -2,10 +2,12 @@
 using Sefirah.App.Data.Enums;
 using Sefirah.App.Data.Models;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Sefirah.App.Data.AppDatabase.Models;
 public class ApplicationInfoEntity : BaseEntity
 {
+    [Key]
     public string AppPackage { get; set; } = string.Empty;
     public string AppName { get; set; } = string.Empty;
     public byte[]? AppIconBytes { get; set; }

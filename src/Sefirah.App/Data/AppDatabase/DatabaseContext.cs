@@ -19,8 +19,7 @@ public class DatabaseContext(ILogger logger) : IDisposable
             using var command = _connection.CreateCommand();
             command.CommandText = @"
                 CREATE TABLE IF NOT EXISTS ApplicationInfo (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    AppPackage NVARCHAR(2048) NOT NULL,
+                    AppPackage NVARCHAR(2048) PRIMARY KEY,
                     AppName NVARCHAR(2048),
                     NotificationFilter NVARCHAR(20) NOT NULL,
                     AppIcon BLOB

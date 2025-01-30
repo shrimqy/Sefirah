@@ -174,4 +174,22 @@ public class RemoteAppsRepository(DatabaseContext context, ILogger logger) : IRe
             throw;
         }
     }
+
+    public async Task ClearAllAsync()
+    {
+        try
+        {
+            var conn = await context.GetConnectionAsync();
+            var command = new SqliteCommand(
+                "DELETE FROM ApplicationInfo",
+                conn);
+
+            await command.ExecuteNonQueryAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Error clearing all application info", ex);
+            throw;
+        }
+    }
 } 
