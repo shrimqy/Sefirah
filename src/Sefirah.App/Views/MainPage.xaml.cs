@@ -142,26 +142,19 @@ public sealed partial class MainPage : Page
     }
 
 
-    private async void SendButton_Click(object sender, RoutedEventArgs e)
+    private void SendButton_Click(object sender, RoutedEventArgs e)
     {
         var button = sender as Button;
-        if (button != null)
+        if (button?.Tag is NotificationMessage message)
         {
-            // Find the parent StackPanel
-            var stackPanel = FindParent<StackPanel>(button);
-            if (stackPanel != null)
+            var replyTextBox = FindChild<TextBox>(button.Parent, "ReplyTextBox");
+            if (replyTextBox != null)
             {
-                // Get the ReplyTextBox in the same StackPanel
-                var replyTextBox = stackPanel.Children.OfType<TextBox>().FirstOrDefault(t => t.Name == "ReplyTextBox");
-                string replyText = replyTextBox?.Text;
-                // Clear the textbox after sending
+                string replyText = replyTextBox.Text;
+                // Clear the textbox after getting the text
                 replyTextBox.Text = string.Empty;
-
-                // Retrieve NotificationKey from the Tag of the SendButton
-                string notificationKey = button.Tag as string;
-
-                //HandleReply(notificationKey, replyText);
-
+                
+                ViewModel.NotificationReplyCommand.Execute((message, replyText));
             }
         }
     }
