@@ -66,7 +66,8 @@ public class NotificationService(
                         await ShowWindowsNotification(message);
                     });
                 }
-                else if (message.NotificationType == nameof(NotificationType.Active) && filter == NotificationFilter.Feed || filter == NotificationFilter.ToastFeed)
+                else if ((message.NotificationType == nameof(NotificationType.Active) || message.NotificationType == nameof(NotificationType.New)) 
+                    && filter == NotificationFilter.Feed || filter == NotificationFilter.ToastFeed)
                 {
                     await dispatcher.EnqueueAsync(() =>
                     {
