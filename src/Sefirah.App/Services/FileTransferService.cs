@@ -34,6 +34,8 @@ public class FileTransferService(
     private ServerSession? session;
     private TaskCompletionSource<ServerSession>? connectionSource;
     private uint notificationSequence = 1;
+
+    private TaskCompletionSource<ServerSession>? connectionSource;
     private TaskCompletionSource<bool>? sendTransferCompletionSource;
     private TaskCompletionSource<bool>? receiveTransferCompletionSource;
 
@@ -101,6 +103,10 @@ public class FileTransferService(
             logger.Error("Error during file transfer setup", ex);
             throw;
         }
+        finally 
+        {
+            CleanupTransfer(receiveTransferCompletionSource?.Task.IsCompletedSuccessfully == true);
+        }
     }
 
     public void OnConnected()
@@ -113,7 +119,7 @@ public class FileTransferService(
     {
         logger.Info("Disconnected from file transfer server");
 
-        // Only cleanup if we have metadata and didn't complete the transfer
+        // if transfer is not complete
         if (currentFileMetadata != null && 
             currentFileStream != null && 
             bytesReceived < currentFileMetadata.FileSize)
@@ -151,8 +157,9 @@ public class FileTransferService(
                 var successBytes = Encoding.UTF8.GetBytes("Complete");
                 client?.SendAsync(successBytes);
 
-                // Perform cleanup with success flag
-                CleanupTransfer(true);
+                // Signal completion before cleanup
+                receiveTransferCompletionSource?.TrySetResult(true);
+
                 return; // Exit after handling completion
             }
 
