@@ -30,7 +30,7 @@ internal sealed class FeaturesSettingsService : BaseObservableJsonSettings, IFea
 
     public bool OpenLinksInBrowser 
     { 
-        get => Get(true);
+        get => Get(false);
         set => Set(value);
     }   
 
@@ -72,7 +72,7 @@ internal sealed class FeaturesSettingsService : BaseObservableJsonSettings, IFea
 
     public bool IgnoreWindowsApps 
     { 
-        get => Get(false);
+        get => Get(true);
         set => Set(value);
     }
 
