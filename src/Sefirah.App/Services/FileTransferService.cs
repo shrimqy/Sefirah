@@ -7,7 +7,6 @@ using Sefirah.App.Services.Socket;
 using Sefirah.App.Utils;
 using Sefirah.App.Utils.Serialization;
 using System.Net;
-using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Text;
@@ -32,12 +31,13 @@ public class FileTransferService(
     private Server? server;
     private ServerInfo? serverInfo;
     private ServerSession? session;
-    private TaskCompletionSource<ServerSession>? connectionSource;
     private uint notificationSequence = 1;
 
     private TaskCompletionSource<ServerSession>? connectionSource;
     private TaskCompletionSource<bool>? sendTransferCompletionSource;
     private TaskCompletionSource<bool>? receiveTransferCompletionSource;
+    
+    public event EventHandler<StorageFile>? FileReceived;
 
     public async Task ReceiveBulkFiles(BulkFileTransfer bulkFile)
     {
@@ -87,16 +87,21 @@ public class FileTransferService(
             }
             logger.Info($"Connected to file transfer server at {serverInfo.IpAddress}:{serverInfo.Port}");
 
-
             await ShowTransferNotification("Receiving File", $"{currentFileMetadata.FileName}", 0);
+
             await Task.Delay(200);
             var passwordBytes = Encoding.UTF8.GetBytes(serverInfo.Password + "\n");
             client?.SendAsync(passwordBytes);
 
             // Wait for transfer completion
             await receiveTransferCompletionSource.Task;
+            if (userSettingsService.FeatureSettingsService.ClipboardFilesEnabled)
+            {
+                var file = await StorageFile.GetFileFromPathAsync(fullPath);
+                FileReceived?.Invoke(this, file);
+            }
 
-            _ = ShowTransferNotification("File Received", $"{currentFileMetadata.FileName} has been saved successfully");
+            await ShowTransferNotification("File Received", $"{currentFileMetadata.FileName} has been saved successfully");
         }
         catch (Exception ex)
         {

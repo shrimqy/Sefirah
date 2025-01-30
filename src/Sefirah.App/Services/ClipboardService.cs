@@ -43,6 +43,11 @@ public class ClipboardService : IClipboardService
             Clipboard.ContentChanged += OnClipboardContentChanged;
             logger.Info("Clipboard monitoring started");
         });
+
+        fileTransferService.FileReceived += async (sender, data) =>
+        {
+            await SetContentAsync(data);
+        };  
     }
 
     private async void OnClipboardContentChanged(object? sender, object? e)
@@ -200,8 +205,16 @@ public class ClipboardService : IClipboardService
                 var dataPackage = new DataPackage();
                 var builder = new AppNotificationBuilder()
                     .AddText("Clipboard data received", new AppNotificationTextProperties());
+
                 switch (content)
                 {
+                    case StorageFile file:
+                        // Set package family name for proper file handling
+                        dataPackage.Properties.PackageFamilyName = 
+                            Windows.ApplicationModel.Package.Current.Id.FamilyName;
+                        // Pass false as second parameter to indicate the app isn't taking ownership of the files
+                        dataPackage.SetStorageItems([file], false);
+                        break;
                     case string textContent:
                         dataPackage.SetText(textContent);
                         Uri.TryCreate(textContent, UriKind.Absolute, out Uri? uri);
@@ -216,9 +229,6 @@ public class ClipboardService : IClipboardService
                                 .AddArgument("notificationType", ToastNotificationType.Clipboard)
                                 .AddArgument("uri", textContent));
                         }
-                        break;
-                    case StorageFile fileContent:
-                        dataPackage.SetStorageItems(new List<IStorageFile> { fileContent });
                         break;
                     default:
                         throw new ArgumentException($"Unsupported content type: {content.GetType()}");
@@ -238,6 +248,10 @@ public class ClipboardService : IClipboardService
             {
                 logger.Error("Error setting clipboard content: {Error}", ex);
                 throw;
+            }
+            finally
+            {
+                isInternalUpdate = false;
             }
         });
     }

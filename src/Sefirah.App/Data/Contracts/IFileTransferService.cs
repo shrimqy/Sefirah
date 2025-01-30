@@ -1,6 +1,7 @@
 ﻿using Sefirah.App.Data.Models;
 using System.IO;
 using Windows.ApplicationModel.DataTransfer.ShareTarget;
+using Windows.Storage;
 
 namespace Sefirah.App.Data.Contracts;
 public interface IFileTransferService
@@ -24,4 +25,6 @@ public interface IFileTransferService
     /// Sends a file to the remote device (Used for clipboard image transfer)
     /// </summary>
     Task SendFile(Stream stream, FileMetadata metadata);
+
+    event EventHandler<StorageFile> FileReceived;
 }
