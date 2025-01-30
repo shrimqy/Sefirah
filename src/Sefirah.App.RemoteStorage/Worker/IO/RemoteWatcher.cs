@@ -46,7 +46,7 @@ public sealed class RemoteWatcher(
             }
             catch (Exception ex)
             {
-                logger.Error("Handle Created failed", ex);
+                logger.Error("Handle Created failed for: {relativePath}",relativePath, ex);
             }
         });
     }

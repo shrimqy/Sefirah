@@ -139,7 +139,7 @@ public class PlaceholdersService(
         var clientFile = Path.Join(rootDirectory, relativeFile);
         if (!Path.Exists(clientFile))
         {
-            logger.Debug("Skip update; file does not exist {clientFile}", clientFile);
+            //logger.Debug("Skip update; file does not exist {clientFile}", clientFile);
             return;
         }
         var clientFileInfo = new FileInfo(clientFile);
@@ -161,7 +161,7 @@ public class PlaceholdersService(
         var remoteFileInfo = remoteService.GetFileInfo(relativeFile);
         if (!force && remoteFileInfo.GetHashCode() == _fileComparer.GetHashCode(clientFileInfo))
         {
-            logger.Debug("UpdateFile - equal, ignoring {relativeFile}", relativeFile);
+            //logger.Debug("UpdateFile - equal, ignoring {relativeFile}", relativeFile);
             if (!placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
             {
                 CloudFilter.SetInSyncState(hfile);

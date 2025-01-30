@@ -44,10 +44,11 @@
                 <ToggleSwitch Margin="-7,-3,-75,-3" IsOn="{x:Bind ViewModel.ClipboardSyncEnabled, Mode=TwoWay}" />
                 <local:SettingsBlockControl.ExpandableContent>
                     <StackPanel Spacing="12">
-                        <CheckBox Content="Add received files to clipboard" IsChecked="{x:Bind ViewModel.ClipboardFilesEnabled, Mode=TwoWay}" />
-                        <CheckBox Content="Include images to remote clipboard" IsChecked="{x:Bind ViewModel.ImageToClipboardEnabled, Mode=TwoWay}" />
-                        <CheckBox Content="Show clipboard toasts" IsChecked="{x:Bind ViewModel.ShowClipboardToast, Mode=TwoWay}" />
                         <CheckBox Content="Open links in browser" IsChecked="{x:Bind ViewModel.OpenLinksInBrowser, Mode=TwoWay}" />
+                        <CheckBox Content="Show clipboard toasts" IsChecked="{x:Bind ViewModel.ShowClipboardToast, Mode=TwoWay}" />
+                        <CheckBox Content="Add received files to clipboard" IsChecked="{x:Bind ViewModel.ClipboardFilesEnabled, Mode=TwoWay}" />
+                        <CheckBox Content="Include images in clipboard monitor" IsChecked="{x:Bind ViewModel.ImageToClipboardEnabled, Mode=TwoWay}" />
+
                     </StackPanel>
                 </local:SettingsBlockControl.ExpandableContent>
             </local:SettingsBlockControl>

@@ -29,7 +29,7 @@
             FontSize="20"
             Foreground="{ThemeResource TextFillColorTertiaryBrush}"
             LineHeight="32">
-            <Run FontWeight="SemiBold" Text="Seki" />
+            <Run FontWeight="SemiBold" Text="Sefirah" />
         </TextBlock>
 
         <!--  Loading Indicator  -->

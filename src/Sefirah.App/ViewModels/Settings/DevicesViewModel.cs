@@ -68,7 +68,6 @@ public partial class DevicesViewModel : BaseViewModel
 
     private async void OnConnectionStatusChange(object? sender, ConnectedSessionEventArgs args)
     {
-        logger.Info("OnConnectionStatusChange: {args}", args);
         await Dispatcher.EnqueueAsync(() =>
         {
             CurrentlyConnectedDevice = args.Device;

@@ -174,9 +174,17 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
         }
     }
 
-    public async Task<byte[]?> GetLastConnectedDevicePublicKeyAsync()
+    public async Task<byte[]?> GetSharedSecretForLastConnectedDeviceAsync()
     {
-        var device = await GetLastConnectedDevice();
-        return device?.SharedSecret;
+        try
+        {
+            var device = await GetLastConnectedDevice();
+            return device?.SharedSecret;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Error retrieving shared secret for last connected device", ex);
+            return null;
+        }
     }
 }
