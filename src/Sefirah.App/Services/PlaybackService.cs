@@ -31,6 +31,26 @@ public class PlaybackService(
             }
 
             manager.SessionsChanged += Manager_SessionsChanged;
+
+            sessionManager.ClientConnectionStatusChanged += async (sender, args) =>
+            {
+                if (args.IsConnected)
+                {
+                    if (_activeSessions.Count > 0)
+                    {
+                        await UpdatePlaybackDataAsync(_activeSessions.Values.First());
+                    }
+                    else
+                    {
+                        // Send at least volume data when no active sessions
+                        SendPlaybackData(new PlaybackData
+                        {
+                            Volume = VolumeControl.GetMasterVolume() * 100
+                        });
+                    }
+                }
+            };
+
             UpdateActiveSessions();
 
             logger.Info("PlaybackService initialized successfully");
