@@ -132,12 +132,14 @@ public sealed class MainPageViewModel : BaseViewModel
         NotificationService.ClearAllNotification();
     }
 
-    private void ToggleConnection()
+    private async void ToggleConnection()
     {
         if (ConnectionStatus)
         {
             var message = new Misc { MiscType = nameof(MiscType.Disconnect) };
             SessionManager.SendMessage(SocketMessageSerializer.Serialize(message));
+            await Task.Delay(50);
+            SessionManager.DisconnectSession();
         }
     }
 

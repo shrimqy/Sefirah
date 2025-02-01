@@ -1,15 +1,13 @@
 ﻿using CommunityToolkit.WinUI;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml.Controls;
 using Sefirah.App.Data.AppDatabase.Models;
 using Sefirah.App.Data.Contracts;
+using Sefirah.App.Data.Enums;
 using Sefirah.App.Data.EventArguments;
 using Sefirah.App.Data.Models;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Microsoft.UI.Xaml.Controls;
+using Sefirah.App.Utils.Serialization;
 using System.Windows.Input;
-using Microsoft.UI.Xaml;
-using Sefirah.App.Dialogs;
 
 namespace Sefirah.App.ViewModels.Settings;
 
@@ -95,6 +93,9 @@ public partial class DevicesViewModel : BaseViewModel
                 // First disconnect if this is the currently connected device
                 if (CurrentlyConnectedDevice?.DeviceId == device.DeviceId)
                 {
+                    var message = new Misc { MiscType = nameof(MiscType.Disconnect) };
+                    SessionManager.SendMessage(SocketMessageSerializer.Serialize(message));
+
                     SessionManager.DisconnectSession(true);
                 }
 
