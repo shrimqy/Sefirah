@@ -12,6 +12,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using IPNetwork = Sefirah.App.Data.Models.IPNetwork;
 
 namespace Sefirah.App.Services;
 public class DiscoveryService(
@@ -20,32 +21,63 @@ public class DiscoveryService(
     IDeviceManager deviceManager
     ) : IDiscoveryService, IUdpClientProvider
 {
-    private readonly Dictionary<int, MulticastClient> udpClients = [];
     private MulticastClient? udpClient; // Default client for broadcasting
     private readonly DispatcherQueue dispatcher = DispatcherQueue.GetForCurrentThread();
-    private const string MULTICAST_ADDRESS = "255.255.255.255";
+    private const string DEFAULT_BROADCAST = "255.255.255.255";
     private LocalDeviceEntity? localDevice;
-    private int port;
+    private readonly int port = 8689;
     public ObservableCollection<DiscoveredDevice> DiscoveredDevices { get; } = [];
     public List<DiscoveredMdnsServiceArgs> DiscoveredMdnsServices { get; } = [];
+    private List<IPEndPoint> _broadcastEndpoints = [];
+    private const int DiscoveryPort = 8689;
 
     public async Task StartDiscoveryAsync(int serverPort)
     {
-        port = await NetworkHelper.FindAvailablePortAsync(8689);
-        mdnsService.AdvertiseService(port);
-        mdnsService.DiscoveredMdnsService += OnDiscoveredMdnsService;
-        mdnsService.ServiceInstanceShutdown += OnServiceInstanceShutdown;
         try
         {
             localDevice = await deviceManager.GetLocalDeviceAsync();
+            var networkInterfaces = NetworkHelper.GetAllValidAddresses();
+
+
             var publicKey = Convert.ToBase64String(localDevice.PublicKey);
             var localAddresses = NetworkHelper.GetAllValidAddresses();
 
             logger.Info($"Address to advertise: {string.Join(", ", localAddresses)}");
 
+            var (username, avatar) = await CurrentUserInformation.GetCurrentUserInfoAsync();
+            var udpBroadcast = new UdpBroadcast
+            {
+                DeviceId = localDevice.DeviceId,
+                IpAddresses = [.. networkInterfaces.Select(i => i.Address.ToString())],
+                Port = serverPort,
+                DeviceName = username,
+                PublicKey = publicKey,
+            };
+
+            mdnsService.AdvertiseService(udpBroadcast, port);
+
+            _broadcastEndpoints = networkInterfaces.Select(ipInfo => 
+            {
+                // Calculate proper broadcast address
+                var network = new IPNetwork(ipInfo.Address, ipInfo.SubnetMask);
+                var broadcastAddress = network.BroadcastAddress;
+                
+                // Fallback to gateway if broadcast is limited
+                return broadcastAddress.Equals(IPAddress.Broadcast) && ipInfo.Gateway != null
+                    ? new IPEndPoint(ipInfo.Gateway, DiscoveryPort)
+                    : new IPEndPoint(broadcastAddress, DiscoveryPort);
+                
+            }).Distinct().ToList();
+
+            // Always include default broadcast as fallback
+            _broadcastEndpoints.Add(new IPEndPoint(IPAddress.Parse(DEFAULT_BROADCAST), DiscoveryPort));
+            
+            logger.Info($"Active broadcast endpoints: {string.Join(", ", _broadcastEndpoints)}");
+           
+
             udpClient = new MulticastClient("0.0.0.0", port, this)
             {
-                OptionDualMode = true,
+                OptionDualMode = false,
                 OptionMulticast = true,
                 OptionReuseAddress = true,
             };
@@ -55,15 +87,9 @@ public class DiscoveryService(
             {
                 udpClient.Socket.EnableBroadcast = true;
                 logger.Info("UDP Client connected successfully {0}", port);
-                var (username, avatar) = await CurrentUserInformation.GetCurrentUserInfoAsync();
-                var udpBroadcast = new UdpBroadcast
-                {
-                    DeviceId = localDevice.DeviceId,
-                    IpAddresses = [.. localAddresses],
-                    Port = serverPort,
-                    DeviceName = username,
-                    PublicKey = publicKey,
-                };
+
+                mdnsService.DiscoveredMdnsService += OnDiscoveredMdnsService;
+                mdnsService.ServiceInstanceShutdown += OnServiceInstanceShutdown;
 
                 BroadcastDeviceInfoAsync(udpBroadcast);
             }
@@ -75,71 +101,86 @@ public class DiscoveryService(
         }
         catch (Exception ex)
         {
-            logger.Error("Error in UDP broadcast: {message}", ex.Message);
+            logger.Error("Discovery initialization failed: {message}", ex.Message);
             throw;
         }
     }
 
     private async void BroadcastDeviceInfoAsync(UdpBroadcast udpBroadcast)
     {
-
-        var broadcastEndpoint = new IPEndPoint(IPAddress.Parse(MULTICAST_ADDRESS), port);
         while (udpClient != null)
         {
             udpBroadcast.TimeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
             string jsonMessage = SocketMessageSerializer.Serialize(udpBroadcast);
             byte[] messageBytes = Encoding.UTF8.GetBytes(jsonMessage);
-            udpClient.Socket.SendTo(messageBytes, broadcastEndpoint);
+            foreach (var endPoint in _broadcastEndpoints)
+            {
+                try
+                {
+                    udpClient.Socket.SendTo(messageBytes, endPoint);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Error sending UDP broadcast: " + ex);
+                }
+            }
+
             await Task.Delay(1000);
         }
     }
 
     private void OnDiscoveredMdnsService(object? sender, DiscoveredMdnsServiceArgs service)
     {
-        if (!DiscoveredMdnsServices.Any(s => s.ServiceInstanceName == service.ServiceInstanceName))
+        if (!DiscoveredMdnsServices.Any(s => s.DeviceId == service.DeviceId))
         {
             DiscoveredMdnsServices.Add(service);
-            logger.Info("Discovered service instance: {0}, {1}", service.ServiceInstanceName, service.Port);
-            
-            // Don't create duplicate listener if it's our broadcasting port
-            if (udpClient?.Socket.LocalEndPoint is IPEndPoint localEndPoint && 
-                localEndPoint.Port == service.Port)
-            {
-                logger.Debug("Port {0} is already used by default UDP client", service.Port);
-                return;
-            }
+            logger.Info("Discovered service instance: {0}, {1}", service.DeviceId, service.DeviceName);
 
-            // Check if we already have a listener for this port
-            if (!udpClients.ContainsKey(service.Port))
+            // Create device from mDNS data
+            var sharedSecret = EcdhHelper.DeriveKey(service.PublicKey, localDevice!.PrivateKey);
+            var device = new DiscoveredDevice
             {
-                try
-                {
-                    var client = new MulticastClient("0.0.0.0", service.Port, this)
-                    {
-                        OptionDualMode = true,
-                        OptionMulticast = true,
-                        OptionReuseAddress = true,
-                    };
-                    client.SetupMulticast(true);
+                DeviceId = service.DeviceId, // Assuming instance name is unique ID
+                DeviceName = service.DeviceName,
+                PublicKey = service.PublicKey,
+                HashedKey = sharedSecret,
+                LastSeen = DateTimeOffset.UtcNow,
+                Origin = DeviceOrigin.MdnsService
+            };
 
-                    if (client.Connect())
-                    {
-                        client.Socket.EnableBroadcast = true;
-                        udpClients.Add(service.Port, client);
-                        logger.Info("Started UDP listener on port {0}", service.Port);
-                    }
-                }
-                catch (Exception ex)
+            dispatcher.EnqueueAsync(() =>
+            {
+                var existing = DiscoveredDevices.FirstOrDefault(d => d.DeviceId == device.DeviceId);
+                if (existing != null)
                 {
-                    logger.Error("Failed to create UDP listener on port {0}: {1}", service.Port, ex.Message);
+                    DiscoveredDevices[DiscoveredDevices.IndexOf(existing)] = device;
                 }
-            }
+                else
+                {
+                    DiscoveredDevices.Add(device);
+                }
+            });
         }
     }
 
     private void OnServiceInstanceShutdown(object? sender, ServiceInstanceShutdownEventArgs e)
     {
-        DiscoveredMdnsServices.RemoveAll(s => s.ServiceInstanceName == e.ServiceInstanceName);
+        var deviceId = e.ServiceInstanceName.ToString().Split('.')[0];
+
+        // Remove from MDNS services list
+        DiscoveredMdnsServices.RemoveAll(s => s.DeviceId == deviceId);
+        
+        // Remove corresponding device from main collection
+        dispatcher.EnqueueAsync(() =>
+        {
+            var deviceToRemove = DiscoveredDevices
+                .FirstOrDefault(d => d.DeviceId == deviceId);
+            
+            if (deviceToRemove != null)
+            {
+                DiscoveredDevices.Remove(deviceToRemove);
+            }
+        });
     }
 
     public void OnConnected()
@@ -162,8 +203,13 @@ public class DiscoveryService(
         try
         {
             var message = Encoding.UTF8.GetString(buffer, (int)offset, (int)size);
-
             if (SocketMessageSerializer.DeserializeMessage(message) is not UdpBroadcast broadcast) return;
+
+            // Skip if we already have this device via mDNS
+            if (DiscoveredMdnsServices.Any(s => s.PublicKey == broadcast.PublicKey)) 
+            {
+                return;
+            }
 
             // Ignore our own broadcasts
             if (broadcast.DeviceId == localDevice?.DeviceId) return;
@@ -175,7 +221,8 @@ public class DiscoveryService(
                 DeviceName = broadcast.DeviceName,
                 PublicKey = broadcast.PublicKey,
                 HashedKey = sharedSecret,
-                LastSeen = DateTimeOffset.FromUnixTimeMilliseconds(broadcast.TimeStamp)
+                LastSeen = DateTimeOffset.FromUnixTimeMilliseconds(broadcast.TimeStamp),
+                Origin = DeviceOrigin.UdpBroadcast
             };
 
             // Update or add device to collection
@@ -219,7 +266,8 @@ public class DiscoveryService(
         var staleThreshold = TimeSpan.FromSeconds(5);
 
         var staleDevices = DiscoveredDevices
-            .Where(d => now - d.LastSeen > staleThreshold)
+            .Where(d => d.Origin == DeviceOrigin.UdpBroadcast && 
+                      now - d.LastSeen > staleThreshold)
             .ToList();
 
         foreach (var device in staleDevices)
@@ -227,8 +275,8 @@ public class DiscoveryService(
             DiscoveredDevices.Remove(device);
         }
 
-        // Stop timer if no devices left
-        if (DiscoveredDevices.Count == 0)
+        // Stop timer if no UDP devices left
+        if (DiscoveredDevices.All(d => d.Origin != DeviceOrigin.UdpBroadcast))
         {
             _cleanupTimer?.Stop();
             _cleanupTimer = null;
@@ -247,19 +295,5 @@ public class DiscoveryService(
         {
             logger.Error("Error disposing default UDP client: {message}", ex.Message);
         }
-
-        // Dispose additional clients
-        foreach (var client in udpClients.Values)
-        {
-            try
-            {
-                client.Dispose();
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Error disposing UDP client: {message}", ex.Message);
-            }
-        }
-        udpClients.Clear();
     }
 }

@@ -33,39 +33,36 @@ public static class NetworkHelper
         return port;
     }
 
-    public static List<string> GetAllValidAddresses()
+    public static List<IPAddressInfo> GetAllValidAddresses()
     {
-        var ipv4Addresses = new List<string>();
-        var ipv6Addresses = new List<string>();
+        var addresses = new List<IPAddressInfo>();
         
         foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
         {
-            if ((ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 || 
-                 ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet) &&
+            if (ni.NetworkInterfaceType is NetworkInterfaceType.Wireless80211 or NetworkInterfaceType.Ethernet &&
                 ni.OperationalStatus == OperationalStatus.Up)
             {
+                var gateway = ni.GetIPProperties().GatewayAddresses
+                    .FirstOrDefault(g => g.Address?.AddressFamily == AddressFamily.InterNetwork)?
+                    .Address;
+
                 foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
                 {
-                    if (IPAddress.IsLoopback(ip.Address)) 
-                        continue;
-                    
-                    if (ip.Address.AddressFamily == AddressFamily.InterNetwork)
+                    if (ip.Address.AddressFamily == AddressFamily.InterNetwork && 
+                        !IPAddress.IsLoopback(ip.Address))
                     {
-                        ipv4Addresses.Add(ip.Address.ToString());
-                    }
-                    else if (ip.Address.AddressFamily == AddressFamily.InterNetworkV6)
-                    {
-                        var ipString = ip.Address.IsIPv6LinkLocal 
-                            ? $"{ip.Address}%{ip.Address.ScopeId}"
-                            : ip.Address.ToString();
-                            
-                        ipv6Addresses.Add(ipString);
+                        addresses.Add(new IPAddressInfo(
+                            Address: ip.Address,
+                            SubnetMask: ip.IPv4Mask,
+                            Gateway: gateway
+                        ));
                     }
                 }
             }
         }
         
-        
-        return ipv4Addresses.Concat(ipv6Addresses).ToList();
+        return addresses;
     }
+
+    public record IPAddressInfo(IPAddress Address, IPAddress SubnetMask, IPAddress? Gateway);
 }

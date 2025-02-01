@@ -1,9 +1,12 @@
 ﻿using MeaMod.DNS.Model;
 using MeaMod.DNS.Multicast;
+using Sefirah.App.Data.AppDatabase.Models;
 using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.EventArguments;
 using Sefirah.App.Data.Models;
+using Sefirah.App.Helpers;
 using Sefirah.App.Utils;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Sefirah.App.Services;
 
@@ -17,14 +20,15 @@ public class MdnsService(ILogger logger) : IMdnsService
     public event EventHandler<ServiceInstanceShutdownEventArgs>? ServiceInstanceShutdown;
 
     /// <inheritdoc />
-    public void AdvertiseService(int port)
+    public void AdvertiseService(UdpBroadcast broadcast, int port)
     {
         try
         {
-            // Fetch device Id
-            var deviceId = CurrentUserInformation.GenerateDeviceId();
             // Set up the service profile
-            serviceProfile = new ServiceProfile(deviceId, "_sefirah._udp", ((ushort)port));
+            serviceProfile = new ServiceProfile(broadcast.DeviceId, "_sefirah._udp", ((ushort)port));
+            serviceProfile.AddProperty("deviceName", broadcast.DeviceName);
+            serviceProfile.AddProperty("publicKey", broadcast.PublicKey);
+            serviceProfile.AddProperty("serverPort", broadcast.Port.ToString());
 
             // Advertise the service
             multicastService = new MulticastService();
@@ -43,16 +47,46 @@ public class MdnsService(ILogger logger) : IMdnsService
     /// <inheritdoc />
     public void UnAdvertiseService()
     {
-        if (serviceDiscovery != null && serviceProfile != null)
+        try
         {
-            logger.Info("Un-advertising service for {0}", serviceProfile.InstanceName);
-            serviceDiscovery.Unadvertise(serviceProfile);
+            if (serviceDiscovery != null && serviceProfile != null && multicastService != null)
+            {
+                logger.Info("Un-advertising service for {0}", serviceProfile.InstanceName);
+
+                // Validate service instance name format
+                if (string.IsNullOrWhiteSpace(serviceProfile.QualifiedServiceName.ToString()))
+                {
+                    logger.Warn("Service profile has invalid name, skipping unadvertise");
+                    return;
+                }
+
+                // Library-specific cleanup sequence
+                serviceDiscovery.Unadvertise(serviceProfile);
+                multicastService.Stop();
+            }
         }
-        else
+        catch (ArgumentOutOfRangeException ex)
         {
-            logger.Warn("Service not advertised or already unadvertised");
+            logger.Error("Service already unadvertised or invalid state", ex);
+        }
+        finally
+        {
+            // Dispose resources regardless of success
+            serviceDiscovery?.Dispose();
+            multicastService?.Dispose();
+            
+            // Reset references after disposal
+            serviceDiscovery = null;
+            multicastService = null;
+            serviceProfile = null;
+        }
+
+        if (serviceDiscovery == null)
+        {
+            logger.Warn("Service already unadvertised or not initialized");
         }
     }
+
 
     /// <inheritdoc />
     public void StartDiscovery()
@@ -68,25 +102,55 @@ public class MdnsService(ILogger logger) : IMdnsService
                 
                 // Only process _sefirah._udp services
                 if (!args.ServiceInstanceName.ToCanonical().ToString().Contains("_sefirah._udp")) return;
-                
-                // Query for both TXT and SRV records
+
+                // Queries
                 multicastService.SendQuery(args.ServiceInstanceName, type: DnsType.TXT);
                 multicastService.SendQuery(args.ServiceInstanceName, type: DnsType.SRV);
-                
+                multicastService.SendQuery(args.ServiceInstanceName, type: DnsType.A);
+
             };
 
             // Add handler for answers
             multicastService.AnswerReceived += (sender, args) => {
-                foreach (var answer in args.Message.Answers)
+                var txtRecords = args.Message.Answers.OfType<TXTRecord>();
+                foreach (var txtRecord in txtRecords)
                 {
-                    if (answer is SRVRecord srvRecord)
+                    string? deviceName = null;
+                    string? publicKey = null;
+
+                    // Only process _sefirah._udp services
+                    if (!txtRecord.CanonicalName.Contains("_sefirah._udp")) continue;
+
+                    foreach (var txtData in txtRecord.Strings)
                     {
-                        // Only process _sefirah._udp services
-                        if (!srvRecord.CanonicalName.Contains("_sefirah._udp")) continue;
-                        
-                        int port = srvRecord.Port;
-                        DiscoveredMdnsService?.Invoke(this, new DiscoveredMdnsServiceArgs { ServiceInstanceName = srvRecord.CanonicalName, Port = port });
+                        // Trim spaces in case there's any
+                        var cleanTxtData = txtData.Trim();
+                        var parts = cleanTxtData.Split(['='], 2); // Split at first '=' only
+                        if (parts.Length == 2)
+                        {
+                            if (parts[0] == "deviceName")
+                            {
+                                deviceName = parts[1];
+                            }
+                            else if (parts[0] == "publicKey")
+                            {
+                                publicKey = parts[1];
+                            }
+                        }
                     }
+
+                    if (!string.IsNullOrEmpty(deviceName) && !string.IsNullOrEmpty(publicKey) && txtRecord.CanonicalName != serviceProfile!.FullyQualifiedName)
+                    {
+                        var deviceId = txtRecord.CanonicalName.Split('.')[0]; // Split on first dot to get device ID
+                        logger.Info($"Discovered service with ID: {deviceId}");
+                        DiscoveredMdnsService?.Invoke(this, new DiscoveredMdnsServiceArgs 
+                        { 
+                            DeviceId = deviceId,  // Use just the device ID
+                            DeviceName = deviceName, 
+                            PublicKey = publicKey 
+                        });
+                    }
+
                 }
             };
 

@@ -7,6 +7,7 @@ public class DiscoveredDevice
     public string DeviceName { get; set; }
     public byte[]? HashedKey { get; set; }
     public DateTimeOffset LastSeen { get; set; }
+    public DeviceOrigin Origin { get; set; }
 
     // To return the formatted key
     public string? FormattedKey
@@ -22,4 +23,10 @@ public class DiscoveredDevice
             return derivedKeyInt.ToString().PadLeft(6, '0');
         }
     }
+}
+
+public enum DeviceOrigin
+{
+    MdnsService,
+    UdpBroadcast
 }

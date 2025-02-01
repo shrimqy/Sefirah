@@ -13,4 +13,6 @@ public interface IDiscoveryService
     /// Starts the udp discovery process.
     /// </summary>
     Task StartDiscoveryAsync(int serverPort);
+
+    void Dispose();
 }

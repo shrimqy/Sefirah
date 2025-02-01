@@ -2,6 +2,7 @@
 
 public class DiscoveredMdnsServiceArgs : EventArgs
 {
-    public required string ServiceInstanceName { get; set; }
-    public int Port { get; set; }
+    public required string DeviceId { get; set; }
+    public string DeviceName { get; set; } = string.Empty;
+    public string PublicKey { get; set; } = string.Empty;
 }

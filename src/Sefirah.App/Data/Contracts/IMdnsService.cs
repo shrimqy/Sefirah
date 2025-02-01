@@ -1,5 +1,6 @@
 ﻿using MeaMod.DNS.Multicast;
 using Sefirah.App.Data.EventArguments;
+using Sefirah.App.Data.Models;
 
 namespace Sefirah.App.Data.Contracts;
 
@@ -21,7 +22,7 @@ public interface IMdnsService
     /// <summary>
     /// Advertises the device to the local network.
     /// </summary>
-    void AdvertiseService(int port);
+    void AdvertiseService(UdpBroadcast udpBroadcast, int port);
 
     /// <summary>
     /// Stops advertising the mDNS service.
