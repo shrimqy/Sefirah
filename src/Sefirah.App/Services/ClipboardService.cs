@@ -52,14 +52,15 @@ public class ClipboardService : IClipboardService
 
     private async void OnClipboardContentChanged(object? sender, object? e)
     {
+        if (isInternalUpdate || !userSettingsService.FeatureSettingsService.ClipboardSyncEnabled)
+        {
+            return;
+        }
+
         await dispatcher.EnqueueAsync(async () =>
         {
             try
             {
-                if (isInternalUpdate) {
-                    isInternalUpdate = false;
-                    return;
-                }
                 var dataPackageView = Clipboard.GetContent();
                 if (dataPackageView == null) return;
 
@@ -197,6 +198,8 @@ public class ClipboardService : IClipboardService
             throw new InvalidOperationException("DispatcherQueue is not available");
         }
 
+        if (!userSettingsService.FeatureSettingsService.ClipboardSyncEnabled) return;
+
         await dispatcher.EnqueueAsync(async () =>
         {
             try
@@ -235,6 +238,7 @@ public class ClipboardService : IClipboardService
                 }
 
                 Clipboard.SetContent(dataPackage);
+                await Task.Delay(50);
                 logger.Info("Clipboard content set: {Content}", content);
                 var notification = builder.BuildNotification();
 
@@ -256,14 +260,10 @@ public class ClipboardService : IClipboardService
         });
     }
 
-    private async Task HandleTextContentAsync(DataPackage dataPackage, string content)
+    public static bool IsValidWebUrl(Uri? uri)
     {
-
-    }
-
-    public static bool IsValidWebUrl(Uri uri)
-    {
-        return (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps) && 
+        return uri != null && 
+               (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps) && 
                !string.IsNullOrWhiteSpace(uri.Host) &&
                uri.Host.Contains('.');
     }

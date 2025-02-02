@@ -5,7 +5,6 @@ using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Enums;
 using Sefirah.App.Data.Models;
 using Sefirah.App.Utils.Serialization;
-using System;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.System;
@@ -62,7 +61,7 @@ public class NotificationService(
                             notifications.Insert(0, message);
                         }
 
-                        if (userSettingsService.FeatureSettingsService.IgnoreWindowsApps && await IsAppActiveAsync(message.AppName!)) return;
+                        if (userSettingsService.FeatureSettingsService.IgnoreWindowsApps && await IsAppActiveAsync(message.AppName!) || !userSettingsService.FeatureSettingsService.ShowNotificationToast) return;
                         await ShowWindowsNotification(message);
                     });
                 }
