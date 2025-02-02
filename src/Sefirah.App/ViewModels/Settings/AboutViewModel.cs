@@ -38,6 +38,12 @@ public partial class AboutViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task OpenAndroidGitHubRepo()
+    {
+        await Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.AndroidGitHubRepoUrl)).AsTask();
+    }
+
+    [RelayCommand]
     private async Task OpenFeatureRequest()
     {
         await Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.FeatureRequestUrl)).AsTask();

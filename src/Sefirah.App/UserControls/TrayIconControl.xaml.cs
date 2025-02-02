@@ -30,6 +30,7 @@ public sealed partial class TrayIconControl : UserControl
         }
         else
         {
+            window.Activate();
             window.AppWindow.Show();
         }
         IsWindowVisible = window.Visible;

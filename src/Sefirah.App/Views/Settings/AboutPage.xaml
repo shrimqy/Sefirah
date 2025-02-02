@@ -158,6 +158,17 @@
                 <FontIcon Glyph="&#xE8A7;" />
             </local:SettingsBlockControl>
 
+            <!--  Android GitHub Repository  -->
+            <local:SettingsBlockControl
+                Title="Android GitHub Repository"
+                ButtonCommand="{x:Bind ViewModel.OpenAndroidGitHubRepoCommand}"
+                IsClickable="True">
+                <local:SettingsBlockControl.Icon>
+                    <FontIcon Glyph="&#xE774;" />
+                </local:SettingsBlockControl.Icon>
+                <FontIcon Glyph="&#xE8A7;" />
+            </local:SettingsBlockControl>
+
             <!--  Privacy Policy  -->
             <local:SettingsBlockControl
                 Title="Privacy Policy"

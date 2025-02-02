@@ -22,7 +22,7 @@
         IconSource="{x:Bind IsWindowVisible, Converter={StaticResource BoolToImageSourceConverter}}"
         LeftClickCommand="{x:Bind ShowHideWindowCommand}"
         NoLeftClickDelay="True"
-        ToolTipText="Seki">
+        ToolTipText="Sefirah">
         <tb:TaskbarIcon.ContextFlyout>
             <MenuFlyout AreOpenCloseAnimationsEnabled="False">
                 <MenuFlyoutItem Command="{x:Bind ShowHideWindowCommand}" Text="Show/Hide Window" />

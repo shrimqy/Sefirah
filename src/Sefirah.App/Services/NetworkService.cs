@@ -6,7 +6,6 @@ using Sefirah.App.Data.Models;
 using Sefirah.App.Services.Socket;
 using Sefirah.App.Utils;
 using Sefirah.App.Utils.Serialization;
-using Sefirah.Common.Utils;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Authentication;

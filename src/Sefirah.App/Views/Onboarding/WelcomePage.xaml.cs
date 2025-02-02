@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Windows.System;
+using static Sefirah.App.Constants;
 
 namespace Sefirah.App.Views.Onboarding;
 
@@ -13,7 +14,7 @@ public sealed partial class WelcomePage : Page
 
     private async void OnGitHubButton_Click(object sender, RoutedEventArgs e)
     {
-        var uri = new Uri("https://github.com/shrimqy/sefirah");
+        var uri = new Uri(ExternalUrl.AndroidGitHubRepoUrl);
         await Launcher.LaunchUriAsync(uri);
     }
 

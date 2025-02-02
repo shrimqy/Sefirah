@@ -277,7 +277,6 @@
                                                                             <FontIcon Glyph="&#xECE4;" />
                                                                         </MenuFlyoutItem.Icon>
                                                                     </MenuFlyoutItem>
-                                                                    <MenuFlyoutItem Icon="Pin" Text="Pin" />
                                                                 </MenuFlyout>
                                                             </Button.Flyout>
                                                         </Button>

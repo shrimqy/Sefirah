@@ -89,7 +89,7 @@ public class FileTransferService(
 
             await ShowTransferNotification("Receiving File", $"{currentFileMetadata.FileName}", 0);
 
-            await Task.Delay(200);
+            await Task.Delay(300);
             var passwordBytes = Encoding.UTF8.GetBytes(serverInfo.Password + "\n");
             client?.SendAsync(passwordBytes);
 
@@ -101,7 +101,7 @@ public class FileTransferService(
                 FileReceived?.Invoke(this, file);
             }
 
-            await ShowTransferNotification("File Received", $"{currentFileMetadata.FileName} has been saved successfully");
+            _ = ShowTransferNotification("File Received", $"{currentFileMetadata.FileName} has been saved successfully");
         }
         catch (Exception ex)
         {

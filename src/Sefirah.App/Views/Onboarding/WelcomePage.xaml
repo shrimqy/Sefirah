@@ -31,7 +31,7 @@
 
             <TextBlock
                 Style="{ThemeResource BodyTextBlockStyle}"
-                Text="To get started download and install the comapanion App through the github page."
+                Text="To get started download and install the comapanion App through the corresponding github page."
                 TextAlignment="Center"
                 TextWrapping="Wrap" />
 
