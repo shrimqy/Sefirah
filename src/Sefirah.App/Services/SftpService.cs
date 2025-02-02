@@ -1,9 +1,11 @@
 using Sefirah.App.Data.Contracts;
+using Sefirah.App.Data.EventArguments;
 using Sefirah.App.Data.Models;
 using Sefirah.App.RemoteStorage.Commands;
 using Sefirah.App.RemoteStorage.RemoteSftp;
 using Sefirah.App.RemoteStorage.Worker;
 using Windows.Storage;
+using Windows.Storage.Provider;
 
 namespace Sefirah.App.Services;
 
@@ -12,9 +14,12 @@ public class SftpService(
     SyncRootRegistrar registrar,
     SyncProviderPool syncProviderPool,  
     IUserSettingsService userSettingsService,
-    IDeviceManager deviceManager
+    IDeviceManager deviceManager,
+    ISessionManager sessionManager
     ) : ISftpService
 {
+    private StorageProviderSyncRootInfo? info;
+
     public async Task InitializeAsync(SftpServerInfo info)
     {
         try
@@ -44,6 +49,16 @@ public class SftpService(
             logger.Error("Failed to initialize SFTP service", ex);
             throw;
         }
+
+        sessionManager.ClientConnectionStatusChanged += OnClientConnectionStatusChanged;
+    }
+
+    private void OnClientConnectionStatusChanged(object? sender, ConnectedSessionEventArgs e)
+    {
+        if (!e.IsConnected && info != null)
+        {
+            syncProviderPool.StopSyncRoot(info);
+        }
     }
 
     private async Task Register<T>(string name, string directory, string accountId, T context) where T : struct 
@@ -69,7 +84,7 @@ public class SftpService(
                 storageFolder = await parentFolder.CreateFolderAsync(Path.GetFileName(registerCommand.Directory));
             }
 
-            var info = registrar.Register(registerCommand, storageFolder, context);
+            info = registrar.Register(registerCommand, storageFolder, context);
             syncProviderPool.Start(info);
         }
         catch (Exception ex) 

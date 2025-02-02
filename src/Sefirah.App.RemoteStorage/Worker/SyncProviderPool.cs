@@ -60,6 +60,16 @@ public class SyncProviderPool(
         await Task.WhenAll(stopTasks);
     }
 
+    public void StopSyncRoot(StorageProviderSyncRootInfo syncRootInfo)
+    {
+        if (_threads.TryGetValue(syncRootInfo.Id, out var existingThread))
+        {
+            logger.Debug("Stopping existing sync provider for {id}", syncRootInfo.Id);
+            existingThread.Stop().Wait();
+            _threads.Remove(syncRootInfo.Id);
+        }
+    }
+
     public async Task Stop(string id)
     {
         if (!_threads.TryGetValue(id, out var thread))
