@@ -1,8 +1,15 @@
 namespace Sefirah.App.RemoteStorage.Interop.Extensions;
 public class HFileException : Exception
 {
-    public HFileException(string path) : base("Invalid hfile")
+    public int ErrorCode { get; }
+    public string Path { get; }
+
+    public HFileException(string message, int errorCode, string path) 
+        : base($"{message}. Error: 0x{errorCode:X8} ({errorCode})")
     {
-        Data.Add(nameof(path), path);
+        ErrorCode = errorCode;
+        Path = path;
+        Data[nameof(Path)] = path;
+        Data[nameof(ErrorCode)] = errorCode;
     }
 }

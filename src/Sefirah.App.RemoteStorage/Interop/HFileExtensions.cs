@@ -1,5 +1,7 @@
 using Sefirah.App.RemoteStorage.Interop.Extensions;
 using Vanara.PInvoke;
+using System;
+using System.Runtime.InteropServices;
 
 namespace Sefirah.App.RemoteStorage.Interop;
 public static class HFileExtensions
@@ -13,7 +15,10 @@ public static class HFileExtensions
         {
             return fileHandle;
         }
+        
+        var lastError = Marshal.GetLastWin32Error();
         fileHandle.Dispose();
-        throw new HFileException(path);
+        
+        throw new HFileException($"Failed to create valid file handle for: {path}", lastError, path);
     }
 }

@@ -4,6 +4,8 @@ using Vanara.InteropServices;
 using Vanara.PInvoke;
 using Sefirah.App.RemoteStorage.Helpers;
 using Sefirah.App.RemoteStorage.RemoteAbstractions;
+using Sefirah.App.RemoteStorage.Interop.Extensions;
+using System.ComponentModel;
 
 namespace Sefirah.App.RemoteStorage.Interop;
 public static class CloudFilter
@@ -33,14 +35,30 @@ public static class CloudFilter
 
     public static bool IsPlaceholder(string path)
     {
-        using var hfile = CreateHFile(path);
-        return IsPlaceholder(hfile);
+        try
+        {
+            using var hfile = CreateHFile(path);
+            return IsPlaceholder(hfile);
+        }
+        catch (HFileException)
+        {
+            // If we can't open the file handle, assume it's not a placeholder
+            return false;
+        }
     }
 
     public static CldApi.CF_PLACEHOLDER_STATE GetPlaceholderState(string path)
     {
-        using var hfile = CreateHFile(path);
-        return GetPlaceholderState(hfile);
+        try
+        {
+            using var hfile = CreateHFile(path);
+            return GetPlaceholderState(hfile);
+        }
+        catch (HFileException)
+        {
+            // return invalid
+            return CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_INVALID;
+        }
     }
 
     public static CldApi.CF_PLACEHOLDER_STATE GetPlaceholderState(HFILE hfile)
@@ -184,14 +202,18 @@ public static class CloudFilter
         ).ThrowIfFailed("Update placeholder failed");
     }
 
-    public static SafeMetaHFILE CreateHFile(string path, FileAccess access = 0, FileShare fileShare = FileShare.Read) =>
-        Kernel32.CreateFile(
+    public static SafeMetaHFILE CreateHFile(string path, FileAccess access = 0, FileShare fileShare = FileShare.Read)
+    {
+        var handle = Kernel32.CreateFile(
             path,
             (Kernel32.FileAccess)access | Kernel32.FileAccess.FILE_READ_ATTRIBUTES,
             fileShare,
             dwCreationDisposition: FileMode.Open,
             dwFlagsAndAttributes: FileFlagsAndAttributes.FILE_FLAG_BACKUP_SEMANTICS
-        ).ToMeta().ThrowIfInvalid(path);
+        ).ToMeta();
+        
+        return handle.ThrowIfInvalid(path);
+    }
 
     public static SafeMetaHFILE CreateHFileWithOplock(string clientPath, FileAccess access = FileAccess.Read)
     {
