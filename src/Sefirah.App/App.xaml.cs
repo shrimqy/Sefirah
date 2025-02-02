@@ -72,9 +72,9 @@ public partial class App : Application
                         MainWindow.Instance.WindowState = WindowState.Minimized;
                         break;
                     case StartupOptions.InTray:
-                        // Initialize but don't show window
-                        MainWindow.Instance.Activate();
-                        MainWindow.Instance.AppWindow.Hide();
+                        // Don't activate?
+                        //MainWindow.Instance.Activate();
+                        //MainWindow.Instance.AppWindow.Hide();
                         break;
                     default:
                         MainWindow.Instance.Activate();
@@ -97,7 +97,7 @@ public partial class App : Application
             // Show Splash Screen only for visible windows
             if (MainWindow.Instance.AppWindow.IsVisible)
             {
-                SplashScreenLoadingTCS = new TaskCompletionSource<bool>();
+                SplashScreenLoadingTCS = new TaskCompletionSource<bool>(); // We are not using this for anything right now
                 MainWindow.Instance.ShowSplashScreen();
                 await Task.Delay(200);
             }
