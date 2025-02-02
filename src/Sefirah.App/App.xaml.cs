@@ -72,9 +72,7 @@ public partial class App : Application
                         MainWindow.Instance.WindowState = WindowState.Minimized;
                         break;
                     case StartupOptions.InTray:
-                        // Don't activate?
-                        //MainWindow.Instance.Activate();
-                        //MainWindow.Instance.AppWindow.Hide();
+                        // Don't activate
                         break;
                     default:
                         MainWindow.Instance.Activate();
