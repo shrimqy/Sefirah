@@ -63,13 +63,18 @@ public class PlaybackService(
     }
 
     /// <inheritdoc/>
-    public async Task HandleLocalMediaActionAsync(PlaybackData request)
+    public async Task HandleLocalMediaActionAsync(PlaybackData playback)
     {
         try
         {
-            if (!Enum.TryParse(request.MediaAction, true, out MediaAction action)) return;
+            if (!Enum.TryParse(playback.MediaAction, true, out MediaAction action)) return;
 
-            await ExecuteMediaActionAsync(request, action);
+            if (action == MediaAction.Volume)
+            {
+                VolumeControlAsync(playback.Volume);
+            }
+
+            await ExecuteMediaActionAsync(playback, action);
         }
         catch (Exception ex)
         {
@@ -78,7 +83,7 @@ public class PlaybackService(
         }
     }
 
-    private async Task ExecuteMediaActionAsync(PlaybackData request, MediaAction action)
+    private async Task ExecuteMediaActionAsync(PlaybackData playback, MediaAction action)
     {
         var session = _activeSessions.Values.FirstOrDefault();
         if (session == null)
@@ -87,7 +92,7 @@ public class PlaybackService(
             return;
         }
 
-        await ExecuteSessionActionAsync(session, action, request);
+        await ExecuteSessionActionAsync(session, action, playback);
     }
 
     private async Task ExecuteSessionActionAsync(GlobalSystemMediaTransportControlsSession session, MediaAction action, PlaybackData playbackData)
