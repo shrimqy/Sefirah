@@ -89,7 +89,7 @@ public class FileTransferService(
 
             await ShowTransferNotification("Receiving File", $"{currentFileMetadata.FileName}", 0);
 
-            await Task.Delay(300);
+            await Task.Delay(500);
             var passwordBytes = Encoding.UTF8.GetBytes(serverInfo.Password + "\n");
             client?.SendAsync(passwordBytes);
 
