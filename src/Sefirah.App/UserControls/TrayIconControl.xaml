@@ -12,8 +12,8 @@
     <UserControl.Resources>
         <converters:BoolToImageSourceConverter
             x:Key="BoolToImageSourceConverter"
-            FalseImage="ms-appx:///Assets/Icons/SekiDark.ico"
-            TrueImage="ms-appx:///Assets/Icons/SekiDark.ico" />
+            FalseImage="ms-appx:///Assets/Icons/SefirahDark.ico"
+            TrueImage="ms-appx:///Assets/Icons/SefirahLight.ico" />
     </UserControl.Resources>
     <tb:TaskbarIcon
         x:Name="TrayIcon"

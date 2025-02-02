@@ -101,8 +101,8 @@ internal sealed class GeneralSettingsService : BaseObservableJsonSettings, IGene
                 try
                 {
                     window.AppWindow?.SetIcon(isDark ? 
-                        "Assets/SekiDark.ico" : 
-                        "Assets/SekiLight.ico");
+                        "Assets/SefirahDark.ico" : 
+                        "Assets/SefirahLight.ico");
                 }
                 catch (COMException ex)
                 {
