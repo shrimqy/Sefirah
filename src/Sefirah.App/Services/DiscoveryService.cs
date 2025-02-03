@@ -169,16 +169,23 @@ public class DiscoveryService(
 
         // Remove from MDNS services list
         DiscoveredMdnsServices.RemoveAll(s => s.DeviceId == deviceId);
-        
+
         // Remove corresponding device from main collection
         dispatcher.EnqueueAsync(() =>
         {
-            var deviceToRemove = DiscoveredDevices
-                .FirstOrDefault(d => d.DeviceId == deviceId);
-            
-            if (deviceToRemove != null)
+            try
             {
-                DiscoveredDevices.Remove(deviceToRemove);
+                var deviceToRemove = DiscoveredDevices
+                    .FirstOrDefault(d => d.DeviceId == deviceId);
+
+                if (deviceToRemove != null)
+                {
+                    DiscoveredDevices.Remove(deviceToRemove);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error clearing discovered device", ex);
             }
         });
     }

@@ -7,15 +7,13 @@
 		<AssemblyName>Sefirah</AssemblyName>
         <DefaultLanguage>en-US</DefaultLanguage>
         <Nullable>enable</Nullable>
+        <UseWinUI>true</UseWinUI>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
+        <AppxBundlePlatforms>x86|x64|arm64</AppxBundlePlatforms>
         <AppxBundle>Always</AppxBundle>
-		<Platforms>x86;x64;ARM64</Platforms>
+		<Platforms>x86;x64;arm64</Platforms>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<UseWinUI>true</UseWinUI>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <ApplicationManifest>app.manifest</ApplicationManifest>
-		<ImplicitUsings>disable</ImplicitUsings>
-
         <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
         <DefineConstants Condition="'$(Configuration)' == 'Debug'">TRACE;DEBUG;NETFX_CORE;DISABLE_XAML_GENERATED_MAIN</DefineConstants>
         <DefineConstants Condition="'$(Configuration)' != 'Debug'">TRACE;RELEASE;NETFX_CORE;DISABLE_XAML_GENERATED_MAIN</DefineConstants>
@@ -24,21 +22,6 @@
 
     <ItemGroup>
         <Content CopyToOutputDirectory="PreserveNewest" Include="Assets\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="Views\MainPage.xaml" />
-      <None Remove="Views\Onboarding\SyncPage.xaml" />
-      <None Remove="Views\Onboarding\WelcomePage.xaml" />
-      <None Remove="Views\SplashScreen.xaml" />
-    </ItemGroup>
-    
-    <ItemGroup>
-        <Manifest Include="$(ApplicationManifest)" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
-        <ProjectCapability Include="Msix" />
     </ItemGroup>
     
     <ItemGroup>
@@ -64,40 +47,6 @@
         <ProjectReference Include="..\Sefirah.App.RemoteStorage\Sefirah.App.RemoteStorage.csproj" />
         <ProjectReference Include="..\Sefirah.Common\Sefirah.Common.csproj" />
     </ItemGroup>
-    
-    <ItemGroup>
-      <Page Update="Views\SplashScreen.xaml">
-        <Generator>MSBuild:Compile</Generator>
-      </Page>
-    </ItemGroup>
-    
-    <ItemGroup>
-      <Page Update="Views\MainPage.xaml">
-        <Generator>MSBuild:Compile</Generator>
-      </Page>
-    </ItemGroup>
-    
-    <ItemGroup>
-      <Page Update="Views\Onboarding\SyncPage.xaml">
-        <Generator>MSBuild:Compile</Generator>
-      </Page>
-    </ItemGroup>
-    
-    <ItemGroup>
-      <Page Update="Views\Onboarding\WelcomePage.xaml">
-        <Generator>MSBuild:Compile</Generator>
-      </Page>
-    </ItemGroup>
-    
-    <ItemGroup>
-      <Page Update="UserControls\TrayIconControl.xaml">
-        <Generator>MSBuild:Compile</Generator>
-      </Page>
-    </ItemGroup>
-
-    <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
-        <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
-    </PropertyGroup>
 
     <!-- Publish Properties -->
     <PropertyGroup>

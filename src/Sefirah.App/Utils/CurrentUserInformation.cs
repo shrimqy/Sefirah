@@ -56,7 +56,9 @@ public static class CurrentUserInformation
 
     private static string GetFirstNameFromProperties(IDictionary<string, object> properties)
     {
-        if (properties.TryGetValue("FirstName", out object? value) && value is string firstNameProperty)
+        if (properties.TryGetValue("FirstName", out object? value) && 
+            value is string firstNameProperty &&
+            !string.IsNullOrEmpty(firstNameProperty))
         {
             return firstNameProperty;
         }
