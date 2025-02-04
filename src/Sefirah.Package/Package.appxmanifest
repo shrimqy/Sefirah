@@ -107,8 +107,6 @@
   <Capabilities>
     <Capability Name="internetClient" />
     <rescap:Capability Name="runFullTrust" />
-	<rescap:Capability Name="storageProviderSync"/>
-	<rescap:Capability Name="storageProviderSyncRoot"/>
 	<rescap:Capability Name="appDiagnostics"/>
     <uap3:Capability Name="backgroundMediaPlayback"/>
     <Capability Name="internetClientServer"/>
