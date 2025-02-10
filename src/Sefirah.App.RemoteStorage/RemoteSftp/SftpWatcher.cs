@@ -129,9 +129,11 @@ public sealed class SftpWatcher(
                 return _knownFiles;  // Return existing known files instead of empty dictionary
             }
 
-            // Get all directories first (including non-hydrated ones)
+            // Get all directories first (including non-hydrated ones), excluding system directories
             var directories = sftpFiles
-                .Where(sftpFile => sftpFile.IsDirectory && !_relativeDirectoryNames.Contains(sftpFile.Name))
+                .Where(sftpFile => sftpFile.IsDirectory && 
+                                  !_relativeDirectoryNames.Contains(sftpFile.Name) &&
+                                  !FileHelper.IsSystemDirectory(PathMapper.GetRelativePath(sftpFile.FullName, _context.Directory)))
                 .ToDictionary(
                     dir => dir.FullName,
                     _ => DateTime.MaxValue

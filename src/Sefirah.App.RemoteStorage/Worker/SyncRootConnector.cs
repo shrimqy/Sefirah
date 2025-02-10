@@ -67,12 +67,12 @@ public sealed class SyncRootConnector(
 
         var clientDirectory = Path.Join(callbackInfo.VolumeDosName, callbackInfo.NormalizedPath[1..]);
         var relativeDirectory = PathMapper.GetRelativePath(clientDirectory, _rootDirectory);
-
+        
         try
         {
-            var fileInfos = remoteService.EnumerateFiles(relativeDirectory, callbackParameters.FetchPlaceholders.Pattern)
-                .Where(x => !FileHelper.IsSystemFile(x.RelativePath));
-            var directoryInfos = remoteService.EnumerateDirectories(relativeDirectory, callbackParameters.FetchPlaceholders.Pattern);
+            var fileInfos = remoteService.EnumerateFiles(relativeDirectory, callbackParameters.FetchPlaceholders.Pattern);
+            var directoryInfos = remoteService.EnumerateDirectories(relativeDirectory, callbackParameters.FetchPlaceholders.Pattern)
+                .Where(dir => !FileHelper.IsSystemDirectory(dir.RelativePath));
             var fileSystemInfos = fileInfos.Concat<RemoteFileSystemInfo>(directoryInfos).ToArray();
 
             CloudFilter.TransferPlaceholders(callbackInfo, fileSystemInfos);

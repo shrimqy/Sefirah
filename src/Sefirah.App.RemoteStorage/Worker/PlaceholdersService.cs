@@ -4,6 +4,7 @@ using Sefirah.App.RemoteStorage.Interop;
 using Sefirah.App.RemoteStorage.RemoteAbstractions;
 using Sefirah.Common.Utils;
 using Vanara.PInvoke;
+using static Vanara.PInvoke.Shell32;
 
 namespace Sefirah.App.RemoteStorage.Worker;
 public class PlaceholdersService(
@@ -19,7 +20,7 @@ public class PlaceholdersService(
     public void CreateBulk(string subpath)
     {
         using (var safeFilePlaceholderCreateInfos = remoteService.EnumerateFiles(subpath)
-            .Where((x) => !FileHelper.IsSystemFile(x.RelativePath))
+            .Where((x) => !FileHelper.IsSystemDirectory(x.RelativePath))
             .Select(GetFilePlaceholderCreateInfo)
             .ToDisposableArray()
         )

@@ -175,10 +175,6 @@ public class ClientWatcher : IDisposable
         };
 
         watcher.Created += async (object sender, FileSystemEventArgs e) => {
-            if (FileHelper.IsSystemFile(e.FullPath))
-            {
-                return;
-            }
 
             var state = CloudFilter.GetPlaceholderState(e.FullPath);
             if (state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))

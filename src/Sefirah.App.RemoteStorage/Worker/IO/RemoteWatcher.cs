@@ -25,13 +25,11 @@ public sealed class RemoteWatcher(
     private async Task HandleCreated(string relativePath)
     {
         relativePath = PathMapper.NormalizePath(relativePath);
-        logger.Debug("Created {path}", relativePath);
         await taskWriter.WriteAsync(async () =>
         {
-            if (FileHelper.IsSystemFile(relativePath))
-            {
-                return;
-            }
+            if (FileHelper.IsSystemDirectory(relativePath)) return;
+        
+            logger.Debug("Created {path}", relativePath);
             using var locker = await fileLocker.Lock(relativePath);
             try
             {

@@ -15,6 +15,13 @@ public static class FileHelper
         "Thumbs.db"
     ];
 
+    private static readonly ImmutableHashSet<string> SYSTEM_FOLDER_NAMES = [
+        "/Android/obb",
+        "/Android/data",
+        "Android/obb",
+        "Android/data",
+    ];
+
     public static async Task WaitUntilUnlocked(Action funcOrAction, ILogger logger)
     {
         IOException? latestEx = null;
@@ -63,4 +70,7 @@ public static class FileHelper
 
     public static bool IsSystemFile(string path) =>
         SYSTEM_FILE_NAMES.Any(x => path.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+
+    public static bool IsSystemDirectory(string path) =>
+        SYSTEM_FOLDER_NAMES.Any(x => path.StartsWith(x, StringComparison.OrdinalIgnoreCase));
 }
