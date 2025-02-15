@@ -5,19 +5,21 @@
 		<TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
 		<TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
 		<AssemblyName>Sefirah</AssemblyName>
-        <DefaultLanguage>en-US</DefaultLanguage>
         <Nullable>enable</Nullable>
         <UseWinUI>true</UseWinUI>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
         <AppxBundlePlatforms>x86|x64|arm64</AppxBundlePlatforms>
         <AppxBundle>Always</AppxBundle>
-		<Platforms>x86;x64;arm64</Platforms>
+        <DefaultLanguage>en-US</DefaultLanguage>
+        <AppxDefaultResourceQualifiers>Language=en-US;ja-JP</AppxDefaultResourceQualifiers>
+        <Platforms>x86;x64;arm64</Platforms>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
         <DefineConstants Condition="'$(Configuration)' == 'Debug'">TRACE;DEBUG;NETFX_CORE;DISABLE_XAML_GENERATED_MAIN</DefineConstants>
         <DefineConstants Condition="'$(Configuration)' != 'Debug'">TRACE;RELEASE;NETFX_CORE;DISABLE_XAML_GENERATED_MAIN</DefineConstants>
         <ApplicationIcon>..\Sefirah.Package\Assets\Icons\SefirahDark.ico</ApplicationIcon>
+        <DefaultLanguage>en-US</DefaultLanguage>
 	</PropertyGroup>
 
     <ItemGroup>
@@ -48,6 +50,10 @@
         <ProjectReference Include="..\Sefirah.Common\Sefirah.Common.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <AdditionalFiles Include="Strings\en-US\Resources.resw" />
+    </ItemGroup>
+        
     <!-- Publish Properties -->
     <PropertyGroup>
         <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>

@@ -6,6 +6,7 @@ using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Enums;
 using Sefirah.App.Data.EventArguments;
 using Sefirah.App.Data.Models;
+using Sefirah.App.Extensions;
 using Sefirah.App.Utils.Serialization;
 using System.Windows.Input;
 
@@ -74,12 +75,16 @@ public partial class DevicesViewModel : BaseViewModel
 
     private async Task RemoveDevice(RemoteDeviceEntity? device)
     {
+        if (device == null)
+        {
+            return;
+        }   
         var dialog = new ContentDialog
         {
-            Title = "Remove Device",
-            Content = $"Are you sure you want to remove {device.Name}? This action cannot be undone.",
-            PrimaryButtonText = "Remove",
-            CloseButtonText = "Cancel",
+            Title = "RemoveDeviceDialogTitle".GetLocalizedResource(),
+            Content = string.Format("RemoveDeviceDialogSubtitle".GetLocalizedResource(), device.Name),
+            PrimaryButtonText = "RemoveDeviceConfirmButton".GetLocalizedResource(),
+            CloseButtonText = "RemoveDeviceCancelButton".GetLocalizedResource(),
             DefaultButton = ContentDialogButton.Close,
             XamlRoot = MainWindow.Instance.Content.XamlRoot
         };

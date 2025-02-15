@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:Sefirah.App.Views"
+    xmlns:helpers="using:Sefirah.App.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     mc:Ignorable="d">
@@ -27,11 +28,11 @@
             <TextBlock
                 HorizontalAlignment="Center"
                 Style="{ThemeResource TitleLargeTextBlockStyle}"
-                Text="Welcome" />
+                Text="{helpers:ResourceString Name=OnboardingWelcome/Title}" />
 
             <TextBlock
                 Style="{ThemeResource BodyTextBlockStyle}"
-                Text="To get started download and install the comapanion app through the corresponding github page."
+                Text="{helpers:ResourceString Name=OnboardingWelcome/Subtitle}"
                 TextAlignment="Center"
                 TextWrapping="Wrap" />
 
@@ -47,7 +48,7 @@
                     Grid.Column="0"
                     HorizontalAlignment="Center"
                     Click="OnGitHubButton_Click"
-                    Content="Github" />
+                    Content="{helpers:ResourceString Name=GitHub}" />
 
                 <!--  Get Started Button  -->
                 <Button
@@ -55,9 +56,8 @@
                     Grid.Column="1"
                     HorizontalAlignment="Center"
                     Click="OnGetStartedButton_Click"
-                    Content="Get Started" />
+                    Content="{helpers:ResourceString Name=OnboardingWelcomeGetStarted}" />
             </Grid>
-
         </StackPanel>
     </Grid>
 </Page>

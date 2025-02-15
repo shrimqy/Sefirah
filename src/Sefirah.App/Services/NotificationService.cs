@@ -4,6 +4,7 @@ using Microsoft.Windows.AppNotifications.Builder;
 using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Enums;
 using Sefirah.App.Data.Models;
+using Sefirah.App.Extensions;
 using Sefirah.App.Utils.Serialization;
 using Windows.Storage;
 using Windows.Storage.Streams;
@@ -32,10 +33,10 @@ public class NotificationService(
         await semaphore.WaitAsync().ConfigureAwait(false);
         try
         {
-            logger.Debug("Processing notification message from {0}", message.AppName!);
+            logger.Debug("Processing notification message from {0}", message.AppName);
             
-            var filter = await remoteAppsRepository.GetNotificationFilterAsync(message.AppPackage!)
-                ?? await remoteAppsRepository.AddNewAppNotificationFilter(message.AppPackage!, message.AppName!, !string.IsNullOrEmpty(message.AppIcon) ? Convert.FromBase64String(message.AppIcon) : null!);
+            var filter = await remoteAppsRepository.GetNotificationFilterAsync(message.AppPackage)
+                ?? await remoteAppsRepository.AddNewAppNotificationFilter(message.AppPackage, message.AppName!, !string.IsNullOrEmpty(message.AppIcon) ? Convert.FromBase64String(message.AppIcon) : null!);
             
             if (filter == NotificationFilter.Disabled) return;
 
@@ -136,14 +137,13 @@ public class NotificationService(
             // Handle actions
             foreach (var action in message.Actions)
             {
-                logger.Debug("Adding action: {0}", action.Label);
                 if (action == null) continue;
 
                 if (action.IsReplyAction)
                 {
                     builder
-                        .AddTextBox("textBox", "Type a reply", "")
-                        .AddButton(new AppNotificationButton("Send")
+                        .AddTextBox("textBox", "ReplyPlaceholder".GetLocalizedResource(), "")
+                        .AddButton(new AppNotificationButton("SendButton".GetLocalizedResource())
                             .AddArgument("notificationType", ToastNotificationType.RemoteNotification)
                             .AddArgument("notificationKey", message.NotificationKey)
                             .AddArgument("replyResultKey", message.ReplyResultKey)

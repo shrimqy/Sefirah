@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dataitems="using:Sefirah.App.Data.Items"
+    xmlns:helpers="using:Sefirah.App.Helpers"   
     xmlns:local="using:Sefirah.App.UserControls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:Sefirah.App.ViewModels.Settings"
@@ -32,7 +33,7 @@
                 Margin="0,0,0,8"
                 FontSize="28"
                 FontWeight="Medium"
-                Text="About" />
+                Text="{helpers:ResourceString Name=About}" />
 
             <!--  App Version  -->
             <local:SettingsBlockControl
@@ -53,7 +54,7 @@
             </local:SettingsBlockControl>
 
             <!--  Feedback  -->
-            <local:SettingsBlockControl Title="Feedback" ContentPadding="-16">
+            <local:SettingsBlockControl Title="{helpers:ResourceString Name=Feedback}" ContentPadding="-16">
                 <local:SettingsBlockControl.Icon>
                     <FontIcon Glyph="&#xE939;" />
                 </local:SettingsBlockControl.Icon>
@@ -87,7 +88,7 @@
             </local:SettingsBlockControl>
 
             <!--  Third Party Libraries  -->
-            <local:SettingsBlockControl Title="Third Party Libraries" ContentPadding="0">
+            <local:SettingsBlockControl Title="{helpers:ResourceString Name=ThirdPartyLibraries}" ContentPadding="0">
                 <local:SettingsBlockControl.Icon>
                     <FontIcon Glyph="&#xE72D;" />
                 </local:SettingsBlockControl.Icon>
@@ -127,7 +128,7 @@
 
             <!--  Support  -->
             <local:SettingsBlockControl
-                Title="Support Development"
+                Title="{helpers:ResourceString Name=SupportDevelopment}"
                 ButtonCommand="{x:Bind ViewModel.OpenDonateCommand}"
                 IsClickable="True">
                 <local:SettingsBlockControl.Icon>
@@ -138,7 +139,7 @@
 
             <!--  Open Logs  -->
             <local:SettingsBlockControl
-                Title="Open Logs"
+                Title="{helpers:ResourceString Name=OpenLogs}"
                 ButtonCommand="{x:Bind ViewModel.OpenLogsCommand}"
                 IsClickable="True">
                 <local:SettingsBlockControl.Icon>
@@ -149,7 +150,7 @@
 
             <!--  GitHub Repository  -->
             <local:SettingsBlockControl
-                Title="GitHub Repository"
+                Title="{helpers:ResourceString Name=GitHubRepository}"
                 ButtonCommand="{x:Bind ViewModel.OpenGitHubRepoCommand}"
                 IsClickable="True">
                 <local:SettingsBlockControl.Icon>
@@ -160,7 +161,7 @@
 
             <!--  Android GitHub Repository  -->
             <local:SettingsBlockControl
-                Title="Android GitHub Repository"
+                Title="{helpers:ResourceString Name=AndroidGitHubRepository}"
                 ButtonCommand="{x:Bind ViewModel.OpenAndroidGitHubRepoCommand}"
                 IsClickable="True">
                 <local:SettingsBlockControl.Icon>
@@ -171,7 +172,7 @@
 
             <!--  Privacy Policy  -->
             <local:SettingsBlockControl
-                Title="Privacy Policy"
+                Title="{helpers:ResourceString Name=PrivacyPolicy}"
                 ButtonCommand="{x:Bind ViewModel.OpenPrivacyPolicyCommand}"
                 IsClickable="True">
                 <local:SettingsBlockControl.Icon>

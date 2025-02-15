@@ -5,6 +5,7 @@
     xmlns:converters="using:Sefirah.App.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:Sefirah.App.UserControls"
+    xmlns:helpers="using:Sefirah.App.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:tb="using:H.NotifyIcon"
     mc:Ignorable="d">
@@ -25,9 +26,9 @@
         ToolTipText="Sefirah">
         <tb:TaskbarIcon.ContextFlyout>
             <MenuFlyout AreOpenCloseAnimationsEnabled="False">
-                <MenuFlyoutItem Command="{x:Bind ShowHideWindowCommand}" Text="Show/Hide Window" />
+                <MenuFlyoutItem Command="{x:Bind ShowHideWindowCommand}" Text="{helpers:ResourceString Name=ShowHideWindow}" />
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Command="{x:Bind ExitApplicationCommand}" Text="Exit" />
+                <MenuFlyoutItem Command="{x:Bind ExitApplicationCommand}" Text="{helpers:ResourceString Name=Exit}" />
             </MenuFlyout>
         </tb:TaskbarIcon.ContextFlyout>
     </tb:TaskbarIcon>

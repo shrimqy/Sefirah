@@ -9,6 +9,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:userControls="using:Sefirah.App.UserControls"
     xmlns:views="using:Sefirah.App.Views"
+    xmlns:helpers="using:Sefirah.App.Helpers"
     x:Name="MainPageRoot"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     DataContext="{x:Bind ViewModel, Mode=OneWay}"
@@ -81,7 +82,7 @@
                     </Grid.ColumnDefinitions>
 
                     <Grid
-                        Grid.Column="0"
+                        Grid.Column="0" 
                         Width="53"
                         Height="100"
                         Margin="18,0,0,0"
@@ -183,7 +184,7 @@
                             Grid.Column="0"
                             FontSize="20"
                             FontWeight="SemiBold"
-                            Text="Notifications" />
+                            Text="{helpers:ResourceString Name=Notifications}" />
 
                         <!--  Clear All Button  -->
                         <Button
@@ -195,7 +196,7 @@
                             Background="Transparent"
                             BorderBrush="Transparent"
                             Command="{x:Bind ViewModel.ClearAllNotificationsCommand}"
-                            Content="Clear All"
+                            Content="{helpers:ResourceString Name=NotificationsClearButton}"
                             FontSize="14" />
                     </Grid>
                     <ScrollViewer
@@ -440,7 +441,7 @@
                     SelectionChanged="NavigationView_SelectionChanged">
                     <NavigationView.MenuItems>
                         <NavigationViewItem
-                            Content="Settings"
+                            Content="{helpers:ResourceString Name=Settings}"
                             IsSelected="True"
                             Tag="Settings">
                             <NavigationViewItem.Icon>

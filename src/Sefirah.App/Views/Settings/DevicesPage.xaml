@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dataEntity="using:Sefirah.App.Data.AppDatabase.Models"
     xmlns:local="using:Sefirah.App.Data.Models"
+    xmlns:helpers="using:Sefirah.App.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:Sefirah.App.ViewModels.Settings"
     x:Name="ThisPage"
@@ -30,7 +31,7 @@
             <TextBlock
                 FontSize="24"
                 FontWeight="SemiBold"
-                Text="Paired Devices" />
+                Text="{helpers:ResourceString Name=PairedDevices/Title}" />
 
             <ItemsRepeater ItemsSource="{x:Bind ViewModel.PairedDevices, Mode=OneWay}">
                 <ItemsRepeater.Layout>
@@ -69,7 +70,7 @@
                                 <StackPanel Orientation="Horizontal" Spacing="5">
                                     <TextBlock
                                         Foreground="{ThemeResource SystemAccentColor}"
-                                        Text="Connected"
+                                        Text="{helpers:ResourceString Name=Connected/Text}"
                                         Visibility="{x:Bind Name, Converter={StaticResource StringEqualsConverter}, ConverterParameter={Binding DataContext.CurrentlyConnectedDevice.Name, ElementName=ThisPage, Mode=OneWay}}" />
                                 </StackPanel>
                             </controls:SettingsBlockControl.AdditionalDescriptionContent>
@@ -90,11 +91,11 @@
                 Margin="0,20,0,0"
                 FontSize="24"
                 FontWeight="SemiBold"
-                Text="Available Devices" />
+                Text="{helpers:ResourceString Name=AvailableDevices/Title}" />
             <TextBlock
                 FontSize="14"
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                Text="Other Android devices that are running the app in the same network"
+                Text="{helpers:ResourceString Name=AvailableDevices/Subtitle}"
                 TextWrapping="Wrap" />
 
             <ItemsRepeater ItemsSource="{x:Bind ViewModel.DiscoveredDevices, Mode=OneWay}">

@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Dispatching;
 using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Enums;
-using Windows.ApplicationModel;
+using Sefirah.App.Extensions;
 
 namespace Sefirah.App.ViewModels.Settings;
 
@@ -26,9 +26,9 @@ public sealed partial class GeneralViewModel : ObservableObject
 
     public Dictionary<Theme, string> ThemeTypes { get; } = new()
     {
-        { Theme.Default, "System Default" },
-        { Theme.Light, "Light" },
-        { Theme.Dark, "Dark" }
+        { Theme.Default, "ThemeDefault/Content".GetLocalizedResource() },
+        { Theme.Light, "ThemeLight/Content".GetLocalizedResource() },
+        { Theme.Dark, "ThemeDark/Content".GetLocalizedResource() }
     };
 
     private string selectedThemeType;
@@ -40,12 +40,11 @@ public sealed partial class GeneralViewModel : ObservableObject
             if (SetProperty(ref selectedThemeType, value))
             {
                 var newTheme = ThemeTypes.First(t => t.Value == value).Key;
-                CurrentTheme = newTheme; // Direct assignment, no dispatcher needed
+                CurrentTheme = newTheme;
             }
         }
     }
 
-    // Startup Options settings
     public StartupOptions StartupOption
     {
         get => UserSettingsService.GeneralSettingsService.StartupOption;
@@ -55,7 +54,7 @@ public sealed partial class GeneralViewModel : ObservableObject
             {
                 UserSettingsService.GeneralSettingsService.StartupOption = value;
                 // Update startup task when option changes
-                _ = HandleStartupTaskAsync(value != StartupOptions.Disabled);
+                _ = AppLifecycleHelper.HandleStartupTaskAsync(value != StartupOptions.Disabled);
                 OnPropertyChanged();
             }
         }
@@ -63,10 +62,10 @@ public sealed partial class GeneralViewModel : ObservableObject
 
     public Dictionary<StartupOptions, string> StartupTypes { get; } = new()
     {
-        { StartupOptions.Disabled, "Disabled" },
-        { StartupOptions.Minimized, "Start Minimized" },
-        { StartupOptions.InTray, "Start in System Tray" },
-        { StartupOptions.Maximized, "Start Maximized" }
+        { StartupOptions.Disabled, "StartupOptionDisabled/Content".GetLocalizedResource() },
+        { StartupOptions.Minimized, "StartupOptionMinimized/Content".GetLocalizedResource() },
+        { StartupOptions.InTray, "StartupOptionSystemTray/Content".GetLocalizedResource() },
+        { StartupOptions.Maximized, "StartupOptionMaximized/Content".GetLocalizedResource() }
     };
 
     private string selectedStartupType;
@@ -82,30 +81,11 @@ public sealed partial class GeneralViewModel : ObservableObject
         }
     }
 
-    private static async Task HandleStartupTaskAsync(bool enable)
-    {
-        var startupTask = await StartupTask.GetAsync("8B5D3E3F-9B69-4E8A-A9F7-BFCA793B9AF0");
-        
-        if (enable)
-        {
-            if (startupTask.State == StartupTaskState.Disabled)
-                await startupTask.RequestEnableAsync();
-        }
-        else
-        {
-            if (startupTask.State == StartupTaskState.Enabled)
-                startupTask.Disable();
-        }
-    }
-
     public GeneralViewModel()
     {
         dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
-        // Initialize selected theme
         selectedThemeType = ThemeTypes[CurrentTheme];
-        
-        // Initialize selected startup option
         selectedStartupType = StartupTypes[StartupOption];
     }
 }

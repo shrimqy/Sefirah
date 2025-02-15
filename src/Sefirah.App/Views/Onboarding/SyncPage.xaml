@@ -5,6 +5,7 @@
     xmlns:converters="using:Sefirah.App.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:Sefirah.App.Data.Models"
+    xmlns:helpers="using:Sefirah.App.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     DataContext="{x:Bind ViewModel, Mode=OneWay}"
@@ -28,12 +29,12 @@
             <TextBlock
                 HorizontalAlignment="Center"
                 Style="{ThemeResource TitleLargeTextBlockStyle}"
-                Text="Connect Your Device" />
+                Text="{helpers:ResourceString Name=OnboardingDevice/Title}" />
 
             <!--  Description  -->
             <TextBlock
                 Style="{ThemeResource BodyTextBlockStyle}"
-                Text="Discovered devices in your network will appear below, and initiate the connection from your mobile (Make sure the pin matches)"
+                Text="{helpers:ResourceString Name=OnboardingDevice/Subtitle}"
                 TextAlignment="Center"
                 TextWrapping="Wrap" />
 
@@ -89,7 +90,7 @@
                 x:Name="SkipButton"
                 HorizontalAlignment="Center"
                 Click="SkipButton_Click"
-                Content="Skip for now" />
+                Content="{helpers:ResourceString Name=OnboardingSkip}" />
         </StackPanel>
     </Grid>
 </Page>

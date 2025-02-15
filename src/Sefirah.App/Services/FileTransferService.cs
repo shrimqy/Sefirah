@@ -3,6 +3,7 @@ using Microsoft.Windows.AppNotifications.Builder;
 using NetCoreServer;
 using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Models;
+using Sefirah.App.Extensions;
 using Sefirah.App.Services.Socket;
 using Sefirah.App.Utils;
 using Sefirah.App.Utils.Serialization;
@@ -87,8 +88,9 @@ public class FileTransferService(
             }
             logger.Info($"Connected to file transfer server at {serverInfo.IpAddress}:{serverInfo.Port}");
 
-            await ShowTransferNotification("Receiving File", $"{currentFileMetadata.FileName}", 0);
+            await ShowTransferNotification("TransferNotificationReceiving/Title".GetLocalizedResource(), $"{currentFileMetadata.FileName}", 0);
 
+            // Adding a small delay for the android to open a read channel
             await Task.Delay(500);
             var passwordBytes = Encoding.UTF8.GetBytes(serverInfo.Password + "\n");
             client?.SendAsync(passwordBytes);
@@ -101,7 +103,7 @@ public class FileTransferService(
                 FileReceived?.Invoke(this, file);
             }
 
-            _ = ShowTransferNotification("File Received", $"{currentFileMetadata.FileName} has been saved successfully");
+            await ShowTransferNotification("TransferNotificationReceived/Title".GetLocalizedResource(), $"{currentFileMetadata.FileName} has been saved successfully");
         }
         catch (Exception ex)
         {
@@ -173,8 +175,8 @@ public class FileTransferService(
             if (Math.Floor(progress) > Math.Floor((double)(bytesReceived - size) / currentFileMetadata.FileSize * 100))
             {
                 await ShowTransferNotification(
-                    "File Transfer",
-                    $"Receiving {currentFileMetadata.FileName}",
+                    "TransferNotificationReceiving/Title".GetLocalizedResource(),
+                    $"{currentFileMetadata.FileName}",
                     progress,
                     isReceiving: true);
             }
@@ -183,8 +185,8 @@ public class FileTransferService(
         {
             logger.Error("Error processing received file data", ex);
             await ShowTransferNotification(
-                "File Transfer Failed",
-                $"Error while receiving {currentFileMetadata?.FileName}",
+                 "TransferNotification/Title".GetLocalizedResource(),
+                string.Format("TransferNotificationReceivingError".GetLocalizedResource(), currentFileMetadata?.FileName),
                 null,
                 isReceiving: true);
             CleanupTransfer(false);
@@ -525,11 +527,11 @@ public class FileTransferService(
                     );
 
                     builder
-                        .AddButton(new AppNotificationButton("Open File")
+                        .AddButton(new AppNotificationButton("TransferNotificationActionOpenFile".GetLocalizedResource())
                             .AddArgument("notificationType", ToastNotificationType.FileTransfer)
                             .AddArgument("action", "openFile")
                             .AddArgument("filePath", filePath))
-                        .AddButton(new AppNotificationButton("Open Folder")
+                        .AddButton(new AppNotificationButton("TransferNotificationActionOpenFolder".GetLocalizedResource())
                             .AddArgument("notificationType", ToastNotificationType.FileTransfer)
                             .AddArgument("action", "openFolder")
                             .AddArgument("folderPath", Path.GetDirectoryName(filePath)));

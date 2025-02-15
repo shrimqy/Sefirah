@@ -4,6 +4,7 @@ using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Enums;
 using Sefirah.App.Data.EventArguments;
 using Sefirah.App.Data.Models;
+using Sefirah.App.Extensions;
 using Sefirah.App.Utils.Serialization;
 using System.Windows.Input;
 
@@ -46,7 +47,7 @@ public sealed class MainPageViewModel : BaseViewModel
         }
     }
 
-    public string ConnectionButtonText => ConnectionStatus ? "Connected" : "Disconnected";
+    public string ConnectionButtonText => ConnectionStatus ? "Connected/Text".GetLocalizedResource() : "Disconnected/Text".GetLocalizedResource();
 
     public ICommand ToggleConnectionCommand { get; }
     public ICommand ClearAllNotificationsCommand { get; }

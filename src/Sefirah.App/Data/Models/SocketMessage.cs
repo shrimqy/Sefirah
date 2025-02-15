@@ -1,4 +1,6 @@
 using Microsoft.UI.Xaml.Media.Imaging;
+using Sefirah.App.Extensions;
+using static Vanara.PInvoke.AdvApi32.INSTALLSPEC;
 
 namespace Sefirah.App.Data.Models;
 
@@ -122,13 +124,11 @@ public class NotificationMessage : SocketMessage
     }
 
     [JsonIgnore]
-    public string? FlyoutFilterString
-    {
-        get
-        {
-            return $"Turn off Notifications from {AppName}";
-        }
-    }
+    public string? FlyoutFilterString => AppName != null 
+        ? string.Format(
+            "NotificationFilterButton".GetLocalizedResource(),
+            AppName)
+        : null;
 
     [JsonPropertyName("tag")]
     public string? Tag { get; set; }

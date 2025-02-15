@@ -78,6 +78,11 @@ public class RemoteAppsRepository(DatabaseContext context, ILogger logger) : IRe
     {
         try
         {
+            if (string.IsNullOrEmpty(appInfo.AppPackage))
+            {
+                logger.Warn("AppPackage cannot be null or empty");
+                return;
+            }
             var conn = await context.GetConnectionAsync();
             var command = new SqliteCommand(
                 "INSERT OR REPLACE INTO ApplicationInfo (AppPackage, AppName, NotificationFilter, AppIcon) " +

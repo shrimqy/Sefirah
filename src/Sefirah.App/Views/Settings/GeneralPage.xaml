@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:Sefirah.App.UserControls"
+    xmlns:helpers="using:Sefirah.App.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:Sefirah.App.ViewModels.Settings"
     mc:Ignorable="d">
@@ -18,10 +19,10 @@
                 Margin="0,0,0,8"
                 FontSize="28"
                 FontWeight="Medium"
-                Text="General" />
+                Text="{helpers:ResourceString Name=General}" />
 
             <!--  Startup Options  -->
-            <local:SettingsBlockControl Title="Startup Options" Description="Choose how the app starts when Windows launches">
+            <local:SettingsBlockControl Title="{helpers:ResourceString Name=StartupOption}" Description="{helpers:ResourceString Name=StartupOptionDescription}">
                 <local:SettingsBlockControl.Icon>
                     <FontIcon Glyph="&#xE7E8;" />
                 </local:SettingsBlockControl.Icon>
@@ -34,7 +35,7 @@
             </local:SettingsBlockControl>
 
             <!--  Theme  -->
-            <local:SettingsBlockControl Title="Theme" Description="Choose your default app theme">
+            <local:SettingsBlockControl Title="{helpers:ResourceString Name=Theme}" Description="{helpers:ResourceString Name=ThemeDescription}">
                 <local:SettingsBlockControl.Icon>
                     <FontIcon Glyph="&#xE790;" />
                 </local:SettingsBlockControl.Icon>
