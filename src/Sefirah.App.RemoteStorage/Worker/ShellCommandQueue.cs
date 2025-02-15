@@ -39,6 +39,7 @@ public sealed class ShellCommandQueue(
                     // Broken upload, state is just "No State"
                     logger.Info("placeholder state {state}", state);
                     if (state == CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_NO_STATES ||
+                        state == CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC ||
                         state == CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER)
                     {
                         var isDirectory = File.GetAttributes(shellCommand.FullPath).HasFlag(FileAttributes.Directory);
