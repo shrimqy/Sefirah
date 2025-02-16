@@ -10,7 +10,6 @@ using Sefirah.App.Utils;
 using Sefirah.App.Utils.Serialization;
 using System.Net;
 using System.Net.Sockets;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using IPNetwork = Sefirah.App.Data.Models.IPNetwork;
 
@@ -167,25 +166,34 @@ public class DiscoveryService(
     {
         var deviceId = e.ServiceInstanceName.ToString().Split('.')[0];
 
-        // Remove from MDNS services list
+        // Remove from MDNS services list first
         DiscoveredMdnsServices.RemoveAll(s => s.DeviceId == deviceId);
 
         // Remove corresponding device from main collection
-        dispatcher.EnqueueAsync(() =>
+        dispatcher.TryEnqueue(() =>
         {
             try
             {
                 var deviceToRemove = DiscoveredDevices
+                    .Where(d => d.Origin == DeviceOrigin.MdnsService)
                     .FirstOrDefault(d => d.DeviceId == deviceId);
-
+                
                 if (deviceToRemove != null)
                 {
-                    DiscoveredDevices.Remove(deviceToRemove);
+                    // First attempt: Safe removal
+                    if (DiscoveredDevices.Remove(deviceToRemove))
+                    {
+                        return;
+                    }
                 }
+            }
+            catch (Exception ex) when (ex is ArgumentOutOfRangeException or InvalidOperationException)
+            {
+                logger.Warn("Device removal race condition: {Message}", ex.Message);
             }
             catch (Exception ex)
             {
-                logger.Error("Error clearing discovered device", ex);
+                logger.Error("Unexpected error removing device: {Message}", ex.Message);
             }
         });
     }
