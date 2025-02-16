@@ -1,6 +1,7 @@
 ﻿namespace Sefirah.App.RemoteStorage.Abstractions;
 public class SyncProviderContextAccessor : ISyncProviderContextAccessor
 {
+    private static SyncProviderContext? _staticContext;
     private static readonly AsyncLocal<ContextHolder> _syncProviderContextCurrent = new();
 
     /// <inheritdoc/>
@@ -8,10 +9,13 @@ public class SyncProviderContextAccessor : ISyncProviderContextAccessor
     {
         get
         {
-            return _syncProviderContextCurrent.Value?.Context!;
+            return _syncProviderContextCurrent.Value?.Context ?? _staticContext ?? 
+                throw new NullReferenceException("SyncProviderContext not initialized");
         }
         set
         {
+            _staticContext = value; // Keep a static copy for shell extensions
+            
             var holder = _syncProviderContextCurrent.Value;
             if (holder != null)
             {

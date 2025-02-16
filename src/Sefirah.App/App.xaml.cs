@@ -141,8 +141,7 @@ public partial class App : Application
         var activatedEventArgsData = activatedEventArgs.Data;
 
         // InitializeApplication accesses UI, needs to be called on UI thread
-        await MainWindow.Instance.DispatcherQueue.EnqueueAsync(()
-            => MainWindow.Instance.InitializeApplicationAsync(activatedEventArgsData));
+        await MainWindow.Instance.DispatcherQueue.EnqueueAsync(() => MainWindow.Instance.InitializeApplicationAsync(activatedEventArgsData));
     }
 
     public async Task HandleShareTargetActivation(ShareTargetActivatedEventArgs? args)
@@ -166,7 +165,7 @@ public partial class App : Application
 #if DEBUG
             .Verbose()
 #else
-				.Error()
+			.Verbose()
 #endif
             .WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day)
             .WriteTo.Debug()

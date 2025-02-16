@@ -32,21 +32,21 @@ public partial class AboutViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task OpenGitHubRepo()
+    private Task OpenGitHubRepo()
     {
-        await Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.GitHubRepoUrl)).AsTask();
+        return Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.GitHubRepoUrl)).AsTask();
     }
 
     [RelayCommand]
-    private async Task OpenAndroidGitHubRepo()
+    private Task OpenAndroidGitHubRepo()
     {
-        await Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.AndroidGitHubRepoUrl)).AsTask();
+        return Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.AndroidGitHubRepoUrl)).AsTask();
     }
 
     [RelayCommand]
-    private async Task OpenFeatureRequest()
+    private Task OpenFeatureRequest()
     {
-        await Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.FeatureRequestUrl)).AsTask();
+        return Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.FeatureRequestUrl)).AsTask();
     }
 
     [RelayCommand]
@@ -56,33 +56,34 @@ public partial class AboutViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task OpenLibraryLink(string url)
+    private Task OpenLibraryLink(string url)
     {
-        await Launcher.LaunchUriAsync(new Uri(url)).AsTask();
+        return Launcher.LaunchUriAsync(new Uri(url)).AsTask();
     }
 
     [RelayCommand]
-    private async Task OpenDonate()
+    private Task OpenDonate()
     {
-        await Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.DonateUrl)).AsTask();
+        return Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.DonateUrl)).AsTask();
     }
 
     [RelayCommand]
-    private async Task OpenLogs()
+    private async Task<bool> OpenLogs()
     {
-        await Launcher.LaunchFolderAsync(Windows.Storage.ApplicationData.Current.LocalFolder);
+        var result = await Launcher.LaunchFolderAsync(Windows.Storage.ApplicationData.Current.LocalFolder).AsTask();
+        return result;
     }
 
     [RelayCommand]
-    private async Task OpenPrivacyPolicy()
+    private Task OpenPrivacyPolicy()
     {
-        await Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.PrivacyPolicyUrl)).AsTask();
+        return Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.PrivacyPolicyUrl)).AsTask();
     }
 
     [RelayCommand]
-    private async Task OpenLicense()
+    private Task OpenLicense()
     {
-        await Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.LicenseUrl)).AsTask();
+        return Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.LicenseUrl)).AsTask();
     }
 
     public ObservableCollection<OpenSourceLibraryItem> ThirdPartyLibraries { get; } =

@@ -60,10 +60,11 @@ public sealed partial class MainWindow : WindowEx
         var localSettings = ApplicationData.Current.LocalSettings;
         bool isOnboardingComplete = localSettings.Values["HasCompletedOnboarding"] == null;
 
-        bool isFirstLaunch = localSettings.Values["IsFirstLaunch"] == null;
-        if (isFirstLaunch)
+        var isFirstLaunch = localSettings.Values["IsFirstLaunch"];
+        if (isFirstLaunch == null || true)
         {
             _ = AppLifecycleHelper.HandleStartupTaskAsync(true);
+            localSettings.Values["IsFirstLaunch"] = false;
         }
 
         if (isOnboardingComplete)

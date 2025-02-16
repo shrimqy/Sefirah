@@ -1,6 +1,6 @@
-using Microsoft.Extensions.Logging;
 using Sefirah.App.RemoteStorage.Abstractions;
 using Sefirah.App.RemoteStorage.Interop;
+using Sefirah.Common.Utils;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Channels;
@@ -13,7 +13,8 @@ using static Vanara.PInvoke.ShlwApi;
 
 namespace Sefirah.App.RemoteStorage.Shell.Commands;
 [ComVisible(true), Guid("4a3c9b56-f075-4499-b4ee-ba4b88d1fe05")]
-public class UploadCommand(ChannelWriter<ShellCommand> commandWriter, ILogger<UploadCommand> logger) : IExplorerCommand, IExplorerCommandState, IObjectWithSite
+public class UploadCommand(
+    ChannelWriter<ShellCommand> commandWriter, ILogger logger) : IExplorerCommand, IExplorerCommandState, IObjectWithSite
 {
     public HRESULT GetTitle(IShellItemArray psiItemArray, out string? ppszName)
     {
@@ -63,23 +64,23 @@ public class UploadCommand(ChannelWriter<ShellCommand> commandWriter, ILogger<Up
                 using var pShellItem = ComReleaserFactory.Create(psiItemArray.GetItemAt(i));
 
                 var rawFullPath = pShellItem.Item.GetDisplayName(SIGDN.SIGDN_FILESYSPATH);
-                logger.LogInformation("Upload Command received for file {path}", rawFullPath);
+                logger.Info("Upload Command received for file {path}", rawFullPath);
 
                 // Clear the in-sync flag to force reupload
                 try
                 {
                     var currentState = CloudFilter.GetPlaceholderState(rawFullPath);
-                    logger.LogInformation("Current state before reupload: {state}", currentState);
+                    logger.Info("Current state before reupload: {state}", currentState);
 
                     if (currentState.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
                     {
                         CloudFilter.ClearInSyncState(rawFullPath);
-                        logger.LogInformation("Cleared in-sync state for reupload");
+                        logger.Info("Cleared in-sync state for reupload");
                     }
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Failed to clear sync state for {path}", rawFullPath);
+                    logger.Error("Failed to clear sync state for {path}", rawFullPath, ex);
                 }
 
                 commandWriter.TryWrite(new ShellCommand
@@ -92,7 +93,7 @@ public class UploadCommand(ChannelWriter<ShellCommand> commandWriter, ILogger<Up
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Upload command failed");
+            logger.Error("Upload command failed", ex);
             return ex.HResult;
         }
 
