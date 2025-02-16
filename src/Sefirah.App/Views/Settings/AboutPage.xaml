@@ -62,7 +62,7 @@
                     <StackPanel>
                         <!--  Submit feature request  -->
                         <local:SettingsBlockControl
-                            Title="Feature Request"
+                            Title="{helpers:ResourceString Name=SubmitFeatureRequest}"
                             ButtonCommand="{x:Bind ViewModel.OpenFeatureRequestCommand}"
                             CornerRadius="0"
                             IsClickable="True">
@@ -74,7 +74,7 @@
 
                         <!--  Submit bug report  -->
                         <local:SettingsBlockControl
-                            Title="Report a Bug"
+                            Title="{helpers:ResourceString Name=SubmitBugReport}"
                             ButtonCommand="{x:Bind ViewModel.OpenBugReportCommand}"
                             CornerRadius="0"
                             IsClickable="True">

@@ -26,7 +26,7 @@ public sealed partial class GeneralViewModel : ObservableObject
 
     public Dictionary<Theme, string> ThemeTypes { get; } = new()
     {
-        { Theme.Default, "ThemeDefault/Content".GetLocalizedResource() },
+        { Theme.Default, "Default".GetLocalizedResource() },
         { Theme.Light, "ThemeLight/Content".GetLocalizedResource() },
         { Theme.Dark, "ThemeDark/Content".GetLocalizedResource() }
     };

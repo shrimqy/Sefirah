@@ -222,7 +222,7 @@
   <data name="ThemeDescription" xml:space="preserve">
     <value>Choose your default app theme</value>
   </data>
-  <data name="ThemeDefault.Content" xml:space="preserve">
+  <data name="Default" xml:space="preserve">
     <value>Default</value>
   </data>
   <data name="ThemeLight.Content" xml:space="preserve">
@@ -317,9 +317,6 @@ mobile (Make sure the pin matches)</value>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>App-specific Settings</value>
   </data>
-  <data name="NotificationFilterButton" xml:space="preserve">
-    <value>Turn off notifications from {0}</value>
-  </data>
   <data name="TransferNotificationReceiving.Content" xml:space="preserve">
     <value>Receiving {0}</value>
   </data>
@@ -346,5 +343,14 @@ mobile (Make sure the pin matches)</value>
   </data>
   <data name="TransferNotificationActionOpenFolder" xml:space="preserve">
     <value>Open folder</value>
+  </data>
+  <data name="NotificationFilterButton" xml:space="preserve">
+    <value>Turn off notifications from {0}</value>
+  </data>
+  <data name="SubmitBugReport" xml:space="preserve">
+    <value>Report a bug</value>
+  </data>
+  <data name="SubmitFeatureRequest" xml:space="preserve">
+    <value>Feature request</value>
   </data>
 </root>
