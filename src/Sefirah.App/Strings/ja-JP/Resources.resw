@@ -124,7 +124,7 @@
     <value>General</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Settings</value>
+    <value>設定</value>
   </data>
   <data name="PrivacyPolicy" xml:space="preserve">
     <value>Privacy Policy</value>
@@ -145,7 +145,7 @@
     <value>Clipboard</value>
   </data>
   <data name="Feedback" xml:space="preserve">
-    <value>Feedback</value>
+    <value>フィードバック</value>
   </data>
   <data name="Notifications" xml:space="preserve">
     <value>Notifications</value>
@@ -223,7 +223,7 @@
     <value>Choose your default app theme</value>
   </data>
   <data name="Default" xml:space="preserve">
-    <value>Default</value>
+    <value>既定</value>
   </data>
   <data name="ThemeLight.Content" xml:space="preserve">
     <value>Light</value>
