@@ -24,6 +24,11 @@ public class SftpService(
     {
         try
         {
+            if (!StorageProviderSyncRootManager.IsSupported())
+            {
+                return;
+            }
+
             logger.Info("Initializing SFTP service, iP: {0}, Port: {1}, PASS: {2}, Username: {3}", info.IpAddress, info.Port, info.Password, info.Username);
             var sftpContext = new SftpContext
             {
@@ -58,6 +63,7 @@ public class SftpService(
         if (!e.IsConnected && info != null)
         {
             syncProviderPool.StopSyncRoot(info);
+            registrar.Unregister(info.Id);
         }
     }
 
@@ -85,7 +91,15 @@ public class SftpService(
             }
 
             info = registrar.Register(registerCommand, storageFolder, context);
+            logger.Debug("Starting sync provider pool");
             syncProviderPool.Start(info);
+            
+            // Verify registration
+            if (!registrar.IsRegistered(info.Id))
+            {
+                logger.Error("Sync root registration failed silently");
+                throw new InvalidOperationException("Sync root registration failed without throwing exception");
+            }
         }
         catch (Exception ex) 
         {
