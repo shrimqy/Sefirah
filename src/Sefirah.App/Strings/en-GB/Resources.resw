@@ -353,4 +353,7 @@ mobile (Make sure the pin matches)</value>
   <data name="SubmitFeatureRequest" xml:space="preserve">
     <value>Feature request</value>
   </data>
+  <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
+    <value>Do not show notification toast when phone is in DND</value>
+  </data>
 </root>

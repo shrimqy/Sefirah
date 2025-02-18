@@ -76,6 +76,12 @@ internal sealed class FeaturesSettingsService : BaseObservableJsonSettings, IFea
         set => Set(value);
     }
 
+    public bool IgnoreNotificationDuringDnd
+    {
+        get => Get(true);
+        set => Set(value);
+    }
+
     public bool ClipboardFilesEnabled 
     { 
         get => Get(false);

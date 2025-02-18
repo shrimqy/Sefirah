@@ -55,6 +55,11 @@ public interface IFeatureSettingsService : IBaseSettingsService, INotifyProperty
     bool IgnoreWindowsApps { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether to ignore notifications during DND.
+    /// </summary>
+    bool IgnoreNotificationDuringDnd { get; set; }
+
+    /// <summary>
     /// Gets or sets a value indicating whether to copy received files to clipboard.
     /// </summary>
     bool ClipboardFilesEnabled { get; set; }

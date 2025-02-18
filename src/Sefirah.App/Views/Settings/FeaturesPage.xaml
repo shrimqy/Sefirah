@@ -83,6 +83,7 @@
                                 Text="{helpers:ResourceString Name=GeneralSettings}" />
                             <CheckBox Content="{helpers:ResourceString Name=ShowNotificationToast}" IsChecked="{x:Bind ViewModel.ShowNotificationToast, Mode=TwoWay}" />
                             <CheckBox Content="{helpers:ResourceString Name=IgnoreWindowsApps}" IsChecked="{x:Bind ViewModel.IgnoreWindowsApps, Mode=TwoWay}" />
+                            <CheckBox Content="{helpers:ResourceString Name=IgnoreNotificationDuringDnd}" IsChecked="{x:Bind ViewModel.IgnoreNotificationDuringDnd, Mode=TwoWay}" />
                         </StackPanel>
 
                         <!--  App-Specific Settings  -->

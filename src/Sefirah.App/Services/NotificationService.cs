@@ -62,7 +62,8 @@ public class NotificationService(
                             notifications.Insert(0, message);
                         }
 
-                        if (userSettingsService.FeatureSettingsService.IgnoreWindowsApps && await IsAppActiveAsync(message.AppName!) || !userSettingsService.FeatureSettingsService.ShowNotificationToast) return;
+                        if (userSettingsService.FeatureSettingsService.IgnoreWindowsApps && await IsAppActiveAsync(message.AppName!) || !userSettingsService.FeatureSettingsService.ShowNotificationToast ||
+                        userSettingsService.FeatureSettingsService.IgnoreNotificationDuringDnd && deviceManager.CurrentDeviceStatus?.IsDndEnabled == true) return;
                         await ShowWindowsNotification(message);
                     });
                 }
