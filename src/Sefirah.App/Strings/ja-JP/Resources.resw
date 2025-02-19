@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -118,242 +118,240 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="About" xml:space="preserve">
-    <value>About</value>
+    <value>バージョン情報</value>
   </data>
   <data name="General" xml:space="preserve">
-    <value>General</value>
+    <value>一般</value>
   </data>
   <data name="Settings" xml:space="preserve">
     <value>設定</value>
   </data>
   <data name="PrivacyPolicy" xml:space="preserve">
-    <value>Privacy Policy</value>
+    <value>プライバシーポリシー</value>
   </data>
   <data name="SupportDevelopment" xml:space="preserve">
-    <value>Support Development</value>
+    <value>開発のサポート</value>
   </data>
   <data name="OpenLogs" xml:space="preserve">
-    <value>Open Logs</value>
+    <value>ログを開く</value>
   </data>
   <data name="GitHubRepository" xml:space="preserve">
-    <value>GitHub Repository</value>
+    <value>GitHub リポジトリ</value>
   </data>
   <data name="AndroidGitHubRepository" xml:space="preserve">
-    <value>Android GitHub Repository</value>
+    <value>Android GitHub リポジトリ</value>
   </data>
   <data name="Clipboard" xml:space="preserve">
-    <value>Clipboard</value>
+    <value>クリップボード</value>
   </data>
   <data name="Feedback" xml:space="preserve">
     <value>フィードバック</value>
   </data>
   <data name="Notifications" xml:space="preserve">
-    <value>Notifications</value>
+    <value>通知</value>
   </data>
   <data name="ThirdPartyLibraries" xml:space="preserve">
-    <value>Third party libraries</value>
+    <value>サードパーティーライブラリ</value>
   </data>
   <data name="SaveLocation" xml:space="preserve">
-    <value>Save location</value>
+    <value>保存先</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Remote storage location</value>
+    <value>リモートストレージの場所</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
-    <value>Show clipboard toast</value>
+    <value>クリップボードトースト通知を表示</value>
   </data>
   <data name="ImageToClipboard" xml:space="preserve">
-    <value>Include images in clipboard monitor</value>
+    <value>クリップボードの監視に画像を含める</value>
   </data>
   <data name="ClipboardFiles" xml:space="preserve">
-    <value>Add received files to clipboard</value>
+    <value>受信したファイルをクリップボードに追加する</value>
   </data>
   <data name="NotificationsDescription" xml:space="preserve">
-    <value>Receive notifications from remote device</value>
+    <value>リモートデバイスから通知を受信する</value>
   </data>
   <data name="GeneralSettings" xml:space="preserve">
-    <value>General Settings</value>
+    <value>一般設定</value>
   </data>
   <data name="ShowNotificationToast" xml:space="preserve">
-    <value>Show notification toast</value>
+    <value>トースト通知を表示</value>
   </data>
   <data name="IgnoreWindowsApps" xml:space="preserve">
-    <value>Ignore remote notifications from active Windows apps</value>
+    <value>アクティブな Windows アプリからのリモート通知を無視</value>
   </data>
   <data name="NotificationFilterDisabled.Content" xml:space="preserve">
-    <value>Disabled</value>
+    <value>無効</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Notification Feed</value>
+    <value>通知フィード</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>Notification Feed + Toast</value>
+    <value>通知フィード + トースト通知</value>
   </data>
   <data name="PairedDevices.Title" xml:space="preserve">
-    <value>Paired Devices</value>
+    <value>ペアリング済みのデバイス</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
-    <value>Available Devices</value>
+    <value>利用可能なデバイス</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
-    <value>Other Android devices that are running the app in the same network</value>
+    <value>同じネットワークに接続している他の Android デバイス</value>
   </data>
   <data name="StartupOption" xml:space="preserve">
-    <value>Startup option</value>
+    <value>スタートアップオプション</value>
   </data>
   <data name="StartupOptionDescription" xml:space="preserve">
-    <value>Choose how the app starts when Windows boots</value>
+    <value>Windows の起動時にアプリを開始する方法を選択</value>
   </data>
   <data name="StartupOptionMinimized.Content" xml:space="preserve">
-    <value>Start minimized</value>
+    <value>開始時に最小化</value>
   </data>
   <data name="StartupOptionMaximized.Content" xml:space="preserve">
-    <value>Start maximized</value>
+    <value>開始時に最大化</value>
   </data>
   <data name="StartupOptionSystemTray.Content" xml:space="preserve">
-    <value>Start in system tray</value>
+    <value>開始時にシステムトレイへ収納</value>
   </data>
   <data name="StartupOptionDisabled.Content" xml:space="preserve">
-    <value>Disabled</value>
+    <value>無効</value>
   </data>
   <data name="Theme" xml:space="preserve">
-    <value>Theme</value>
+    <value>テーマ</value>
   </data>
   <data name="ThemeDescription" xml:space="preserve">
-    <value>Choose your default app theme</value>
+    <value>既定のアプリテーマを選択</value>
   </data>
   <data name="Default" xml:space="preserve">
     <value>既定</value>
   </data>
   <data name="ThemeLight.Content" xml:space="preserve">
-    <value>Light</value>
+    <value>ライト</value>
   </data>
   <data name="ThemeDark.Content" xml:space="preserve">
-    <value>Dark</value>
+    <value>ダーク</value>
   </data>
   <data name="RemoveDeviceDialogTitle" xml:space="preserve">
-    <value>Remove Device</value>
+    <value>デバイスを削除</value>
   </data>
   <data name="RemoveDeviceConfirmButton" xml:space="preserve">
-    <value>Remove</value>
+    <value>削除</value>
   </data>
   <data name="RemoveDeviceCancelButton" xml:space="preserve">
-    <value>Cancel</value>
+    <value>キャンセル</value>
   </data>
   <data name="OnboardingWelcome.Title" xml:space="preserve">
-    <value>Welcome to Sefirah</value>
+    <value>Sefirah にようこそ</value>
   </data>
   <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
-    <value>To get started download and install the comapanion app through the corresponding github
-page.</value>
+    <value>開始するには、GitHub のページから対応するコンパニオンアプリをダウンロードとインストールしてください。</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
-    <value>Get Started</value>
+    <value>始める</value>
   </data>
   <data name="OnboardingSkip" xml:space="preserve">
-    <value>Skip for now</value>
+    <value>今はスキップする</value>
   </data>
   <data name="OnboardingDevice.Title" xml:space="preserve">
-    <value>Connect Your Device</value>
+    <value>デバイスを接続</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>Discovered devices in your network will appear below, and initiate the connection from your
-mobile (Make sure the pin matches)</value>
+    <value>ネットワーク内で検出された Android デバイスが以下に表示されます (PIN が一致していることを確認してください)</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>Device Connection Request</value>
+    <value>デバイス接続要求</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
-    <value>Verify the passkey matches on both devices:</value>
+    <value>両方のデバイスでパスキーが一致しているか確認してください:</value>
   </data>
   <data name="ConnectionRequestRejectButton" xml:space="preserve">
-    <value>Reject</value>
+    <value>拒否</value>
   </data>
   <data name="NotificationsClearButton" xml:space="preserve">
-    <value>Clear all</value>
+    <value>すべて消去</value>
   </data>
   <data name="ConnectionRequestAcceptButton" xml:space="preserve">
-    <value>Accept</value>
+    <value>同意する</value>
   </data>
   <data name="NoDevicesFound" xml:space="preserve">
-    <value>No devices found</value>
+    <value>デバイスが見つかりません</value>
   </data>
   <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
-    <value>PASSKEY</value>
+    <value>パスキー</value>
   </data>
   <data name="GitHub" xml:space="preserve">
     <value>GitHub</value>
   </data>
   <data name="ClipboardDescription" xml:space="preserve">
-    <value>Sync your clipboard across devices</value>
+    <value>デバイス間でクリップボードを同期</value>
   </data>
   <data name="StartupOptionsDescription" xml:space="preserve">
-    <value>Choose how the app starts when Windows boots</value>
+    <value>Windows の起動時にアプリを開始する方法を選択</value>
   </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
-    <value>Open links in browser</value>
+    <value>ブラウザーでリンクを開く</value>
   </data>
   <data name="Connected.Text" xml:space="preserve">
-    <value>Connected</value>
+    <value>接続中</value>
   </data>
   <data name="Disconnected.Text" xml:space="preserve">
-    <value>Disconnected</value>
+    <value>切断</value>
   </data>
   <data name="ShowHideWindow" xml:space="preserve">
-    <value>Show/Hide Window</value>
+    <value>ウィンドウを表示、非表示</value>
   </data>
   <data name="Exit" xml:space="preserve">
-    <value>Exit</value>
+    <value>終了</value>
   </data>
   <data name="Features" xml:space="preserve">
-    <value>Features</value>
+    <value>機能</value>
   </data>
   <data name="SelectLocation" xml:space="preserve">
-    <value>Select location</value>
+    <value>場所を選択</value>
   </data>
   <data name="RemoveDeviceDialogSubtitle" xml:space="preserve">
-    <value>Are you sure you want to remove '{0}'? This action cannot be undone.</value>
+    <value>「{0}」を削除してもよろしいですか？この操作は元に戻せません。</value>
   </data>
   <data name="AppSpecificSettings" xml:space="preserve">
-    <value>App-specific Settings</value>
+    <value>アプリ固有の設定</value>
   </data>
   <data name="TransferNotificationReceiving.Content" xml:space="preserve">
-    <value>Receiving {0}</value>
+    <value>「{0}」を受信中</value>
   </data>
   <data name="TransferNotificationReceivingError" xml:space="preserve">
-    <value>Error while receiving {0}</value>
+    <value>「{0}」の受信中にエラーが発生しました</value>
   </data>
   <data name="TransferNotificationReceiving.Title" xml:space="preserve">
-    <value>Receiving File</value>
+    <value>ファイルを受信中</value>
   </data>
   <data name="TransferNotificationReceived.Title" xml:space="preserve">
-    <value>Received File</value>
+    <value>受信済みのファイル</value>
   </data>
   <data name="TransferNotification.Title" xml:space="preserve">
-    <value>File Transfer</value>
+    <value>ファイル転送</value>
   </data>
   <data name="SendButton" xml:space="preserve">
-    <value>Send</value>
+    <value>送信</value>
   </data>
   <data name="ReplyPlaceholder" xml:space="preserve">
-    <value>Type a reply</value>
+    <value>返信を入力</value>
   </data>
   <data name="TransferNotificationActionOpenFile" xml:space="preserve">
-    <value>Open file</value>
+    <value>ファイルを開く</value>
   </data>
   <data name="TransferNotificationActionOpenFolder" xml:space="preserve">
-    <value>Open folder</value>
+    <value>フォルダーを開く</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
-    <value>Turn off notifications from {0}</value>
+    <value>「{0}」からの通知をオフにする</value>
   </data>
   <data name="SubmitBugReport" xml:space="preserve">
-    <value>Report a bug</value>
+    <value>バグを報告</value>
   </data>
   <data name="SubmitFeatureRequest" xml:space="preserve">
-    <value>Feature request</value>
+    <value>機能を要望</value>
   </data>
   <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
-    <value>Do not show notification toast when phone is in DND</value>
+    <value>デバイスがサイレントモード時はトースト通知を表示しない</value>
   </data>
 </root>
