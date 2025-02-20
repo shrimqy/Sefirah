@@ -359,4 +359,13 @@ mobile (Make sure the pin matches)</value>
   <data name="Devices" xml:space="preserve">
     <value>Devices</value>
   </data>
+  <data name="RingerModeNormal.Content" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="RingerModeSilent.Content" xml:space="preserve">
+    <value>Silent</value>
+  </data>
+  <data name="RingerModeVibrate.Content" xml:space="preserve">
+    <value>Vibrate</value>
+  </data>
 </root>

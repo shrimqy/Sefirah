@@ -450,3 +450,27 @@ public class NotificationLaunchPreferenceConverter : IValueConverter
         return NotificationLaunchPreference.Nothing;
     }
 }
+
+public class RingerModeToIconConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (value is int ringerMode)
+        {
+            return ringerMode switch
+            {
+                2 => "\uE995",    // Normal (Speaker icon)
+                1 => "\uE877",    // Vibrate icon
+                0 => "\uE74F",    // Silent (Mute icon)
+                _ => "\uE995"     // Default to speaker icon
+            };
+        }
+
+        return "\uE995"; // Default icon
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}

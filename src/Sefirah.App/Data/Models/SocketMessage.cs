@@ -18,6 +18,7 @@ namespace Sefirah.App.Data.Models;
 [JsonDerivedType(typeof(ApplicationInfo), typeDiscriminator: "10")]
 [JsonDerivedType(typeof(SftpServerInfo), typeDiscriminator: "11")]
 [JsonDerivedType(typeof(UdpBroadcast), typeDiscriminator: "12")]
+[JsonDerivedType(typeof(DeviceRingerMode), typeDiscriminator: "13")]
 public class SocketMessage { }
 
 public class Misc : SocketMessage
@@ -316,4 +317,10 @@ public class UdpBroadcast : SocketMessage
 
     [JsonPropertyName("timestamp")]
     public long TimeStamp { get; set; }
+}
+
+public class DeviceRingerMode : SocketMessage
+{
+    [JsonPropertyName("ringerMode")]
+    public int RingerMode { get; set; }
 }

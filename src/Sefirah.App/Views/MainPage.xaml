@@ -26,6 +26,7 @@
         <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
         <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
         <converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
+        <converters:RingerModeToIconConverter x:Key="RingerModeToIconConverter" />
     </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -128,23 +129,58 @@
                             Orientation="Horizontal"
                             Spacing="5"
                             Visibility="{x:Bind ViewModel.DeviceInfo.Name, Converter={StaticResource NullToVisibilityConverter}, Mode=OneWay}">
-                            <FontIcon Glyph="{x:Bind ViewModel.DeviceStatus, Converter={StaticResource BatteryStatusToIconConverter}, Mode=OneWay}" />
+                            
+                            <!-- Audio Mode Button -->
+                            <Button
+                                Grid.Column="2"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="5">
+                                <FontIcon Glyph="{x:Bind ViewModel.DeviceStatus.RingerMode, Converter={StaticResource RingerModeToIconConverter}, Mode=OneWay}" />
+                                <Button.Flyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem 
+                                        Text="{helpers:ResourceString Name=RingerModeNormal/Content}" 
+                                        Command="{x:Bind ViewModel.SetRingerModeCommand}"
+                                        CommandParameter="2">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xE995;" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                        <MenuFlyoutItem 
+                                        Text="{helpers:ResourceString Name=RingerModeVibrate/Content}"
+                                        Command="{x:Bind ViewModel.SetRingerModeCommand}"
+                                        CommandParameter="1">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xE877;" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                        <MenuFlyoutItem 
+                                        Text="{helpers:ResourceString Name=RingerModeSilent/Content}"
+                                        Command="{x:Bind ViewModel.SetRingerModeCommand}"
+                                        CommandParameter="0">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xE74F;" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                    </MenuFlyout>
+                                </Button.Flyout>
+                            </Button>
+                            
+                            <!-- Battery status -->
                             <StackPanel
                                 Orientation="Horizontal"
                                 Spacing="1"
+                                VerticalAlignment="Center"
                                 Visibility="{x:Bind ViewModel.DeviceStatus.BatteryStatus, Converter={StaticResource NullToVisibilityConverter}, Mode=OneWay}">
+                                <FontIcon Margin="0,0,4,0" Glyph="{x:Bind ViewModel.DeviceStatus, Converter={StaticResource BatteryStatusToIconConverter}, Mode=OneWay}" />
                                 <TextBlock FontWeight="SemiBold" Text="{x:Bind ViewModel.DeviceStatus.BatteryStatus, Mode=OneWay}" />
                                 <TextBlock FontWeight="SemiBold" Text="%" />
                             </StackPanel>
                         </StackPanel>
+                        
+                        <!--  Connection Status Card  -->
                         <Grid Padding="0,0,20,0" Visibility="{x:Bind ViewModel.DeviceInfo.Name, Converter={StaticResource NullToVisibilityConverter}, Mode=OneWay}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-
-                            <!--  Connection Status Card  -->
                             <Button
                                 Grid.Column="0"
                                 HorizontalAlignment="Left"
@@ -153,9 +189,6 @@
                         </Grid>
                     </StackPanel>
                 </Grid>
-
-
-
 
                 <!--  Separator  -->
                 <Rectangle

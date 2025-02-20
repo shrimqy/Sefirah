@@ -53,6 +53,7 @@ public sealed class MainPageViewModel : BaseViewModel
     public ICommand ClearAllNotificationsCommand { get; }
     public ICommand NotificationActionCommand { get; }
     public ICommand NotificationReplyCommand { get; }
+    public ICommand SetRingerModeCommand { get; }
 
     public MainPageViewModel()
     {
@@ -63,6 +64,7 @@ public sealed class MainPageViewModel : BaseViewModel
             ClearAllNotificationsCommand = new RelayCommand(ClearAllNotifications);
             NotificationActionCommand = new RelayCommand<NotificationAction>(HandleNotificationAction);
             NotificationReplyCommand = new RelayCommand<(Notification, string)>(HandleNotificationReply);
+            SetRingerModeCommand = new RelayCommand<string>(SetRingerMode);
             getLastConnectedDevice();
 
             // Subscribe to device events
@@ -176,5 +178,14 @@ public sealed class MainPageViewModel : BaseViewModel
     {
         var (message, replyText) = reply;
         NotificationService.ProcessReplyAction(message.Key, message.ReplyResultKey!, replyText);
+    }
+
+    private void SetRingerMode(string? modeStr)
+    {
+        if (int.TryParse(modeStr, out int mode))
+        {
+            var message = new DeviceRingerMode { RingerMode = mode };
+            SessionManager.SendMessage(SocketMessageSerializer.Serialize(message));
+        }
     }
 }
