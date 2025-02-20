@@ -127,7 +127,7 @@
     <value>設定</value>
   </data>
   <data name="PrivacyPolicy" xml:space="preserve">
-    <value>プライバシーポリシー</value>
+    <value>プライバシー ポリシー</value>
   </data>
   <data name="SupportDevelopment" xml:space="preserve">
     <value>開発のサポート</value>
@@ -139,7 +139,7 @@
     <value>GitHub リポジトリ</value>
   </data>
   <data name="AndroidGitHubRepository" xml:space="preserve">
-    <value>Android GitHub リポジトリ</value>
+    <value>Android アプリの GitHub リポジトリ</value>
   </data>
   <data name="Clipboard" xml:space="preserve">
     <value>クリップボード</value>
@@ -151,16 +151,16 @@
     <value>通知</value>
   </data>
   <data name="ThirdPartyLibraries" xml:space="preserve">
-    <value>サードパーティーライブラリ</value>
+    <value>サードパーティー ライブラリ</value>
   </data>
   <data name="SaveLocation" xml:space="preserve">
     <value>保存先</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>リモートストレージの場所</value>
+    <value>リモート ストレージの場所</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
-    <value>クリップボードトースト通知を表示</value>
+    <value>クリップボード トースト通知を表示</value>
   </data>
   <data name="ImageToClipboard" xml:space="preserve">
     <value>クリップボードの監視に画像を含める</value>
@@ -169,7 +169,7 @@
     <value>受信したファイルをクリップボードに追加する</value>
   </data>
   <data name="NotificationsDescription" xml:space="preserve">
-    <value>リモートデバイスから通知を受信する</value>
+    <value>リモート デバイスから通知を受信します</value>
   </data>
   <data name="GeneralSettings" xml:space="preserve">
     <value>一般設定</value>
@@ -196,10 +196,10 @@
     <value>利用可能なデバイス</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
-    <value>同じネットワークに接続している他の Android デバイス</value>
+    <value>同じネットワークに接続している Android デバイス</value>
   </data>
   <data name="StartupOption" xml:space="preserve">
-    <value>スタートアップオプション</value>
+    <value>スタートアップ オプション</value>
   </data>
   <data name="StartupOptionDescription" xml:space="preserve">
     <value>Windows の起動時にアプリを開始する方法を選択</value>
@@ -211,7 +211,7 @@
     <value>開始時に最大化</value>
   </data>
   <data name="StartupOptionSystemTray.Content" xml:space="preserve">
-    <value>開始時にシステムトレイへ収納</value>
+    <value>開始時にシステム トレイへ収納</value>
   </data>
   <data name="StartupOptionDisabled.Content" xml:space="preserve">
     <value>無効</value>
@@ -244,7 +244,7 @@
     <value>Sefirah にようこそ</value>
   </data>
   <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
-    <value>開始するには、GitHub のページから対応するコンパニオンアプリをダウンロードとインストールしてください。</value>
+    <value>開始するには、GitHub のページから対応するコンパニオン アプリをインストールしてください。</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
     <value>始める</value>
@@ -256,7 +256,7 @@
     <value>デバイスを接続</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>ネットワーク内で検出された Android デバイスが以下に表示されます (PIN が一致していることを確認してください)</value>
+    <value>ネットワーク内で検出された Android デバイスが下に表示されます (パスキーが一致しているか確認してください)</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
     <value>デバイス接続要求</value>
@@ -271,7 +271,7 @@
     <value>すべて消去</value>
   </data>
   <data name="ConnectionRequestAcceptButton" xml:space="preserve">
-    <value>同意する</value>
+    <value>許可</value>
   </data>
   <data name="NoDevicesFound" xml:space="preserve">
     <value>デバイスが見つかりません</value>
@@ -283,7 +283,7 @@
     <value>GitHub</value>
   </data>
   <data name="ClipboardDescription" xml:space="preserve">
-    <value>デバイス間でクリップボードを同期</value>
+    <value>デバイス間でクリップボードを同期します</value>
   </data>
   <data name="StartupOptionsDescription" xml:space="preserve">
     <value>Windows の起動時にアプリを開始する方法を選択</value>
@@ -295,7 +295,7 @@
     <value>接続中</value>
   </data>
   <data name="Disconnected.Text" xml:space="preserve">
-    <value>切断</value>
+    <value>切断しました</value>
   </data>
   <data name="ShowHideWindow" xml:space="preserve">
     <value>ウィンドウを表示、非表示</value>
@@ -307,7 +307,7 @@
     <value>機能</value>
   </data>
   <data name="SelectLocation" xml:space="preserve">
-    <value>場所を選択</value>
+    <value>参照</value>
   </data>
   <data name="RemoveDeviceDialogSubtitle" xml:space="preserve">
     <value>「{0}」を削除してもよろしいですか？この操作は元に戻せません。</value>
@@ -352,6 +352,6 @@
     <value>機能を要望</value>
   </data>
   <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
-    <value>デバイスがサイレントモード時はトースト通知を表示しない</value>
+    <value>デバイスがサイレント モード時はトースト通知を表示しない</value>
   </data>
 </root>
