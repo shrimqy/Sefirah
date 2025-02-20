@@ -127,7 +127,7 @@
     <value>設定</value>
   </data>
   <data name="PrivacyPolicy" xml:space="preserve">
-    <value>プライバシーポリシー</value>
+    <value>プライバシー ポリシー</value>
   </data>
   <data name="SupportDevelopment" xml:space="preserve">
     <value>開発のサポート</value>
@@ -139,7 +139,7 @@
     <value>GitHub リポジトリ</value>
   </data>
   <data name="AndroidGitHubRepository" xml:space="preserve">
-    <value>Android GitHub リポジトリ</value>
+    <value>Android アプリの GitHub リポジトリ</value>
   </data>
   <data name="Clipboard" xml:space="preserve">
     <value>クリップボード</value>
@@ -157,7 +157,7 @@
     <value>保存先</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>リモートストレージの場所</value>
+    <value>リモート ストレージの場所</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>クリップボード トースト通知を表示</value>
@@ -169,7 +169,7 @@
     <value>受信したファイルをクリップボードに追加する</value>
   </data>
   <data name="NotificationsDescription" xml:space="preserve">
-    <value>リモートデバイスから通知を受信します</value>
+    <value>リモート デバイスから通知を受信します</value>
   </data>
   <data name="GeneralSettings" xml:space="preserve">
     <value>一般設定</value>
@@ -244,7 +244,7 @@
     <value>Sefirah にようこそ</value>
   </data>
   <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
-    <value>開始するには、GitHub のページから対応するコンパニオンアプリをインストールしてください。</value>
+    <value>開始するには、GitHub のページから対応するコンパニオン アプリをインストールしてください。</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
     <value>始める</value>
@@ -256,7 +256,7 @@
     <value>デバイスを接続</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>ネットワーク内で検出された Android デバイスが下に表示されます (PIN が一致しているか確認してください)</value>
+    <value>ネットワーク内で検出された Android デバイスが下に表示されます (パスキーが一致しているか確認してください)</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
     <value>デバイス接続要求</value>
@@ -352,6 +352,6 @@
     <value>機能を要望</value>
   </data>
   <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
-    <value>デバイスがサイレントモード時はトースト通知を表示しない</value>
+    <value>デバイスがサイレント モード時はトースト通知を表示しない</value>
   </data>
 </root>
