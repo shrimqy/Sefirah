@@ -6,9 +6,9 @@ public interface INotificationService
     /// <summary>
     /// Gets the notification history.
     /// </summary>
-    ReadOnlyObservableCollection<NotificationMessage> NotificationHistory { get; }
+    ReadOnlyObservableCollection<Notification> NotificationHistory { get; }
 
-    event EventHandler<NotificationMessage> NotificationReceived;
+    event EventHandler<Notification> NotificationReceived;
 
     /// <summary>
     /// Handles incoming notification messages. 

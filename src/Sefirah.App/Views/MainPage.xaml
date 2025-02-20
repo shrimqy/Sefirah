@@ -212,7 +212,7 @@
                                 <StackLayout Orientation="Vertical" Spacing="7" />
                             </ItemsRepeater.Layout>
                             <ItemsRepeater.ItemTemplate>
-                                <DataTemplate x:DataType="local:NotificationMessage">
+                                <DataTemplate x:DataType="local:Notification">
                                     <Border
                                         Padding="10"
                                         Background="{ThemeResource CardBackgroundFillColorDefault}"
@@ -266,7 +266,7 @@
                                                             BorderBrush="Transparent"
                                                             IsHitTestVisible="False"
                                                             Opacity="0"
-                                                            Tag="{x:Bind NotificationKey}">
+                                                            Tag="{x:Bind Key}">
                                                             <SymbolIcon Symbol="More" />
                                                             <Button.Flyout>
                                                                 <MenuFlyout Closed="MoreButtonFlyoutClosed" Placement="BottomEdgeAlignedLeft">
@@ -291,7 +291,7 @@
                                                             IsHitTestVisible="False"
                                                             Opacity="0"
                                                             Style="{StaticResource AlternateCloseButtonStyle}"
-                                                            Tag="{x:Bind NotificationKey}" />
+                                                            Tag="{x:Bind Key}" />
                                                         <TextBlock
                                                             x:Name="TimeStampTextBlock"
                                                             Grid.Column="1"

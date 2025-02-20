@@ -14,6 +14,7 @@ namespace Sefirah.App.Services;
 public class DeviceManager(DeviceRepository repository, ILogger logger) : IDeviceManager
 {
     public event EventHandler<DeviceStatus>? DeviceStatusChanged;
+    public DeviceStatus? CurrentDeviceStatus { get; private set; }
 
     public async Task<List<RemoteDeviceEntity>> GetDeviceListAsync()
     {
@@ -128,6 +129,7 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
     {
         try
         {
+            CurrentDeviceStatus = deviceStatus;
             DeviceStatusChanged?.Invoke(this, deviceStatus);
             return Task.CompletedTask;
         }

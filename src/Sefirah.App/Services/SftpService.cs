@@ -1,3 +1,5 @@
+using CommunityToolkit.WinUI;
+using Microsoft.UI.Dispatching;
 using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.EventArguments;
 using Sefirah.App.Data.Models;
@@ -29,7 +31,29 @@ public class SftpService(
                 return;
             }
 
-            logger.Info("Initializing SFTP service, iP: {0}, Port: {1}, PASS: {2}, Username: {3}", info.IpAddress, info.Port, info.Password, info.Username);
+            // Retrieve and parse the OS version from the device family version string.
+            string deviceFamilyVersion = Windows.System.Profile.AnalyticsInfo.VersionInfo.DeviceFamilyVersion;
+            ulong version = ulong.Parse(deviceFamilyVersion);
+            ulong major = (version & 0xFFFF000000000000L) >> 48;
+            ulong minor = (version & 0x0000FFFF00000000L) >> 32;
+            ulong build = (version & 0x00000000FFFF0000L) >> 16;
+            ulong revision = (version & 0x000000000000FFFFL);
+
+            var currentOsVersion = new Version((int)major, (int)minor, (int)build, (int)revision);
+            var requiredOsVersion = new Version(10, 0, 19624, 1000);
+
+            // If the current OS version is lower than the threshold version, skip the sync root registration.
+            if (currentOsVersion < requiredOsVersion)
+            {
+                logger.Info(
+                    "OS version {0} is lower than the required threshold {1}. Skipping sync root registration.",
+                    currentOsVersion, requiredOsVersion);
+                return;
+            }
+
+            logger.Info("Initializing SFTP service, iP: {0}, Port: {1}, Password: {2}, Username: {3}",
+                info.IpAddress, info.Port, info.Password, info.Username);
+
             var sftpContext = new SftpContext
             {
                 Host = info.IpAddress,
@@ -63,7 +87,7 @@ public class SftpService(
         if (!e.IsConnected && info != null)
         {
             syncProviderPool.StopSyncRoot(info);
-            registrar.Unregister(info.Id);
+            //registrar.Unregister(info.Id);
         }
     }
 
@@ -91,20 +115,15 @@ public class SftpService(
             }
 
             info = registrar.Register(registerCommand, storageFolder, context);
-            logger.Debug("Starting sync provider pool");
-            syncProviderPool.Start(info);
-            
-            // Verify registration
-            if (!registrar.IsRegistered(info.Id))
+            if (info != null)
             {
-                logger.Error("Sync root registration failed silently");
-                throw new InvalidOperationException("Sync root registration failed without throwing exception");
+                syncProviderPool.Start(info);
+                logger.Debug("Starting sync provider pool");
             }
         }
         catch (Exception ex) 
         {
             logger.Error($"Failed to register sync root. Directory: {directory}, AccountId: {accountId}", ex);
-            throw;
         }
     }
 }

@@ -49,4 +49,9 @@ public interface IDeviceManager
     /// Gets the local device.
     /// </summary>
     Task<LocalDeviceEntity> GetLocalDeviceAsync();
+
+    /// <summary>
+    /// Gets the current device status.
+    /// </summary>
+    DeviceStatus? CurrentDeviceStatus { get; }
 }

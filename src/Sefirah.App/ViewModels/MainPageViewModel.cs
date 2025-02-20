@@ -20,7 +20,7 @@ public sealed class MainPageViewModel : BaseViewModel
     private RemoteDeviceEntity? _deviceInfo = new();
     private DeviceStatus _deviceStatus = new();
     private bool _connectionStatus = false;
-    public ReadOnlyObservableCollection<NotificationMessage> RecentNotifications => NotificationService.NotificationHistory;
+    public ReadOnlyObservableCollection<Notification> RecentNotifications => NotificationService.NotificationHistory;
     public ObservableCollection<DiscoveredDevice> DiscoveredDevices { get; } = [];
 
     public RemoteDeviceEntity? DeviceInfo
@@ -62,7 +62,7 @@ public sealed class MainPageViewModel : BaseViewModel
             ToggleConnectionCommand = new RelayCommand(ToggleConnection);
             ClearAllNotificationsCommand = new RelayCommand(ClearAllNotifications);
             NotificationActionCommand = new RelayCommand<NotificationAction>(HandleNotificationAction);
-            NotificationReplyCommand = new RelayCommand<(NotificationMessage, string)>(HandleNotificationReply);
+            NotificationReplyCommand = new RelayCommand<(Notification, string)>(HandleNotificationReply);
             getLastConnectedDevice();
 
             // Subscribe to device events
@@ -172,9 +172,9 @@ public sealed class MainPageViewModel : BaseViewModel
 
     }
 
-    private void HandleNotificationReply((NotificationMessage message, string replyText) reply)
+    private void HandleNotificationReply((Notification message, string replyText) reply)
     {
         var (message, replyText) = reply;
-        NotificationService.ProcessReplyAction(message.NotificationKey, message.ReplyResultKey!, replyText);
+        NotificationService.ProcessReplyAction(message.Key, message.ReplyResultKey!, replyText);
     }
 }

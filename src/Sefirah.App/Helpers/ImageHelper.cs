@@ -6,7 +6,7 @@ namespace Sefirah.App.Helpers;
 
 public static class ImageHelper
 {
-    public static BitmapImage? Base64ToBitmapImage(string base64String, int decodeSize = -1)
+    public static async Task<BitmapImage?> Base64ToBitmapImageAsync(string base64String, int decodeSize = -1)
     {
         try
         {
@@ -19,7 +19,7 @@ public static class ImageHelper
                 image.DecodePixelHeight = decodeSize;
             }
             image.DecodePixelType = DecodePixelType.Logical;
-            _ = image.SetSourceAsync(ms.AsRandomAccessStream());
+            await image.SetSourceAsync(ms.AsRandomAccessStream());
             return image;
         }
         catch (Exception)
@@ -77,23 +77,6 @@ public static class ImageHelper
         {
             return null;
         }
-    }
-
-    public static async Task<BitmapImage?> ConvertByteArrayToBitmapImageAsync(this byte[]? byteArray)
-    {
-        if (byteArray == null) return null;
-
-        using var stream = new InMemoryRandomAccessStream();
-        using (var writer = new DataWriter(stream.GetOutputStreamAt(0)))
-        {
-            writer.WriteBytes(byteArray);
-            await writer.StoreAsync();
-            await writer.FlushAsync();
-        }
-
-        var bitmapImage = new BitmapImage();
-        await bitmapImage.SetSourceAsync(stream);
-        return bitmapImage;
     }
 
     public static async Task<string> ToBase64Async(IRandomAccessStreamReference data)

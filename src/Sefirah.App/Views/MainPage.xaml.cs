@@ -145,7 +145,7 @@ public sealed partial class MainPage : Page
     private void SendButton_Click(object sender, RoutedEventArgs e)
     {
         var button = sender as Button;
-        if (button?.Tag is NotificationMessage message)
+        if (button?.Tag is Notification message)
         {
             var replyTextBox = FindChild<TextBox>(button.Parent, "ReplyTextBox");
             if (replyTextBox != null)

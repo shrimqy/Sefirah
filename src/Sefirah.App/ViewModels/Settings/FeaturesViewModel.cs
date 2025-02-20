@@ -97,6 +97,19 @@ public sealed partial class FeaturesViewModel : ObservableObject
         }
     }
 
+    public bool IgnoreNotificationDuringDnd
+    {
+        get => UserSettingsService.FeatureSettingsService.IgnoreNotificationDuringDnd;
+        set 
+        {
+            if (value != UserSettingsService.FeatureSettingsService.IgnoreNotificationDuringDnd)
+            {
+                UserSettingsService.FeatureSettingsService.IgnoreNotificationDuringDnd = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public bool ShowBadge
     {
         get => UserSettingsService.FeatureSettingsService.ShowBadge;

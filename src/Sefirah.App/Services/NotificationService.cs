@@ -17,14 +17,15 @@ public class NotificationService(
     ILogger logger,
     ISessionManager sessionManager,
     IUserSettingsService userSettingsService,
+    IDeviceManager deviceManager,
     IRemoteAppsRepository remoteAppsRepository) : INotificationService
 {
     private readonly SemaphoreSlim semaphore = new(1, 1);
-    private readonly ObservableCollection<NotificationMessage> notifications = [];
+    private readonly ObservableCollection<Notification> notifications = [];
     private readonly Microsoft.UI.Dispatching.DispatcherQueue dispatcher = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
 
-    public ReadOnlyObservableCollection<NotificationMessage> NotificationHistory => new(notifications);
-    public event EventHandler<NotificationMessage>? NotificationReceived;
+    public ReadOnlyObservableCollection<Notification> NotificationHistory => new(notifications);
+    public event EventHandler<Notification>? NotificationReceived;
 
     public async Task HandleNotificationMessage(NotificationMessage message)
     {
@@ -34,51 +35,52 @@ public class NotificationService(
         try
         {
             logger.Debug("Processing notification message from {0}", message.AppName);
-            
-            var filter = await remoteAppsRepository.GetNotificationFilterAsync(message.AppPackage)
+
+            if (message.Title != null && message.AppPackage != null)
+            {
+                var filter = await remoteAppsRepository.GetNotificationFilterAsync(message.AppPackage)
                 ?? await remoteAppsRepository.AddNewAppNotificationFilter(message.AppPackage, message.AppName!, !string.IsNullOrEmpty(message.AppIcon) ? Convert.FromBase64String(message.AppIcon) : null!);
             
-            if (filter == NotificationFilter.Disabled) return;
+                if (filter == NotificationFilter.Disabled) return;
 
-            if (message.Title != null)
-            {
-                if (message.NotificationType == nameof(NotificationType.New) && filter == NotificationFilter.ToastFeed)
+                await dispatcher.EnqueueAsync(async () =>
                 {
-                    await dispatcher.EnqueueAsync(async () =>
+                    var notification = await Notification.FromMessage(message);
+                    if (message.NotificationType == nameof(NotificationType.New) && filter == NotificationFilter.ToastFeed)
                     {
                         // Check for existing notification
                         var existingNotification = notifications.FirstOrDefault(n => 
-                            n.NotificationKey == message.NotificationKey);
+                            n.Key == notification.Key);
 
                         if (existingNotification != null)
                         {
                             // Update existing notification
                             var index = notifications.IndexOf(existingNotification);
-                            notifications[index] = message;
+                            notifications[index] = notification;
                         }
                         else
                         {
                             // Add new notification
-                            notifications.Insert(0, message);
+                            notifications.Insert(0, notification);
                         }
 
                         if (userSettingsService.FeatureSettingsService.IgnoreWindowsApps && await IsAppActiveAsync(message.AppName!) || !userSettingsService.FeatureSettingsService.ShowNotificationToast ||
                         userSettingsService.FeatureSettingsService.IgnoreNotificationDuringDnd && deviceManager.CurrentDeviceStatus?.IsDndEnabled == true) return;
                         await ShowWindowsNotification(message);
-                    });
-                }
-                else if ((message.NotificationType == nameof(NotificationType.Active) || message.NotificationType == nameof(NotificationType.New)) 
-                    && filter == NotificationFilter.Feed || filter == NotificationFilter.ToastFeed)
-                {
-                    await dispatcher.EnqueueAsync(() =>
+                    }
+                    else if ((message.NotificationType == nameof(NotificationType.Active) || message.NotificationType == nameof(NotificationType.New)) 
+                        && filter == NotificationFilter.Feed || filter == NotificationFilter.ToastFeed)
                     {
-                        notifications.Add(message);
-                    });
-                }
-                else
-                {
-                    logger.Warn("Notification from {0} does not meet criteria for Windows feed display", message.AppName);
-                }
+                        await dispatcher.EnqueueAsync(() =>
+                        {
+                            notifications.Add(notification);
+                        });
+                    }
+                    else
+                    {
+                        logger.Warn("Notification from {0} does not meet criteria for Windows feed display", message.AppName);
+                    }
+                });
             }
             else if (message.NotificationType == nameof(NotificationType.Removed))
             {
@@ -113,30 +115,30 @@ public class NotificationService(
         }
     }
 
-    private async Task ShowWindowsNotification(NotificationMessage message)
+    private async Task ShowWindowsNotification(NotificationMessage notificationMessage)
     {
         try
         {
             var builder = new AppNotificationBuilder()
-                .AddText(message.AppName, new AppNotificationTextProperties().SetMaxLines(1))
-                .AddText(message.Title)
-                .AddText(message.Text)
-                .SetTag(message.Tag ?? string.Empty)
-                .SetGroup(message.GroupKey ?? string.Empty);
+                .AddText(notificationMessage.AppName, new AppNotificationTextProperties().SetMaxLines(1))
+                .AddText(notificationMessage.Title)
+                .AddText(notificationMessage.Text)
+                .SetTag(notificationMessage.Tag ?? string.Empty)
+                .SetGroup(notificationMessage.GroupKey ?? string.Empty);
 
 
             // Handle icons
-            if (!string.IsNullOrEmpty(message.LargeIcon))
+            if (!string.IsNullOrEmpty(notificationMessage.LargeIcon))
             {
-                await SetNotificationIcon(builder, message.LargeIcon, "largeIcon.png");
+                await SetNotificationIcon(builder, notificationMessage.LargeIcon, "largeIcon.png");
             }
-            else if (!string.IsNullOrEmpty(message.AppIcon))
+            else if (!string.IsNullOrEmpty(notificationMessage.AppIcon))
             {
-                await SetNotificationIcon(builder, message.AppIcon, "appIcon.png");
+                await SetNotificationIcon(builder, notificationMessage.AppIcon, "appIcon.png");
             }
 
             // Handle actions
-            foreach (var action in message.Actions)
+            foreach (var action in notificationMessage.Actions)
             {
                 if (action == null) continue;
 
@@ -146,8 +148,8 @@ public class NotificationService(
                         .AddTextBox("textBox", "ReplyPlaceholder".GetLocalizedResource(), "")
                         .AddButton(new AppNotificationButton("SendButton".GetLocalizedResource())
                             .AddArgument("notificationType", ToastNotificationType.RemoteNotification)
-                            .AddArgument("notificationKey", message.NotificationKey)
-                            .AddArgument("replyResultKey", message.ReplyResultKey)
+                            .AddArgument("notificationKey", notificationMessage.NotificationKey)
+                            .AddArgument("replyResultKey", notificationMessage.ReplyResultKey)
                             .AddArgument("action", "Reply")
                                 .SetInputId("textBox"));
                 }
@@ -157,18 +159,18 @@ public class NotificationService(
                         .AddArgument("notificationType", ToastNotificationType.RemoteNotification)
                         .AddArgument("action", "Click")
                         .AddArgument("actionIndex", action.ActionIndex.ToString())
-                        .AddArgument("notificationKey", message.NotificationKey));
+                        .AddArgument("notificationKey", notificationMessage.NotificationKey));
                 }
             }
 
             var notification = builder.BuildNotification();
             notification.ExpiresOnReboot = true;
             AppNotificationManager.Default.Show(notification);
-            logger.Debug("Windows notification shown for {0}", message.AppName);
+            logger.Debug("Windows notification shown for {0}", notificationMessage.AppName);
         }
         catch (Exception ex)
         {
-            logger.Error("Failed to show Windows notification for {0}", message.AppName, ex);
+            logger.Error("Failed to show Windows notification for {0}", notificationMessage.AppName, ex);
             throw;
         }
     }
@@ -209,28 +211,32 @@ public class NotificationService(
         {
             try
             {
-                var notificationToRemove = notifications.FirstOrDefault(n =>
-                    n.NotificationKey == notificationKey);
+                var notification = notifications.FirstOrDefault(n =>
+                    n.Key == notificationKey);
 
-                if (notificationToRemove != null)
+                if (notification != null)
                 {
-                    notifications.Remove(notificationToRemove);
+                    notifications.Remove(notification);
                     logger.Debug("Removed notification with key: {0}", notificationKey);
 
-                    if (!string.IsNullOrEmpty(notificationToRemove.Tag))
+                    if (!string.IsNullOrEmpty(notification.Tag))
                     {
-                        await AppNotificationManager.Default.RemoveByTagAsync(notificationToRemove.Tag);
-                        logger.Debug("Removed Windows notification by tag: {0}", notificationToRemove.Tag);
+                        await AppNotificationManager.Default.RemoveByTagAsync(notification.Tag);
+                        logger.Debug("Removed Windows notification by tag: {0}", notification.Tag);
                     }
-                    else if (!string.IsNullOrEmpty(notificationToRemove.GroupKey))
+                    else if (!string.IsNullOrEmpty(notification.GroupKey))
                     {
-                        await AppNotificationManager.Default.RemoveByGroupAsync(notificationToRemove.GroupKey);
-                        logger.Debug("Removed Windows notification by group: {0}", notificationToRemove.GroupKey);
+                        await AppNotificationManager.Default.RemoveByGroupAsync(notification.GroupKey);
+                        logger.Debug("Removed Windows notification by group: {0}", notification.GroupKey);
                     }
 
                     if (!isRemote)
                     {
-                        notificationToRemove.NotificationType = nameof(NotificationType.Removed);
+                        var notificationToRemove = new NotificationMessage
+                        {
+                            NotificationKey = notificationKey,
+                            NotificationType = nameof(NotificationType.Removed)
+                        };
                         string jsonMessage = SocketMessageSerializer.Serialize(notificationToRemove);
                         sessionManager.SendMessage(jsonMessage);
                         logger.Debug("Sent notification removal message to remote device");

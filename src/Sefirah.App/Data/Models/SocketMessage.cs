@@ -43,9 +43,6 @@ public class NotificationMessage : SocketMessage
     [JsonPropertyName("timestamp")]
     public string? TimeStamp { get; set; }
 
-    [JsonIgnore]
-    public bool HasTimestamp => !string.IsNullOrEmpty(TimeStamp);
-
     [JsonPropertyName("notificationType")]
     public required string NotificationType { get; set; }
 
@@ -63,72 +60,6 @@ public class NotificationMessage : SocketMessage
 
     [JsonPropertyName("messages")]
     public List<Message>? Messages { get; set; }
-
-    [JsonIgnore]
-    public List<GroupedMessage>? GroupedMessages
-    {
-        get
-        {
-            var result = new List<GroupedMessage>();
-            var currentGroup = new GroupedMessage();
-            if (Messages != null)
-            {
-                foreach (var message in Messages)
-                {
-                    if (currentGroup.Sender != message.Sender)
-                    {
-                        if (currentGroup.Sender != null)
-                        {
-                            result.Add(currentGroup);
-                        }
-                        currentGroup = new GroupedMessage
-                        {
-                            Sender = message.Sender,
-                            Messages = []
-                        };
-                    }
-                    currentGroup.Messages.Add(message.Text);
-                }
-
-                if (currentGroup.Sender != null)
-                {
-                    result.Add(currentGroup);
-                }
-
-                return result;
-            }
-            return null;
-        }
-    }
-
-    [JsonIgnore]
-    public bool HasGroupedMessages => GroupedMessages?.Count > 0;
-
-    [JsonIgnore]
-    public bool ShouldShowTitle
-    {
-        get
-        {
-            if (GroupedMessages != null && GroupedMessages.Count != 0)
-            {
-                return !string.Equals(Title, GroupedMessages.First().Sender, StringComparison.OrdinalIgnoreCase);
-            }
-
-            else if (string.Equals(AppName, Title, StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-
-            return true;
-        }
-    }
-
-    [JsonIgnore]
-    public string? FlyoutFilterString => AppName != null 
-        ? string.Format(
-            "NotificationFilterButton".GetLocalizedResource(),
-            AppName)
-        : null;
 
     [JsonPropertyName("tag")]
     public string? Tag { get; set; }
@@ -150,26 +81,6 @@ public class NotificationMessage : SocketMessage
 
     [JsonPropertyName("largeIcon")]
     public string? LargeIcon { get; set; }
-
-    [JsonIgnore]
-    public BitmapImage? Icon
-    {
-        get
-        {
-            if (!string.IsNullOrEmpty(LargeIcon))
-            {
-                return ImageHelper.Base64ToBitmapImage(LargeIcon);
-            }
-            else if (!string.IsNullOrEmpty(AppIcon))
-            {
-                return ImageHelper.Base64ToBitmapImage(AppIcon);
-            }
-            else
-            {
-                return null;
-            }
-        }
-    }
 }
 
 public class ReplyAction : SocketMessage
@@ -248,6 +159,12 @@ public class DeviceStatus : SocketMessage
 
     [JsonPropertyName("bluetoothStatus")]
     public bool BluetoothStatus { get; set; }
+
+    [JsonPropertyName("isDndEnabled")]
+    public bool IsDndEnabled { get; set; }
+
+    [JsonPropertyName("ringerMode")]
+    public int RingerMode { get; set; }
 }
 
 public class PlaybackData : SocketMessage
