@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml.Data;
 using Sefirah.App.Data.Enums;
 using Sefirah.App.Data.Models;
+using Sefirah.App.Extensions;
 using System.Globalization;
 
 namespace Sefirah.App.Converters;
@@ -405,24 +406,27 @@ public class NotificationFilterConverter : IValueConverter
         {
             return filter switch
             {
-                NotificationFilter.ToastFeed => "Notification feed + toast",
-                NotificationFilter.Feed => "Notification feed",
-                NotificationFilter.Disabled => "Disabled",
-                _ => "Unknown"
+                NotificationFilter.ToastFeed => "NotificationFilterToastFeed/Content".GetLocalizedResource(),
+                NotificationFilter.Feed => "NotificationFilterFeed/Content".GetLocalizedResource(),
+                NotificationFilter.Disabled => "NotificationFilterDisabled/Content".GetLocalizedResource(),
+                _ => ""
             };
         }
-        return "Unknown";
+        return "";
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)
     {
-        return value switch
+        if (value is string strValue)
         {
-            "Notification feed + toast" => NotificationFilter.ToastFeed,
-            "Notification feed" => NotificationFilter.Feed,
-            "Disabled" => NotificationFilter.Disabled,
-            _ => NotificationFilter.Disabled
-        };
+            if (strValue == "NotificationFilterToastFeed/Content".GetLocalizedResource())
+                return NotificationFilter.ToastFeed;
+            if (strValue == "NotificationFilterFeed/Content".GetLocalizedResource())
+                return NotificationFilter.Feed;
+            if (strValue == "NotificationFilterDisabled/Content".GetLocalizedResource())
+                return NotificationFilter.Disabled;
+        }
+        return NotificationFilter.Disabled;
     }
 }
 

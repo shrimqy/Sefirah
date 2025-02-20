@@ -83,8 +83,8 @@ public partial class DevicesViewModel : BaseViewModel
         {
             Title = "RemoveDeviceDialogTitle".GetLocalizedResource(),
             Content = string.Format("RemoveDeviceDialogSubtitle".GetLocalizedResource(), device.Name),
-            PrimaryButtonText = "RemoveDeviceConfirmButton".GetLocalizedResource(),
-            CloseButtonText = "RemoveDeviceCancelButton".GetLocalizedResource(),
+            PrimaryButtonText = "Remove".GetLocalizedResource(),
+            CloseButtonText = "Cancel".GetLocalizedResource(),
             DefaultButton = ContentDialogButton.Close,
             XamlRoot = MainWindow.Instance.Content.XamlRoot
         };

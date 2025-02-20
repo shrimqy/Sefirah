@@ -234,10 +234,10 @@
   <data name="RemoveDeviceDialogTitle" xml:space="preserve">
     <value>Remove Device</value>
   </data>
-  <data name="RemoveDeviceConfirmButton" xml:space="preserve">
+  <data name="Remove" xml:space="preserve">
     <value>Remove</value>
   </data>
-  <data name="RemoveDeviceCancelButton" xml:space="preserve">
+  <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
   <data name="OnboardingWelcome.Title" xml:space="preserve">
@@ -355,5 +355,8 @@ mobile (Make sure the pin matches)</value>
   </data>
   <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
     <value>Do not show notification toast when phone is in DND</value>
+  </data>
+  <data name="Devices" xml:space="preserve">
+    <value>Devices</value>
   </data>
 </root>
