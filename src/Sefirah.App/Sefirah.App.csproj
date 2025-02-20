@@ -12,7 +12,7 @@
         <AppxBundlePlatforms>x86|x64|arm64</AppxBundlePlatforms>
         <AppxBundle>Always</AppxBundle>
         <DefaultLanguage>en-US</DefaultLanguage>
-        <AppxDefaultResourceQualifiers>Language=en-US;ja-JP</AppxDefaultResourceQualifiers>
+        <AppxDefaultResourceQualifiers>Language=en-US;en-GB;ja-JP</AppxDefaultResourceQualifiers>
         <Platforms>x86;x64;arm64</Platforms>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
@@ -52,6 +52,21 @@
 
     <ItemGroup>
         <AdditionalFiles Include="Strings\en-US\Resources.resw" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Strings\en-GB\Resources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Resources.resw</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PRIResource Update="Strings\en-GB\Resources.resw">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      </PRIResource>
     </ItemGroup>
         
     <!-- Publish Properties -->
