@@ -80,7 +80,7 @@ public static class AppLifecycleHelper
                 .AddSingleton<ShellRegistrar>()
                 .AddHostedService<ShellWorker>()
 
-                .AddHostedService<SyncProviderWorker>()
+                .AddSingleton<SyncProviderWorker>()
                 .AddSingleton<ISftpService, SftpService>()
 
                 // Database
@@ -117,11 +117,7 @@ public static class AppLifecycleHelper
     /// </summary>
     public static void HandleAppUnhandledException(Exception? ex)
     {
-        var logger = Ioc.Default.GetRequiredService<Common.Utils.ILogger>();
-        if (ex is not null)
-        {
-            logger.Error("Unhandled exception occurred", ex);
-        }
+        Ioc.Default.GetService<Common.Utils.ILogger>()?.Fatal("Unhandled exception", ex);
     }
 
 
