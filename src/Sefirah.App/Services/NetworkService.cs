@@ -325,7 +325,7 @@ public class NetworkService(
     {
         try
         {
-            logger.Debug($"Processing individual message: {(message.Length > 100 ? string.Concat(message.AsSpan(0, Math.Min(100, message.Length)), "...") : message)}");
+            logger.Debug($"Processing message: {(message.Length > 100 ? string.Concat(message.AsSpan(0, Math.Min(100, message.Length)), "...") : message)}");
             var socketMessage = SocketMessageSerializer.DeserializeMessage(message);
             if (socketMessage != null)
                 await messageHandler.Value.HandleJsonMessage(socketMessage);

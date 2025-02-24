@@ -165,7 +165,7 @@ public partial class App : Application
 #if DEBUG
             .Verbose()
 #else
-			.Verbose()
+			.Debug()
 #endif
             .WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day)
             .WriteTo.Debug()
