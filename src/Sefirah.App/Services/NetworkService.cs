@@ -31,7 +31,11 @@ public class NetworkService(
     private bool isFirstMessage = true;
     private bool isVerified;
 
+    private RemoteDeviceEntity? currentlyConnectedDevice;
+
     public event EventHandler<ConnectedSessionEventArgs>? ClientConnectionStatusChanged;
+
+    public RemoteDeviceEntity? GetCurrentlyConnectedDevice() => currentlyConnectedDevice;
 
     public bool IsConnected() => currentSession != null;
 
@@ -166,6 +170,7 @@ public class NetworkService(
                 logger.Debug($"Non-critical error during session disconnect: {ex.Message}");
             }
             currentSession = null;
+            currentlyConnectedDevice = null;
 
             if (removeSession)
             {
@@ -278,6 +283,8 @@ public class NetworkService(
             }
             else
             {
+                SendMessage("Rejected");
+                await Task.Delay(50);
                 logger.Info("Device verification failed or was declined");
                 DisconnectSession();
             }
@@ -318,6 +325,7 @@ public class NetworkService(
             SessionId = currentSession?.Id.ToString(),
             IsConnected = true
         };
+        currentlyConnectedDevice = device;
         ClientConnectionStatusChanged?.Invoke(this, args);
     }
 
@@ -340,4 +348,5 @@ public class NetworkService(
     {
         DisconnectSession();
     }
+
 }

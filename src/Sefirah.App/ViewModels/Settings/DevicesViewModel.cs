@@ -96,7 +96,7 @@ public partial class DevicesViewModel : BaseViewModel
             try
             {
                 // First disconnect if this is the currently connected device
-                if (CurrentlyConnectedDevice?.DeviceId == device.DeviceId)
+                if (SessionManager.GetCurrentlyConnectedDevice()?.DeviceId == device.DeviceId)
                 {
                     var message = new Misc { MiscType = nameof(MiscType.Disconnect) };
                     SessionManager.SendMessage(SocketMessageSerializer.Serialize(message));
