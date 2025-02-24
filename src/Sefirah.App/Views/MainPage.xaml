@@ -48,8 +48,23 @@
                 Height="25"
                 Margin="10,1,0,0"
                 HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                Source="ms-appx:///Assets/AppTiles/StoreLogo.png" />
+                VerticalAlignment="Center">
+                <Image.Resources>
+                    <ResourceDictionary>
+                        <ResourceDictionary.ThemeDictionaries>
+                            <ResourceDictionary x:Key="Light">
+                                <x:String x:Key="TitleBarIconPath">ms-appx:///Assets/Icons/SefirahLight.ico</x:String>
+                            </ResourceDictionary>
+                            <ResourceDictionary x:Key="Dark">
+                                <x:String x:Key="TitleBarIconPath">ms-appx:///Assets/Icons/SefirahDark.ico</x:String>
+                            </ResourceDictionary>
+                        </ResourceDictionary.ThemeDictionaries>
+                    </ResourceDictionary>
+                </Image.Resources>
+                <Image.Source>
+                    <BitmapImage UriSource="{ThemeResource TitleBarIconPath}" />
+                </Image.Source>
+            </Image>
             <TextBlock
                 x:Name="TitleBarTextBlock"
                 Grid.Column="1"

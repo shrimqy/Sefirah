@@ -5,8 +5,10 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using Sefirah.App.Views;
 using Sefirah.App.Views.Onboarding;
+using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Storage;
+using Windows.UI.ViewManagement;
 using WinUIEx;
 
 namespace Sefirah.App;
@@ -15,33 +17,30 @@ public sealed partial class MainWindow : WindowEx
 {
     private static MainWindow? _Instance;
     public static MainWindow Instance => _Instance ??= new();
-    public IntPtr WindowHandle { get; }
-    private MainWindow()
-    {
-        WindowHandle = this.GetWindowHandle();
 
+    private readonly UISettings uiSettings = new();
+    public nint WindowHandle { get; }
+    public MainWindow()
+    {
         InitializeComponent();
 
-        EnsureEarlyWindow();
-    }
-
-    private void EnsureEarlyWindow()
-    {
-        // Set PersistenceId
-        PersistenceId = "SefirahMainWindow";
-
-        // Set minimum sizes
+        WindowHandle = WindowExtensions.GetWindowHandle(this);
         MinHeight = 416;
         MinWidth = 516;
-
-        AppWindow.Title = "Sefirah";
         AppWindow.TitleBar.ExtendsContentIntoTitleBar = true;
+        Title = "Sefirah";
+        PersistenceId = "SefirahMainWindow";
         AppWindow.TitleBar.ButtonBackgroundColor = Colors.Transparent;
         AppWindow.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
+        AppWindow.TitleBar.ButtonPressedBackgroundColor = Colors.Transparent;
+        AppWindow.TitleBar.ButtonHoverBackgroundColor = Colors.Transparent;
 
-        // Workaround for full screen window messing up the taskbar
-        // https://github.com/microsoft/microsoft-ui-xaml/issues/8431
-        //InteropHelpers.SetPropW(WindowHandle, "NonRudeHWND", new IntPtr(1));
+        var iconPath = uiSettings.GetColorValue(UIColorType.Background) == Colors.Black
+            ? "Assets/Icons/SefirahDark.ico"
+            : "/Assets/Icons/SefirahLight.ico";
+
+        Debug.WriteLine("app location: " + Package.Current.InstalledLocation.Path + "icon path" + iconPath);
+        AppWindow.SetIcon(Path.Combine(Package.Current.InstalledLocation.Path, iconPath));
     }
 
     public void ShowSplashScreen()
@@ -50,7 +49,6 @@ public sealed partial class MainWindow : WindowEx
 
         rootFrame.Navigate(typeof(Views.SplashScreen));
     }
-
 
     public Task InitializeApplicationAsync(object activatedEventArgs)
     {
