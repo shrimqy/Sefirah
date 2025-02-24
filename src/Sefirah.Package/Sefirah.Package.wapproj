@@ -18,7 +18,7 @@
     <AppxDefaultResourceQualifiers>Language=en-US;en-GB;ja-JP</AppxDefaultResourceQualifiers>
     <AppxBundleAutoResourcePackageQualifiers>Scale|DXFeatureLevel</AppxBundleAutoResourcePackageQualifiers>
     <UapAppxPackageBuildMode>StoreUpload</UapAppxPackageBuildMode>
-    <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
+    <AppxBundlePlatforms>x86|x64|arm64</AppxBundlePlatforms>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     <EntryPointProjectUniqueName>..\Sefirah.App\Sefirah.App.csproj</EntryPointProjectUniqueName>
     <AppxBundle>Always</AppxBundle>
