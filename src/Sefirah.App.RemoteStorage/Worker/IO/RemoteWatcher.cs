@@ -29,7 +29,7 @@ public sealed class RemoteWatcher(
         {
             if (FileHelper.IsSystemDirectory(relativePath)) return;
         
-            logger.Debug("Created {path}", relativePath);
+            //logger.Debug("Created {path}", relativePath);
             using var locker = await fileLocker.Lock(relativePath);
             try
             {
@@ -44,7 +44,7 @@ public sealed class RemoteWatcher(
             }
             catch (Exception ex)
             {
-                logger.Error("Handle Created failed for: {relativePath}",relativePath, ex);
+                logger.Error("Handle Created failed for: {relativePath}, {ex}",relativePath, ex);
             }
         });
     }
@@ -71,7 +71,7 @@ public sealed class RemoteWatcher(
                         }
                         catch (Exception ex)
                         {
-                            logger.Error("Failed to update file {file}", file.RelativePath, ex);
+                            logger.Error("Failed to update file {file}, {ex}", file.RelativePath, ex);
                         }
                     }
                 }

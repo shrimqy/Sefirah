@@ -38,6 +38,7 @@ public class SftpReadService(
         return client.ListDirectory(GetSftpPath(relativeDirectory))
             .Where((sftpFile) => sftpFile.IsDirectory)
             .Where((sftpFile) => !_relativeDirectoryNames.Contains(sftpFile.Name))
+            .Where(sftpFile => !FileHelper.IsSystemDirectory(PathMapper.GetRelativePath(sftpFile.FullName, _context.Directory)))
             .Select(GetRemoteDirectoryInfo)
             .ToArray();
     }

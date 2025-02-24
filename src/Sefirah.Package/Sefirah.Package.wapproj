@@ -71,7 +71,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\Icons\**" />
-    <Content Include="Assets\AppTiles\**" />
     <Content Include="Package.StoreAssociation.xml" />
     <None Include="Sefirah.Package_TemporaryKey.pfx" />
   </ItemGroup>

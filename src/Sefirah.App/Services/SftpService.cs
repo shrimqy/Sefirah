@@ -65,7 +65,6 @@ public class SftpService(
             };
 
             var directory = userSettingsService.FeatureSettingsService.RemoteStoragePath;
-            var localDevice = await deviceManager.GetLocalDeviceAsync();
             var remoteDevice = await deviceManager.GetLastConnectedDevice();
             await Register(
                 name: remoteDevice!.Name,

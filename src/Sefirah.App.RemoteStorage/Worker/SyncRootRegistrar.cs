@@ -105,11 +105,18 @@ public class SyncRootRegistrar(
 
     public void UpdateCredentials<T>(string id, T context) where T : struct
     {
-        var roots = StorageProviderSyncRootManager.GetCurrentSyncRoots();
-        var existingRoot = roots.FirstOrDefault(x => x.Id == id) ?? throw new InvalidOperationException($"Sync root {id} not found");
-        var contextBytes = StructBytes.ToBytes(context);
-        
-        // Update using the lower-level API
-        CloudFilter.UpdateSyncRoot(existingRoot.Path.Path, contextBytes);
+        try
+        {
+            var roots = StorageProviderSyncRootManager.GetCurrentSyncRoots();
+            var existingRoot = roots.FirstOrDefault(x => x.Id == id) ?? throw new InvalidOperationException($"Sync root {id} not found");
+            var contextBytes = StructBytes.ToBytes(context);
+            
+            CloudFilter.UpdateSyncRoot(existingRoot.Path.Path, contextBytes);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Failed to update credentials", ex);
+            throw;
+        }
     }
 }
