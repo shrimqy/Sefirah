@@ -66,10 +66,11 @@ public class SftpService(
 
             var directory = userSettingsService.FeatureSettingsService.RemoteStoragePath;
             var localDevice = await deviceManager.GetLocalDeviceAsync();
+            var remoteDevice = await deviceManager.GetLastConnectedDevice();
             await Register(
-                name: localDevice.DeviceName,
+                name: remoteDevice!.Name,
                 directory: directory,
-                accountId: localDevice.DeviceId,
+                accountId: remoteDevice!.DeviceId,
                 context: sftpContext
             );
         }
