@@ -366,4 +366,10 @@
   <data name="RingerModeVibrate.Content" xml:space="preserve">
     <value>Vibrate</value>
   </data>
+  <data name="Pin" xml:space="preserve">
+    <value>Pin</value>
+  </data>
+  <data name="Unpin" xml:space="preserve">
+    <value>Unpin</value>
+  </data>
 </root>
