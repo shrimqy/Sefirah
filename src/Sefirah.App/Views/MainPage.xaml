@@ -26,7 +26,9 @@
         <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
         <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
         <converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
+        <converters:PinConverter x:Key="PinConverter" />
         <converters:RingerModeToIconConverter x:Key="RingerModeToIconConverter" />
+        <converters:PinIconConverter x:Key="PinIconConverter" />
     </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -326,6 +328,14 @@
                                                                             <FontIcon Glyph="&#xECE4;" />
                                                                         </MenuFlyoutItem.Icon>
                                                                     </MenuFlyoutItem>
+                                                                    <MenuFlyoutItem
+                                                                        Click="OnNotificationPinClick"  
+                                                                        Tag="{x:Bind Key}"
+                                                                        Text="{x:Bind IsPinned, Converter={StaticResource PinConverter}}">
+                                                                        <MenuFlyoutItem.Icon>
+                                                                            <FontIcon Glyph="{x:Bind IsPinned, Converter={StaticResource PinIconConverter}}" />
+                                                                        </MenuFlyoutItem.Icon>
+                                                                    </MenuFlyoutItem>
                                                                 </MenuFlyout>
                                                             </Button.Flyout>
                                                         </Button>
@@ -340,6 +350,16 @@
                                                             Opacity="0"
                                                             Style="{StaticResource AlternateCloseButtonStyle}"
                                                             Tag="{x:Bind Key}" />
+                                                        <SymbolIcon 
+                                                            x:Name="PinIcon" 
+                                                            Symbol="Pin" 
+                                                            Tag="{x:Bind IsPinned}" 
+                                                            Visibility="{x:Bind IsPinned, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                            RenderTransformOrigin="0.5,0.5">
+                                                            <SymbolIcon.RenderTransform>
+                                                                <ScaleTransform ScaleX="0.7" ScaleY="0.7"/>
+                                                            </SymbolIcon.RenderTransform>
+                                                        </SymbolIcon>
                                                         <TextBlock
                                                             x:Name="TimeStampTextBlock"
                                                             Grid.Column="1"
@@ -350,7 +370,6 @@
                                                             Visibility="Visible" />
                                                     </StackPanel>
                                                 </Grid>
-
 
                                                 <TextBlock
                                                     x:Name="TitleTextBlock"

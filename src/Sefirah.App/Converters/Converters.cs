@@ -451,6 +451,53 @@ public class NotificationLaunchPreferenceConverter : IValueConverter
     }
 }
 
+public class BooleanToOpacityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (value is bool isPinned)
+        {
+            return isPinned ? 100 : 0;
+        }
+        return 0;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class PinConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (value is bool isPinned && isPinned)
+        {
+            return "Unpin".GetLocalizedResource();
+        }
+        return "Pin".GetLocalizedResource();
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class PinIconConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        return value is bool isPinned ? (isPinned ? "\uE77A" : "\uE718") : "\uE718";
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}
+
 public class RingerModeToIconConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)

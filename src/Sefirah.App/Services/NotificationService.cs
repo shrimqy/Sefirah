@@ -21,7 +21,7 @@ public class NotificationService(
     IRemoteAppsRepository remoteAppsRepository) : INotificationService
 {
     private readonly SemaphoreSlim semaphore = new(1, 1);
-    private readonly ObservableCollection<Notification> notifications = [];
+    private ObservableCollection<Notification> notifications = [];
     private readonly Microsoft.UI.Dispatching.DispatcherQueue dispatcher = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
 
     public ReadOnlyObservableCollection<Notification> NotificationHistory => new(notifications);
@@ -56,6 +56,10 @@ public class NotificationService(
                         {
                             // Update existing notification
                             var index = notifications.IndexOf(existingNotification);
+                            if (existingNotification.IsPinned)
+                            {
+                                notification.IsPinned = true;
+                            }
                             notifications[index] = notification;
                         }
                         else
@@ -84,7 +88,7 @@ public class NotificationService(
             }
             else if (message.NotificationType == nameof(NotificationType.Removed))
             {
-                await RemoveNotification(message.NotificationKey, false);
+                await RemoveNotification(message.NotificationKey, true);
             }
         }
         catch (Exception ex)
@@ -189,6 +193,26 @@ public class NotificationService(
         }
     }
 
+    private async Task SortNotifications()
+    {
+        await dispatcher.EnqueueAsync(() =>   
+        {
+            var sorted = notifications.OrderByDescending(n => n.IsPinned)
+                .ThenByDescending(n => n.TimeStamp)
+                .ToList();
+            
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                int currentIndex = notifications.IndexOf(sorted[i]);
+                if (currentIndex != i)
+                {
+                    notifications.Move(currentIndex, i);
+                }
+            }
+        });
+    }
+    
+
     private static async Task<Uri> SaveBase64ToFileAsync(string base64, string fileName)
     {
         var bytes = Convert.FromBase64String(base64);
@@ -216,20 +240,6 @@ public class NotificationService(
 
                 if (notification != null)
                 {
-                    notifications.Remove(notification);
-                    logger.Debug("Removed notification with key: {0}", notificationKey);
-
-                    if (!string.IsNullOrEmpty(notification.Tag))
-                    {
-                        await AppNotificationManager.Default.RemoveByTagAsync(notification.Tag);
-                        logger.Debug("Removed Windows notification by tag: {0}", notification.Tag);
-                    }
-                    else if (!string.IsNullOrEmpty(notification.GroupKey))
-                    {
-                        await AppNotificationManager.Default.RemoveByGroupAsync(notification.GroupKey);
-                        logger.Debug("Removed Windows notification by group: {0}", notification.GroupKey);
-                    }
-
                     if (!isRemote)
                     {
                         var notificationToRemove = new NotificationMessage
@@ -241,6 +251,23 @@ public class NotificationService(
                         sessionManager.SendMessage(jsonMessage);
                         logger.Debug("Sent notification removal message to remote device");
                     }
+                    if(!notification.IsPinned || !isRemote)
+                    {
+                        notifications.Remove(notification);
+                        logger.Debug("Removed notification with key: {0}", notificationKey);
+                    }
+
+                    // TODO : MAKE THIS WORK 
+                    if (!string.IsNullOrEmpty(notification.Tag))
+                    {
+                        await AppNotificationManager.Default.RemoveByTagAsync(notification.Tag);
+                        logger.Debug("Removed Windows notification by tag: {0}", notification.Tag);
+                    }
+                    else if (!string.IsNullOrEmpty(notification.GroupKey))
+                    {
+                        await AppNotificationManager.Default.RemoveByGroupAsync(notification.GroupKey);
+                        logger.Debug("Removed Windows notification by group: {0}", notification.GroupKey);
+                    }
                 }
             }
             catch (Exception ex)
@@ -251,9 +278,27 @@ public class NotificationService(
         });
     }
 
+    public async Task TogglePinNotification(string notificationKey)
+    {
+        logger.Debug("Toggling pin status for notification with key: {0}", notificationKey);
+        await dispatcher.EnqueueAsync(async () =>
+        {
+            var notification = notifications.FirstOrDefault(n => n.Key == notificationKey);
+            if (notification != null)
+            {
+                notification.IsPinned = !notification.IsPinned;
+                // Update existing notification
+                var index = notifications.IndexOf(notification);
+                notifications[index] = notification;
+                await SortNotifications();
+                logger.Debug("Pinned status for notification with key: {0} is now {1}", notificationKey, notification.IsPinned);
+            }
+        });
+    }
+
     public async Task ClearAllNotification()
     {
-        await dispatcher.EnqueueAsync(async () =>
+        await dispatcher.EnqueueAsync(() =>
         {
             try
             {

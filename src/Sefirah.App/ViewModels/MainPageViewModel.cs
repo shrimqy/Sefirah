@@ -151,6 +151,11 @@ public sealed class MainPageViewModel : BaseViewModel
         await remoteAppsRepository.UpdateFilterAsync(appPackageName, filter);
     }
 
+    public async Task PinNotificationAsync(string notificationKey)
+    {
+        await NotificationService.TogglePinNotification(notificationKey);
+    }
+
     private void OnDeviceStatusReceived(object? sender, DeviceStatus deviceStatus)
     {
         dispatcher.TryEnqueue(() => DeviceStatus = deviceStatus);

@@ -25,13 +25,22 @@ public sealed partial class MainPage : Page
     private void OnPointerEntered(object sender, PointerRoutedEventArgs e)
     {
         var border = sender as Border;
+        var pinIcon = FindChild<SymbolIcon>(border, "PinIcon");
         var closeButton = FindChild<Button>(border, "CloseButton");
         var moreButton = FindChild<Button>(border, "MoreButton");
         var timeStamp = FindChild<TextBlock>(border, "TimeStampTextBlock");
+        
         if (closeButton != null && timeStamp != null && moreButton != null)
         {
             timeStamp.Visibility = Visibility.Collapsed;
-            closeButton.Visibility = Visibility.Visible;
+
+            // Only make pinIcon visible if it's not already visible
+            if (pinIcon.Tag is bool isPinned && isPinned)
+            {
+                pinIcon.Visibility = Visibility.Collapsed;
+            }
+            
+            pinIcon.IsHitTestVisible = true;
             closeButton.Opacity = 1;
             closeButton.IsHitTestVisible = true;
             moreButton.Opacity = 1;
@@ -42,6 +51,7 @@ public sealed partial class MainPage : Page
     private void OnPointerExited(object sender, PointerRoutedEventArgs e)
     {
         var border = sender as Border;
+        var pinIcon = FindChild<SymbolIcon>(border, "PinIcon");
         var closeButton = FindChild<Button>(border, "CloseButton");
         var moreButton = FindChild<Button>(border, "MoreButton");
         var timeStamp = FindChild<TextBlock>(border, "TimeStampTextBlock");
@@ -53,12 +63,18 @@ public sealed partial class MainPage : Page
             var flyout = moreButton.Flyout as MenuFlyout;
             if (flyout != null && flyout.IsOpen)
             {
-                // Flyout is open, so don't change the opacity or hit testing
+                // Flyout is open, so don't change the visibility
                 return;
             }
 
-            // Reset the buttons when the flyout is not open
             timeStamp.Visibility = Visibility.Visible;
+
+            if (pinIcon.Tag is bool isPinned && isPinned)
+            {
+                pinIcon.Visibility = Visibility.Visible;
+            }
+            
+            pinIcon.IsHitTestVisible = false;
             closeButton.Opacity = 0;
             closeButton.IsHitTestVisible = false;
             moreButton.Opacity = 0;
@@ -72,18 +88,21 @@ public sealed partial class MainPage : Page
         var flyout = sender as MenuFlyout;
         if (flyout != null)
         {
-            // Now get the MoreButton that owns the flyout
             var moreButton = flyout.Target as Button;
             if (moreButton != null)
             {
-                // Find the CloseButton within the same parent (e.g., the same StackPanel or Border)
                 var parent = VisualTreeHelper.GetParent(moreButton) as FrameworkElement;
+                var pinIcon = FindChild<SymbolIcon>(parent, "PinIcon");
                 var closeButton = FindChild<Button>(parent, "CloseButton");
                 var timeStamp = FindChild<TextBlock>(parent, "TimeStampTextBlock");
-
+                
                 if (closeButton != null)
                 {
-                    // Reset the opacity and hit testing after the flyout is closed
+                    if (pinIcon.Tag is bool isPinned && isPinned)
+                    {
+                        pinIcon.Visibility = Visibility.Visible;
+                    }
+
                     closeButton.Opacity = 0;
                     closeButton.IsHitTestVisible = false;
                     moreButton.Opacity = 0;
@@ -96,18 +115,27 @@ public sealed partial class MainPage : Page
 
     private async void OnNotificationFilterClick(object sender, RoutedEventArgs e)
     {
-        // Retrieve the AppPackage from the Flyout's Tag or DataContext (depending on your binding)
         var menuItem = sender as MenuFlyoutItem;
         if (menuItem != null)
         {
-            string? appName = menuItem.Tag as string;  // Assume AppPackage is set as Tag or DataContext
+            string? appName = menuItem.Tag as string; 
 
             if (!string.IsNullOrEmpty(appName))
             {
-                // Update the database to set NotificationFilter to DISABLED
                 await ViewModel.UpdateNotificationFilterAsync(appName, NotificationFilter.Disabled);
+            }
+        }
+    }
 
-                // TODO reflect the change in the UI
+    private async void OnNotificationPinClick(object sender, RoutedEventArgs e)
+    {
+        var menuItem = sender as MenuFlyoutItem;
+        if (menuItem != null)
+        {
+            string? notificationKey = menuItem.Tag as string;
+            if (!string.IsNullOrEmpty(notificationKey))
+            {
+                await ViewModel.PinNotificationAsync(notificationKey);
             }
         }
     }

@@ -7,6 +7,7 @@ namespace Sefirah.App.Data.Models;
 public class Notification
 {
     public string Key { get; set; } = string.Empty;
+    public bool IsPinned { get; set; } = false;
     public string? TimeStamp { get; set; }
     public string Type { get; set; } = string.Empty;
     public string? AppName { get; set; }

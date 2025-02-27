@@ -24,6 +24,12 @@ public interface INotificationService
     Task RemoveNotification(string notificationKey, bool isRemote);
 
     /// <summary>
+    /// Toggles the pin status of a notification by its notificationKey.
+    /// </summary>
+    /// <param name="notificationKey">The key of the notification to toggle the pin status of.</param>
+    Task TogglePinNotification(string notificationKey);
+
+    /// <summary>
     /// Processes a reply action.
     /// </summary>
     /// <param name="notificationKey">The key of the notification.</param>
