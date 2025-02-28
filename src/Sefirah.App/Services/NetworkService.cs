@@ -37,7 +37,7 @@ public class NetworkService(
 
     public RemoteDeviceEntity? GetCurrentlyConnectedDevice() => currentlyConnectedDevice;
 
-    public bool IsConnected() => currentSession != null;
+    public bool IsConnected() => currentlyConnectedDevice != null;
 
     /// <inheritdoc/>
     public async Task<bool> StartServerAsync()

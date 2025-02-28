@@ -307,6 +307,10 @@ public class PlaybackService(
     {
         try
         {
+            if (!sessionManager.IsConnected())
+            {
+                return;
+            }
             string jsonMessage = SocketMessageSerializer.Serialize(playbackData);
             sessionManager.SendMessage(jsonMessage);
         }
