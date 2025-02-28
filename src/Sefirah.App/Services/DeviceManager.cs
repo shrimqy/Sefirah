@@ -50,8 +50,6 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
         {
 
             var localDevice = await GetLocalDeviceAsync();
-
-
             var existingDevice = await repository.GetByIdAsync(device.DeviceId);
 
             // If device exists and we've already verified it before, validate the proof
@@ -60,13 +58,13 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
                 
                 if (!EcdhHelper.VerifyProof(existingDevice.SharedSecret!, device.Nonce!, device.Proof!)) { return null; }
 
+                // Update device info
                 existingDevice.LastConnected = DateTime.Now;
-                
+                existingDevice.Name = device.DeviceName;
                 if (!string.IsNullOrEmpty(device.Avatar))
                 {
                     existingDevice.WallpaperBytes = Convert.FromBase64String(device.Avatar);
                 }
-
                 return await repository.AddOrUpdateAsync(existingDevice);
             }
 
