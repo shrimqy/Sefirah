@@ -19,6 +19,7 @@
         <converters:DateTimeDevicesConverter x:Key="DateTimeDevicesConverter" />
         <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
         <converters:StringEqualsConverter x:Key="StringEqualsConverter" />
+        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
     </Page.Resources>
 
     <Page.DataContext>
@@ -31,7 +32,8 @@
             <TextBlock
                 FontSize="24"
                 FontWeight="SemiBold"
-                Text="{helpers:ResourceString Name=PairedDevices/Title}" />
+                Text="{helpers:ResourceString Name=PairedDevices/Title}"
+                Visibility="{x:Bind ViewModel.PairedDevices.Count, Mode=OneWay, Converter={StaticResource CountToVisibilityConverter}}"/>
 
             <ItemsRepeater ItemsSource="{x:Bind ViewModel.PairedDevices, Mode=OneWay}">
                 <ItemsRepeater.Layout>
