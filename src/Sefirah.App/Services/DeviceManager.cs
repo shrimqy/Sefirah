@@ -14,6 +14,7 @@ namespace Sefirah.App.Services;
 public class DeviceManager(DeviceRepository repository, ILogger logger) : IDeviceManager
 {
     public event EventHandler<DeviceStatus>? DeviceStatusChanged;
+    public event EventHandler<RemoteDeviceEntity>? DeviceAdded;
     public DeviceStatus? CurrentDeviceStatus { get; private set; }
 
     public async Task<List<RemoteDeviceEntity>> GetDeviceListAsync()
@@ -65,7 +66,12 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
                 {
                     existingDevice.WallpaperBytes = Convert.FromBase64String(device.Avatar);
                 }
-                return await repository.AddOrUpdateAsync(existingDevice);
+                var savedDevice = await repository.AddOrUpdateAsync(existingDevice);
+                if (savedDevice != null)
+                {
+                    DeviceAdded?.Invoke(this, existingDevice);
+                }
+                return savedDevice;
             }
 
             // For new devices, show connection request dialog
@@ -106,6 +112,10 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
                     };
 
                     var savedDevice = await repository.AddOrUpdateAsync(newDevice);
+                    if (savedDevice != null)
+                    {
+                        DeviceAdded?.Invoke(this, savedDevice);
+                    }
                     tcs.SetResult(savedDevice);
                 }
                 catch (Exception ex)

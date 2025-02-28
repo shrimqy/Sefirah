@@ -54,4 +54,9 @@ public interface IDeviceManager
     /// Gets the current device status.
     /// </summary>
     DeviceStatus? CurrentDeviceStatus { get; }
+
+    /// <summary>
+    /// Event that is raised when a device is added to the device list.
+    /// </summary>
+    event EventHandler<RemoteDeviceEntity>? DeviceAdded;
 }

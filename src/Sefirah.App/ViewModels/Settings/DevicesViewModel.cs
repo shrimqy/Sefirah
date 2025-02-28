@@ -40,13 +40,18 @@ public partial class DevicesViewModel : BaseViewModel
 
         RemoveDeviceCommand = new AsyncRelayCommand<RemoteDeviceEntity>(RemoveDevice);
         SessionManager.ClientConnectionStatusChanged += OnConnectionStatusChange;
+        
+        DeviceManager.DeviceAdded += OnDeviceAdded;
+        
         LoadDevices();
     }
 
     private async void LoadDevices()
     {
+        try
+        {
         var devices = await DeviceManager.GetDeviceListAsync();
-        Dispatcher.TryEnqueue(async () =>
+            await Dispatcher.EnqueueAsync(async () =>
         {
             PairedDevices.Clear();
             foreach (var device in devices)
@@ -63,6 +68,11 @@ public partial class DevicesViewModel : BaseViewModel
                 PairedDevices.Add(device);
             }
         });
+    }
+        catch
+        {
+            logger.Error("Failed to load devices");
+        }
     }
 
     private async void OnConnectionStatusChange(object? sender, ConnectedSessionEventArgs args)
@@ -126,5 +136,37 @@ public partial class DevicesViewModel : BaseViewModel
                 await errorDialog.ShowAsync();
             }
         }
+    }
+
+    private async void OnDeviceAdded(object? sender, RemoteDeviceEntity device)
+    {
+        try
+        {
+            await Dispatcher.EnqueueAsync(async () =>
+            {
+                var existingDevice = PairedDevices.FirstOrDefault(d => d?.DeviceId == device?.DeviceId);
+                if (device.WallpaperBytes != null && device.WallpaperImage == null)
+                {
+                    device.WallpaperImage = await device.WallpaperBytes.ToBitmapAsync();
+                }
+                if (existingDevice == null)
+                {
+                    PairedDevices.Add(device);
+                }
+                else
+                {
+                    PairedDevices[PairedDevices.IndexOf(existingDevice)] = device;
+                }
+            });
+        }
+        catch
+        {
+            logger.Error("Failed to add device to UI");
+        }
+    }
+
+    ~DevicesViewModel()
+    {
+        SessionManager.ClientConnectionStatusChanged -= OnConnectionStatusChange;
     }
 }
