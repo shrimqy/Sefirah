@@ -4,8 +4,10 @@ using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.EventArguments;
 using Sefirah.App.Data.Models;
 using Sefirah.App.RemoteStorage.Commands;
+using Sefirah.App.RemoteStorage.Configuration;
 using Sefirah.App.RemoteStorage.RemoteSftp;
 using Sefirah.App.RemoteStorage.Worker;
+using System.Security.Principal;
 using Windows.Storage;
 using Windows.Storage.Provider;
 
@@ -88,6 +90,19 @@ public class SftpService(
         {
             syncProviderPool.StopSyncRoot(info);
             //registrar.Unregister(info.Id);
+        }
+    }
+
+    public void RemoveSyncRoot(string deviceId)
+    {
+        var id = $"Shrimqy:Sefirah!{WindowsIdentity.GetCurrent().User}!{deviceId}";
+        if (info?.Id == id)
+        {
+            syncProviderPool.StopSyncRoot(info);
+        }
+        if (registrar.IsRegistered(id))
+        {
+            registrar.Unregister(id);
         }
     }
 

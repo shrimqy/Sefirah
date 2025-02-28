@@ -19,10 +19,8 @@ public partial class DevicesViewModel : BaseViewModel
     private IDiscoveryService DiscoveryService { get; } = Ioc.Default.GetRequiredService<IDiscoveryService>();
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
 
-    // This collection is for devices you already have connected.
+    private ISftpService SftpService { get; } = Ioc.Default.GetRequiredService<ISftpService>();
     public ObservableCollection<RemoteDeviceEntity?> PairedDevices { get; } = [];
-
-    // Devices discovered on the WiFi network
     public ObservableCollection<DiscoveredDevice> DiscoveredDevices => DiscoveryService.DiscoveredDevices;
 
     private RemoteDeviceEntity? _currentlyConnectedDevice;
@@ -50,25 +48,24 @@ public partial class DevicesViewModel : BaseViewModel
     {
         try
         {
-        var devices = await DeviceManager.GetDeviceListAsync();
+            var devices = await DeviceManager.GetDeviceListAsync();
             await Dispatcher.EnqueueAsync(async () =>
-        {
-            PairedDevices.Clear();
-            foreach (var device in devices)
             {
-
-                if (device != null)
+                PairedDevices.Clear();
+                foreach (var device in devices)
                 {
-                    // Load the images
-                    if (device.WallpaperBytes != null && device.WallpaperImage == null)
+                    if (device != null)
                     {
-                        device.WallpaperImage = await device.WallpaperBytes.ToBitmapAsync();
+                        // Load the images
+                        if (device.WallpaperBytes != null && device.WallpaperImage == null)
+                        {
+                            device.WallpaperImage = await device.WallpaperBytes.ToBitmapAsync();
+                        }
                     }
+                    PairedDevices.Add(device);
                 }
-                PairedDevices.Add(device);
-            }
-        });
-    }
+            });    
+        }
         catch
         {
             logger.Error("Failed to load devices");
@@ -113,6 +110,7 @@ public partial class DevicesViewModel : BaseViewModel
 
                     SessionManager.DisconnectSession(true);
                 }
+                SftpService.RemoveSyncRoot(device.DeviceId);
 
                 // Remove the device from the database
                 await DeviceManager.RemoveDevice(device);
