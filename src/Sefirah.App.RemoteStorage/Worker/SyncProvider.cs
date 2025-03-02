@@ -31,7 +31,7 @@ public class SyncProvider(
             placeholdersService.CreateBulk(string.Empty);
         }
 
-        // TODO: Sync changes since last time this service ran
+        syncProvider.UpdatePlaceholders(contextAccessor.Context.RootDirectory);
 
         // Stage 2: Running
         //--------------------------------------------------------------------------------------------
@@ -49,7 +49,5 @@ public class SyncProvider(
         await taskQueue.Stop();
 
         logger.Debug("Disconnecting...");
-        // TODO: Only on uninstall (or not at all?)
-        //placeholdersService.DeleteBulk(directory);
     }
 }

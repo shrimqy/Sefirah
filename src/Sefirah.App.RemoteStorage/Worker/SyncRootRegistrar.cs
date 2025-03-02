@@ -47,7 +47,7 @@ public class SyncRootRegistrar(
 
         if (IsRegistered(id))
         {
-            Unregister(id);
+            UpdateCredentials(id, context);
         }
 
         string iconPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Assets", "IconResource.dll"));
@@ -100,6 +100,23 @@ public class SyncRootRegistrar(
         catch (Exception ex)
         {
             logger.Error("Unregister sync root failed", ex);
+        }
+    }
+
+    public void UpdateCredentials<T>(string id, T context) where T : struct
+    {
+        try
+        {
+            var roots = StorageProviderSyncRootManager.GetCurrentSyncRoots();
+            var existingRoot = roots.FirstOrDefault(x => x.Id == id) ?? throw new InvalidOperationException($"Sync root {id} not found");
+            var contextBytes = StructBytes.ToBytes(context);
+
+            CloudFilter.UpdateSyncRoot(existingRoot.Path.Path, contextBytes);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Failed to update credentials", ex);
+            throw;
         }
     }
 }

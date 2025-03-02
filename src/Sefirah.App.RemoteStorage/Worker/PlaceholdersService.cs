@@ -85,12 +85,6 @@ public class PlaceholdersService(
         var fileInfo = remoteService.GetFileInfo(relativeFile);
         var parentPath = Path.Join(rootDirectory, fileInfo.RelativeParentDirectory);
 
-        // Ensure parent directory exists first
-        if (!Directory.Exists(parentPath))
-        {
-            await CreateDirectory(fileInfo.RelativeParentDirectory);
-        }
-
         using var createInfo = new SafeCreateInfo(fileInfo, fileInfo.RelativePath);
         CldApi.CfCreatePlaceholders(
             parentPath,
@@ -99,6 +93,8 @@ public class PlaceholdersService(
             CldApi.CF_CREATE_FLAGS.CF_CREATE_FLAG_NONE,
             out var entriesProcessed
         ).ThrowIfFailed("Create placeholder failed");
+
+        logger.Info("Created placeholder file for {path}", relativeFile);
     }
 
     public async Task CreateDirectory(string relativeDirectory)
@@ -108,21 +104,10 @@ public class PlaceholdersService(
         var parentPath = Path.Join(rootDirectory, directoryInfo.RelativeParentDirectory);
         var targetPath = Path.Join(rootDirectory, relativeDirectory);
 
-        // Ensure parent directory exists first
-        if (!Directory.Exists(parentPath))
-        {
-            await CreateDirectory(directoryInfo.RelativeParentDirectory);
-        }
-
-        // Create the physical directory if it doesn't exist
-        if (!Directory.Exists(targetPath))
-        {
-            Directory.CreateDirectory(targetPath);
-        }
-
         // If it's already a placeholder, just update it
         if (CloudFilter.IsPlaceholder(targetPath))
         {
+            logger.Info("Directory is already a placeholder, updating {path}", relativeDirectory);
             await UpdateDirectory(relativeDirectory);
             return;
         }
@@ -136,14 +121,10 @@ public class PlaceholdersService(
                 [createInfo],
                 1u,
                 CldApi.CF_CREATE_FLAGS.CF_CREATE_FLAG_NONE,
-                out var _
+                out var entriesProcessed
             ).ThrowIfFailed("Create placeholder failed");
-            
+
             logger.Info("Created placeholder for {path}", relativeDirectory);
-        }
-        catch (Win32Exception ex) when (ex.NativeErrorCode == 183) // ERROR_ALREADY_EXISTS
-        {
-            await UpdateDirectory(relativeDirectory);
         }
         catch (Exception ex)
         {
@@ -164,7 +145,7 @@ public class PlaceholdersService(
         var clientFile = Path.Join(rootDirectory, relativeFile);
         if (!Path.Exists(clientFile))
         {
-            //logger.Debug("Skip update; file does not exist {clientFile}", clientFile);
+            //logger.Info("Skip update; file does not exist {clientFile}", clientFile);
             return;
         }
         var clientFileInfo = new FileInfo(clientFile);
@@ -186,7 +167,7 @@ public class PlaceholdersService(
         var remoteFileInfo = remoteService.GetFileInfo(relativeFile);
         if (!force && remoteFileInfo.GetHashCode() == _fileComparer.GetHashCode(clientFileInfo))
         {
-            //logger.Debug("UpdateFile - equal, ignoring {relativeFile}", relativeFile);
+            //logger.Info("UpdateFile - equal, ignoring {relativeFile}", relativeFile);
             if (!placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
             {
                 CloudFilter.SetInSyncState(hfile);
@@ -222,20 +203,19 @@ public class PlaceholdersService(
         var clientDirectory = Path.Join(rootDirectory, relativeDirectory);
         if (!Path.Exists(clientDirectory))
         {
-            logger.Warn("Skip update; directory does not exist {clientDirectory}", clientDirectory);
+            //logger.Warn("Skip update; directory does not exist {clientDirectory}", clientDirectory);
             return Task.CompletedTask;
         }
-        
-        var clientDirectoryInfo = new DirectoryInfo(clientDirectory);
-        
+
+        var remoteDirectoryInfo = remoteService.GetDirectoryInfo(relativeDirectory);
+
         // Check if the directory is hydrated 
-        bool isHydrated = !clientDirectoryInfo.Attributes.HasAnySyncFlag(SyncAttributes.OFFLINE);
+        bool isHydrated = !File.GetAttributes(clientDirectory).HasAnySyncFlag(SyncAttributes.OFFLINE);
         
         // Only update placeholder state if directory is a hydrated directory
         if (isHydrated)
         {
-            var remoteDirectoryInfo = remoteService.GetDirectoryInfo(relativeDirectory);
-            
+            logger.Info("Directory {path} is hydrated", relativeDirectory);
             if (!CloudFilter.IsPlaceholder(clientDirectory))
             {
                 CloudFilter.ConvertToPlaceholder(clientDirectory);
@@ -243,11 +223,11 @@ public class PlaceholdersService(
                 logger.Info("Converted to placeholder and updated {path}", relativeDirectory);
                 return Task.CompletedTask;
             }
-            else if (remoteDirectoryInfo.GetHashCode() == _directoryComparer.GetHashCode(clientDirectoryInfo))
-            {
-                CloudFilter.SetInSyncState(clientDirectory);
-                logger.Info("Updated {path}", relativeDirectory);
-            }
+            CloudFilter.SetInSyncState(clientDirectory);
+        }
+        else
+        {
+            logger.Warn("Directory {path} exists but is not hydrated - skipping sync state update", relativeDirectory);
         }
 
         return Task.CompletedTask;
