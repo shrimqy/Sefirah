@@ -29,7 +29,6 @@ public sealed class RemoteWatcher(
         {
             if (FileHelper.IsSystemDirectory(relativePath)) return;
         
-            //logger.Debug("Created {path}", relativePath);
             using var locker = await fileLocker.Lock(relativePath);
             try
             {

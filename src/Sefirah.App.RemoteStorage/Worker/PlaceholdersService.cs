@@ -3,6 +3,7 @@ using Sefirah.App.RemoteStorage.Helpers;
 using Sefirah.App.RemoteStorage.Interop;
 using Sefirah.App.RemoteStorage.RemoteAbstractions;
 using Sefirah.Common.Utils;
+using System.ComponentModel;
 using Vanara.PInvoke;
 using static Vanara.PInvoke.Shell32;
 
@@ -102,30 +103,53 @@ public class PlaceholdersService(
 
     public async Task CreateDirectory(string relativeDirectory)
     {
-        // Ensure parent directory exists first
+
         var directoryInfo = remoteService.GetDirectoryInfo(relativeDirectory);
         var parentPath = Path.Join(rootDirectory, directoryInfo.RelativeParentDirectory);
+        var targetPath = Path.Join(rootDirectory, relativeDirectory);
 
+        // Ensure parent directory exists first
         if (!Directory.Exists(parentPath))
         {
-            // Recursively create parent directories if needed
             await CreateDirectory(directoryInfo.RelativeParentDirectory);
         }
 
-        var targetPath = Path.Join(rootDirectory, relativeDirectory);
+        // Create the physical directory if it doesn't exist
         if (!Directory.Exists(targetPath))
         {
             Directory.CreateDirectory(targetPath);
         }
 
-        using var createInfo = new SafeCreateInfo(directoryInfo, directoryInfo.RelativePath);
-        CldApi.CfCreatePlaceholders(
-            parentPath,
-            [createInfo],
-            1u,
-            CldApi.CF_CREATE_FLAGS.CF_CREATE_FLAG_NONE,
-            out var entriesProcessed
-        ).ThrowIfFailed("Create placeholder failed");
+        // If it's already a placeholder, just update it
+        if (CloudFilter.IsPlaceholder(targetPath))
+        {
+            await UpdateDirectory(relativeDirectory);
+            return;
+        }
+
+        try
+        {
+            // Attempt to create the placeholder
+            using var createInfo = new SafeCreateInfo(directoryInfo, directoryInfo.RelativePath, onDemand: false);
+            CldApi.CfCreatePlaceholders(
+                parentPath,
+                [createInfo],
+                1u,
+                CldApi.CF_CREATE_FLAGS.CF_CREATE_FLAG_NONE,
+                out var _
+            ).ThrowIfFailed("Create placeholder failed");
+            
+            logger.Info("Created placeholder for {path}", relativeDirectory);
+        }
+        catch (Win32Exception ex) when (ex.NativeErrorCode == 183) // ERROR_ALREADY_EXISTS
+        {
+            await UpdateDirectory(relativeDirectory);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Failed to create placeholder for {path}: {error}", relativeDirectory, ex.Message);
+            throw;
+        }
     }
 
 
@@ -170,7 +194,7 @@ public class PlaceholdersService(
             return;
         }
 
-        logger.Debug("UpdateFile - update placeholder {relativeFile}", relativeFile);
+        logger.Info("UpdateFile - update placeholder {relativeFile}", relativeFile);
         var pinned = clientFileInfo.Attributes.HasAnySyncFlag(SyncAttributes.PINNED);
         if (pinned)
         {
@@ -198,23 +222,34 @@ public class PlaceholdersService(
         var clientDirectory = Path.Join(rootDirectory, relativeDirectory);
         if (!Path.Exists(clientDirectory))
         {
-            logger.Debug("Skip update; directory does not exist {clientDirectory}", clientDirectory);
+            logger.Warn("Skip update; directory does not exist {clientDirectory}", clientDirectory);
             return Task.CompletedTask;
         }
-        var remoteDirectoryInfo = remoteService.GetDirectoryInfo(relativeDirectory);
+        
         var clientDirectoryInfo = new DirectoryInfo(clientDirectory);
-
-        if (!CloudFilter.IsPlaceholder(clientDirectory))
+        
+        // Check if the directory is hydrated 
+        bool isHydrated = !clientDirectoryInfo.Attributes.HasAnySyncFlag(SyncAttributes.OFFLINE);
+        
+        // Only update placeholder state if directory is a hydrated directory
+        if (isHydrated)
         {
-            CloudFilter.ConvertToPlaceholder(clientDirectory);
-        }
-        else if (remoteDirectoryInfo.GetHashCode() == _directoryComparer.GetHashCode(clientDirectoryInfo))
-        {
-            CloudFilter.SetInSyncState(clientDirectory);
-            return Task.CompletedTask;
+            var remoteDirectoryInfo = remoteService.GetDirectoryInfo(relativeDirectory);
+            
+            if (!CloudFilter.IsPlaceholder(clientDirectory))
+            {
+                CloudFilter.ConvertToPlaceholder(clientDirectory);
+                CloudFilter.SetInSyncState(clientDirectory);
+                logger.Info("Converted to placeholder and updated {path}", relativeDirectory);
+                return Task.CompletedTask;
+            }
+            else if (remoteDirectoryInfo.GetHashCode() == _directoryComparer.GetHashCode(clientDirectoryInfo))
+            {
+                CloudFilter.SetInSyncState(clientDirectory);
+                logger.Info("Updated {path}", relativeDirectory);
+            }
         }
 
-        CloudFilter.SetInSyncState(clientDirectory);
         return Task.CompletedTask;
     }
 

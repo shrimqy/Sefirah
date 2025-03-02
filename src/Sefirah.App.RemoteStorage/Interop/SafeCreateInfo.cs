@@ -11,51 +11,77 @@ public sealed class SafeCreateInfo : IDisposable
 
     public SafeCreateInfo(RemoteFileInfo serverFileInfo, string relativePath)
     {
-        _relativePathPointer = new SafeCoTaskMemString(relativePath);
-        CreateInfo = new CldApi.CF_PLACEHOLDER_CREATE_INFO
+        if (string.IsNullOrEmpty(relativePath))
         {
-            RelativeFileName = serverFileInfo.Name,
-            FileIdentity = _relativePathPointer,
-            FileIdentityLength = _relativePathPointer.Size,
-            FsMetadata = new CldApi.CF_FS_METADATA
+            throw new ArgumentException("Relative path cannot be null or empty", nameof(relativePath));
+        }
+        
+        try
+        {
+            _relativePathPointer = new SafeCoTaskMemString(relativePath);
+            CreateInfo = new CldApi.CF_PLACEHOLDER_CREATE_INFO
             {
-                FileSize = serverFileInfo.Length,
-                BasicInfo = new Kernel32.FILE_BASIC_INFO
+                RelativeFileName = serverFileInfo.Name,
+                FileIdentity = _relativePathPointer,
+                FileIdentityLength = _relativePathPointer.Size,
+                FsMetadata = new CldApi.CF_FS_METADATA
                 {
-                    FileAttributes = (FileFlagsAndAttributes)serverFileInfo.Attributes,
-                    CreationTime = serverFileInfo.CreationTimeUtc.ToFileTimeStruct(),
-                    LastWriteTime = serverFileInfo.LastWriteTimeUtc.ToFileTimeStruct(),
-                    LastAccessTime = serverFileInfo.LastAccessTimeUtc.ToFileTimeStruct(),
-                    ChangeTime = serverFileInfo.LastWriteTimeUtc.ToFileTimeStruct()
-                }
-            },
-            Flags = CldApi.CF_PLACEHOLDER_CREATE_FLAGS.CF_PLACEHOLDER_CREATE_FLAG_MARK_IN_SYNC,
-        };
+                    FileSize = serverFileInfo.Length,
+                    BasicInfo = new Kernel32.FILE_BASIC_INFO
+                    {
+                        FileAttributes = (FileFlagsAndAttributes)serverFileInfo.Attributes,
+                        CreationTime = serverFileInfo.CreationTimeUtc.ToFileTimeStruct(),
+                        LastWriteTime = serverFileInfo.LastWriteTimeUtc.ToFileTimeStruct(),
+                        LastAccessTime = serverFileInfo.LastAccessTimeUtc.ToFileTimeStruct(),
+                        ChangeTime = serverFileInfo.LastWriteTimeUtc.ToFileTimeStruct()
+                    }
+                },
+                Flags = CldApi.CF_PLACEHOLDER_CREATE_FLAGS.CF_PLACEHOLDER_CREATE_FLAG_MARK_IN_SYNC,
+            };
+        }
+        catch (Exception ex)
+        {
+            _relativePathPointer?.Dispose();
+            throw new InvalidOperationException($"Failed to create SafeCoTaskMemString: {ex.Message}", ex);
+        }
     }
 
     public SafeCreateInfo(RemoteDirectoryInfo serverDirectoryInfo, string relativePath, bool onDemand = true)
     {
-        _relativePathPointer = new SafeCoTaskMemString(relativePath);
-        CreateInfo = new CldApi.CF_PLACEHOLDER_CREATE_INFO
+        if (string.IsNullOrEmpty(relativePath))
         {
-            RelativeFileName = serverDirectoryInfo.Name,
-            FileIdentity = _relativePathPointer,
-            FileIdentityLength = _relativePathPointer.Size,
-            FsMetadata = new CldApi.CF_FS_METADATA
+            throw new ArgumentException("Relative path cannot be null or empty", nameof(relativePath));
+        }
+        
+        try
+        {
+            _relativePathPointer = new SafeCoTaskMemString(relativePath);
+            CreateInfo = new CldApi.CF_PLACEHOLDER_CREATE_INFO
             {
-                FileSize = 0,
-                BasicInfo = new Kernel32.FILE_BASIC_INFO
+                RelativeFileName = serverDirectoryInfo.Name,
+                FileIdentity = _relativePathPointer,
+                FileIdentityLength = _relativePathPointer.Size,
+                FsMetadata = new CldApi.CF_FS_METADATA
                 {
-                    FileAttributes = (FileFlagsAndAttributes)serverDirectoryInfo.Attributes,
-                    CreationTime = serverDirectoryInfo.CreationTimeUtc.ToFileTimeStruct(),
-                    LastWriteTime = serverDirectoryInfo.LastWriteTimeUtc.ToFileTimeStruct(),
-                    LastAccessTime = serverDirectoryInfo.LastAccessTimeUtc.ToFileTimeStruct(),
-                    ChangeTime = serverDirectoryInfo.LastWriteTimeUtc.ToFileTimeStruct()
-                }
-            },
-            Flags = CldApi.CF_PLACEHOLDER_CREATE_FLAGS.CF_PLACEHOLDER_CREATE_FLAG_MARK_IN_SYNC
-                | (!onDemand ? CldApi.CF_PLACEHOLDER_CREATE_FLAGS.CF_PLACEHOLDER_CREATE_FLAG_DISABLE_ON_DEMAND_POPULATION : CldApi.CF_PLACEHOLDER_CREATE_FLAGS.CF_PLACEHOLDER_CREATE_FLAG_NONE),
-        };
+                    FileSize = 0,
+                    BasicInfo = new Kernel32.FILE_BASIC_INFO
+                    {
+                        FileAttributes = (FileFlagsAndAttributes)serverDirectoryInfo.Attributes,
+                        CreationTime = serverDirectoryInfo.CreationTimeUtc.ToFileTimeStruct(),
+                        LastWriteTime = serverDirectoryInfo.LastWriteTimeUtc.ToFileTimeStruct(),
+                        LastAccessTime = serverDirectoryInfo.LastAccessTimeUtc.ToFileTimeStruct(),
+                        ChangeTime = serverDirectoryInfo.LastWriteTimeUtc.ToFileTimeStruct()
+                    }
+                },
+                Flags = CldApi.CF_PLACEHOLDER_CREATE_FLAGS.CF_PLACEHOLDER_CREATE_FLAG_MARK_IN_SYNC
+                    | (!onDemand ? CldApi.CF_PLACEHOLDER_CREATE_FLAGS.CF_PLACEHOLDER_CREATE_FLAG_DISABLE_ON_DEMAND_POPULATION : CldApi.CF_PLACEHOLDER_CREATE_FLAGS.CF_PLACEHOLDER_CREATE_FLAG_NONE),
+            };
+        }
+        catch (Exception ex)
+        {
+            _relativePathPointer?.Dispose();
+            throw new InvalidOperationException($"Failed to create SafeCoTaskMemString: {ex.Message}", ex);
+        }
     }
 
     public static implicit operator CldApi.CF_PLACEHOLDER_CREATE_INFO(SafeCreateInfo c) => c.CreateInfo;

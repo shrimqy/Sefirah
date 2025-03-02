@@ -126,10 +126,10 @@ public sealed class SftpWatcher(
             if (sftpFiles == null)
             {
                 logger.Warn("ListDirectory returned null for {directory}", directory);
-                return _knownFiles;  // Return existing known files instead of empty dictionary
+                return _knownFiles; 
             }
 
-            // Get all directories first (including non-hydrated ones), excluding system directories
+            // Get all directories first, excluding system directories
             var directories = sftpFiles
                 .Where(sftpFile => sftpFile.IsDirectory && 
                                   !_relativeDirectoryNames.Contains(sftpFile.Name) &&
@@ -149,7 +149,7 @@ public sealed class SftpWatcher(
 
             // Recursively get files from hydrated subdirectories
             var subFiles = directories.Keys
-                .Where(IsHydrated)
+                .Where(IsHydrated) 
                 .SelectMany(FindFiles)
                 .ToDictionary(
                     pair => pair.Key,

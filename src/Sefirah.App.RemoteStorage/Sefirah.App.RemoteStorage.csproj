@@ -19,9 +19,9 @@
         <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250108002" />
         <PackageReference Include="SSH.NET" Version="2024.2.0" />
         <PackageReference Include="System.Linq.Async" Version="6.0.1" />
-        <PackageReference Include="Vanara.PInvoke.CldApi" Version="4.0.4" />
-        <PackageReference Include="Vanara.PInvoke.Ole" Version="4.0.4" />
-        <PackageReference Include="Vanara.PInvoke.Shell32" Version="4.0.4" />
+        <PackageReference Include="Vanara.PInvoke.CldApi" Version="4.0.6" />
+        <PackageReference Include="Vanara.PInvoke.Ole" Version="4.0.6" />
+        <PackageReference Include="Vanara.PInvoke.Shell32" Version="4.0.6" />
     </ItemGroup>
     
     <ItemGroup>

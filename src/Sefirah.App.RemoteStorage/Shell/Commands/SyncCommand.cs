@@ -13,8 +13,7 @@ namespace Sefirah.App.RemoteStorage.Shell.Commands;
 [ComVisible(true), Guid("942952b6-3bdc-4e50-8fe2-8d2d869ca70f")]
 public class SyncCommand(
     ChannelWriter<ShellCommand> commandWriter,
-    ILogger logger
-) : IExplorerCommand, IExplorerCommandState, IObjectWithSite
+    ILogger logger) : IExplorerCommand, IExplorerCommandState, IObjectWithSite
 {
     public HRESULT GetTitle(IShellItemArray psiItemArray, out string? ppszName)
     {
