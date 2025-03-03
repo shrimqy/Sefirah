@@ -42,7 +42,7 @@
 1. **Download and Install the [Android app](https://github.com/shrimqy/Sefirah-Android)**
 
 2. **Setting Up**:
-    - On the Android devicem, allow the necessary permissions on the onboarding page. (**Note:** Allow restricted settings from App Info after attempting to grant notification access or accessibility permission, as Android blocks side-loaded apps from requesting sensitive permissions.)
+    - On the Android device, allow the necessary permissions on the onboarding page. (**Note:** Allow restricted settings from App Info after attempting to grant notification access or accessibility permission, as Android blocks side-loaded apps from requesting sensitive permissions.)
     - Ensure both your Android device and Windows PC are connected to the same network.
     - Launch the app on your Windows PC and wait for the devices to show up on both.
     - Initiate the connection on your Android device using either manual connect or auto connect. Manual connect is faster, while auto connect takes a bit more time to determine which IP address works for you.
@@ -55,8 +55,8 @@
 4. **File Transfer**:
     - Use the share sheet on your Android or Windows device and select the app to share files between the devices.
 5. **Windows Explorer Storage**:
-   - You would need Android 11 or higher for this to work, I will try to add support for others in a later version.
-   - This feature may cause some crashes as this is a bit experimental, but should work stable enough for most cases.
+   - You would need Android 11 or higher
+   - **Note:** This feature is still a bit experimental and may not work on all Windows versions especially older versions of Windows 10 and other unofficial debloated Windows 11 versions. 
 
      
 ## Screenshots
@@ -64,3 +64,17 @@
 <p align="center">
   <img alt="Files hero image" src="./.github/readme-images/Screenshot.png" />
 </p>
+
+## Contribute
+
+Feel free to open an issue if you want to report a bug, give feedback, or ask a question. Pull requests are very welcome!
+
+If you wish to know any specific details or questions hit me up on [the Discord server](https://discord.gg/MuvMqv4MES)
+or email, I would be happy to help.
+
+If you wish to translate to your language, you can find the project on [Crowdin](https://crowdin.com/project/sefirah)
+
+## Thanks
+
+I would like to express my thanks to [@PrimalZed](https://github.com/PrimalZed) for his work on [CloudSync](https://github.com/PrimalZed/CloudSync). 
+
