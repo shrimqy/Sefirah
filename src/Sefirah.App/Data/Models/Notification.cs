@@ -68,10 +68,6 @@ public class Notification
         {
             notification.Icon = await Convert.FromBase64String(message.AppIcon).ToBitmapAsync();
         }
-        if (notification.Icon != null)
-        {
-            Ioc.Default.GetRequiredService<ILogger>().Debug("Notification icon exists");
-        }
         return notification;
     }
 }

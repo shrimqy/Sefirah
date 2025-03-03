@@ -225,11 +225,6 @@ public class PlaceholdersService(
             }
             CloudFilter.SetInSyncState(clientDirectory);
         }
-        else
-        {
-            logger.Warn("Directory {path} exists but is not hydrated - skipping sync state update", relativeDirectory);
-        }
-
         return Task.CompletedTask;
     }
 
