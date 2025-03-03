@@ -196,7 +196,7 @@
     <value>Available Devices</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
-    <value>Other Android devices that are running the app in the same network</value>
+    <value>Android devices that are running the app in the same network will show up below</value>
   </data>
   <data name="StartupOption" xml:space="preserve">
     <value>Startup option</value>
