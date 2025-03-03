@@ -196,7 +196,7 @@
     <value>利用可能なデバイス</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
-    <value>同じネットワークに接続している Android デバイス</value>
+    <value>Android devices that are running the app in the same network will show up below</value>
   </data>
   <data name="StartupOption" xml:space="preserve">
     <value>スタートアップ オプション</value>
