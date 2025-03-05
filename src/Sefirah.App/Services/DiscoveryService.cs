@@ -24,11 +24,11 @@ public class DiscoveryService(
     private readonly DispatcherQueue dispatcher = DispatcherQueue.GetForCurrentThread();
     private const string DEFAULT_BROADCAST = "255.255.255.255";
     private LocalDeviceEntity? localDevice;
-    private readonly int port = 8689;
+    private readonly int port = 5149;
     public ObservableCollection<DiscoveredDevice> DiscoveredDevices { get; } = [];
     public List<DiscoveredMdnsServiceArgs> DiscoveredMdnsServices { get; } = [];
     private List<IPEndPoint> broadcastEndpoints = [];
-    private const int DiscoveryPort = 8689;
+    private const int DiscoveryPort = 5149;
     private readonly object collectionLock = new();
 
     public async Task StartDiscoveryAsync(int serverPort)
@@ -73,7 +73,7 @@ public class DiscoveryService(
 
             // Always include default broadcast as fallback
             broadcastEndpoints.Add(new IPEndPoint(IPAddress.Parse(DEFAULT_BROADCAST), DiscoveryPort));
-            
+
             if (remoteDevice != null && remoteDevice.IpAddresses != null)
             {
                 logger.Info($"Remote device IP addresses: {string.Join(", ", remoteDevice.IpAddresses)}");
@@ -237,14 +237,17 @@ public class DiscoveryService(
             var message = Encoding.UTF8.GetString(buffer, (int)offset, (int)size);
             if (SocketMessageSerializer.DeserializeMessage(message) is not UdpBroadcast broadcast) return;
 
-            // Skip if we already have this device via mDNS
-            if (DiscoveredMdnsServices.Any(s => s.PublicKey == broadcast.PublicKey)) 
+            if (broadcast.DeviceId == localDevice?.DeviceId) return;        
+
+            IPEndPoint? deviceEndpoint = broadcast.IpAddresses.Select(ip => new IPEndPoint(IPAddress.Parse(ip), DiscoveryPort)).FirstOrDefault();
+
+            if (deviceEndpoint != null && !broadcastEndpoints.Contains(deviceEndpoint))
             {
-                return;
+                broadcastEndpoints.Add(deviceEndpoint);
             }
 
-            // Ignore our own broadcasts
-            if (broadcast.DeviceId == localDevice?.DeviceId) return;
+            // Skip if we already have this device via mDNS
+            if (DiscoveredMdnsServices.Any(s => s.PublicKey == broadcast.PublicKey)) return;
 
             var sharedSecret = EcdhHelper.DeriveKey(broadcast.PublicKey, localDevice!.PrivateKey);
             var device = new DiscoveredDevice
@@ -274,6 +277,7 @@ public class DiscoveryService(
                     }
                 }
             });
+
 
             // Start cleanup timer if not already started
             StartCleanupTimer();
