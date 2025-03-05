@@ -23,6 +23,7 @@ public class NetworkService(
     private Server? server;
     private bool isRunning;
     private int port;
+    private readonly IEnumerable<int> PORT_RANGE = Enumerable.Range(5150, 20); // 5150 to 5169
     private ServerSession? currentSession;
     private bool disposed;
     private X509Certificate2? certificate;
@@ -50,16 +51,28 @@ public class NetworkService(
         try
         {
 
-            port = await NetworkHelper.FindAvailablePortAsync(5941);
             certificate = await CertificateHelper.GetOrCreateCertificateAsync();
 
             var context = new SslContext(SslProtocols.Tls12, certificate);
 
-            server = new Server(context, IPAddress.Any, port, this, logger)
+            foreach (int port in PORT_RANGE)
             {
-                OptionDualMode = true,
-                OptionReuseAddress = true,
-            };
+                try
+                {                     
+                    server = new Server(context, IPAddress.Any, port, this, logger)
+                    {
+                        OptionDualMode = true,
+                        OptionReuseAddress = true,
+                    };
+                    this.port = port;
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Error starting server", ex);
+                    server = null;
+                }
+            }   
 
             if (server != null)
             {
@@ -271,7 +284,10 @@ public class NetworkService(
                 return;
             }
 
-            var device = await deviceManager.VerifyDevice(deviceInfo);
+            var ipAddress = session.Socket.RemoteEndPoint?.ToString()?.Split(':')[0];
+            logger.Info($"Received connection from {ipAddress}");
+
+            var device = await deviceManager.VerifyDevice(deviceInfo, ipAddress);
 
             if (device != null)
             {
