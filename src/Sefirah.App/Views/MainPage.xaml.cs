@@ -140,6 +140,18 @@ public sealed partial class MainPage : Page
         }
     }
 
+    private async void OpenAppClick(object sender, RoutedEventArgs e)
+    {
+        var menuItem = sender as MenuFlyoutItem;
+        if (menuItem != null)
+        {
+            string? appPackage = menuItem.Tag as string;
+            if (!string.IsNullOrEmpty(appPackage))
+            {
+                await ViewModel.OpenApp(appPackage);
+            }
+        }
+    }
 
     private void OnNotificationCloseButtonClick(object sender, RoutedEventArgs e)
     {

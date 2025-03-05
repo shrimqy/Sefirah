@@ -367,9 +367,36 @@
     <value>Vibrate</value>
   </data>
   <data name="Pin" xml:space="preserve">
-    <value />
+    <value>Pin</value>
   </data>
   <data name="Unpin" xml:space="preserve">
-    <value />
+    <value>Unpin</value>
+  </data>
+  <data name="ScreenMirror" xml:space="preserve">
+    <value>Screen Mirror</value>
+  </data>
+  <data name="VideoSettings" xml:space="preserve">
+    <value>Video Settings</value>
+  </data>
+  <data name="AudioSettings" xml:space="preserve">
+    <value>Audio Settings</value>
+  </data>
+  <data name="OpenApp" xml:space="preserve">
+    <value>Open App</value>
+  </data>
+  <data name="ScreenOff" xml:space="preserve">
+    <value>Keep device screen off while mirroring</value>
+  </data>
+  <data name="PhysicalKeyboard" xml:space="preserve">
+    <value>Disable on-screen keyboard</value>
+  </data>
+  <data name="Bitrate" xml:space="preserve">
+    <value>Bitrate</value>
+  </data>
+  <data name="Resolution" xml:space="preserve">
+    <value>Resolution</value>
+  </data>
+  <data name="Buffer" xml:space="preserve">
+    <value>Buffer</value>
   </data>
 </root>

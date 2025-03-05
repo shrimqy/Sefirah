@@ -53,6 +53,9 @@ public static class AppLifecycleHelper
         await playbackService.InitializeAsync();
         mdnsService.StartDiscovery();
         toastNotificationService.RegisterNotification();
+
+        //var adbDeviceMonitor = Ioc.Default.GetRequiredService<IAdbDeviceMonitor>();
+        //await adbDeviceMonitor.StartAsync();
     }
 
 
@@ -88,11 +91,13 @@ public static class AppLifecycleHelper
                 .AddSingleton<IRemoteAppsRepository, RemoteAppsRepository>()
                 .AddSingleton<DeviceRepository>()
 
+                .AddSingleton<IAdbDeviceMonitor, AdbDeviceMonitor>()
 
                 // Services
                 .AddSingleton<IDeviceManager, DeviceManager>()
                 .AddSingleton<IDiscoveryService, DiscoveryService>()
                 .AddSingleton<INetworkService, NetworkService>()
+                .AddSingleton<IScreenMirrorService, ScreenMirrorService>()
                 .AddSingleton(sp => (ITcpServerProvider)sp.GetRequiredService<INetworkService>())
                 .AddSingleton(sp => (ISessionManager)sp.GetRequiredService<INetworkService>())
                 .AddSingleton<IFileTransferService, FileTransferService>()

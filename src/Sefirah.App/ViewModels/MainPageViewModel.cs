@@ -7,6 +7,8 @@ using Sefirah.App.Data.Models;
 using Sefirah.App.Extensions;
 using Sefirah.App.Utils.Serialization;
 using System.Windows.Input;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
 
 namespace Sefirah.App.ViewModels;
 
@@ -16,6 +18,8 @@ public sealed class MainPageViewModel : BaseViewModel
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
     private IRemoteAppsRepository remoteAppsRepository { get; } = Ioc.Default.GetRequiredService<IRemoteAppsRepository>();
     private INotificationService NotificationService { get; } = Ioc.Default.GetRequiredService<INotificationService>();
+
+    private IScreenMirrorService ScreenMirrorService { get; } = Ioc.Default.GetRequiredService<IScreenMirrorService>();
 
     private RemoteDeviceEntity? _deviceInfo = new();
     private DeviceStatus _deviceStatus = new();
@@ -54,7 +58,7 @@ public sealed class MainPageViewModel : BaseViewModel
     public ICommand NotificationActionCommand { get; }
     public ICommand NotificationReplyCommand { get; }
     public ICommand SetRingerModeCommand { get; }
-
+    public ICommand ToggleScreenMirrorCommand { get; }
     public MainPageViewModel()
     {
         try
@@ -65,6 +69,7 @@ public sealed class MainPageViewModel : BaseViewModel
             NotificationActionCommand = new RelayCommand<NotificationAction>(HandleNotificationAction);
             NotificationReplyCommand = new RelayCommand<(Notification, string)>(HandleNotificationReply);
             SetRingerModeCommand = new RelayCommand<string>(SetRingerMode);
+            ToggleScreenMirrorCommand = new RelayCommand(ToggleScreenMirror);
             getLastConnectedDevice();
 
             // Subscribe to device events
@@ -105,6 +110,42 @@ public sealed class MainPageViewModel : BaseViewModel
                 DeviceInfo = null;
             }
         });
+    }
+
+    private async void ToggleScreenMirror()
+    {
+        var argsTextBox = new TextBox
+        {
+            PlaceholderText = "Enter command arguments",
+            AcceptsReturn = false,
+            Width = 300,
+            Margin = new Thickness(0, 10, 0, 0)
+        };
+        
+        var panel = new StackPanel();
+        panel.Children.Add(argsTextBox);
+        
+        var dialog = new ContentDialog
+        {
+            XamlRoot = MainWindow.Instance.Content.XamlRoot,
+            Title = "scrcpy",
+            Content = panel,
+            PrimaryButtonText = "Start",
+            CloseButtonText = "Cancel"
+        };
+        
+        var result = await dialog.ShowAsync();
+        
+        if (result == ContentDialogResult.Primary)
+        {
+            string args = argsTextBox.Text?.Trim() ?? string.Empty;
+            await ScreenMirrorService.StartScrcpy(customArgs: args);
+        }
+    }
+
+    public async Task OpenApp(string appPackage)
+    {
+        await ScreenMirrorService.StartScrcpy(customArgs: $"--new-display --start-app={appPackage}");
     }
 
     private async void getLastConnectedDevice()

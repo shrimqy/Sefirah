@@ -27,6 +27,7 @@
     </ItemGroup>
     
     <ItemGroup>
+        <PackageReference Include="AdvancedSharpAdbClient" Version="3.3.13" />
         <PackageReference Include="BouncyCastle.Cryptography" Version="2.5.0" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
         <PackageReference Include="CommunityToolkit.WinUI.Behaviors" Version="8.1.240916" />
@@ -52,21 +53,6 @@
 
     <ItemGroup>
         <AdditionalFiles Include="Strings\en-US\Resources.resw" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Update="Strings\en-GB\Resources.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Resources.resw</DependentUpon>
-      </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-      <PRIResource Update="Strings\en-GB\Resources.resw">
-        <Generator>PublicResXFileCodeGenerator</Generator>
-        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      </PRIResource>
     </ItemGroup>
         
     <!-- Publish Properties -->
