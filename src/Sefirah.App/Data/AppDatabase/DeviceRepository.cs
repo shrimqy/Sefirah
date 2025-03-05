@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using Sefirah.App.Data.AppDatabase.Models;
-
+using System.Text.Json;
 namespace Sefirah.App.Data.AppDatabase;
 public class DeviceRepository(DatabaseContext context, ILogger logger)
 {
@@ -10,7 +10,7 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
         {
             var conn = await context.GetConnectionAsync();
             var command = new SqliteCommand(
-                "SELECT DeviceId, DeviceName, LastConnected, SharedSecret, WallpaperBytes FROM RemoteDevice",
+                "SELECT DeviceId, DeviceName, IpAddresses, LastConnected, SharedSecret, WallpaperBytes FROM RemoteDevice",
                 conn);
 
             using var reader = await command.ExecuteReaderAsync();
@@ -22,9 +22,10 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
                 {
                     DeviceId = reader.GetString(0),
                     Name = reader.GetString(1),
-                    LastConnected = reader.IsDBNull(2) ? null : reader.GetDateTime(2),
-                    SharedSecret = reader.IsDBNull(3) ? null : (byte[])reader[3],
-                    WallpaperBytes = reader.IsDBNull(4) ? null : (byte[])reader[4]
+                    IpAddresses = reader.IsDBNull(2) ? null : JsonSerializer.Deserialize<List<string>>(reader[2].ToString() ?? "[]"),
+                    LastConnected = reader.IsDBNull(3) ? null : reader.GetDateTime(3),
+                    SharedSecret = reader.IsDBNull(4) ? null : (byte[])reader[4],
+                    WallpaperBytes = reader.IsDBNull(5) ? null : (byte[])reader[5]
                 });
             }
 
@@ -43,7 +44,7 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
         {
             var conn = await context.GetConnectionAsync();
             var command = new SqliteCommand(
-                "SELECT DeviceId, DeviceName, LastConnected, SharedSecret, WallpaperBytes " +
+                "SELECT DeviceId, DeviceName, IpAddresses, LastConnected, SharedSecret, WallpaperBytes " +
                 "FROM RemoteDevice WHERE DeviceId = @DeviceId",
                 conn);
 
@@ -56,9 +57,10 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
                 {
                     DeviceId = reader.GetString(0),
                     Name = reader.GetString(1),
-                    LastConnected = reader.IsDBNull(2) ? null : reader.GetDateTime(2),
-                    SharedSecret = reader.IsDBNull(3) ? null : (byte[])reader[3],
-                    WallpaperBytes = reader.IsDBNull(4) ? null : (byte[])reader[4]
+                    IpAddresses = reader.IsDBNull(2) ? null : JsonSerializer.Deserialize<List<string>>(reader[2].ToString() ?? "[]"),
+                    LastConnected = reader.IsDBNull(3) ? null : reader.GetDateTime(3),
+                    SharedSecret = reader.IsDBNull(4) ? null : (byte[])reader[4],
+                    WallpaperBytes = reader.IsDBNull(5) ? null : (byte[])reader[5]
                 };
             }
 
@@ -78,12 +80,13 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
             var conn = await context.GetConnectionAsync();
             var command = new SqliteCommand(
                 "INSERT OR REPLACE INTO RemoteDevice " +
-                "(DeviceId, DeviceName, LastConnected, SharedSecret, WallpaperBytes) " +
-                "VALUES (@DeviceId, @DeviceName, @LastConnected, @SharedSecret, @WallpaperBytes)",
+                "(DeviceId, DeviceName, IpAddresses, LastConnected, SharedSecret, WallpaperBytes) " +
+                "VALUES (@DeviceId, @DeviceName, @IpAddresses, @LastConnected, @SharedSecret, @WallpaperBytes)",
                 conn);
 
             command.Parameters.AddWithValue("@DeviceId", device.DeviceId);
             command.Parameters.AddWithValue("@DeviceName", device.Name);
+            command.Parameters.AddWithValue("@IpAddresses", JsonSerializer.Serialize(device.IpAddresses));
             command.Parameters.AddWithValue("@LastConnected", device.LastConnected as object ?? DBNull.Value);
             command.Parameters.AddWithValue("@SharedSecret", device.SharedSecret as object ?? DBNull.Value);
             command.Parameters.AddWithValue("@WallpaperBytes", device.WallpaperBytes as object ?? DBNull.Value);
@@ -123,7 +126,7 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
         {
             var conn = await context.GetConnectionAsync();
             var command = new SqliteCommand(
-                "SELECT DeviceId, DeviceName, LastConnected, SharedSecret, WallpaperBytes " +
+                "SELECT DeviceId, DeviceName, IpAddresses, LastConnected, SharedSecret, WallpaperBytes " +
                 "FROM RemoteDevice ORDER BY LastConnected DESC LIMIT 1",
                 conn);
 
@@ -131,15 +134,16 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
             
             if (await reader.ReadAsync())
             {
-                var WallpaperBytes = reader.IsDBNull(4) ? null : (byte[])reader[4];
+                var WallpaperBytes = reader.IsDBNull(5) ? null : (byte[])reader[5];
                 var WallpaperImage = WallpaperBytes?.ToBitmap();
 
                 return new RemoteDeviceEntity
                 {
                     DeviceId = reader.GetString(0),
                     Name = reader.GetString(1),
-                    LastConnected = reader.IsDBNull(2) ? null : reader.GetDateTime(2),
-                    SharedSecret = reader.IsDBNull(3) ? null : (byte[])reader[3],
+                    IpAddresses = reader.IsDBNull(2) ? null : JsonSerializer.Deserialize<List<string>>(reader[2].ToString() ?? "[]"),
+                    LastConnected = reader.IsDBNull(3) ? null : reader.GetDateTime(3),
+                    SharedSecret = reader.IsDBNull(4) ? null : (byte[])reader[4],
                     WallpaperBytes = WallpaperBytes,
                     WallpaperImage = WallpaperImage
                 };

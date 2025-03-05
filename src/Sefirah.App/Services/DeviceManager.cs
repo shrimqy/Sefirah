@@ -45,7 +45,7 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
         await repository.AddOrUpdateAsync(device);
     }
 
-    public async Task<RemoteDeviceEntity?> VerifyDevice(DeviceInfo device)
+    public async Task<RemoteDeviceEntity?> VerifyDevice(DeviceInfo device, string? ipAddress)
     {
         try
         {
@@ -56,7 +56,6 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
             // If device exists and we've already verified it before, validate the proof
             if (existingDevice != null)
             {
-                
                 if (!EcdhHelper.VerifyProof(existingDevice.SharedSecret!, device.Nonce!, device.Proof!)) { return null; }
 
                 // Update device info
@@ -66,11 +65,18 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
                 {
                     existingDevice.WallpaperBytes = Convert.FromBase64String(device.Avatar);
                 }
+
+                if (ipAddress != null && existingDevice.IpAddresses?.Contains(ipAddress) == false)
+                {
+                    existingDevice.IpAddresses?.Add(ipAddress);
+                }
+
                 var savedDevice = await repository.AddOrUpdateAsync(existingDevice);
                 if (savedDevice != null)
                 {
                     DeviceAdded?.Invoke(this, existingDevice);
                 }
+                logger.Info($"Device verified: {string.Join(", ", savedDevice.IpAddresses)}");
                 return savedDevice;
             }
 
@@ -108,7 +114,8 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
                         SharedSecret = sharedSecret,
                         WallpaperBytes = !string.IsNullOrEmpty(device.Avatar) 
                             ? Convert.FromBase64String(device.Avatar) 
-                            : null
+                            : null,
+                        IpAddresses = ipAddress != null ? [ipAddress] : []
                     };
 
                     var savedDevice = await repository.AddOrUpdateAsync(newDevice);

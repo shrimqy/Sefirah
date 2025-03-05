@@ -36,6 +36,8 @@ public class DiscoveryService(
         try
         {
             localDevice = await deviceManager.GetLocalDeviceAsync();
+            var remoteDevice = await deviceManager.GetLastConnectedDevice();
+
             var networkInterfaces = NetworkHelper.GetAllValidAddresses();
 
 
@@ -72,6 +74,12 @@ public class DiscoveryService(
             // Always include default broadcast as fallback
             broadcastEndpoints.Add(new IPEndPoint(IPAddress.Parse(DEFAULT_BROADCAST), DiscoveryPort));
             
+            if (remoteDevice != null && remoteDevice.IpAddresses != null)
+            {
+                logger.Info($"Remote device IP addresses: {string.Join(", ", remoteDevice.IpAddresses)}");
+                broadcastEndpoints.AddRange(remoteDevice.IpAddresses.Select(ip => new IPEndPoint(IPAddress.Parse(ip), DiscoveryPort)));
+            }
+
             logger.Info($"Active broadcast endpoints: {string.Join(", ", broadcastEndpoints)}");
            
 

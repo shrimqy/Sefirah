@@ -28,6 +28,7 @@ public class DatabaseContext(ILogger logger) : IDisposable
                 CREATE TABLE IF NOT EXISTS RemoteDevice (
                     DeviceId NVARCHAR(128) PRIMARY KEY,
                     DeviceName NVARCHAR(2048) NOT NULL,
+                    IpAddresses NVARCHAR(2048),
                     LastConnected DATETIME,
                     SharedSecret BLOB,
                     WallpaperBytes BLOB
@@ -41,11 +42,52 @@ public class DatabaseContext(ILogger logger) : IDisposable
                 );";
 
             await command.ExecuteNonQueryAsync();
+            
+            // Should probably use a version based migration system later
+            await MigrateAddIpAddressesColumn();
+            
             logger.Info("Database initialized successfully");
         }
         catch (Exception ex)
         {
             logger.Error("Failed to initialize database", ex);
+            throw;
+        }
+    }
+
+    private async Task MigrateAddIpAddressesColumn()
+    {
+        try
+        {
+            // Check if the column exists
+            bool columnExists = false;
+            using (var pragmaCommand = _connection.CreateCommand())
+            {
+                pragmaCommand.CommandText = "PRAGMA table_info(RemoteDevice)";
+                using var reader = await pragmaCommand.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    string columnName = reader.GetString(1);  // Column name is at index 1
+                    if (columnName.Equals("IpAddresses", StringComparison.OrdinalIgnoreCase))
+                    {
+                        columnExists = true;
+                        break;
+                    }
+                }
+            }
+
+            // Add the column if it doesn't exist
+            if (!columnExists)
+            {
+                using var alterCommand = _connection.CreateCommand();
+                alterCommand.CommandText = "ALTER TABLE RemoteDevice ADD COLUMN IpAddresses NVARCHAR(2048)";
+                await alterCommand.ExecuteNonQueryAsync();
+                logger.Info("Added IpAddresses column to RemoteDevice table");
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Failed to migrate IpAddresses column", ex);
             throw;
         }
     }
