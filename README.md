@@ -15,6 +15,7 @@
 - **File Sharing**: Share files between your devices easily.
 - **Storage Integration**: Integrate your Android storage into the Windows Explorer.
 - **Notification**: Allows toasting the notifications from your android in desktop.
+- **Screen mirroring**: Mirror and control the Android device via scrcpy. 
 
 ## Limitations
 
@@ -58,7 +59,6 @@
    - You would need Android 11 or higher
    - **Note:** This feature is still a bit experimental and may not work on all Windows versions especially older versions of Windows 10 and other unofficial debloated Windows 11 versions. 
 
-     
 ## Screenshots
 
 <p align="center">
@@ -67,12 +67,11 @@
 
 ## Contribute
 
-Feel free to open an issue if you want to report a bug, give feedback, or ask a question. Pull requests are very welcome!
+Feel free to open an issue if you want to report a bug, provide feedback, or ask a question. Pull requests are very welcome!
 
-If you wish to know any specific details or questions hit me up on [the Discord server](https://discord.gg/MuvMqv4MES)
-or email, I would be happy to help.
+If you have any specific questions or need further details, please reach out to me on [the Discord server](https://discord.gg/MuvMqv4MES) or by email—I would be happy to help.
 
-If you wish to translate to your language, you can find the project on [Crowdin](https://crowdin.com/project/sefirah)
+If you would like to translate the project into your language, you can find it on [Crowdin](https://crowdin.com/project/sefirah)
 
 ## Thanks
 
