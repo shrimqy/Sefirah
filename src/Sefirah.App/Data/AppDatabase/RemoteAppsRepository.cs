@@ -22,12 +22,20 @@ public class RemoteAppsRepository(DatabaseContext context, ILogger logger) : IRe
             {
                 var appIconBytes = reader.IsDBNull(3) ? null : (byte[])reader[3];
                 var appIcon = appIconBytes != null ? await appIconBytes.ToBitmapAsync() : null;
+                
+                var notificationFilterStr = reader.GetString(2);
+                NotificationFilter notificationFilter = NotificationFilter.ToastFeed;
+                
+                if (!Enum.TryParse<NotificationFilter>(notificationFilterStr, out notificationFilter))
+                {
+                    logger.Warn($"Invalid NotificationFilter value '{notificationFilterStr}' for app {reader.GetString(1)}. Using default.");
+                }
 
                 applications.Add(new ApplicationInfoEntity
                 {
                     AppPackage = reader.GetString(0),
                     AppName = reader.GetString(1),
-                    NotificationFilter = Enum.Parse<NotificationFilter>(reader.GetString(2)),
+                    NotificationFilter = notificationFilter,
                     AppIconBytes = appIconBytes,
                     AppIcon = appIcon
                 });
@@ -39,6 +47,55 @@ public class RemoteAppsRepository(DatabaseContext context, ILogger logger) : IRe
         {
             logger.Error("Error getting application info list", ex);
             throw;
+        }
+    }
+
+    public async Task<ObservableCollection<ApplicationInfoEntity>> GetAllAsObservableCollection()
+    {
+        try 
+        {
+            using var conn = await context.GetConnectionAsync();
+            using var command = new SqliteCommand(
+                "SELECT AppPackage, AppName, NotificationFilter, AppIcon FROM ApplicationInfo ORDER BY AppName",
+                conn);
+
+            var apps = new ObservableCollection<ApplicationInfoEntity>();
+
+            conn.Open();
+            if (conn.State == System.Data.ConnectionState.Open)
+                {
+                using var reader = await command.ExecuteReaderAsync();
+                {
+                    while (reader.Read())
+                    {
+                        var appIconBytes = reader.IsDBNull(3) ? null : (byte[])reader[3];
+                        var appIcon = appIconBytes != null ? await appIconBytes.ToBitmapAsync() : null;
+
+                        var notificationFilterStr = reader.GetString(2);
+                        NotificationFilter notificationFilter = NotificationFilter.ToastFeed;
+                                
+                        if (!Enum.TryParse<NotificationFilter>(notificationFilterStr, out notificationFilter))
+                        {
+                            logger.Warn($"Invalid NotificationFilter value '{notificationFilterStr}' for app {reader.GetString(1)}. Using default.");
+                        }
+
+                        apps.Add(new ApplicationInfoEntity
+                        {
+                            AppPackage = reader.GetString(0),
+                            AppName = reader.GetString(1),
+                            NotificationFilter = notificationFilter,
+                            AppIconBytes = appIconBytes,
+                            AppIcon = appIcon
+                        });
+                    }  
+                }
+            }
+            return apps;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Error getting application info list", ex);
+            return null;
         }
     }
 
@@ -56,11 +113,19 @@ public class RemoteAppsRepository(DatabaseContext context, ILogger logger) : IRe
             using var reader = await command.ExecuteReaderAsync();
             if (await reader.ReadAsync())
             {
+                var notificationFilterStr = reader.GetString(2);
+                NotificationFilter notificationFilter = NotificationFilter.ToastFeed;
+                
+                if (!Enum.TryParse<NotificationFilter>(notificationFilterStr, out notificationFilter))
+                {
+                    logger.Warn($"Invalid NotificationFilter value '{notificationFilterStr}' for app {reader.GetString(1)}. Using default.");
+                }
+                
                 return new ApplicationInfoEntity
                 {
                     AppPackage = reader.GetString(0),
                     AppName = reader.GetString(1),
-                    NotificationFilter = Enum.Parse<NotificationFilter>(reader.GetString(2)),
+                    NotificationFilter = notificationFilter,
                     AppIconBytes = reader.IsDBNull(3) ? null : (byte[])reader[3]
                 };
             }
