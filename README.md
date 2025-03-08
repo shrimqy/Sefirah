@@ -58,6 +58,7 @@
 5. **Windows Explorer Storage**:
    - You would need Android 11 or higher
    - **Note:** This feature is still a bit experimental and may not work on all Windows versions especially older versions of Windows 10 and other unofficial debloated Windows 11 versions. 
+   - **WARNING**: DO NOT set the remote storage location to a pre-existing folder as it will delete the contents of that folder.
 
 ## Screenshots
 
