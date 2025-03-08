@@ -33,20 +33,39 @@ public sealed partial class FeaturesPage : Page
 
     public async void SelectRemoteLocation_Click(object sender, RoutedEventArgs e)
     {
-        var picker = new FolderPicker
+        
+        // Show warning dialog before setting the path
+        var dialog = new ContentDialog 
         {
-            SuggestedStartLocation = PickerLocationId.DocumentsLibrary
+            Title = "Warning: Remote Storage Location",
+            Content = "DO NOT set the remote storage location to a pre-existing folder as it will delete the contents of that folder. Are you sure you want to continue?",
+            PrimaryButtonText = "Continue",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Close,
+            XamlRoot = this.Content.XamlRoot
         };
-        picker.FileTypeFilter.Add("*");
 
-        var window = MainWindow.Instance;
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, 
-            WinRT.Interop.WindowNative.GetWindowHandle(window));
-
-        if (await picker.PickSingleFolderAsync() is StorageFolder folder)
+        var result = await dialog.ShowAsync();
+        
+        if (result == ContentDialogResult.Primary)
         {
-            ViewModel.RemoteStoragePath = folder.Path;
+             var picker = new FolderPicker
+            {
+                SuggestedStartLocation = PickerLocationId.DocumentsLibrary
+            };
+            picker.FileTypeFilter.Add("*");
+
+            var window = MainWindow.Instance;
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, 
+                WinRT.Interop.WindowNative.GetWindowHandle(window));
+
+            if (await picker.PickSingleFolderAsync() is StorageFolder folder)
+            {
+                // User confirmed, update the path
+                ViewModel.RemoteStoragePath = folder.Path;
+            }
         }
+
     }
 
     public async void SelectScrcpyLocation_Click(object sender, RoutedEventArgs e)
