@@ -63,8 +63,8 @@ public sealed partial class GeneralViewModel : ObservableObject
     public Dictionary<StartupOptions, string> StartupTypes { get; } = new()
     {
         { StartupOptions.Disabled, "StartupOptionDisabled/Content".GetLocalizedResource() },
-        { StartupOptions.Minimized, "StartupOptionMinimized/Content".GetLocalizedResource() },
         { StartupOptions.InTray, "StartupOptionSystemTray/Content".GetLocalizedResource() },
+        { StartupOptions.Minimized, "StartupOptionMinimized/Content".GetLocalizedResource() },
         { StartupOptions.Maximized, "StartupOptionMaximized/Content".GetLocalizedResource() }
     };
 
