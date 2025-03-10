@@ -27,7 +27,7 @@
 	<Identity
 		Name="shrimqy.Seki-PhoneLink"
 		Publisher="CN=shrimqy"
-		Version="1.0.3.0" />
+		Version="1.0.4.0" />
 
 	<Properties>
 		<DisplayName>Sefirah</DisplayName>
