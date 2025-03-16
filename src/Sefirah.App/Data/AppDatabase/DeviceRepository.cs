@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using Sefirah.App.Data.AppDatabase.Models;
+using Sefirah.App.Data.Models;
 using System.Text.Json;
 namespace Sefirah.App.Data.AppDatabase;
 public class DeviceRepository(DatabaseContext context, ILogger logger)
@@ -10,7 +11,7 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
         {
             var conn = await context.GetConnectionAsync();
             var command = new SqliteCommand(
-                "SELECT DeviceId, DeviceName, IpAddresses, LastConnected, SharedSecret, WallpaperBytes FROM RemoteDevice",
+                "SELECT DeviceId, DeviceName, IpAddresses, LastConnected, SharedSecret, WallpaperBytes, PhoneNumbers FROM RemoteDevice",
                 conn);
 
             using var reader = await command.ExecuteReaderAsync();
@@ -25,7 +26,8 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
                     IpAddresses = reader.IsDBNull(2) ? null : JsonSerializer.Deserialize<List<string>>(reader[2].ToString() ?? "[]"),
                     LastConnected = reader.IsDBNull(3) ? null : reader.GetDateTime(3),
                     SharedSecret = reader.IsDBNull(4) ? null : (byte[])reader[4],
-                    WallpaperBytes = reader.IsDBNull(5) ? null : (byte[])reader[5]
+                    WallpaperBytes = reader.IsDBNull(5) ? null : (byte[])reader[5],
+                    PhoneNumbers = reader.IsDBNull(6) ? null : JsonSerializer.Deserialize<List<PhoneNumber>>(reader[6].ToString() ?? "[]")
                 });
             }
 
@@ -44,7 +46,7 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
         {
             var conn = await context.GetConnectionAsync();
             var command = new SqliteCommand(
-                "SELECT DeviceId, DeviceName, IpAddresses, LastConnected, SharedSecret, WallpaperBytes " +
+                "SELECT DeviceId, DeviceName, IpAddresses, LastConnected, SharedSecret, WallpaperBytes, PhoneNumbers " +
                 "FROM RemoteDevice WHERE DeviceId = @DeviceId",
                 conn);
 
@@ -60,7 +62,8 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
                     IpAddresses = reader.IsDBNull(2) ? null : JsonSerializer.Deserialize<List<string>>(reader[2].ToString() ?? "[]"),
                     LastConnected = reader.IsDBNull(3) ? null : reader.GetDateTime(3),
                     SharedSecret = reader.IsDBNull(4) ? null : (byte[])reader[4],
-                    WallpaperBytes = reader.IsDBNull(5) ? null : (byte[])reader[5]
+                    WallpaperBytes = reader.IsDBNull(5) ? null : (byte[])reader[5],
+                    PhoneNumbers = reader.IsDBNull(6) ? null : JsonSerializer.Deserialize<List<PhoneNumber>>(reader[6].ToString() ?? "[]")
                 };
             }
 
@@ -80,8 +83,8 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
             var conn = await context.GetConnectionAsync();
             var command = new SqliteCommand(
                 "INSERT OR REPLACE INTO RemoteDevice " +
-                "(DeviceId, DeviceName, IpAddresses, LastConnected, SharedSecret, WallpaperBytes) " +
-                "VALUES (@DeviceId, @DeviceName, @IpAddresses, @LastConnected, @SharedSecret, @WallpaperBytes)",
+                "(DeviceId, DeviceName, IpAddresses, LastConnected, SharedSecret, WallpaperBytes, PhoneNumbers) " +
+                "VALUES (@DeviceId, @DeviceName, @IpAddresses, @LastConnected, @SharedSecret, @WallpaperBytes, @PhoneNumbers)",
                 conn);
 
             command.Parameters.AddWithValue("@DeviceId", device.DeviceId);
@@ -90,6 +93,7 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
             command.Parameters.AddWithValue("@LastConnected", device.LastConnected as object ?? DBNull.Value);
             command.Parameters.AddWithValue("@SharedSecret", device.SharedSecret as object ?? DBNull.Value);
             command.Parameters.AddWithValue("@WallpaperBytes", device.WallpaperBytes as object ?? DBNull.Value);
+            command.Parameters.AddWithValue("@PhoneNumbers", JsonSerializer.Serialize(device.PhoneNumbers));
 
             await command.ExecuteNonQueryAsync();
             return device;
@@ -101,6 +105,49 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
         }
     }
 
+    public async Task<ObservableCollection<PhoneNumber>> GetLastConnectedDevicePhoneNumbersAsync()
+    {
+        try
+        {
+            var conn = await context.GetConnectionAsync();
+            var command = new SqliteCommand("SELECT PhoneNumbers FROM RemoteDevice WHERE LastConnected IS NOT NULL ORDER BY LastConnected DESC LIMIT 1", conn);
+
+            var phoneNumbers = new ObservableCollection<PhoneNumber>();
+            conn.Open();
+            if (conn.State == System.Data.ConnectionState.Open)
+            {
+                using var reader = await command.ExecuteReaderAsync();
+                while (reader.Read())    
+                {   
+                    if (reader.IsDBNull(0) || string.IsNullOrWhiteSpace(reader[0].ToString()))
+                    {
+                        logger.Info("PhoneNumbers column is null or empty for the device");
+                        return [];
+                    }
+
+                    var phoneNumbersJson = reader[0].ToString();
+                    logger.Info($"Deserializing PhoneNumbers JSON: {phoneNumbersJson}");
+                
+                    try
+                    {
+                        var phoneNumbersJsonList = JsonSerializer.Deserialize<List<PhoneNumber>>(phoneNumbersJson ?? "[]") ?? [];
+                        phoneNumbersJsonList.ForEach(pn => phoneNumbers.Add(pn));
+                    }
+                    catch (JsonException jsonEx)
+                    {
+                        logger.Warn($"Failed to deserialize phone numbers, returning empty list. JSON was: '{phoneNumbersJson}'", jsonEx);
+                    }
+                    return phoneNumbers;
+                }
+            }
+            return [];
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Error getting phone numbers", ex);
+            return [];
+        }
+    }
     public async Task DeleteAsync(string deviceId)
     {
         try
