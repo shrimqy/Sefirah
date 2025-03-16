@@ -133,7 +133,7 @@
                                                                     <dataEntity:ApplicationInfoEntity
                                                                         AppName="{x:Bind AppName}"
                                                                         AppPackage="{x:Bind AppPackage}"
-                                                                        NotificationFilter="FEED" />
+                                                                        NotificationFilter="Feed" />
                                                                 </MenuFlyoutItem.Tag>
                                                             </MenuFlyoutItem>
 
@@ -142,7 +142,7 @@
                                                                     <dataEntity:ApplicationInfoEntity
                                                                         AppName="{x:Bind AppName}"
                                                                         AppPackage="{x:Bind AppPackage}"
-                                                                        NotificationFilter="DISABLED" />
+                                                                        NotificationFilter="Disabled" />
                                                                 </MenuFlyoutItem.Tag>
                                                             </MenuFlyoutItem>
                                                         </MenuFlyout>
