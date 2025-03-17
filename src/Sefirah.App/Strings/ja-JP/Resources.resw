@@ -315,9 +315,6 @@
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>アプリ固有の設定</value>
   </data>
-  <data name="AppSpecificSettings1" xml:space="preserve">
-    <value>アプリ固有の設定</value>
-  </data>
   <data name="TransferNotificationReceiving.Content" xml:space="preserve">
     <value>「{0}」を受信中</value>
   </data>
