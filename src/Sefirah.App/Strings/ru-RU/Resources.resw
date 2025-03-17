@@ -317,9 +317,6 @@ mobile (Make sure the pin matches)</value>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>App-specific Settings</value>
   </data>
-  <data name="AppSpecificSettings1" xml:space="preserve">
-    <value>App-specific Settings</value>
-  </data>
   <data name="TransferNotificationReceiving.Content" xml:space="preserve">
     <value>Receiving {0}</value>
   </data>
