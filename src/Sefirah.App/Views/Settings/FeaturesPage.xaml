@@ -133,7 +133,7 @@
                                                                     <dataEntity:ApplicationInfoEntity
                                                                         AppName="{x:Bind AppName}"
                                                                         AppPackage="{x:Bind AppPackage}"
-                                                                        NotificationFilter="FEED" />
+                                                                        NotificationFilter="Feed" />
                                                                 </MenuFlyoutItem.Tag>
                                                             </MenuFlyoutItem>
 
@@ -142,7 +142,7 @@
                                                                     <dataEntity:ApplicationInfoEntity
                                                                         AppName="{x:Bind AppName}"
                                                                         AppPackage="{x:Bind AppPackage}"
-                                                                        NotificationFilter="DISABLED" />
+                                                                        NotificationFilter="Disabled" />
                                                                 </MenuFlyoutItem.Tag>
                                                             </MenuFlyoutItem>
                                                         </MenuFlyout>
@@ -158,13 +158,97 @@
                 </local:SettingsBlockControl.ExpandableContent>
             </local:SettingsBlockControl>
 
+            <!--  Screen Mirror  -->
+            <local:SettingsBlockControl 
+                Title="{helpers:ResourceString Name=ScreenMirror}"
+                Description="{x:Bind ViewModel.ScrcpyPath, Mode=TwoWay}" 
+                ContentPadding="0"
+                IsExpanded="{x:Bind ViewModel.IsScreenMirrorExpanded, Mode=TwoWay}">
+                <local:SettingsBlockControl.Icon>
+                    <FontIcon Glyph="&#xEC15;" />
+                </local:SettingsBlockControl.Icon>
+                <local:SettingsBlockControl.SettingsActionableElement>
+                    <Button Content="{helpers:ResourceString Name=SelectLocation}" Click="SelectScrcpyLocation_Click" />
+                </local:SettingsBlockControl.SettingsActionableElement>
+                <local:SettingsBlockControl.ExpandableContent>
+                    <StackPanel Spacing="16">
+                        <StackPanel
+                            Padding="16,8,16,8"
+                            Background="{ThemeResource ExpanderHeaderBackground}"
+                            BorderBrush="{ThemeResource ExpanderHeaderBorderBrush}"
+                            BorderThickness="{ThemeResource ExpanderHeaderBorderThickness}"
+                            CornerRadius="8"
+                            Spacing="12">
+                            <TextBlock
+                                Margin="0,0,0,4"
+                                FontWeight="SemiBold"
+                                Text="{helpers:ResourceString Name=GeneralSettings}" />
+                            <CheckBox Content="{helpers:ResourceString Name=ScreenOff}" IsChecked="{x:Bind ViewModel.ScreenOff, Mode=TwoWay}" />
+                            <CheckBox Content="{helpers:ResourceString Name=PhysicalKeyboard}" IsChecked="{x:Bind ViewModel.PhysicalKeyboard, Mode=TwoWay}" />
+                        </StackPanel>
+
+                        <StackPanel
+                            Padding="16,8,16,8"
+                            Background="{ThemeResource ExpanderHeaderBackground}"
+                            BorderBrush="{ThemeResource ExpanderHeaderBorderBrush}"
+                            BorderThickness="{ThemeResource ExpanderHeaderBorderThickness}"
+                            CornerRadius="8"
+                            Spacing="12">
+                            <TextBlock
+                                Margin="0,0,0,4"
+                                FontWeight="SemiBold"
+                                Text="{helpers:ResourceString Name=VideoSettings}" />
+                            <local:SettingsBlockControl Title="{helpers:ResourceString Name=Bitrate}">
+                                <local:SettingsBlockControl.SettingsActionableElement>
+                                    <TextBox Text="{x:Bind ViewModel.VideoBitrate, Mode=TwoWay}" />
+                                </local:SettingsBlockControl.SettingsActionableElement>
+                            </local:SettingsBlockControl>
+                            <local:SettingsBlockControl Title="{helpers:ResourceString Name=Resolution}">
+                                <local:SettingsBlockControl.SettingsActionableElement>
+                                    <TextBox Text="{x:Bind ViewModel.VideoResolution, Mode=TwoWay}" />
+                                </local:SettingsBlockControl.SettingsActionableElement>
+                            </local:SettingsBlockControl>
+                            <local:SettingsBlockControl Title="{helpers:ResourceString Name=Buffer}">
+                                <local:SettingsBlockControl.SettingsActionableElement>
+                                    <TextBox Text="{x:Bind ViewModel.VideoBuffer, Mode=TwoWay}" />
+                                </local:SettingsBlockControl.SettingsActionableElement>
+                            </local:SettingsBlockControl>
+                        </StackPanel>
+                        
+                        <StackPanel
+                            Padding="16,8,16,8"
+                            Background="{ThemeResource ExpanderHeaderBackground}"
+                            BorderBrush="{ThemeResource ExpanderHeaderBorderBrush}"
+                            BorderThickness="{ThemeResource ExpanderHeaderBorderThickness}"
+                            CornerRadius="8"
+                            Spacing="12">
+                            <TextBlock
+                                Margin="0,0,0,4"
+                                FontWeight="SemiBold"
+                                Text="{helpers:ResourceString Name=AudioSettings}" />
+                            <local:SettingsBlockControl Title="{helpers:ResourceString Name=Bitrate}">
+                                <local:SettingsBlockControl.SettingsActionableElement>
+                                    <TextBox Text="{x:Bind ViewModel.AudioBitrate, Mode=TwoWay}" />
+                                </local:SettingsBlockControl.SettingsActionableElement>
+                            </local:SettingsBlockControl>
+                            <local:SettingsBlockControl Title="{helpers:ResourceString Name=Buffer}">
+                                <local:SettingsBlockControl.SettingsActionableElement>
+                                    <TextBox Text="{x:Bind ViewModel.AudioBuffer, Mode=TwoWay}" />
+                                </local:SettingsBlockControl.SettingsActionableElement>
+                            </local:SettingsBlockControl>
+                        </StackPanel>
+                    </StackPanel>
+                </local:SettingsBlockControl.ExpandableContent>
+            </local:SettingsBlockControl>
+
+
             <!--  Save Location  -->
             <local:SettingsBlockControl Title="{helpers:ResourceString Name=SaveLocation}" Description="{x:Bind ViewModel.ReceivedFilesPath, Mode=OneWay}">
                 <local:SettingsBlockControl.Icon>
                     <SymbolIcon Symbol="Folder" />
                 </local:SettingsBlockControl.Icon>
                 <local:SettingsBlockControl.SettingsActionableElement>
-                    <Button Click="SelectSaveLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
+                    <Button Margin="0,0,44,0" Click="SelectSaveLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
                 </local:SettingsBlockControl.SettingsActionableElement>
             </local:SettingsBlockControl>
 
@@ -174,7 +258,7 @@
                     <SymbolIcon Symbol="SyncFolder" />
                 </local:SettingsBlockControl.Icon>
                 <local:SettingsBlockControl.SettingsActionableElement>
-                    <Button Click="SelectRemoteLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
+                    <Button Margin="0,0,44,0" Click="SelectRemoteLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
                 </local:SettingsBlockControl.SettingsActionableElement>
             </local:SettingsBlockControl>
 

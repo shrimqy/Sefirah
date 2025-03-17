@@ -9,6 +9,7 @@ public enum FileTransferType
     SingleFile,
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum MediaAction
 {
     Resume,
@@ -19,6 +20,7 @@ public enum MediaAction
     Volume
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum MiscType
 {
     Disconnect,
@@ -31,10 +33,21 @@ public enum MiscType
     ClearNotifications
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum NotificationType
 {
     Active,
     Removed,
     New,
-    Action
+    Action,
+    Invoke
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ConversationType
+{
+    Active,
+    ActiveUpdated,
+    Removed,
+    New
 }

@@ -11,11 +11,13 @@ public sealed partial class FeaturesViewModel : ObservableObject
     private readonly IRemoteAppsRepository RemoteAppsRepository = Ioc.Default.GetRequiredService<IRemoteAppsRepository>();
     private readonly DispatcherQueue dispatcherQueue;
 
-    public ObservableCollection<ApplicationInfoEntity> NotificationPreferences { get; } = [];
+    public ObservableCollection<ApplicationInfoEntity> NotificationPreferences { get; set; } = [];
 
     public bool IsClipboardExpanded { get; set; }
     public bool IsNotificationExpanded { get; set; }
     public bool IsAppNotificationExpanded { get; set; }
+
+    public bool IsScreenMirrorExpanded { get; set; }
 
     // Clipboard Settings
     public bool ClipboardSyncEnabled
@@ -138,6 +140,107 @@ public sealed partial class FeaturesViewModel : ObservableObject
         }
     }
 
+    public string? ScrcpyPath
+    {
+        get => UserSettingsService.FeatureSettingsService.ScrcpyPath;
+        set
+        {
+            UserSettingsService.FeatureSettingsService.ScrcpyPath = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool ScreenOff
+    {
+        get => UserSettingsService.FeatureSettingsService.ScreenOff;
+        set
+        {
+            if (value != UserSettingsService.FeatureSettingsService.ScreenOff)
+            {
+                UserSettingsService.FeatureSettingsService.ScreenOff = value;
+                OnPropertyChanged();
+            }
+        }
+    }   
+
+    public bool PhysicalKeyboard
+    {
+        get => UserSettingsService.FeatureSettingsService.PhysicalKeyboard;
+        set
+        {
+            if (value != UserSettingsService.FeatureSettingsService.PhysicalKeyboard)
+            {
+                UserSettingsService.FeatureSettingsService.PhysicalKeyboard = value;
+                OnPropertyChanged();
+            }
+        }
+    }       
+
+    public string? VideoBitrate
+    {
+        get => UserSettingsService.FeatureSettingsService.VideoBitrate;
+        set
+        {
+            if (value != UserSettingsService.FeatureSettingsService.VideoBitrate)
+            {
+                UserSettingsService.FeatureSettingsService.VideoBitrate = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public string? VideoResolution
+    {
+        get => UserSettingsService.FeatureSettingsService.VideoResolution;
+        set
+        {
+            if (value != UserSettingsService.FeatureSettingsService.VideoResolution)
+            {
+                UserSettingsService.FeatureSettingsService.VideoResolution = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public string? VideoBuffer
+    {
+        get => UserSettingsService.FeatureSettingsService.VideoBuffer;
+        set
+        {
+            if (value != UserSettingsService.FeatureSettingsService.VideoBuffer)
+            {
+                UserSettingsService.FeatureSettingsService.VideoBuffer = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public string? AudioBitrate
+    {
+        get => UserSettingsService.FeatureSettingsService.AudioBitrate;
+        set
+        {
+            if (value != UserSettingsService.FeatureSettingsService.AudioBitrate)
+            {
+                UserSettingsService.FeatureSettingsService.AudioBitrate = value;
+                OnPropertyChanged();
+            }
+        }
+    }       
+
+    public string? AudioBuffer
+    {
+        get => UserSettingsService.FeatureSettingsService.AudioBuffer;
+        set
+        {
+            if (value != UserSettingsService.FeatureSettingsService.AudioBuffer)
+            {
+                UserSettingsService.FeatureSettingsService.AudioBuffer = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public string ReceivedFilesPath
     {
         get => UserSettingsService.FeatureSettingsService.ReceivedFilesPath;
@@ -198,14 +301,11 @@ public sealed partial class FeaturesViewModel : ObservableObject
 
     private async void LoadNotificationPreferencesAsync()
     {
-        var preferences = await RemoteAppsRepository.GetAllAsync();
+        var preferences = await RemoteAppsRepository.GetAllAsObservableCollection();
         dispatcherQueue.TryEnqueue(() =>
         {
-            NotificationPreferences.Clear();
-            foreach (var preference in preferences)
-            {
-                NotificationPreferences.Add(preference);
-            }
+            NotificationPreferences = preferences;
+            OnPropertyChanged(nameof(NotificationPreferences));
         });
     }
 

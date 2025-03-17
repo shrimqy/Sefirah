@@ -87,4 +87,52 @@ internal sealed class FeaturesSettingsService : BaseObservableJsonSettings, IFea
         get => Get(false);
         set => Set(value);
     }
+
+    public string? ScrcpyPath
+    {
+        get => Get(string.Empty);
+        set => Set(value);
+    }
+
+    public bool ScreenOff
+    {
+        get => Get(true);
+        set => Set(value);
+    }
+
+    public bool PhysicalKeyboard
+    {
+        get => Get(true);
+        set => Set(value);
+    }
+    
+    public string? VideoBitrate
+    {
+        get => Get("8M");
+        set => Set(value);
+    }
+
+    public string? VideoResolution
+    {
+        get => Get(string.Empty);
+        set => Set(value);
+    }
+
+    public string? VideoBuffer
+    {
+        get => Get("0");
+        set => Set(value);
+    }
+    
+    public string? AudioBitrate
+    {
+        get => Get("128K");
+        set => Set(value);
+    }   
+    
+    public string? AudioBuffer
+    {
+        get => Get("20");
+        set => Set(value);
+    }
 }

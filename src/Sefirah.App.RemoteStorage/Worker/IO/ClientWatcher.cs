@@ -1,13 +1,12 @@
-using Microsoft.Extensions.Logging;
-using System.Threading.Channels;
-using Sefirah.App.RemoteStorage.RemoteAbstractions;
 using Sefirah.App.RemoteStorage.Abstractions;
 using Sefirah.App.RemoteStorage.Helpers;
 using Sefirah.App.RemoteStorage.Interop;
-using static Vanara.PInvoke.CldApi;
-using System.ComponentModel;
-using Vanara.PInvoke;
 using Sefirah.App.RemoteStorage.Interop.Extensions;
+using Sefirah.App.RemoteStorage.RemoteAbstractions;
+using Sefirah.Common.Utils;
+using System.Threading.Channels;
+using Vanara.PInvoke;
+using static Vanara.PInvoke.CldApi;
 
 namespace Sefirah.App.RemoteStorage.Worker.IO;
 public class ClientWatcher : IDisposable
@@ -28,7 +27,7 @@ public class ClientWatcher : IDisposable
         FileLocker fileLocker,
         IRemoteReadWriteService remoteService,
         PlaceholdersService placeholdersService,
-        ILogger<ClientWatcher> logger
+        ILogger logger
     )
     {
         _contextAccessor = contextAccessor;
@@ -72,12 +71,12 @@ public class ClientWatcher : IDisposable
                 catch (HFileException)
                 {
                     // File handle is invalid, likely due to disconnection
-                    _logger.LogWarning("Unable to get placeholder state for {path} - connection may be lost", e.FullPath);
+                    _logger.Warn("Unable to get placeholder state for {path} - connection may be lost", e.FullPath);
                     return;
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error getting placeholder state for {path}", e.FullPath);
+                    _logger.Error( "Error getting placeholder state for {path}", e.FullPath, ex);
                     return;
                 }
 
@@ -115,17 +114,17 @@ public class ClientWatcher : IDisposable
                                     }
                                     catch (HFileException)
                                     {
-                                        _logger.LogWarning("Unable to hydrate placeholder for {path} - connection may be lost", childItem);
+                                        _logger.Warn("Unable to hydrate placeholder for {path} - connection may be lost", childItem);
                                     }
                                     catch (Exception ex)
                                     {
-                                        _logger.LogError(ex, "Hydrate file failed: {filePath}", childItem);
+                                        _logger.Error("Hydrate file failed: {filePath}", childItem, ex);
                                     }
                                 }
                             }
                             catch (Exception ex)
                             {
-                                _logger.LogError(ex, "Error processing directory {path}", e.FullPath);
+                                _logger.Error("Error processing directory {path}", e.FullPath, ex);
                             }
                         }
                         else
@@ -136,7 +135,7 @@ public class ClientWatcher : IDisposable
                             }
                             catch (HFileException)
                             {
-                                _logger.LogWarning("Unable to hydrate placeholder for {path} - connection may be lost", e.FullPath);
+                                _logger.Warn("Unable to hydrate placeholder for {path} - connection may be lost", e.FullPath);
                             }
                         }
                     }
@@ -152,7 +151,7 @@ public class ClientWatcher : IDisposable
                         }
                         catch (HFileException)
                         {
-                            _logger.LogWarning("Unable to dehydrate placeholder for {path} - connection may be lost", e.FullPath);
+                            _logger.Warn("Unable to dehydrate placeholder for {path} - connection may be lost", e.FullPath);
                         }
                     }
 
@@ -170,7 +169,7 @@ public class ClientWatcher : IDisposable
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unhandled error in file system watcher for {path}", e.FullPath);
+                _logger.Error("Unhandled error in file system watcher for {path}", e.FullPath, ex);
             }
         };
 
@@ -202,7 +201,7 @@ public class ClientWatcher : IDisposable
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError(ex, "Create file failed: {filePath}", childItem);
+                            _logger.Error("Create file failed: {filePath}", childItem, ex);
                         }
                     }
                 }
@@ -216,19 +215,19 @@ public class ClientWatcher : IDisposable
                         // Add explicit placeholder and sync state handling with delays
                         try
                         {
-                            _logger.LogInformation("Setting placeholder state for new file: {path}", e.FullPath);
+                            _logger.Info("Setting placeholder state for new file: {path}", e.FullPath);
                             
                             if (!CloudFilter.IsPlaceholder(e.FullPath))
                             {
                                 CloudFilter.ConvertToPlaceholder(e.FullPath);
-                                _logger.LogInformation("Converted to placeholder: {path}", e.FullPath);
+                                _logger.Info("Converted to placeholder: {path}", e.FullPath);
                                 
                                 // Give time for the placeholder conversion to settle
                                 await Task.Delay(1000);
                             }
 
                             var stateAfterPlaceholder = CloudFilter.GetPlaceholderState(e.FullPath);
-                            _logger.LogInformation("State after placeholder conversion: {state} for {path}", 
+                            _logger.Info("State after placeholder conversion: {state} for {path}", 
                                 stateAfterPlaceholder, e.FullPath);
 
                             // Set sync state and wait for it to settle
@@ -236,24 +235,24 @@ public class ClientWatcher : IDisposable
                             await Task.Delay(1000);  // Wait for state change to complete
 
                             var finalState = CloudFilter.GetPlaceholderState(e.FullPath);
-                            _logger.LogInformation("Final state after sync: {state} for {path}", 
+                            _logger.Info("Final state after sync: {state} for {path}", 
                                 finalState, e.FullPath);
 
                             // One final check to ensure we don't trigger another upload
                             if (!finalState.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
                             {
-                                _logger.LogWarning("Sync state not set properly, retrying for: {path}", e.FullPath);
+                                _logger.Warn("Sync state not set properly, retrying for: {path}", e.FullPath);
                                 CloudFilter.SetInSyncState(e.FullPath);
                             }
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError(ex, "Failed to set placeholder/sync state for {path}", e.FullPath);
+                            _logger.Error("Failed to set placeholder/sync state for {path}", e.FullPath, ex);
                         }
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Create file failed: {filePath}", e.FullPath);
+                        _logger.Error("Create file failed: {filePath}", e.FullPath, ex);
                     }
                 }
             });
@@ -261,7 +260,7 @@ public class ClientWatcher : IDisposable
 
         watcher.Error += (object sender, ErrorEventArgs e) => {
             var ex = e.GetException();
-            _logger.LogError(ex, "Client file watcher error");
+            _logger.Error("Client file watcher error", ex);
         };
 
         return watcher;

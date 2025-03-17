@@ -38,7 +38,7 @@ public interface IDeviceManager
     /// <summary>
     /// Returns the device if it get's successfully verified and added to the database.
     /// </summary>
-    Task<RemoteDeviceEntity?> VerifyDevice(DeviceInfo device);
+    Task<RemoteDeviceEntity?> VerifyDevice(DeviceInfo device, string? ipAddress);
 
     /// <summary>
     /// Event that is raised when the device properties (battery..) changes.
@@ -54,4 +54,14 @@ public interface IDeviceManager
     /// Gets the current device status.
     /// </summary>
     DeviceStatus? CurrentDeviceStatus { get; }
+
+    /// <summary>
+    /// Event that is raised when a device is added to the device list.
+    /// </summary>
+    event EventHandler<RemoteDeviceEntity>? DeviceAdded;
+
+    /// <summary>
+    /// Gets the phone numbers for the last connected device.
+    /// </summary>
+    Task<ObservableCollection<PhoneNumber>> GetLastConnectedDevicePhoneNumbersAsync();
 }

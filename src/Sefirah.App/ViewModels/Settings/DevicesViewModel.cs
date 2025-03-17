@@ -19,10 +19,8 @@ public partial class DevicesViewModel : BaseViewModel
     private IDiscoveryService DiscoveryService { get; } = Ioc.Default.GetRequiredService<IDiscoveryService>();
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
 
-    // This collection is for devices you already have connected.
+    private ISftpService SftpService { get; } = Ioc.Default.GetRequiredService<ISftpService>();
     public ObservableCollection<RemoteDeviceEntity?> PairedDevices { get; } = [];
-
-    // Devices discovered on the WiFi network
     public ObservableCollection<DiscoveredDevice> DiscoveredDevices => DiscoveryService.DiscoveredDevices;
 
     private RemoteDeviceEntity? _currentlyConnectedDevice;
@@ -40,29 +38,38 @@ public partial class DevicesViewModel : BaseViewModel
 
         RemoveDeviceCommand = new AsyncRelayCommand<RemoteDeviceEntity>(RemoveDevice);
         SessionManager.ClientConnectionStatusChanged += OnConnectionStatusChange;
+        
+        DeviceManager.DeviceAdded += OnDeviceAdded;
+        
         LoadDevices();
     }
 
     private async void LoadDevices()
     {
-        var devices = await DeviceManager.GetDeviceListAsync();
-        Dispatcher.TryEnqueue(async () =>
+        try
         {
-            PairedDevices.Clear();
-            foreach (var device in devices)
+            var devices = await DeviceManager.GetDeviceListAsync();
+            await Dispatcher.EnqueueAsync(async () =>
             {
-
-                if (device != null)
+                PairedDevices.Clear();
+                foreach (var device in devices)
                 {
-                    // Load the images
-                    if (device.WallpaperBytes != null && device.WallpaperImage == null)
+                    if (device != null)
                     {
-                        device.WallpaperImage = await device.WallpaperBytes.ToBitmapAsync();
+                        // Load the images
+                        if (device.WallpaperBytes != null && device.WallpaperImage == null)
+                        {
+                            device.WallpaperImage = await device.WallpaperBytes.ToBitmapAsync();
+                        }
                     }
+                    PairedDevices.Add(device);
                 }
-                PairedDevices.Add(device);
-            }
-        });
+            });    
+        }
+        catch
+        {
+            logger.Error("Failed to load devices");
+        }
     }
 
     private async void OnConnectionStatusChange(object? sender, ConnectedSessionEventArgs args)
@@ -96,13 +103,14 @@ public partial class DevicesViewModel : BaseViewModel
             try
             {
                 // First disconnect if this is the currently connected device
-                if (CurrentlyConnectedDevice?.DeviceId == device.DeviceId)
+                if (SessionManager.GetCurrentlyConnectedDevice()?.DeviceId == device.DeviceId)
                 {
-                    var message = new Misc { MiscType = nameof(MiscType.Disconnect) };
+                    var message = new Misc { MiscType = MiscType.Disconnect };
                     SessionManager.SendMessage(SocketMessageSerializer.Serialize(message));
 
                     SessionManager.DisconnectSession(true);
                 }
+                SftpService.RemoveSyncRoot(device.DeviceId);
 
                 // Remove the device from the database
                 await DeviceManager.RemoveDevice(device);
@@ -126,5 +134,37 @@ public partial class DevicesViewModel : BaseViewModel
                 await errorDialog.ShowAsync();
             }
         }
+    }
+
+    private async void OnDeviceAdded(object? sender, RemoteDeviceEntity device)
+    {
+        try
+        {
+            await Dispatcher.EnqueueAsync(async () =>
+            {
+                var existingDevice = PairedDevices.FirstOrDefault(d => d?.DeviceId == device?.DeviceId);
+                if (device.WallpaperBytes != null && device.WallpaperImage == null)
+                {
+                    device.WallpaperImage = await device.WallpaperBytes.ToBitmapAsync();
+                }
+                if (existingDevice == null)
+                {
+                    PairedDevices.Add(device);
+                }
+                else
+                {
+                    PairedDevices[PairedDevices.IndexOf(existingDevice)] = device;
+                }
+            });
+        }
+        catch
+        {
+            logger.Error("Failed to add device to UI");
+        }
+    }
+
+    ~DevicesViewModel()
+    {
+        SessionManager.ClientConnectionStatusChanged -= OnConnectionStatusChange;
     }
 }

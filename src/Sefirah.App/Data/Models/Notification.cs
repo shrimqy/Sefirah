@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Xaml.Media.Imaging;
+using Sefirah.App.Data.Enums;
 using Sefirah.App.Extensions;
 using Sefirah.App.Helpers;
 
@@ -7,8 +8,9 @@ namespace Sefirah.App.Data.Models;
 public class Notification
 {
     public string Key { get; set; } = string.Empty;
+    public bool IsPinned { get; set; } = false;
     public string? TimeStamp { get; set; }
-    public string Type { get; set; } = string.Empty;
+    public NotificationType Type { get; set; }
     public string? AppName { get; set; }
     public string? AppPackage { get; set; }
     public string? Title { get; set; }
@@ -66,10 +68,6 @@ public class Notification
         else if (!string.IsNullOrEmpty(message.AppIcon))
         {
             notification.Icon = await Convert.FromBase64String(message.AppIcon).ToBitmapAsync();
-        }
-        if (notification.Icon != null)
-        {
-            Ioc.Default.GetRequiredService<ILogger>().Debug("Notification icon exists");
         }
         return notification;
     }

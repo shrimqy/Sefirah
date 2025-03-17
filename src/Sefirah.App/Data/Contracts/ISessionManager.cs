@@ -1,4 +1,5 @@
-﻿using Sefirah.App.Data.EventArguments;
+﻿using Sefirah.App.Data.AppDatabase.Models;
+using Sefirah.App.Data.EventArguments;
 
 namespace Sefirah.App.Data.Contracts;
 public interface ISessionManager
@@ -25,4 +26,10 @@ public interface ISessionManager
     /// </summary>
     /// <param name="removeSession">Whether to remove the session from the manager.</param>
     void DisconnectSession(bool removeSession = false);
+
+    /// <summary>
+    /// Gets the currently connected device.
+    /// </summary>
+    /// <returns>The currently connected device.</returns>
+    RemoteDeviceEntity? GetCurrentlyConnectedDevice();
 }

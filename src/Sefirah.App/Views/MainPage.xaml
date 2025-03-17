@@ -26,6 +26,9 @@
         <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
         <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
         <converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
+        <converters:PinConverter x:Key="PinConverter" />
+        <converters:RingerModeToIconConverter x:Key="RingerModeToIconConverter" />
+        <converters:PinIconConverter x:Key="PinIconConverter" />
     </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -47,8 +50,23 @@
                 Height="25"
                 Margin="10,1,0,0"
                 HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                Source="ms-appx:///Assets/AppTiles/StoreLogo.png" />
+                VerticalAlignment="Center">
+                <Image.Resources>
+                    <ResourceDictionary>
+                        <ResourceDictionary.ThemeDictionaries>
+                            <ResourceDictionary x:Key="Light">
+                                <x:String x:Key="TitleBarIconPath">ms-appx:///Assets/Icons/SefirahLight.ico</x:String>
+                            </ResourceDictionary>
+                            <ResourceDictionary x:Key="Dark">
+                                <x:String x:Key="TitleBarIconPath">ms-appx:///Assets/Icons/SefirahDark.ico</x:String>
+                            </ResourceDictionary>
+                        </ResourceDictionary.ThemeDictionaries>
+                    </ResourceDictionary>
+                </Image.Resources>
+                <Image.Source>
+                    <BitmapImage UriSource="{ThemeResource TitleBarIconPath}" />
+                </Image.Source>
+            </Image>
             <TextBlock
                 x:Name="TitleBarTextBlock"
                 Grid.Column="1"
@@ -128,23 +146,68 @@
                             Orientation="Horizontal"
                             Spacing="5"
                             Visibility="{x:Bind ViewModel.DeviceInfo.Name, Converter={StaticResource NullToVisibilityConverter}, Mode=OneWay}">
-                            <FontIcon Glyph="{x:Bind ViewModel.DeviceStatus, Converter={StaticResource BatteryStatusToIconConverter}, Mode=OneWay}" />
+                            
+                            <!-- Audio Mode Button -->
+                            <Button
+                                Grid.Column="2"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="5">
+                                <FontIcon Glyph="{x:Bind ViewModel.DeviceStatus.RingerMode, Converter={StaticResource RingerModeToIconConverter}, Mode=OneWay}" />
+                                <Button.Flyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem 
+                                        Text="{helpers:ResourceString Name=RingerModeNormal/Content}" 
+                                        Command="{x:Bind ViewModel.SetRingerModeCommand}"
+                                        CommandParameter="2">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xE995;" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                        <MenuFlyoutItem 
+                                        Text="{helpers:ResourceString Name=RingerModeVibrate/Content}"
+                                        Command="{x:Bind ViewModel.SetRingerModeCommand}"
+                                        CommandParameter="1">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xE877;" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                        <MenuFlyoutItem 
+                                        Text="{helpers:ResourceString Name=RingerModeSilent/Content}"
+                                        Command="{x:Bind ViewModel.SetRingerModeCommand}"
+                                        CommandParameter="0">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xE74F;" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                    </MenuFlyout>
+                                </Button.Flyout>
+                            </Button>
+
+                            <!--  Screen Mirror Button  -->
+                            <Button
+                                Grid.Column="3"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Command="{x:Bind ViewModel.ToggleScreenMirrorCommand}"
+                                Padding="5">
+                                <FontIcon Glyph="&#xEC15;" />
+                            </Button>
+                            
+                            <!-- Battery status -->
                             <StackPanel
                                 Orientation="Horizontal"
                                 Spacing="1"
+                                VerticalAlignment="Center"
                                 Visibility="{x:Bind ViewModel.DeviceStatus.BatteryStatus, Converter={StaticResource NullToVisibilityConverter}, Mode=OneWay}">
+                                <FontIcon Margin="0,0,4,0" Glyph="{x:Bind ViewModel.DeviceStatus, Converter={StaticResource BatteryStatusToIconConverter}, Mode=OneWay}" />
                                 <TextBlock FontWeight="SemiBold" Text="{x:Bind ViewModel.DeviceStatus.BatteryStatus, Mode=OneWay}" />
                                 <TextBlock FontWeight="SemiBold" Text="%" />
                             </StackPanel>
                         </StackPanel>
+                        
+                        <!--  Connection Status Card  -->
                         <Grid Padding="0,0,20,0" Visibility="{x:Bind ViewModel.DeviceInfo.Name, Converter={StaticResource NullToVisibilityConverter}, Mode=OneWay}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-
-                            <!--  Connection Status Card  -->
                             <Button
                                 Grid.Column="0"
                                 HorizontalAlignment="Left"
@@ -153,9 +216,6 @@
                         </Grid>
                     </StackPanel>
                 </Grid>
-
-
-
 
                 <!--  Separator  -->
                 <Rectangle
@@ -271,11 +331,27 @@
                                                             <Button.Flyout>
                                                                 <MenuFlyout Closed="MoreButtonFlyoutClosed" Placement="BottomEdgeAlignedLeft">
                                                                     <MenuFlyoutItem
+                                                                        Click="OpenAppClick"
+                                                                        Tag="{x:Bind}"
+                                                                        Text="{helpers:ResourceString Name=OpenApp}">
+                                                                        <MenuFlyoutItem.Icon>
+                                                                            <FontIcon Glyph="&#xED35;" />
+                                                                        </MenuFlyoutItem.Icon>
+                                                                    </MenuFlyoutItem>
+                                                                    <MenuFlyoutItem
                                                                         Click="OnNotificationFilterClick"
                                                                         Tag="{x:Bind AppPackage}"
                                                                         Text="{x:Bind FlyoutFilterString}">
                                                                         <MenuFlyoutItem.Icon>
                                                                             <FontIcon Glyph="&#xECE4;" />
+                                                                        </MenuFlyoutItem.Icon>
+                                                                    </MenuFlyoutItem>
+                                                                    <MenuFlyoutItem
+                                                                        Click="OnNotificationPinClick"  
+                                                                        Tag="{x:Bind Key}"
+                                                                        Text="{x:Bind IsPinned, Converter={StaticResource PinConverter}}">
+                                                                        <MenuFlyoutItem.Icon>
+                                                                            <FontIcon Glyph="{x:Bind IsPinned, Converter={StaticResource PinIconConverter}}" />
                                                                         </MenuFlyoutItem.Icon>
                                                                     </MenuFlyoutItem>
                                                                 </MenuFlyout>
@@ -292,6 +368,16 @@
                                                             Opacity="0"
                                                             Style="{StaticResource AlternateCloseButtonStyle}"
                                                             Tag="{x:Bind Key}" />
+                                                        <SymbolIcon 
+                                                            x:Name="PinIcon" 
+                                                            Symbol="Pin" 
+                                                            Tag="{x:Bind IsPinned}" 
+                                                            Visibility="{x:Bind IsPinned, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                            RenderTransformOrigin="0.5,0.5">
+                                                            <SymbolIcon.RenderTransform>
+                                                                <ScaleTransform ScaleX="0.7" ScaleY="0.7"/>
+                                                            </SymbolIcon.RenderTransform>
+                                                        </SymbolIcon>
                                                         <TextBlock
                                                             x:Name="TimeStampTextBlock"
                                                             Grid.Column="1"
@@ -302,7 +388,6 @@
                                                             Visibility="Visible" />
                                                     </StackPanel>
                                                 </Grid>
-
 
                                                 <TextBlock
                                                     x:Name="TitleTextBlock"
@@ -441,8 +526,23 @@
                     SelectionChanged="NavigationView_SelectionChanged">
                     <NavigationView.MenuItems>
                         <NavigationViewItem
-                            Content="{helpers:ResourceString Name=Settings}"
+                            Content="{helpers:ResourceString Name=Messages}"
                             IsSelected="True"
+                            Tag="Messages">
+                            <NavigationViewItem.Icon>
+                                <FontIcon Glyph="&#xE8BD;" />
+                            </NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem
+                            Content="{helpers:ResourceString Name=Apps}"
+                            Tag="Apps">
+                            <NavigationViewItem.Icon>
+                                <FontIcon Glyph="&#xED35;" />
+                            </NavigationViewItem.Icon>
+                        </NavigationViewItem>
+
+                        <NavigationViewItem
+                            Content="{helpers:ResourceString Name=Settings}"
                             Tag="Settings">
                             <NavigationViewItem.Icon>
                                 <AnimatedIcon>

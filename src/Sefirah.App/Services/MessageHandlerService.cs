@@ -7,6 +7,7 @@ namespace Sefirah.App.Services;
 public class MessageHandlerService(
     ILogger logger,
     INotificationService notificationService,
+    ISmsHandlerService smsHandlerService,
     IClipboardService clipboardService,
     IPlaybackService playbackService,
     ISftpService sftpService,
@@ -55,6 +56,11 @@ public class MessageHandlerService(
                 case FileTransfer fileTransfer:
                     await fileTransferService.ReceiveFile(fileTransfer);
                     break;
+
+                case TextConversation textConversation:
+                    await smsHandlerService.HandleTextMessage(textConversation);
+                    break;
+                    
 
                 default:
                     logger.Warn("Unknown message type received: {0}", message.GetType().Name);

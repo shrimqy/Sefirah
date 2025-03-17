@@ -15,6 +15,7 @@
 - **File Sharing**: Share files between your devices easily.
 - **Storage Integration**: Integrate your Android storage into the Windows Explorer.
 - **Notification**: Allows toasting the notifications from your android in desktop.
+- **Screen mirroring**: Mirror and control the Android device via scrcpy. 
 
 ## Limitations
 
@@ -42,7 +43,7 @@
 1. **Download and Install the [Android app](https://github.com/shrimqy/Sefirah-Android)**
 
 2. **Setting Up**:
-    - On the Android devicem, allow the necessary permissions on the onboarding page. (**Note:** Allow restricted settings from App Info after attempting to grant notification access or accessibility permission, as Android blocks side-loaded apps from requesting sensitive permissions.)
+    - On the Android device, allow the necessary permissions on the onboarding page. (**Note:** Allow restricted settings from App Info after attempting to grant notification access or accessibility permission, as Android blocks side-loaded apps from requesting sensitive permissions.)
     - Ensure both your Android device and Windows PC are connected to the same network.
     - Launch the app on your Windows PC and wait for the devices to show up on both.
     - Initiate the connection on your Android device using either manual connect or auto connect. Manual connect is faster, while auto connect takes a bit more time to determine which IP address works for you.
@@ -55,12 +56,25 @@
 4. **File Transfer**:
     - Use the share sheet on your Android or Windows device and select the app to share files between the devices.
 5. **Windows Explorer Storage**:
-   - You would need Android 11 or higher for this to work, I will try to add support for others in a later version.
-   - This feature may cause some crashes as this is a bit experimental, but should work stable enough for most cases.
+   - You would need Android 11 or higher
+   - **Note:** This feature is still a bit experimental and may not work on all Windows versions especially older versions of Windows 10 and other unofficial debloated Windows 11 versions. 
+   - **WARNING**: DO NOT set the remote storage location to a pre-existing folder as it will delete the contents of that folder.
 
-     
 ## Screenshots
 
 <p align="center">
   <img alt="Files hero image" src="./.github/readme-images/Screenshot.png" />
 </p>
+
+## Contribute
+
+Feel free to open an issue if you want to report a bug, provide feedback, or ask a question. Pull requests are very welcome!
+
+If you have any specific questions or need further details, please reach out to me on [the Discord server](https://discord.gg/MuvMqv4MES) or by email—I would be happy to help.
+
+If you would like to translate the project into your language, you can find it on [Crowdin](https://crowdin.com/project/sefirah)
+
+## Thanks
+
+I would like to express my thanks to [@PrimalZed](https://github.com/PrimalZed) for his work on [CloudSync](https://github.com/PrimalZed/CloudSync). 
+

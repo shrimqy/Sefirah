@@ -20,10 +20,6 @@ namespace Sefirah.App.Helpers;
 /// </summary>
 public static class AppLifecycleHelper
 {
-    internal static void CloseApp()
-    {
-        MainWindow.Instance.Close();
-    }
 
     /// <summary>
     /// Gets application package version.
@@ -53,6 +49,9 @@ public static class AppLifecycleHelper
         await playbackService.InitializeAsync();
         mdnsService.StartDiscovery();
         toastNotificationService.RegisterNotification();
+
+        var adbService = Ioc.Default.GetRequiredService<IAdbService>();
+        await adbService.StartAsync();
     }
 
 
@@ -80,7 +79,7 @@ public static class AppLifecycleHelper
                 .AddSingleton<ShellRegistrar>()
                 .AddHostedService<ShellWorker>()
 
-                .AddHostedService<SyncProviderWorker>()
+                .AddSingleton<SyncProviderWorker>()
                 .AddSingleton<ISftpService, SftpService>()
 
                 // Database
@@ -88,27 +87,31 @@ public static class AppLifecycleHelper
                 .AddSingleton<IRemoteAppsRepository, RemoteAppsRepository>()
                 .AddSingleton<DeviceRepository>()
 
+                .AddSingleton<IAdbService, AdbService>()
 
                 // Services
                 .AddSingleton<IDeviceManager, DeviceManager>()
                 .AddSingleton<IDiscoveryService, DiscoveryService>()
                 .AddSingleton<INetworkService, NetworkService>()
+                .AddSingleton<IScreenMirrorService, ScreenMirrorService>()
                 .AddSingleton(sp => (ITcpServerProvider)sp.GetRequiredService<INetworkService>())
                 .AddSingleton(sp => (ISessionManager)sp.GetRequiredService<INetworkService>())
                 .AddSingleton<IFileTransferService, FileTransferService>()
                 .AddSingleton(sp => (ITcpClientProvider)sp.GetRequiredService<IFileTransferService>())
                 .AddSingleton<IMdnsService, MdnsService>()
+                .AddSingleton<ISmsHandlerService, SmsHandlerService>()
                 .AddSingleton<IClipboardService, ClipboardService>()
                 .AddSingleton<IPlaybackService, PlaybackService>()
                 .AddSingleton<INotificationService, NotificationService>()
                 .AddSingleton<ToastNotificationService>()
-
                 .AddScoped<IMessageHandlerService, MessageHandlerService>()
                 .AddSingleton<Func<IMessageHandlerService>>(sp => () => sp.GetRequiredService<IMessageHandlerService>())
 
                 // ViewModels
                 .AddSingleton<MainPageViewModel>()
                 .AddSingleton<DevicesViewModel>()
+                .AddSingleton<MessagesViewModel>()
+                .AddSingleton<AppsViewModel>()
             ).Build();
     }
 
@@ -117,11 +120,7 @@ public static class AppLifecycleHelper
     /// </summary>
     public static void HandleAppUnhandledException(Exception? ex)
     {
-        var logger = Ioc.Default.GetRequiredService<Common.Utils.ILogger>();
-        if (ex is not null)
-        {
-            logger.Error("Unhandled exception occurred", ex);
-        }
+        Ioc.Default.GetService<Common.Utils.ILogger>()?.Fatal("Unhandled exception", ex);
     }
 
 

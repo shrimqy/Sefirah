@@ -1,17 +1,60 @@
+using Microsoft.UI;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Imaging;
+using Microsoft.Win32;
 using System.Diagnostics;
+using System.Runtime;
+using Windows.UI.ViewManagement;
 
 namespace Sefirah.App.UserControls;
 
 [ObservableObject]
 public sealed partial class TrayIconControl : UserControl
 {
-    [ObservableProperty]
-    private bool _isWindowVisible;
+    private readonly UISettings uiSettings = new();
 
     public TrayIconControl()
     {
         this.InitializeComponent();
+        
+        // Set initial icon
+        UpdateTrayIcon(uiSettings, null);
+        
+        // Monitor system theme changes
+        uiSettings.ColorValuesChanged += UpdateTrayIcon;
+    }
+
+    private void UpdateTrayIcon(UISettings sender, object args)
+    {
+        try
+        {
+            var iconPath = sender.GetColorValue(UIColorType.Background) == Colors.Black
+                ? "ms-appx:///Assets/Icons/SefirahDark.ico"
+                : "ms-appx:///Assets/Icons/SefirahLight.ico";
+
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                try
+                {
+                    var imageSource = new BitmapImage
+                    {
+                        UriSource = new Uri(iconPath)
+                    };
+                    TrayIcon.IconSource = imageSource;
+                }
+                catch (Exception ex)
+                {
+                    // Log or handle the image loading error
+                    Debug.WriteLine($"Failed to load tray icon: {ex.Message}");
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            // Log or handle the theme detection error
+            Debug.WriteLine($"Failed to detect theme: {ex.Message}");
+        }
     }
 
     [RelayCommand]
@@ -33,12 +76,14 @@ public sealed partial class TrayIconControl : UserControl
             window.Activate();
             window.AppWindow.Show();
         }
-        IsWindowVisible = window.Visible;
     }
 
     [RelayCommand]
     public void ExitApplication()
     {
+        // Cleanup
+        uiSettings.ColorValuesChanged -= UpdateTrayIcon;
+        
         App.HandleClosedEvents = false;
         TrayIcon.Dispose();
        

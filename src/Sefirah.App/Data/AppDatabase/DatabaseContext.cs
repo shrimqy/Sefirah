@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using Windows.Storage;
 using static Sefirah.App.Constants;
+using Sefirah.App.Data.AppDatabase.Migrations;
 
 namespace Sefirah.App.Data.AppDatabase;
 public class DatabaseContext(ILogger logger) : IDisposable
@@ -18,6 +19,11 @@ public class DatabaseContext(ILogger logger) : IDisposable
             // Create tables
             using var command = _connection.CreateCommand();
             command.CommandText = @"
+                CREATE TABLE IF NOT EXISTS Version (
+                    Version INTEGER PRIMARY KEY,
+                    AppliedOn DATETIME NOT NULL
+                );
+
                 CREATE TABLE IF NOT EXISTS ApplicationInfo (
                     AppPackage NVARCHAR(2048) PRIMARY KEY,
                     AppName NVARCHAR(2048),
@@ -28,9 +34,11 @@ public class DatabaseContext(ILogger logger) : IDisposable
                 CREATE TABLE IF NOT EXISTS RemoteDevice (
                     DeviceId NVARCHAR(128) PRIMARY KEY,
                     DeviceName NVARCHAR(2048) NOT NULL,
+                    IpAddresses NVARCHAR(2048),
                     LastConnected DATETIME,
                     SharedSecret BLOB,
-                    WallpaperBytes BLOB
+                    WallpaperBytes BLOB,
+                    PhoneNumbers NVARCHAR(2048)
                 );
 
                 CREATE TABLE IF NOT EXISTS LocalDevice (
@@ -41,6 +49,8 @@ public class DatabaseContext(ILogger logger) : IDisposable
                 );";
 
             await command.ExecuteNonQueryAsync();
+
+            await RunMigrationsAsync();
             logger.Info("Database initialized successfully");
         }
         catch (Exception ex)
@@ -48,6 +58,52 @@ public class DatabaseContext(ILogger logger) : IDisposable
             logger.Error("Failed to initialize database", ex);
             throw;
         }
+    }
+
+    private async Task RunMigrationsAsync()
+    {
+        try
+        {
+            // Get current schema version
+            int currentVersion = 0;
+            using (var versionCommand = _connection.CreateCommand())
+            {
+                versionCommand.CommandText = "SELECT MAX(Version) FROM Version";
+                var result = await versionCommand.ExecuteScalarAsync();
+                if (result != null && result != DBNull.Value)
+                {
+                    currentVersion = Convert.ToInt32(result);
+                }
+            }
+
+            // Apply migrations in order based on current version
+            var migrations = GetMigrations();
+            foreach (var migration in migrations.Where(m => m.Version > currentVersion).OrderBy(m => m.Version))
+            {
+                await migration.UpAsync(_connection);
+
+                // Record that migration was applied
+                using var insertVersionCommand = _connection.CreateCommand();
+                insertVersionCommand.CommandText = "INSERT INTO Version (Version, AppliedOn) VALUES (@Version, @AppliedOn)";
+                insertVersionCommand.Parameters.AddWithValue("@Version", migration.Version);
+                insertVersionCommand.Parameters.AddWithValue("@AppliedOn", DateTime.UtcNow);
+                await insertVersionCommand.ExecuteNonQueryAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Failed to run migrations", ex);
+            throw;
+        }
+    }
+
+    private static List<IMigration> GetMigrations()
+    {
+        return
+        [
+            new Migration_001_AddIpAddressesColumn(),
+            new Migration_002_AddPhoneNumbersColumn(),
+        ];
     }
 
     public async Task<SqliteConnection> GetConnectionAsync()
@@ -73,5 +129,6 @@ public class DatabaseContext(ILogger logger) : IDisposable
     public void Dispose()
     {
         _connection?.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

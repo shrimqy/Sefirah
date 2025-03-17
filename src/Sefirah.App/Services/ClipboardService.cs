@@ -64,7 +64,7 @@ public class ClipboardService : IClipboardService
                 var dataPackageView = Clipboard.GetContent();
                 if (dataPackageView == null) return;
 
-                logger.Debug($"Clipboard content changed: {string.Join(", ", dataPackageView.AvailableFormats)}");
+                logger.Info($"Clipboard content changed: {string.Join(", ", dataPackageView.AvailableFormats)}");
                 if (dataPackageView.Contains(StandardDataFormats.Text))
                 {
                     await TryHandleTextContent(dataPackageView);

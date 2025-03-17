@@ -7,6 +7,8 @@ using Sefirah.App.Data.Models;
 using Sefirah.App.Extensions;
 using Sefirah.App.Utils.Serialization;
 using System.Windows.Input;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
 
 namespace Sefirah.App.ViewModels;
 
@@ -16,6 +18,8 @@ public sealed class MainPageViewModel : BaseViewModel
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
     private IRemoteAppsRepository remoteAppsRepository { get; } = Ioc.Default.GetRequiredService<IRemoteAppsRepository>();
     private INotificationService NotificationService { get; } = Ioc.Default.GetRequiredService<INotificationService>();
+
+    private IScreenMirrorService ScreenMirrorService { get; } = Ioc.Default.GetRequiredService<IScreenMirrorService>();
 
     private RemoteDeviceEntity? _deviceInfo = new();
     private DeviceStatus _deviceStatus = new();
@@ -53,7 +57,8 @@ public sealed class MainPageViewModel : BaseViewModel
     public ICommand ClearAllNotificationsCommand { get; }
     public ICommand NotificationActionCommand { get; }
     public ICommand NotificationReplyCommand { get; }
-
+    public ICommand SetRingerModeCommand { get; }
+    public ICommand ToggleScreenMirrorCommand { get; }
     public MainPageViewModel()
     {
         try
@@ -63,6 +68,8 @@ public sealed class MainPageViewModel : BaseViewModel
             ClearAllNotificationsCommand = new RelayCommand(ClearAllNotifications);
             NotificationActionCommand = new RelayCommand<NotificationAction>(HandleNotificationAction);
             NotificationReplyCommand = new RelayCommand<(Notification, string)>(HandleNotificationReply);
+            SetRingerModeCommand = new RelayCommand<string>(SetRingerMode);
+            ToggleScreenMirrorCommand = new RelayCommand(ToggleScreenMirror);
             getLastConnectedDevice();
 
             // Subscribe to device events
@@ -86,12 +93,10 @@ public sealed class MainPageViewModel : BaseViewModel
                 await NotificationService.ClearHistory();
             }
 
-            // Update connection status and device info
             ConnectionStatus = args.IsConnected;
             
             if (args.Device != null)
             {
-                // Ensure the new device has its image loaded
                 if (args.Device.WallpaperBytes != null && args.Device.WallpaperImage == null)
                 {
                     args.Device.WallpaperImage = await args.Device.WallpaperBytes.ToBitmapAsync();
@@ -103,6 +108,52 @@ public sealed class MainPageViewModel : BaseViewModel
                 DeviceInfo = null;
             }
         });
+    }
+
+    private async void ToggleScreenMirror()
+    {
+        var argsTextBox = new TextBox
+        {
+            PlaceholderText = "Enter command arguments",
+            AcceptsReturn = false,
+            Width = 300,
+            Margin = new Thickness(0, 10, 0, 0)
+        };
+        
+        var panel = new StackPanel();
+        panel.Children.Add(argsTextBox);
+        
+        var dialog = new ContentDialog
+        {
+            XamlRoot = MainWindow.Instance.Content.XamlRoot,
+            Title = "scrcpy",
+            Content = panel,
+            PrimaryButtonText = "Start",
+            CloseButtonText = "Cancel"
+        };
+        
+        var result = await dialog.ShowAsync();
+        
+        if (result == ContentDialogResult.Primary)
+        {
+            string args = argsTextBox.Text?.Trim() ?? string.Empty;
+            await ScreenMirrorService.StartScrcpy(customArgs: args);
+        }
+    }
+
+    public async Task OpenApp(Notification notification)
+    {
+        var notificationToInvoke = new NotificationMessage
+        {
+            NotificationType = NotificationType.Invoke,
+            NotificationKey = notification.Key,
+        };
+        
+        await ScreenMirrorService.StartScrcpy(customArgs: $"--new-display --start-app={notification.AppPackage}");
+        // Scrcpy doesn't have a way of opening notifications afaik, so we will just have the notification listener on Android to open it for us
+        // Plus we have to wait (3s will do?) until the app is actually launched to send the intent for launching the notification since Google added a lot more restrictions in this particular case
+        await Task.Delay(3000);
+        SessionManager.SendMessage(SocketMessageSerializer.Serialize(notificationToInvoke));
     }
 
     private async void getLastConnectedDevice()
@@ -137,7 +188,7 @@ public sealed class MainPageViewModel : BaseViewModel
     {
         if (ConnectionStatus)
         {
-            var message = new Misc { MiscType = nameof(MiscType.Disconnect) };
+            var message = new Misc { MiscType = MiscType.Disconnect };
             SessionManager.SendMessage(SocketMessageSerializer.Serialize(message));
             await Task.Delay(50);
             SessionManager.DisconnectSession();
@@ -147,6 +198,11 @@ public sealed class MainPageViewModel : BaseViewModel
     public async Task UpdateNotificationFilterAsync(string appPackageName, NotificationFilter filter)
     {
         await remoteAppsRepository.UpdateFilterAsync(appPackageName, filter);
+    }
+
+    public async Task PinNotificationAsync(string notificationKey)
+    {
+        await NotificationService.TogglePinNotification(notificationKey);
     }
 
     private void OnDeviceStatusReceived(object? sender, DeviceStatus deviceStatus)
@@ -176,5 +232,14 @@ public sealed class MainPageViewModel : BaseViewModel
     {
         var (message, replyText) = reply;
         NotificationService.ProcessReplyAction(message.Key, message.ReplyResultKey!, replyText);
+    }
+
+    private void SetRingerMode(string? modeStr)
+    {
+        if (int.TryParse(modeStr, out int mode))
+        {
+            var message = new DeviceRingerMode { RingerMode = mode };
+            SessionManager.SendMessage(SocketMessageSerializer.Serialize(message));
+        }
     }
 }

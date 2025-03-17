@@ -67,7 +67,6 @@ public sealed class SyncRootConnector(
 
         var clientDirectory = Path.Join(callbackInfo.VolumeDosName, callbackInfo.NormalizedPath[1..]);
         var relativeDirectory = PathMapper.GetRelativePath(clientDirectory, _rootDirectory);
-        
         try
         {
             var fileInfos = remoteService.EnumerateFiles(relativeDirectory, callbackParameters.FetchPlaceholders.Pattern);
@@ -80,6 +79,65 @@ public sealed class SyncRootConnector(
         catch (Exception ex)
         {
             logger.Error("Error transferring placeholders", ex);
+        }
+    }
+    
+    // Right now it just deletes the placeholders which was deleted in remote
+    public void UpdatePlaceholders(string clientDirectory)
+    {
+        if (!Directory.Exists(clientDirectory))
+            return;
+
+        foreach (var clientFile in Directory.GetFiles(clientDirectory))
+        {
+            var clientRelativePath = PathMapper.GetRelativePath(clientFile, _rootDirectory);
+            if (!remoteService.Exists(clientRelativePath))
+            {
+                logger.Info("Deleting local file (not on remote): {path}", clientRelativePath);
+                try
+                {
+                    File.Delete(clientFile);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Failed to delete local file {path}: {error}", clientRelativePath, ex.Message);
+                }
+            }            
+        }
+
+        // Check and delete directories recursively
+        foreach (var clientDir in Directory.GetDirectories(clientDirectory))
+        {
+            // Skip system directories
+            if (FileHelper.IsSystemDirectory(Path.GetFileName(clientDir)))
+                continue;
+                
+            var clientRelativePath = PathMapper.GetRelativePath(clientDir, _rootDirectory);
+            
+            if (!remoteService.Exists(clientRelativePath))
+            {
+                logger.Info("Deleting local directory (not on remote): {path}", clientRelativePath);
+                try
+                {
+                    Directory.Delete(clientDir, recursive: true);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Failed to delete local directory {path}: {error}", clientRelativePath, ex.Message);
+                }
+            }
+            else
+            {
+                //  recursively check hydrated directories
+                var attributes = File.GetAttributes(clientDir);
+                bool isHydrated = !attributes.HasFlag(FileAttributes.Offline);
+                
+                if (isHydrated)
+                {
+                    // Directory exists remotely and is hydrated, check its contents recursively
+                    UpdatePlaceholders(clientDir);
+                }
+            }
         }
     }
 

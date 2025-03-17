@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using Sefirah.App.RemoteStorage.Helpers;
+﻿using Sefirah.App.RemoteStorage.Helpers;
+using Sefirah.Common.Utils;
 using System.Collections.Concurrent;
 
 namespace Sefirah.App.RemoteStorage.Worker;
-public sealed class FileLocker(ILogger<FileLocker> logger) : IDisposable
+public sealed class FileLocker(ILogger logger) : IDisposable
 {
     private readonly Dictionary<string, SemaphoreQueue> _lockers = [];
 
@@ -33,7 +33,7 @@ public sealed class FileLocker(ILogger<FileLocker> logger) : IDisposable
         {
             if (!_lockers.TryGetValue(relativePath, out var semaphore))
             {
-                logger.LogWarning("Could not find semaphore for {relativePath}", relativePath);
+                logger.Warn("Could not find semaphore for {relativePath}", relativePath);
                 return;
             }
             var freed = semaphore.Release();

@@ -8,4 +8,9 @@ public interface ISftpService
     /// Initializes the sftp service with the server information and shell services.
     /// </summary>
     Task InitializeAsync(SftpServerInfo info);
+
+    /// <summary>
+    /// Removes the sync root.
+    /// </summary>
+    void RemoveSyncRoot(string deviceId);
 }

@@ -10,22 +10,15 @@
     xmlns:tb="using:H.NotifyIcon"
     mc:Ignorable="d">
 
-    <UserControl.Resources>
-        <converters:BoolToImageSourceConverter
-            x:Key="BoolToImageSourceConverter"
-            FalseImage="ms-appx:///Assets/Icons/SefirahDark.ico"
-            TrueImage="ms-appx:///Assets/Icons/SefirahLight.ico" />
-    </UserControl.Resources>
     <tb:TaskbarIcon
         x:Name="TrayIcon"
         x:FieldModifier="public"
         ContextMenuMode="SecondWindow"
-        IconSource="{x:Bind IsWindowVisible, Converter={StaticResource BoolToImageSourceConverter}}"
         LeftClickCommand="{x:Bind ShowHideWindowCommand}"
         NoLeftClickDelay="True"
         ToolTipText="Sefirah">
         <tb:TaskbarIcon.ContextFlyout>
-            <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+            <MenuFlyout AreOpenCloseAnimationsEnabled="True">
                 <MenuFlyoutItem Command="{x:Bind ShowHideWindowCommand}" Text="{helpers:ResourceString Name=ShowHideWindow}" />
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem Command="{x:Bind ExitApplicationCommand}" Text="{helpers:ResourceString Name=Exit}" />

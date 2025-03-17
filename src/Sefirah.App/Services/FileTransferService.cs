@@ -40,6 +40,8 @@ public class FileTransferService(
     
     public event EventHandler<StorageFile>? FileReceived;
 
+    private readonly IEnumerable<int> PORT_RANGE = Enumerable.Range(5152, 18);
+
     public async Task ReceiveBulkFiles(BulkFileTransfer bulkFile)
     {
         // TODO : Implement bulk file transfer
@@ -421,24 +423,41 @@ public class FileTransferService(
         }
 
         var certificate = await CertificateHelper.GetOrCreateCertificateAsync();
-        var port = await NetworkHelper.FindAvailablePortAsync(9040);
         var context = new SslContext(SslProtocols.Tls12, certificate);
-        server = new Server(context, IPAddress.Any, port, this, logger)
+        
+        // Try each port in the range
+        foreach (int port in PORT_RANGE)
         {
-            OptionDualMode = true,
-            OptionReuseAddress = true
-        };
-        server.Start();
+            try
+            {
+                server = new Server(context, IPAddress.Any, port, this, logger)
+                {
+                    OptionDualMode = true,
+                    OptionReuseAddress = true
+                };
+                server.Start();
+                
+                // Server started successfully
+                serverInfo = new ServerInfo
+                {
+                    Port = port,
+                    Password = EcdhHelper.GenerateRandomPassword()
+                };
 
-        serverInfo = new ServerInfo
-        {
-            Port = port,
-            Password = EcdhHelper.GenerateRandomPassword()
-        };
-
-        logger.Info($"File transfer server initialized at {serverInfo.IpAddress}:{serverInfo.Port}");
-
-        return serverInfo;
+                logger.Info($"File transfer server initialized at {serverInfo.IpAddress}:{serverInfo.Port}");
+                return serverInfo;
+            }
+            catch (Exception ex)
+            {
+                // Log the error and try the next port
+                logger.Debug($"Failed to start server on port {port}: {ex.Message}");
+                
+                // Clean up failed server instance
+                server?.Dispose();
+                server = null;
+            }
+        }
+        throw new IOException("Failed to start file transfer server: all ports in range are unavailable");
     }
 
     private void CleanupServer()

@@ -14,6 +14,7 @@ namespace Sefirah.App.Services;
 public class DeviceManager(DeviceRepository repository, ILogger logger) : IDeviceManager
 {
     public event EventHandler<DeviceStatus>? DeviceStatusChanged;
+    public event EventHandler<RemoteDeviceEntity>? DeviceAdded;
     public DeviceStatus? CurrentDeviceStatus { get; private set; }
 
     public async Task<List<RemoteDeviceEntity>> GetDeviceListAsync()
@@ -44,30 +45,44 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
         await repository.AddOrUpdateAsync(device);
     }
 
-    public async Task<RemoteDeviceEntity?> VerifyDevice(DeviceInfo device)
+    public async Task<RemoteDeviceEntity?> VerifyDevice(DeviceInfo device, string? ipAddress)
     {
         try
         {
 
             var localDevice = await GetLocalDeviceAsync();
-
-
             var existingDevice = await repository.GetByIdAsync(device.DeviceId);
 
             // If device exists and we've already verified it before, validate the proof
             if (existingDevice != null)
             {
-                
                 if (!EcdhHelper.VerifyProof(existingDevice.SharedSecret!, device.Nonce!, device.Proof!)) { return null; }
 
+                // Update device info
                 existingDevice.LastConnected = DateTime.Now;
-                
+                existingDevice.Name = device.DeviceName;
                 if (!string.IsNullOrEmpty(device.Avatar))
                 {
                     existingDevice.WallpaperBytes = Convert.FromBase64String(device.Avatar);
                 }
 
-                return await repository.AddOrUpdateAsync(existingDevice);
+                if (ipAddress != null && existingDevice.IpAddresses?.Contains(ipAddress) == false)
+                {
+                    existingDevice.IpAddresses?.Add(ipAddress);
+                }
+
+                if (device.PhoneNumbers != null && existingDevice.PhoneNumbers?.Count != device.PhoneNumbers.Count)
+                {
+                    existingDevice.PhoneNumbers = device.PhoneNumbers ?? [];
+                }
+
+                var savedDevice = await repository.AddOrUpdateAsync(existingDevice);
+                if (savedDevice != null)
+                {
+                    DeviceAdded?.Invoke(this, existingDevice);
+                }
+                logger.Info($"Device verified: {string.Join(", ", savedDevice.IpAddresses)}");
+                return savedDevice;
             }
 
             // For new devices, show connection request dialog
@@ -104,10 +119,16 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
                         SharedSecret = sharedSecret,
                         WallpaperBytes = !string.IsNullOrEmpty(device.Avatar) 
                             ? Convert.FromBase64String(device.Avatar) 
-                            : null
+                            : null,
+                        IpAddresses = ipAddress != null ? [ipAddress] : [],
+                        PhoneNumbers = device.PhoneNumbers ?? []
                     };
 
                     var savedDevice = await repository.AddOrUpdateAsync(newDevice);
+                    if (savedDevice != null)
+                    {
+                        DeviceAdded?.Invoke(this, savedDevice);
+                    }
                     tcs.SetResult(savedDevice);
                 }
                 catch (Exception ex)
@@ -188,5 +209,10 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
             logger.Error("Error retrieving shared secret for last connected device", ex);
             return null;
         }
+    }
+
+    public async Task<ObservableCollection<PhoneNumber>> GetLastConnectedDevicePhoneNumbersAsync()
+    {
+        return await repository.GetLastConnectedDevicePhoneNumbersAsync();
     }
 }

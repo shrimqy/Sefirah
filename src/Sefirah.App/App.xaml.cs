@@ -67,17 +67,16 @@ public partial class App : Application
 
                 switch (startupOption)
                 {
+                    case StartupOptions.InTray:
+                        // Don't activate
+                        break;
                     case StartupOptions.Minimized:
                         MainWindow.Instance.Activate();
                         MainWindow.Instance.WindowState = WindowState.Minimized;
                         break;
-                    case StartupOptions.InTray:
-                        // Don't activate
-                        break;
                     default:
                         MainWindow.Instance.Activate();
                         MainWindow.Instance.AppWindow.Show();
-                        MainWindow.Instance.WindowState = WindowState.Maximized;
                         break;
                 }
             }
@@ -88,7 +87,6 @@ public partial class App : Application
                 {
                     MainWindow.Instance.Activate();
                     MainWindow.Instance.AppWindow.Show();
-                    MainWindow.Instance.WindowState = WindowState.Maximized;
                 }
             }
 
@@ -165,7 +163,7 @@ public partial class App : Application
 #if DEBUG
             .Verbose()
 #else
-			.Verbose()
+			.Debug()
 #endif
             .WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day)
             .WriteTo.Debug()

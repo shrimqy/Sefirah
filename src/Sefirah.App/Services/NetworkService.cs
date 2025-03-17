@@ -17,12 +17,14 @@ public class NetworkService(
     Func<IMessageHandlerService> messageHandlerFactory,
     IDeviceManager deviceManager,
     IDiscoveryService discoveryService,
+    IAdbService adbService,
     ILogger logger) : INetworkService, ITcpServerProvider, ISessionManager, IDisposable
 {
     private readonly Lazy<IMessageHandlerService> messageHandler = new(messageHandlerFactory);
     private Server? server;
     private bool isRunning;
     private int port;
+    private readonly IEnumerable<int> PORT_RANGE = Enumerable.Range(5150, 20); // 5150 to 5169
     private ServerSession? currentSession;
     private bool disposed;
     private X509Certificate2? certificate;
@@ -31,9 +33,13 @@ public class NetworkService(
     private bool isFirstMessage = true;
     private bool isVerified;
 
+    private RemoteDeviceEntity? currentlyConnectedDevice;
+
     public event EventHandler<ConnectedSessionEventArgs>? ClientConnectionStatusChanged;
 
-    public bool IsConnected() => currentSession != null;
+    public RemoteDeviceEntity? GetCurrentlyConnectedDevice() => currentlyConnectedDevice;
+
+    public bool IsConnected() => currentlyConnectedDevice != null;
 
     /// <inheritdoc/>
     public async Task<bool> StartServerAsync()
@@ -46,16 +52,28 @@ public class NetworkService(
         try
         {
 
-            port = await NetworkHelper.FindAvailablePortAsync(5941);
             certificate = await CertificateHelper.GetOrCreateCertificateAsync();
 
             var context = new SslContext(SslProtocols.Tls12, certificate);
 
-            server = new Server(context, IPAddress.Any, port, this, logger)
+            foreach (int port in PORT_RANGE)
             {
-                OptionDualMode = true,
-                OptionReuseAddress = true,
-            };
+                try
+                {                     
+                    server = new Server(context, IPAddress.Any, port, this, logger)
+                    {
+                        OptionDualMode = true,
+                        OptionReuseAddress = true,
+                    };
+                    this.port = port;
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Error starting server", ex);
+                    server = null;
+                }
+            }   
 
             if (server != null)
             {
@@ -166,6 +184,7 @@ public class NetworkService(
                 logger.Debug($"Non-critical error during session disconnect: {ex.Message}");
             }
             currentSession = null;
+            currentlyConnectedDevice = null;
 
             if (removeSession)
             {
@@ -266,18 +285,25 @@ public class NetworkService(
                 return;
             }
 
-            var device = await deviceManager.VerifyDevice(deviceInfo);
+            var ipAddress = session.Socket.RemoteEndPoint?.ToString()?.Split(':')[0];
+            logger.Info($"Received connection from {ipAddress}");
+
+            var device = await deviceManager.VerifyDevice(deviceInfo, ipAddress);
 
             if (device != null)
             {
                 isFirstMessage = false;
                 isVerified = true;
                 currentSession = session;
+                if (!string.IsNullOrEmpty(ipAddress))
+                    adbService.ConnectWireless(ipAddress);
                 await SendDeviceInfo(deviceInfo.PublicKey!);
                 NotifyClientConnectionChanged(device);
             }
             else
             {
+                SendMessage("Rejected");
+                await Task.Delay(50);
                 logger.Info("Device verification failed or was declined");
                 DisconnectSession();
             }
@@ -318,6 +344,7 @@ public class NetworkService(
             SessionId = currentSession?.Id.ToString(),
             IsConnected = true
         };
+        currentlyConnectedDevice = device;
         ClientConnectionStatusChanged?.Invoke(this, args);
     }
 
@@ -325,7 +352,7 @@ public class NetworkService(
     {
         try
         {
-            logger.Debug($"Processing individual message: {(message.Length > 100 ? string.Concat(message.AsSpan(0, Math.Min(100, message.Length)), "...") : message)}");
+            logger.Debug($"Processing message: {(message.Length > 100 ? string.Concat(message.AsSpan(0, Math.Min(100, message.Length)), "...") : message)}");
             var socketMessage = SocketMessageSerializer.DeserializeMessage(message);
             if (socketMessage != null)
                 await messageHandler.Value.HandleJsonMessage(socketMessage);
@@ -340,4 +367,5 @@ public class NetworkService(
     {
         DisconnectSession();
     }
+
 }

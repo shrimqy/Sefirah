@@ -3,6 +3,7 @@ using Sefirah.App.RemoteStorage.Helpers;
 using Sefirah.App.RemoteStorage.Interop;
 using Sefirah.App.RemoteStorage.RemoteAbstractions;
 using Sefirah.Common.Utils;
+using System.ComponentModel;
 using Vanara.PInvoke;
 using static Vanara.PInvoke.Shell32;
 
@@ -84,12 +85,6 @@ public class PlaceholdersService(
         var fileInfo = remoteService.GetFileInfo(relativeFile);
         var parentPath = Path.Join(rootDirectory, fileInfo.RelativeParentDirectory);
 
-        // Ensure parent directory exists first
-        if (!Directory.Exists(parentPath))
-        {
-            await CreateDirectory(fileInfo.RelativeParentDirectory);
-        }
-
         using var createInfo = new SafeCreateInfo(fileInfo, fileInfo.RelativePath);
         CldApi.CfCreatePlaceholders(
             parentPath,
@@ -98,34 +93,44 @@ public class PlaceholdersService(
             CldApi.CF_CREATE_FLAGS.CF_CREATE_FLAG_NONE,
             out var entriesProcessed
         ).ThrowIfFailed("Create placeholder failed");
+
+        logger.Info("Created placeholder file for {path}", relativeFile);
     }
 
     public async Task CreateDirectory(string relativeDirectory)
     {
-        // Ensure parent directory exists first
+
         var directoryInfo = remoteService.GetDirectoryInfo(relativeDirectory);
         var parentPath = Path.Join(rootDirectory, directoryInfo.RelativeParentDirectory);
-
-        if (!Directory.Exists(parentPath))
-        {
-            // Recursively create parent directories if needed
-            await CreateDirectory(directoryInfo.RelativeParentDirectory);
-        }
-
         var targetPath = Path.Join(rootDirectory, relativeDirectory);
-        if (!Directory.Exists(targetPath))
+
+        // If it's already a placeholder, just update it
+        if (CloudFilter.IsPlaceholder(targetPath))
         {
-            Directory.CreateDirectory(targetPath);
+            logger.Info("Directory is already a placeholder, updating {path}", relativeDirectory);
+            await UpdateDirectory(relativeDirectory);
+            return;
         }
 
-        using var createInfo = new SafeCreateInfo(directoryInfo, directoryInfo.RelativePath);
-        CldApi.CfCreatePlaceholders(
-            parentPath,
-            [createInfo],
-            1u,
-            CldApi.CF_CREATE_FLAGS.CF_CREATE_FLAG_NONE,
-            out var entriesProcessed
-        ).ThrowIfFailed("Create placeholder failed");
+        try
+        {
+            // Attempt to create the placeholder
+            using var createInfo = new SafeCreateInfo(directoryInfo, directoryInfo.RelativePath, onDemand: false);
+            CldApi.CfCreatePlaceholders(
+                parentPath,
+                [createInfo],
+                1u,
+                CldApi.CF_CREATE_FLAGS.CF_CREATE_FLAG_NONE,
+                out var entriesProcessed
+            ).ThrowIfFailed("Create placeholder failed");
+
+            logger.Info("Created placeholder for {path}", relativeDirectory);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Failed to create placeholder for {path}: {error}", relativeDirectory, ex.Message);
+            throw;
+        }
     }
 
 
@@ -140,7 +145,7 @@ public class PlaceholdersService(
         var clientFile = Path.Join(rootDirectory, relativeFile);
         if (!Path.Exists(clientFile))
         {
-            //logger.Debug("Skip update; file does not exist {clientFile}", clientFile);
+            //logger.Info("Skip update; file does not exist {clientFile}", clientFile);
             return;
         }
         var clientFileInfo = new FileInfo(clientFile);
@@ -162,7 +167,7 @@ public class PlaceholdersService(
         var remoteFileInfo = remoteService.GetFileInfo(relativeFile);
         if (!force && remoteFileInfo.GetHashCode() == _fileComparer.GetHashCode(clientFileInfo))
         {
-            //logger.Debug("UpdateFile - equal, ignoring {relativeFile}", relativeFile);
+            //logger.Info("UpdateFile - equal, ignoring {relativeFile}", relativeFile);
             if (!placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
             {
                 CloudFilter.SetInSyncState(hfile);
@@ -170,7 +175,7 @@ public class PlaceholdersService(
             return;
         }
 
-        logger.Debug("UpdateFile - update placeholder {relativeFile}", relativeFile);
+        logger.Info("UpdateFile - update placeholder {relativeFile}", relativeFile);
         var pinned = clientFileInfo.Attributes.HasAnySyncFlag(SyncAttributes.PINNED);
         if (pinned)
         {
@@ -198,23 +203,28 @@ public class PlaceholdersService(
         var clientDirectory = Path.Join(rootDirectory, relativeDirectory);
         if (!Path.Exists(clientDirectory))
         {
-            logger.Debug("Skip update; directory does not exist {clientDirectory}", clientDirectory);
+            //logger.Warn("Skip update; directory does not exist {clientDirectory}", clientDirectory);
             return Task.CompletedTask;
         }
+
         var remoteDirectoryInfo = remoteService.GetDirectoryInfo(relativeDirectory);
-        var clientDirectoryInfo = new DirectoryInfo(clientDirectory);
 
-        if (!CloudFilter.IsPlaceholder(clientDirectory))
+        // Check if the directory is hydrated 
+        bool isHydrated = !File.GetAttributes(clientDirectory).HasAnySyncFlag(SyncAttributes.OFFLINE);
+        
+        // Only update placeholder state if directory is a hydrated directory
+        if (isHydrated)
         {
-            CloudFilter.ConvertToPlaceholder(clientDirectory);
-        }
-        else if (remoteDirectoryInfo.GetHashCode() == _directoryComparer.GetHashCode(clientDirectoryInfo))
-        {
+            logger.Info("Directory {path} is hydrated", relativeDirectory);
+            if (!CloudFilter.IsPlaceholder(clientDirectory))
+            {
+                CloudFilter.ConvertToPlaceholder(clientDirectory);
+                CloudFilter.SetInSyncState(clientDirectory);
+                logger.Info("Converted to placeholder and updated {path}", relativeDirectory);
+                return Task.CompletedTask;
+            }
             CloudFilter.SetInSyncState(clientDirectory);
-            return Task.CompletedTask;
         }
-
-        CloudFilter.SetInSyncState(clientDirectory);
         return Task.CompletedTask;
     }
 
