@@ -103,6 +103,7 @@ public static class AppLifecycleHelper
                 .AddSingleton<IFileTransferService, FileTransferService>()
                 .AddSingleton(sp => (ITcpClientProvider)sp.GetRequiredService<IFileTransferService>())
                 .AddSingleton<IMdnsService, MdnsService>()
+                .AddSingleton<ISmsHandlerService, SmsHandlerService>()
                 .AddSingleton<IClipboardService, ClipboardService>()
                 .AddSingleton<IPlaybackService, PlaybackService>()
                 .AddSingleton<INotificationService, NotificationService>()
@@ -114,6 +115,7 @@ public static class AppLifecycleHelper
                 // ViewModels
                 .AddSingleton<MainPageViewModel>()
                 .AddSingleton<DevicesViewModel>()
+                .AddSingleton<MessagesViewModel>()
             ).Build();
     }
 

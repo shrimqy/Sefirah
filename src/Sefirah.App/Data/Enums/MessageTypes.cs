@@ -41,3 +41,11 @@ public enum NotificationType
     New,
     Action
 }
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ConversationType
+{
+    Active,
+    Removed,
+    New
+}

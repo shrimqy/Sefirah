@@ -71,6 +71,11 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
                     existingDevice.IpAddresses?.Add(ipAddress);
                 }
 
+                if (device.PhoneNumbers != null && existingDevice.PhoneNumbers?.Count != device.PhoneNumbers.Count)
+                {
+                    existingDevice.PhoneNumbers = device.PhoneNumbers ?? [];
+                }
+
                 var savedDevice = await repository.AddOrUpdateAsync(existingDevice);
                 if (savedDevice != null)
                 {
@@ -115,7 +120,8 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
                         WallpaperBytes = !string.IsNullOrEmpty(device.Avatar) 
                             ? Convert.FromBase64String(device.Avatar) 
                             : null,
-                        IpAddresses = ipAddress != null ? [ipAddress] : []
+                        IpAddresses = ipAddress != null ? [ipAddress] : [],
+                        PhoneNumbers = device.PhoneNumbers ?? []
                     };
 
                     var savedDevice = await repository.AddOrUpdateAsync(newDevice);
@@ -203,5 +209,10 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
             logger.Error("Error retrieving shared secret for last connected device", ex);
             return null;
         }
+    }
+
+    public async Task<ObservableCollection<PhoneNumber>> GetLastConnectedDevicePhoneNumbersAsync()
+    {
+        return await repository.GetLastConnectedDevicePhoneNumbersAsync();
     }
 }

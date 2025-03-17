@@ -218,6 +218,9 @@ public sealed partial class MainPage : Page
             case "Settings":
                 ContentFrame.Navigate(typeof(SettingsPage));
                 break;
+            case "Messages":
+                ContentFrame.Navigate(typeof(MessagesPage));
+                break;
         }
     }
 

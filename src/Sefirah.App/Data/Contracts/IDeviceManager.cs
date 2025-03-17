@@ -59,4 +59,9 @@ public interface IDeviceManager
     /// Event that is raised when a device is added to the device list.
     /// </summary>
     event EventHandler<RemoteDeviceEntity>? DeviceAdded;
+
+    /// <summary>
+    /// Gets the phone numbers for the last connected device.
+    /// </summary>
+    Task<ObservableCollection<PhoneNumber>> GetLastConnectedDevicePhoneNumbersAsync();
 }

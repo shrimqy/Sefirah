@@ -20,6 +20,9 @@ namespace Sefirah.App.Data.Models;
 [JsonDerivedType(typeof(SftpServerInfo), typeDiscriminator: "11")]
 [JsonDerivedType(typeof(UdpBroadcast), typeDiscriminator: "12")]
 [JsonDerivedType(typeof(DeviceRingerMode), typeDiscriminator: "13")]
+[JsonDerivedType(typeof(TextMessage), typeDiscriminator: "14")]
+[JsonDerivedType(typeof(TextConversation), typeDiscriminator: "15")]
+[JsonDerivedType(typeof(ThreadRequest), typeDiscriminator: "16")]
 public class SocketMessage { }
 
 public class Misc : SocketMessage
@@ -146,6 +149,9 @@ public class DeviceInfo : SocketMessage
 
     [JsonPropertyName("publicKey")]
     public string PublicKey { get; set; }
+
+    [JsonPropertyName("phoneNumbers")]
+    public List<PhoneNumber> PhoneNumbers { get; set; } = [];
 }
 
 public class DeviceStatus : SocketMessage
@@ -325,3 +331,91 @@ public class DeviceRingerMode : SocketMessage
     [JsonPropertyName("ringerMode")]
     public int RingerMode { get; set; }
 }
+
+public class TextConversation : SocketMessage
+{
+    [JsonPropertyName("conversationType")]
+    public required ConversationType ConversationType { get; set; }
+
+    [JsonPropertyName("threadId")]
+    public required long ThreadId { get; set; }
+
+    [JsonPropertyName("messages")]
+    public List<TextMessage> Messages { get; set; } = [];
+}
+
+public class TextMessage : SocketMessage
+{
+    [JsonPropertyName("addresses")]
+    public List<SmsAddress> Addresses { get; set; } = [];
+
+    [JsonPropertyName("threadId")]
+    public long? ThreadId { get; set; } = null;
+
+    [JsonPropertyName("body")]
+    public required string Body { get; set; }
+
+    [JsonPropertyName("timestamp")]
+    public long Timestamp { get; set; }
+
+    [JsonPropertyName("messageType")]
+    public int MessageType { get; set; }
+    
+    [JsonPropertyName("read")]
+    public bool Read { get; set; } = false;
+
+    [JsonPropertyName("uniqueId")]
+    public long UniqueId { get; set; }
+
+    [JsonPropertyName("subscriptionId")]
+    public int SubscriptionId { get; set; } = 0;
+
+    [JsonPropertyName("attachments")]
+    public List<SmsAttachment>? Attachments { get; set; } = null;
+
+    [JsonPropertyName("isTextMessage")]
+    public bool IsTextMessage { get; set; } = false;
+
+    [JsonPropertyName("hasMultipleRecipients")]
+    public bool HasMultipleRecipients { get; set; } = false;
+}
+
+public class SmsAddress
+{
+    [JsonPropertyName("address")]
+    public required string Address { get; set; }
+}
+
+public class SmsAttachment
+{
+    [JsonPropertyName("mimeType")]
+    public required string MimeType { get; set; }
+
+    [JsonPropertyName("base64EncodedFile")]
+    public string? Base64EncodedFile { get; set; }
+
+    [JsonPropertyName("fileName")]
+    public required string FileName { get; set; }
+}
+
+public class ThreadRequest: SocketMessage
+{
+    [JsonPropertyName("threadId")]
+    public required long ThreadId { get; set; }
+    
+    [JsonPropertyName("rangeStartTimestamp")]
+    public long RangeStartTimestamp { get; set; } = -1;
+
+    [JsonPropertyName("numberToRequest")]
+    public long NumberToRequest { get; set; } = -1;
+}
+
+public class PhoneNumber
+{
+    [JsonPropertyName("number")]
+    public string Number { get; set; } = string.Empty;
+
+    [JsonPropertyName("subscriptionId")]
+    public int SubscriptionId { get; set; } = -1;
+}
+
