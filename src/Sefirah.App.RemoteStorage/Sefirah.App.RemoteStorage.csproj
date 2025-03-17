@@ -16,7 +16,7 @@
         <PackageReference Include="BouncyCastle.Cryptography" Version="2.5.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.1" />
         <PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.2.0" />
-        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250108002" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250205002" />
         <PackageReference Include="SSH.NET" Version="2024.2.0" />
         <PackageReference Include="System.Linq.Async" Version="6.0.1" />
         <PackageReference Include="Vanara.PInvoke.CldApi" Version="4.0.6" />
