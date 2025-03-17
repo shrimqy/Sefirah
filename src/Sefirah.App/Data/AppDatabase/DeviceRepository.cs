@@ -1,7 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using Sefirah.App.Data.AppDatabase.Models;
 using Sefirah.App.Data.Models;
-using System.Text.Json;
 namespace Sefirah.App.Data.AppDatabase;
 public class DeviceRepository(DatabaseContext context, ILogger logger)
 {
@@ -105,14 +104,14 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
         }
     }
 
-    public async Task<ObservableCollection<PhoneNumber>> GetLastConnectedDevicePhoneNumbersAsync()
+    public async Task<List<PhoneNumber>> GetLastConnectedDevicePhoneNumbersAsync()
     {
         try
         {
             var conn = await context.GetConnectionAsync();
             var command = new SqliteCommand("SELECT PhoneNumbers FROM RemoteDevice WHERE LastConnected IS NOT NULL ORDER BY LastConnected DESC LIMIT 1", conn);
 
-            var phoneNumbers = new ObservableCollection<PhoneNumber>();
+            var phoneNumbers = new List<PhoneNumber>();
             conn.Open();
             if (conn.State == System.Data.ConnectionState.Open)
             {
@@ -124,10 +123,7 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
                         logger.Info("PhoneNumbers column is null or empty for the device");
                         return [];
                     }
-
                     var phoneNumbersJson = reader[0].ToString();
-                    logger.Info($"Deserializing PhoneNumbers JSON: {phoneNumbersJson}");
-                
                     try
                     {
                         var phoneNumbersJsonList = JsonSerializer.Deserialize<List<PhoneNumber>>(phoneNumbersJson ?? "[]") ?? [];

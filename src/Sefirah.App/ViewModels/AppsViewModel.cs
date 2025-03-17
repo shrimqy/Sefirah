@@ -1,4 +1,5 @@
-﻿using Sefirah.App.Data.AppDatabase.Models;
+﻿using CommunityToolkit.WinUI;
+using Sefirah.App.Data.AppDatabase.Models;
 using Sefirah.App.Data.Contracts;
 
 namespace Sefirah.App.ViewModels;
@@ -7,12 +8,7 @@ public sealed class AppsViewModel : BaseViewModel
     public IRemoteAppsRepository RemoteAppsRepository { get; } = Ioc.Default.GetRequiredService<IRemoteAppsRepository>();
     private IScreenMirrorService ScreenMirrorService { get; } = Ioc.Default.GetRequiredService<IScreenMirrorService>();
     
-    private ObservableCollection<ApplicationInfoEntity> _apps = [];
-    public ObservableCollection<ApplicationInfoEntity> Apps 
-    { 
-        get => _apps;
-        set => SetProperty(ref _apps, value);
-    }
+    public ObservableCollection<ApplicationInfoEntity> Apps => RemoteAppsRepository.Applications;
     
     private bool _isLoading;
     public bool IsLoading
@@ -31,11 +27,9 @@ public sealed class AppsViewModel : BaseViewModel
     private async void LoadApps()
     {
         IsLoading = true;
-        var apps = await RemoteAppsRepository.GetInstalledAppsAsync();
-        
-        dispatcher.TryEnqueue(() =>
+        await dispatcher.EnqueueAsync(async() =>
         {
-            Apps = [.. apps];
+            await RemoteAppsRepository.LoadApplicationsAsync();
             IsLoading = false;
             OnPropertyChanged(nameof(IsEmpty));
         });

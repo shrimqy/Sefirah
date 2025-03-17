@@ -63,5 +63,5 @@ public interface IDeviceManager
     /// <summary>
     /// Gets the phone numbers for the last connected device.
     /// </summary>
-    Task<ObservableCollection<PhoneNumber>> GetLastConnectedDevicePhoneNumbersAsync();
+    Task<List<PhoneNumber>> GetLastConnectedDevicePhoneNumbersAsync();
 }

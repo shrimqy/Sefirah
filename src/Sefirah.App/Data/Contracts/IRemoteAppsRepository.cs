@@ -5,9 +5,14 @@ namespace Sefirah.App.Data.Contracts;
 public interface IRemoteAppsRepository
 {
     /// <summary>
-    /// Gets all the remote apps.
+    /// Gets all the remote apps as an observable collection.
     /// </summary>
-    Task<List<ApplicationInfoEntity>> GetAllAsync();
+    ObservableCollection<ApplicationInfoEntity> Applications { get; }
+
+    /// <summary>
+    /// Loads the applications from the database.
+    /// </summary>
+    Task LoadApplicationsAsync();
 
     /// <summary>
     /// Gets a remote app by its package name.
@@ -43,9 +48,4 @@ public interface IRemoteAppsRepository
     /// Gets all the remote apps as an observable collection.
     /// </summary>
     Task<ObservableCollection<ApplicationInfoEntity>> GetAllAsObservableCollection();
-
-    /// <summary>
-    /// Gets all the installed apps.
-    /// </summary>
-    Task<ObservableCollection<ApplicationInfoEntity>> GetInstalledAppsAsync();
 }

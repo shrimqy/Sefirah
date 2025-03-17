@@ -1,4 +1,7 @@
+using CommunityToolkit.WinUI;
 using Microsoft.Data.Sqlite;
+using Microsoft.UI.Dispatching;
+using Sefirah.App;
 using Sefirah.App.Data.AppDatabase;
 using Sefirah.App.Data.AppDatabase.Models;
 using Sefirah.App.Data.Contracts;
@@ -6,7 +9,9 @@ using Sefirah.App.Data.Enums;
 
 public class RemoteAppsRepository(DatabaseContext context, ILogger logger) : IRemoteAppsRepository
 {
-    public async Task<List<ApplicationInfoEntity>> GetAllAsync()
+    public ObservableCollection<ApplicationInfoEntity> Applications { get; set; } = [];
+    private readonly DispatcherQueue dispatcher = MainWindow.Instance.DispatcherQueue;
+    public async Task LoadApplicationsAsync()
     {
         try
         {
@@ -16,126 +21,57 @@ public class RemoteAppsRepository(DatabaseContext context, ILogger logger) : IRe
                 conn);
 
             using var reader = await command.ExecuteReaderAsync();
-            var applications = new List<ApplicationInfoEntity>();
+            var loadedAppPackages = new HashSet<string>();
 
             while (await reader.ReadAsync())
             {
-                var appIconBytes = reader.IsDBNull(3) ? null : (byte[])reader[3];
-                var appIcon = appIconBytes != null ? await appIconBytes.ToBitmapAsync() : null;
+                var appPackage = reader.GetString(0);
+                loadedAppPackages.Add(appPackage);
                 
-                var notificationFilterStr = reader.GetString(2);
-                NotificationFilter notificationFilter = NotificationFilter.ToastFeed;
+                // Find existing item or create new one
+                var existingItem = Applications.FirstOrDefault(a => a.AppPackage == appPackage);
                 
-                if (!Enum.TryParse<NotificationFilter>(notificationFilterStr, out notificationFilter))
+                if (existingItem != null)
                 {
-                    logger.Warn($"Invalid NotificationFilter value '{notificationFilterStr}' for app {reader.GetString(1)}. Using default.");
+                    // Update only if NotificationFilter has changed
+                    var notificationFilterStr = reader.GetString(2);
+                    if (Enum.TryParse<NotificationFilter>(notificationFilterStr, out var notificationFilter) && 
+                        existingItem.NotificationFilter != notificationFilter)
+                    {
+                        existingItem.NotificationFilter = notificationFilter;
+                    }
+                    
+                    // We generally don't need to update other properties as they're unlikely to change
                 }
-
-                applications.Add(new ApplicationInfoEntity
+                else
                 {
-                    AppPackage = reader.GetString(0),
-                    AppName = reader.GetString(1),
-                    NotificationFilter = notificationFilter,
-                    AppIconBytes = appIconBytes,
-                    AppIcon = appIcon
-                });
-            }
+                    // Create new item
+                    var appIconBytes = reader.IsDBNull(3) ? null : (byte[])reader[3];
+                    var appIcon = appIconBytes != null ? await appIconBytes.ToBitmapAsync() : null;
+                    
+                    var notificationFilterStr = reader.GetString(2);
+                    NotificationFilter notificationFilter = NotificationFilter.ToastFeed;
+                    
+                    if (!Enum.TryParse<NotificationFilter>(notificationFilterStr, out notificationFilter))
+                    {
+                        logger.Warn($"Invalid NotificationFilter value '{notificationFilterStr}' for app {reader.GetString(1)}. Using default.");
+                    }
 
-            return applications;
+                    Applications.Add(new ApplicationInfoEntity
+                    {
+                        AppPackage = appPackage,
+                        AppName = reader.GetString(1),
+                        NotificationFilter = notificationFilter,
+                        AppIconBytes = appIconBytes,
+                        AppIcon = appIcon
+                    });
+                }
+            }
         }
         catch (Exception ex)
         {
             logger.Error("Error getting application info list", ex);
             throw;
-        }
-    }
-
-    public async Task<ObservableCollection<ApplicationInfoEntity>> GetAllAsObservableCollection()
-    {
-        try 
-        {
-            using var conn = await context.GetConnectionAsync();
-            using var command = new SqliteCommand(
-                "SELECT AppPackage, AppName, NotificationFilter, AppIcon FROM ApplicationInfo ORDER BY AppName",
-                conn);
-
-            var apps = new ObservableCollection<ApplicationInfoEntity>();
-
-            conn.Open();
-            if (conn.State == System.Data.ConnectionState.Open)
-                {
-                using var reader = await command.ExecuteReaderAsync();
-                {
-                    while (reader.Read())
-                    {
-                        var appIconBytes = reader.IsDBNull(3) ? null : (byte[])reader[3];
-                        var appIcon = appIconBytes != null ? await appIconBytes.ToBitmapAsync() : null;
-
-                        var notificationFilterStr = reader.GetString(2);
-                        NotificationFilter notificationFilter = NotificationFilter.ToastFeed;
-                                
-                        if (!Enum.TryParse<NotificationFilter>(notificationFilterStr, out notificationFilter))
-                        {
-                            logger.Warn($"Invalid NotificationFilter value '{notificationFilterStr}' for app {reader.GetString(1)}. Using default.");
-                        }
-
-                        apps.Add(new ApplicationInfoEntity
-                        {
-                            AppPackage = reader.GetString(0),
-                            AppName = reader.GetString(1),
-                            NotificationFilter = notificationFilter,
-                            AppIconBytes = appIconBytes,
-                            AppIcon = appIcon
-                        });
-                    }  
-                }
-            }
-            return apps;
-        }
-        catch (Exception ex)
-        {
-            logger.Error("Error getting application info list", ex);
-            return null;
-        }
-    }
-
-    public async Task<ObservableCollection<ApplicationInfoEntity>> GetInstalledAppsAsync()
-    {
-        try 
-        {
-            using var conn = await context.GetConnectionAsync();
-            using var command = new SqliteCommand(
-                "SELECT AppPackage, AppName, AppIcon FROM ApplicationInfo ORDER BY AppName",
-                conn);
-
-            var apps = new ObservableCollection<ApplicationInfoEntity>();
-
-            conn.Open();
-            if (conn.State == System.Data.ConnectionState.Open)
-                {
-                using var reader = await command.ExecuteReaderAsync();
-                {
-                    while (reader.Read())
-                    {
-                        var appIconBytes = reader.IsDBNull(2) ? null : (byte[])reader[2];
-                        var appIcon = appIconBytes != null ? await appIconBytes.ToBitmapAsync() : null;
-
-                        apps.Add(new ApplicationInfoEntity
-                        {
-                            AppPackage = reader.GetString(0),
-                            AppName = reader.GetString(1),
-                            AppIconBytes = appIconBytes,
-                            AppIcon = appIcon
-                        });
-                    }  
-                }
-            }
-            return apps;
-        }
-        catch (Exception ex)
-        {
-            logger.Error("Error getting application info list", ex);
-            return null;
         }
     }
 
@@ -200,6 +136,14 @@ public class RemoteAppsRepository(DatabaseContext context, ILogger logger) : IRe
             command.Parameters.AddWithValue("@AppIcon", appInfo.AppIconBytes as object ?? DBNull.Value);
 
             await command.ExecuteNonQueryAsync();
+            if (!Applications.Any(a => a.AppPackage == appInfo.AppPackage))
+            {
+                await dispatcher.EnqueueAsync(async () =>
+                {
+                    appInfo.AppIcon = appInfo.AppIconBytes != null ? await appInfo.AppIconBytes.ToBitmapAsync() : null;
+                    Applications.Add(appInfo);
+                });
+            }
         }
         catch (Exception ex)
         {
@@ -258,6 +202,13 @@ public class RemoteAppsRepository(DatabaseContext context, ILogger logger) : IRe
             command.Parameters.AddWithValue("@AppPackage", appPackage);
 
             await command.ExecuteNonQueryAsync();
+            
+            // Update the item in the collection if it exists
+            var item = Applications.FirstOrDefault(a => a.AppPackage == appPackage);
+            if (item != null)
+            {
+                item.NotificationFilter = filter;
+            }
         }
         catch (Exception ex)
         {
@@ -301,5 +252,14 @@ public class RemoteAppsRepository(DatabaseContext context, ILogger logger) : IRe
             logger.Error("Error clearing all application info", ex);
             throw;
         }
+    }
+
+    public async Task<ObservableCollection<ApplicationInfoEntity>> GetAllAsObservableCollection()
+    {
+        if (Applications.Count == 0)
+        {
+            await LoadApplicationsAsync();
+        }
+        return Applications;
     }
 } 

@@ -211,7 +211,7 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
         }
     }
 
-    public async Task<ObservableCollection<PhoneNumber>> GetLastConnectedDevicePhoneNumbersAsync()
+    public async Task<List<PhoneNumber>> GetLastConnectedDevicePhoneNumbersAsync()
     {
         return await repository.GetLastConnectedDevicePhoneNumbersAsync();
     }

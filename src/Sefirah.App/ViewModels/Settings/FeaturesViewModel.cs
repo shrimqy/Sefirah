@@ -11,7 +11,7 @@ public sealed partial class FeaturesViewModel : ObservableObject
     private readonly IRemoteAppsRepository RemoteAppsRepository = Ioc.Default.GetRequiredService<IRemoteAppsRepository>();
     private readonly DispatcherQueue dispatcherQueue;
 
-    public ObservableCollection<ApplicationInfoEntity> NotificationPreferences { get; set; } = [];
+    public ObservableCollection<ApplicationInfoEntity> NotificationPreferences => RemoteAppsRepository.Applications;
 
     public bool IsClipboardExpanded { get; set; }
     public bool IsNotificationExpanded { get; set; }
@@ -301,12 +301,7 @@ public sealed partial class FeaturesViewModel : ObservableObject
 
     private async void LoadNotificationPreferencesAsync()
     {
-        var preferences = await RemoteAppsRepository.GetAllAsObservableCollection();
-        dispatcherQueue.TryEnqueue(() =>
-        {
-            NotificationPreferences = preferences;
-            OnPropertyChanged(nameof(NotificationPreferences));
-        });
+        await RemoteAppsRepository.LoadApplicationsAsync();
     }
 
     public async void ChangeNotificationFilter(ApplicationInfoEntity preferences)

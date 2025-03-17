@@ -1,11 +1,14 @@
-﻿using Sefirah.App.Data.Contracts;
+﻿using Sefirah.App.Data.AppDatabase.Models;
+using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Models;
+using static Vanara.PInvoke.Shell32;
 
 namespace Sefirah.App.ViewModels;
 public sealed class MessagesViewModel : BaseViewModel
 {
     private ISmsHandlerService SmsHandlerService { get; } = Ioc.Default.GetRequiredService<ISmsHandlerService>();
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
+    private ISessionManager SessionManager { get; } = Ioc.Default.GetRequiredService<ISessionManager>();
 
     public ObservableCollection<SmsConversation> Conversations => SmsHandlerService.Conversations;
 
@@ -37,7 +40,12 @@ public sealed class MessagesViewModel : BaseViewModel
         }
     }
 
-    public ObservableCollection<PhoneNumber> PhoneNumbers { get; set; } = [];
+    public ObservableCollection<PhoneNumber> _phoneNumbers = [];
+    public ObservableCollection<PhoneNumber> PhoneNumbers
+    {
+        get => _phoneNumbers;
+        set => SetProperty(ref _phoneNumbers, value);
+    }
 
     public ObservableCollection<TextMessage>? ConversationMessages => SelectedConversation?.Messages;
 
@@ -111,17 +119,33 @@ public sealed class MessagesViewModel : BaseViewModel
                 }
             }
         };
+        SessionManager.ClientConnectionStatusChanged += (s, e) =>
+        {
+            if (e.IsConnected)
+            {
+                LoadPhoneNumbers();
+            }
+        };
     }
 
     private async void LoadPhoneNumbers()
     {
-        PhoneNumbers = await DeviceManager.GetLastConnectedDevicePhoneNumbersAsync();
-        logger.Info($"Loaded {PhoneNumbers.Count} phone numbers");
-        if (PhoneNumbers != null) 
+        var phoneNumbers = await DeviceManager.GetLastConnectedDevicePhoneNumbersAsync();
+        
+        dispatcher.TryEnqueue(() =>
         {
-            SelectedSubscriptionId = PhoneNumbers[0].SubscriptionId;
-        }
-        OnPropertyChanged(nameof(PhoneNumbers));
+            PhoneNumbers = [.. phoneNumbers];
+            if (PhoneNumbers.Count > 0)
+            {
+                SelectedSubscriptionId = PhoneNumbers[0].SubscriptionId;
+            }
+            else
+            {
+                SelectedSubscriptionId = 0;
+                logger.Warn("No phone numbers available, using default subscription ID 0");
+            }
+            OnPropertyChanged(nameof(PhoneNumbers));
+        });
     }
 
     public void StartNewConversation()
@@ -135,7 +159,14 @@ public sealed class MessagesViewModel : BaseViewModel
         NewConversationAddresses.Clear();
         
         // Set default subscription ID
-        SelectedSubscriptionId = PhoneNumbers[0].SubscriptionId;
+        if (PhoneNumbers != null && PhoneNumbers.Count > 0)
+        {
+            SelectedSubscriptionId = PhoneNumbers[0].SubscriptionId;
+        }
+        else
+        {
+            SelectedSubscriptionId = 0; 
+        }
         
         MessageText = string.Empty;
     }
