@@ -39,7 +39,8 @@ public enum NotificationType
     Active,
     Removed,
     New,
-    Action
+    Action,
+    Invoke
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]

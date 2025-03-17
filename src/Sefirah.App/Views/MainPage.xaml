@@ -332,10 +332,10 @@
                                                                 <MenuFlyout Closed="MoreButtonFlyoutClosed" Placement="BottomEdgeAlignedLeft">
                                                                     <MenuFlyoutItem
                                                                         Click="OpenAppClick"
-                                                                        Tag="{x:Bind AppPackage}"
+                                                                        Tag="{x:Bind}"
                                                                         Text="{helpers:ResourceString Name=OpenApp}">
                                                                         <MenuFlyoutItem.Icon>
-                                                                            <FontIcon Glyph="&#xEC15;" />
+                                                                            <FontIcon Glyph="&#xED35;" />
                                                                         </MenuFlyoutItem.Icon>
                                                                     </MenuFlyoutItem>
                                                                     <MenuFlyoutItem
@@ -534,8 +534,15 @@
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
                         <NavigationViewItem
+                            Content="{helpers:ResourceString Name=Apps}"
+                            Tag="Apps">
+                            <NavigationViewItem.Icon>
+                                <FontIcon Glyph="&#xED35;" />
+                            </NavigationViewItem.Icon>
+                        </NavigationViewItem>
+
+                        <NavigationViewItem
                             Content="{helpers:ResourceString Name=Settings}"
-                            IsSelected="True"
                             Tag="Settings">
                             <NavigationViewItem.Icon>
                                 <AnimatedIcon>
