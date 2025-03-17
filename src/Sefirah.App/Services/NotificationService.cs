@@ -46,7 +46,7 @@ public class NotificationService(
                 await dispatcher.EnqueueAsync(async () =>
                 {
                     var notification = await Notification.FromMessage(message);
-                    if (message.NotificationType == nameof(NotificationType.New) && filter == NotificationFilter.ToastFeed)
+                    if (message.NotificationType == NotificationType.New && filter == NotificationFilter.ToastFeed)
                     {
                         // Check for existing notification
                         var existingNotification = notifications.FirstOrDefault(n => 
@@ -72,7 +72,7 @@ public class NotificationService(
                         userSettingsService.FeatureSettingsService.IgnoreNotificationDuringDnd && deviceManager.CurrentDeviceStatus?.IsDndEnabled == true) return;
                         await ShowWindowsNotification(message);
                     }
-                    else if ((message.NotificationType == nameof(NotificationType.Active) || message.NotificationType == nameof(NotificationType.New)) 
+                    else if ((message.NotificationType == NotificationType.Active || message.NotificationType == NotificationType.New) 
                         && filter == NotificationFilter.Feed || filter == NotificationFilter.ToastFeed)
                     {
                         await dispatcher.EnqueueAsync(() =>
@@ -86,7 +86,7 @@ public class NotificationService(
                     }
                 });
             }
-            else if (message.NotificationType == nameof(NotificationType.Removed))
+            else if (message.NotificationType == NotificationType.Removed)
             {
                 await RemoveNotification(message.NotificationKey, true);
             }
@@ -245,7 +245,7 @@ public class NotificationService(
                         var notificationToRemove = new NotificationMessage
                         {
                             NotificationKey = notificationKey,
-                            NotificationType = nameof(NotificationType.Removed)
+                            NotificationType = NotificationType.Removed
                         };
                         string jsonMessage = SocketMessageSerializer.Serialize(notificationToRemove);
                         sessionManager.SendMessage(jsonMessage);
@@ -303,7 +303,7 @@ public class NotificationService(
             try
             {
                 notifications.Clear();
-                var command = new Misc { MiscType = nameof(MiscType.ClearNotifications) };
+                var command = new Misc { MiscType = MiscType.ClearNotifications };
                 string jsonMessage = SocketMessageSerializer.Serialize(command);
                 sessionManager.SendMessage(jsonMessage);
                 logger.Info("Cleared all notifications");

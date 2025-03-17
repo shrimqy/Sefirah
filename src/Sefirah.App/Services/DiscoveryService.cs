@@ -160,17 +160,14 @@ public class DiscoveryService(
 
                 dispatcher.EnqueueAsync(() =>
                 {
-                    lock (collectionLock)
+                    var existing = DiscoveredDevices.FirstOrDefault(d => d.DeviceId == device.DeviceId);
+                    if (existing != null)
                     {
-                        var existing = DiscoveredDevices.FirstOrDefault(d => d.DeviceId == device.DeviceId);
-                        if (existing != null)
-                        {
-                            DiscoveredDevices[DiscoveredDevices.IndexOf(existing)] = device;
-                        }
-                        else
-                        {
-                            DiscoveredDevices.Add(device);
-                        }
+                        DiscoveredDevices[DiscoveredDevices.IndexOf(existing)] = device;
+                    }
+                    else
+                    {
+                        DiscoveredDevices.Add(device);
                     }
                 });
             }

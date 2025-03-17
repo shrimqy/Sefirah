@@ -180,7 +180,7 @@ public sealed class MainPageViewModel : BaseViewModel
     {
         if (ConnectionStatus)
         {
-            var message = new Misc { MiscType = nameof(MiscType.Disconnect) };
+            var message = new Misc { MiscType = MiscType.Disconnect };
             SessionManager.SendMessage(SocketMessageSerializer.Serialize(message));
             await Task.Delay(50);
             SessionManager.DisconnectSession();

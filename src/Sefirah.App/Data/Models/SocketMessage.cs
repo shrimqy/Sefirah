@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Media.Imaging;
+using Sefirah.App.Data.Enums;
 using Sefirah.App.Extensions;
 using static Vanara.PInvoke.AdvApi32.INSTALLSPEC;
 
@@ -24,7 +25,7 @@ public class SocketMessage { }
 public class Misc : SocketMessage
 {
     [JsonPropertyName("miscType")]
-    public required string MiscType { get; set; }
+    public required MiscType MiscType { get; set; }
 }
 
 public class ClipboardMessage : SocketMessage
@@ -45,7 +46,7 @@ public class NotificationMessage : SocketMessage
     public string? TimeStamp { get; set; }
 
     [JsonPropertyName("notificationType")]
-    public required string NotificationType { get; set; }
+    public required NotificationType NotificationType { get; set; }
 
     [JsonPropertyName("appName")]
     public string? AppName { get; set; }
@@ -192,7 +193,7 @@ public class PlaybackData : SocketMessage
     public long? MinSeekTime { get; set; }
 
     [JsonPropertyName("mediaAction")]
-    public string? MediaAction { get; set; }
+    public MediaAction? MediaAction { get; set; }
 
     [JsonPropertyName("volume")]
     public float Volume { get; set; }
