@@ -116,6 +116,7 @@ public static class AppLifecycleHelper
                 .AddSingleton<MainPageViewModel>()
                 .AddSingleton<DevicesViewModel>()
                 .AddSingleton<MessagesViewModel>()
+                .AddSingleton<AppsViewModel>()
             ).Build();
     }
 

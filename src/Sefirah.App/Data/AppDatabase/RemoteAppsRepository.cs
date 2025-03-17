@@ -99,6 +99,46 @@ public class RemoteAppsRepository(DatabaseContext context, ILogger logger) : IRe
         }
     }
 
+    public async Task<ObservableCollection<ApplicationInfoEntity>> GetInstalledAppsAsync()
+    {
+        try 
+        {
+            using var conn = await context.GetConnectionAsync();
+            using var command = new SqliteCommand(
+                "SELECT AppPackage, AppName, AppIcon FROM ApplicationInfo ORDER BY AppName",
+                conn);
+
+            var apps = new ObservableCollection<ApplicationInfoEntity>();
+
+            conn.Open();
+            if (conn.State == System.Data.ConnectionState.Open)
+                {
+                using var reader = await command.ExecuteReaderAsync();
+                {
+                    while (reader.Read())
+                    {
+                        var appIconBytes = reader.IsDBNull(2) ? null : (byte[])reader[2];
+                        var appIcon = appIconBytes != null ? await appIconBytes.ToBitmapAsync() : null;
+
+                        apps.Add(new ApplicationInfoEntity
+                        {
+                            AppPackage = reader.GetString(0),
+                            AppName = reader.GetString(1),
+                            AppIconBytes = appIconBytes,
+                            AppIcon = appIcon
+                        });
+                    }  
+                }
+            }
+            return apps;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Error getting application info list", ex);
+            return null;
+        }
+    }
+
     public async Task<ApplicationInfoEntity?> GetByAppPackageAsync(string appPackage)
     {
         try

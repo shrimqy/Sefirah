@@ -43,4 +43,9 @@ public interface IRemoteAppsRepository
     /// Gets all the remote apps as an observable collection.
     /// </summary>
     Task<ObservableCollection<ApplicationInfoEntity>> GetAllAsObservableCollection();
+
+    /// <summary>
+    /// Gets all the installed apps.
+    /// </summary>
+    Task<ObservableCollection<ApplicationInfoEntity>> GetInstalledAppsAsync();
 }
