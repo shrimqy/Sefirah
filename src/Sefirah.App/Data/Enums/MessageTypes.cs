@@ -47,6 +47,7 @@ public enum NotificationType
 public enum ConversationType
 {
     Active,
+    ActiveUpdated,
     Removed,
     New
 }
