@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using Windows.Storage;
 using static Sefirah.App.Constants;
+using Sefirah.App.Data.AppDatabase.Migrations;
 
 namespace Sefirah.App.Data.AppDatabase;
 public class DatabaseContext(ILogger logger) : IDisposable
@@ -31,7 +32,8 @@ public class DatabaseContext(ILogger logger) : IDisposable
                     IpAddresses NVARCHAR(2048),
                     LastConnected DATETIME,
                     SharedSecret BLOB,
-                    WallpaperBytes BLOB
+                    WallpaperBytes BLOB,
+                    PhoneNumbers NVARCHAR(2048)
                 );
 
                 CREATE TABLE IF NOT EXISTS LocalDevice (
@@ -42,10 +44,8 @@ public class DatabaseContext(ILogger logger) : IDisposable
                 );";
 
             await command.ExecuteNonQueryAsync();
-            
-            // Should probably use a version based migration system later
-            await MigrateAddIpAddressesColumn();
-            
+
+            await RunMigrationsAsync();
             logger.Info("Database initialized successfully");
         }
         catch (Exception ex)
@@ -55,41 +55,61 @@ public class DatabaseContext(ILogger logger) : IDisposable
         }
     }
 
-    private async Task MigrateAddIpAddressesColumn()
+    private async Task RunMigrationsAsync()
     {
         try
         {
-            // Check if the column exists
-            bool columnExists = false;
-            using (var pragmaCommand = _connection.CreateCommand())
+            // Create version table if it doesn't exist
+            using (var createVersionTableCommand = _connection.CreateCommand())
             {
-                pragmaCommand.CommandText = "PRAGMA table_info(RemoteDevice)";
-                using var reader = await pragmaCommand.ExecuteReaderAsync();
-                while (await reader.ReadAsync())
+                createVersionTableCommand.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS SchemaVersion (
+                        Version INTEGER PRIMARY KEY,
+                        AppliedOn DATETIME NOT NULL
+                    );";
+                await createVersionTableCommand.ExecuteNonQueryAsync();
+            }
+
+            // Get current schema version
+            int currentVersion = 0;
+            using (var versionCommand = _connection.CreateCommand())
+            {
+                versionCommand.CommandText = "SELECT MAX(Version) FROM SchemaVersion";
+                var result = await versionCommand.ExecuteScalarAsync();
+                if (result != null && result != DBNull.Value)
                 {
-                    string columnName = reader.GetString(1);  // Column name is at index 1
-                    if (columnName.Equals("IpAddresses", StringComparison.OrdinalIgnoreCase))
-                    {
-                        columnExists = true;
-                        break;
-                    }
+                    currentVersion = Convert.ToInt32(result);
                 }
             }
 
-            // Add the column if it doesn't exist
-            if (!columnExists)
+            // Apply migrations in order based on current version
+            var migrations = GetMigrations();
+            foreach (var migration in migrations.Where(m => m.Version > currentVersion).OrderBy(m => m.Version))
             {
-                using var alterCommand = _connection.CreateCommand();
-                alterCommand.CommandText = "ALTER TABLE RemoteDevice ADD COLUMN IpAddresses NVARCHAR(2048)";
-                await alterCommand.ExecuteNonQueryAsync();
-                logger.Info("Added IpAddresses column to RemoteDevice table");
+                await migration.UpAsync(_connection);
+
+                // Record that migration was applied
+                using var insertVersionCommand = _connection.CreateCommand();
+                insertVersionCommand.CommandText = "INSERT INTO SchemaVersion (Version, AppliedOn) VALUES (@Version, @AppliedOn)";
+                insertVersionCommand.Parameters.AddWithValue("@Version", migration.Version);
+                insertVersionCommand.Parameters.AddWithValue("@AppliedOn", DateTime.UtcNow);
+                await insertVersionCommand.ExecuteNonQueryAsync();
             }
         }
         catch (Exception ex)
         {
-            logger.Error("Failed to migrate IpAddresses column", ex);
+            logger.Error("Failed to run migrations", ex);
             throw;
         }
+    }
+
+    private static List<IMigration> GetMigrations()
+    {
+        return
+        [
+            new Migration_001_AddIpAddressesColumn(),
+            new Migration_002_AddPhoneNumbersColumn(),
+        ];
     }
 
     public async Task<SqliteConnection> GetConnectionAsync()
@@ -115,5 +135,6 @@ public class DatabaseContext(ILogger logger) : IDisposable
     public void Dispose()
     {
         _connection?.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

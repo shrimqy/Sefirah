@@ -145,10 +145,9 @@ public sealed partial class MainPage : Page
         var menuItem = sender as MenuFlyoutItem;
         if (menuItem != null)
         {
-            string? appPackage = menuItem.Tag as string;
-            if (!string.IsNullOrEmpty(appPackage))
+            if (menuItem.Tag is Notification notification)
             {
-                await ViewModel.OpenApp(appPackage);
+                await ViewModel.OpenApp(notification);
             }
         }
     }
@@ -217,6 +216,12 @@ public sealed partial class MainPage : Page
         {
             case "Settings":
                 ContentFrame.Navigate(typeof(SettingsPage));
+                break;
+            case "Messages":
+                ContentFrame.Navigate(typeof(MessagesPage));
+                break;
+            case "Apps":
+                ContentFrame.Navigate(typeof(AppsPage));
                 break;
         }
     }

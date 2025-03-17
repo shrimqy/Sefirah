@@ -67,8 +67,7 @@ public class PlaybackService(
     {
         try
         {
-            if (!Enum.TryParse(playback.MediaAction, true, out MediaAction action)) return;
-
+            var action = playback.MediaAction ?? throw new Exception("Media action is null");
             if (action == MediaAction.Volume)
             {
                 VolumeControlAsync(playback.Volume);

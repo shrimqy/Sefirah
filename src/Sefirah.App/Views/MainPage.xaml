@@ -332,10 +332,10 @@
                                                                 <MenuFlyout Closed="MoreButtonFlyoutClosed" Placement="BottomEdgeAlignedLeft">
                                                                     <MenuFlyoutItem
                                                                         Click="OpenAppClick"
-                                                                        Tag="{x:Bind AppPackage}"
+                                                                        Tag="{x:Bind}"
                                                                         Text="{helpers:ResourceString Name=OpenApp}">
                                                                         <MenuFlyoutItem.Icon>
-                                                                            <FontIcon Glyph="&#xEC15;" />
+                                                                            <FontIcon Glyph="&#xED35;" />
                                                                         </MenuFlyoutItem.Icon>
                                                                     </MenuFlyoutItem>
                                                                     <MenuFlyoutItem
@@ -526,8 +526,23 @@
                     SelectionChanged="NavigationView_SelectionChanged">
                     <NavigationView.MenuItems>
                         <NavigationViewItem
-                            Content="{helpers:ResourceString Name=Settings}"
+                            Content="{helpers:ResourceString Name=Messages}"
                             IsSelected="True"
+                            Tag="Messages">
+                            <NavigationViewItem.Icon>
+                                <FontIcon Glyph="&#xE8BD;" />
+                            </NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem
+                            Content="{helpers:ResourceString Name=Apps}"
+                            Tag="Apps">
+                            <NavigationViewItem.Icon>
+                                <FontIcon Glyph="&#xED35;" />
+                            </NavigationViewItem.Icon>
+                        </NavigationViewItem>
+
+                        <NavigationViewItem
+                            Content="{helpers:ResourceString Name=Settings}"
                             Tag="Settings">
                             <NavigationViewItem.Icon>
                                 <AnimatedIcon>

@@ -2,29 +2,25 @@
 using AdvancedSharpAdbClient.Models;
 using CommunityToolkit.WinUI;
 using Microsoft.UI.Dispatching;
+using Sefirah.App.Data.Contracts;
+using Sefirah.App.Data.Models;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace Sefirah.App.Services;
 
-public class AdbDevice
-{
-    public string Serial { get; set; } = string.Empty;
-    public string Model { get; set; } = string.Empty;
-    public DeviceState State { get; set; }
-}
-
-public interface IAdbDeviceMonitor
+public interface IAdbService
 {
     ObservableCollection<AdbDevice> Devices { get; }
     Task StartAsync();
+    void ConnectWireless(string host, int port=5555);
     Task StopAsync();
     bool IsMonitoring { get; }
 }
 
-public class AdbDeviceMonitor(
-    ILogger logger
-) : IAdbDeviceMonitor
+public class AdbService(
+    ILogger logger,
+    IUserSettingsService userSettingsService
+) : IAdbService
 {
     private CancellationTokenSource? cts;
     private DeviceMonitor? deviceMonitor;
@@ -33,7 +29,7 @@ public class AdbDeviceMonitor(
     public ObservableCollection<AdbDevice> Devices { get; } = [];
     public bool IsMonitoring => deviceMonitor != null && !(cts?.IsCancellationRequested ?? true);
 
-    private readonly string adbPath = "D:\\Artifacts\\scrcpy-win64-v3.1\\adb.exe";
+    private readonly string adbPath = $"{userSettingsService.FeatureSettingsService.ScrcpyPath}\\adb.exe";
     
     public async Task StartAsync()
     {
@@ -116,7 +112,7 @@ public class AdbDeviceMonitor(
         {
             // Refresh the full device information
             var connectedDevice = await GetFullDeviceInfoAsync(e.Device);
-            
+            Devices.Add(connectedDevice);
             logger.Info($"Device connected: {connectedDevice.Model} ({connectedDevice.Serial})");
             
         }
@@ -144,7 +140,11 @@ public class AdbDeviceMonitor(
         try
         {
             logger.Info($"Device state changed: {e.Device.Serial} {e.OldState} -> {e.NewState}");
-            
+            var index = Devices.IndexOf(Devices.FirstOrDefault(d => d.Serial == e.Device.Serial));
+            if (index != -1)
+            {
+                Devices[index].State = e.NewState;
+            }
         }
         catch (Exception ex)
         {
@@ -157,7 +157,12 @@ public class AdbDeviceMonitor(
         try
         {
             var devices = await adbClient.GetDevicesAsync();
-            
+            if (!devices.Any())
+            {
+                logger.Warn("No devices found");
+                Devices.Clear();
+                return;
+            }
             // Convert to our AdbDevice model and add to collection
             await DispatcherQueue.GetForCurrentThread().EnqueueAsync(() =>
             {
@@ -168,7 +173,8 @@ public class AdbDeviceMonitor(
                     {
                         Serial = device.Serial,
                         Model = device.Model ?? "Unknown",
-                        State = device.State
+                        State = device.State,
+                        Type = device.Serial.Contains(':') ? DeviceType.Tcpip : DeviceType.Usb
                     };
                     Devices.Add(adbDevice);
                 }
@@ -187,25 +193,38 @@ public class AdbDeviceMonitor(
             // Get full device information including model
             var devices = await adbClient.GetDevicesAsync();
             var fullDeviceData = devices.FirstOrDefault(d => d.Serial == deviceData.Serial);
-            
             return new AdbDevice
             {
                 Serial = fullDeviceData.Serial,
                 Model = fullDeviceData.Model ?? "Unknown",
-                State = fullDeviceData.State
+                State = fullDeviceData.State,
+                Type = fullDeviceData.Serial.Contains(':') ? DeviceType.Tcpip : DeviceType.Usb
             };
         }
         catch (Exception ex)
         {
             logger.Error($"Error getting full device info for {deviceData.Serial}", ex);
-            
             // Return basic information if we can't get full details
             return new AdbDevice
             {
                 Serial = deviceData.Serial,
                 Model = "Unknown",
-                State = deviceData.State
+                State = deviceData.State,
+                Type = deviceData.Serial.Contains(':') ? DeviceType.Tcpip : DeviceType.Usb
             };
+        }
+    }
+
+    public async void ConnectWireless(string host, int port=5555)
+    {
+        try
+        {
+            var result = await adbClient.ConnectAsync(host, port);
+            logger.Info($"{host}:{port} - {result}");
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Error connecting to default wireless device", ex);
         }
     }
 

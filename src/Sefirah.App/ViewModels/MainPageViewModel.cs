@@ -93,12 +93,10 @@ public sealed class MainPageViewModel : BaseViewModel
                 await NotificationService.ClearHistory();
             }
 
-            // Update connection status and device info
             ConnectionStatus = args.IsConnected;
             
             if (args.Device != null)
             {
-                // Ensure the new device has its image loaded
                 if (args.Device.WallpaperBytes != null && args.Device.WallpaperImage == null)
                 {
                     args.Device.WallpaperImage = await args.Device.WallpaperBytes.ToBitmapAsync();
@@ -143,9 +141,19 @@ public sealed class MainPageViewModel : BaseViewModel
         }
     }
 
-    public async Task OpenApp(string appPackage)
+    public async Task OpenApp(Notification notification)
     {
-        await ScreenMirrorService.StartScrcpy(customArgs: $"--new-display --start-app={appPackage}");
+        var notificationToInvoke = new NotificationMessage
+        {
+            NotificationType = NotificationType.Invoke,
+            NotificationKey = notification.Key,
+        };
+        
+        await ScreenMirrorService.StartScrcpy(customArgs: $"--new-display --start-app={notification.AppPackage}");
+        // Scrcpy doesn't have a way of opening notifications afaik, so we will just have the notification listener on Android to open it for us
+        // Plus we have to wait (3s will do?) until the app is actually launched to send the intent for launching the notification since Google added a lot more restrictions in this particular case
+        await Task.Delay(3000);
+        SessionManager.SendMessage(SocketMessageSerializer.Serialize(notificationToInvoke));
     }
 
     private async void getLastConnectedDevice()
@@ -180,7 +188,7 @@ public sealed class MainPageViewModel : BaseViewModel
     {
         if (ConnectionStatus)
         {
-            var message = new Misc { MiscType = nameof(MiscType.Disconnect) };
+            var message = new Misc { MiscType = MiscType.Disconnect };
             SessionManager.SendMessage(SocketMessageSerializer.Serialize(message));
             await Task.Delay(50);
             SessionManager.DisconnectSession();

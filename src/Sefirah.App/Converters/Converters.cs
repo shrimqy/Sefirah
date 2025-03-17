@@ -538,3 +538,129 @@ public class RingerModeToIconConverter : IValueConverter
         throw new NotImplementedException();
     }
 }
+
+public class MessageTypeToAlignmentConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        // values: 1 = INBOX, 2 = SENT 
+        int messageType = (int)value;
+        return messageType == 2 ? HorizontalAlignment.Right : HorizontalAlignment.Left;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class UnixTimestampConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (value is long unixTimestampMs)
+        {
+            // Convert Unix timestamp (milliseconds) to DateTime
+            DateTime dateTime = DateTimeOffset.FromUnixTimeMilliseconds(unixTimestampMs).LocalDateTime;
+            
+            // Format based on how recent the message is
+            if (dateTime.Date == DateTime.Today)
+            {
+                // Today - show only time
+                return dateTime.ToString("t"); // Short time pattern (e.g., 3:15 PM)
+            }
+            else if (dateTime.Date == DateTime.Today.AddDays(-1))
+            {
+                // Yesterday
+                return "Yesterday " + dateTime.ToString("t");
+            }
+            else if (dateTime.Date > DateTime.Today.AddDays(-7))
+            {
+                // Within the last week
+                return dateTime.ToString("ddd") + " " + dateTime.ToString("t"); // Day abbreviation (e.g., Mon) + time
+            }
+            else if (dateTime.Year == DateTime.Today.Year)
+            {
+                // This year
+                return dateTime.ToString("MMM d"); // Month abbreviation + day (e.g., Jul 15)
+            }
+            else
+            {
+                // Older
+                return dateTime.ToString("MMM d, yyyy"); // Month abbreviation + day + year (e.g., Jul 15, 2023)
+            }
+        }
+        
+        return string.Empty;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class IndexConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (value is int intValue)
+        {
+            // Convert from 1-based SIM ID to 0-based index
+            return intValue - 1;
+        }
+        return 0;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        if (value is int intValue)
+        {
+            // Convert from 0-based index to 1-based SIM ID
+            return intValue + 1;
+        }
+        return 1;
+    }
+}
+
+public class GreaterThanOneToVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (value is int count && count > 1)
+        {
+            return Visibility.Visible;
+        }
+        return Visibility.Collapsed;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class SubscriptionToIconConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (value is int subscription)   
+        {
+            return subscription switch
+            {
+                1 => "\uE884",
+                2 => "\uE882",
+                _ => "\uE884"   
+            };
+        }
+        return "\uE884";
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language) 
+    {
+        throw new NotImplementedException();
+    }
+}   
+
+
+

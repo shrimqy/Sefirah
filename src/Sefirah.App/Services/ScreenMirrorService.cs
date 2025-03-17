@@ -1,15 +1,17 @@
-﻿using Sefirah.App.Data.Contracts;
+﻿using AdvancedSharpAdbClient.Models;
+using Sefirah.App.Data.Contracts;
+using Sefirah.App.Data.Models;
 
 namespace Sefirah.App.Services;
 public class ScreenMirrorService(
     ILogger logger,
-    IUserSettingsService userSettingsService
+    IUserSettingsService userSettingsService,
+    IAdbService adbService
 ) : IScreenMirrorService
 {
-    private Process? _scrcpyProcess;
-    private CancellationTokenSource? _cts;
-    
-    public bool IsRunning => _scrcpyProcess != null && !_scrcpyProcess.HasExited;
+    private ObservableCollection<AdbDevice> devices = adbService.Devices;
+    private List<Process> scrcpyProcesses = []; // what was this for anyway
+    private CancellationTokenSource? cts;
     
     public async Task<bool> StartScrcpy(
         string? deviceId = null, 
@@ -18,13 +20,6 @@ public class ScreenMirrorService(
     {
         try
         {
-            if (IsRunning)
-            {
-                logger.Warn("Scrcpy is already running");
-                return false;
-            }
-            
-            
             var scrcpyPath = userSettingsService.FeatureSettingsService.ScrcpyPath;
             if (string.IsNullOrEmpty(scrcpyPath))
             {
@@ -35,11 +30,11 @@ public class ScreenMirrorService(
             // Build arguments for scrcpy
             var args = BuildScrcpyArguments(deviceId, wireless, customArgs);
             
-            _cts = new CancellationTokenSource();
+            cts = new CancellationTokenSource();
             
             return await Task.Run(() =>
             {
-                _scrcpyProcess = new Process
+                var process = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
@@ -53,32 +48,31 @@ public class ScreenMirrorService(
                     EnableRaisingEvents = true
                 };
                 
-                _scrcpyProcess.OutputDataReceived += (sender, e) => 
+                process.OutputDataReceived += (sender, e) => 
                 {
                     if (!string.IsNullOrEmpty(e.Data))
                         logger.Info($"scrcpy: {e.Data}");
                 };
                 
-                _scrcpyProcess.ErrorDataReceived += (sender, e) => 
+                process.ErrorDataReceived += (sender, e) => 
                 {
                     if (!string.IsNullOrEmpty(e.Data))
                         logger.Error($"scrcpy error: {e.Data}");
                 };
                 
-                _scrcpyProcess.Exited += (sender, e) =>
+                process.Exited += (sender, e) =>
                 {
-                    logger.Info($"scrcpy process exited with code {_scrcpyProcess.ExitCode}");
-                    _scrcpyProcess?.Dispose();
-                    _scrcpyProcess = null;
-                    _cts?.Dispose();
-                    _cts = null;
+                    logger.Info($"scrcpy process exited with code {process.ExitCode}");
+                    process?.Dispose();
+                    cts?.Dispose();
+                    cts = null;
                 };
                 
-                bool started = _scrcpyProcess.Start();
+                bool started = process.Start();
                 if (started)
                 {
-                    _scrcpyProcess.BeginOutputReadLine();
-                    _scrcpyProcess.BeginErrorReadLine();
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
                     logger.Info("scrcpy process started successfully");
                 }
                 else
@@ -87,7 +81,7 @@ public class ScreenMirrorService(
                 }
                 
                 return started;
-            }, _cts.Token);
+            }, cts.Token);
         }
         catch (Exception ex)
         {
@@ -100,24 +94,20 @@ public class ScreenMirrorService(
     {
         try
         {
-            if (!IsRunning)
+            cts?.Cancel();
+            
+            foreach (var process in scrcpyProcesses)
             {
-                logger.Warn("No scrcpy process is currently running");
-                return true;
+                if (process != null && !process.HasExited)
+                {
+                    process.Kill(true);
+                    await process.WaitForExitAsync();
+                    process.Dispose();
+                }
             }
             
-            _cts?.Cancel();
-            
-            if (_scrcpyProcess != null && !_scrcpyProcess.HasExited)
-            {
-                _scrcpyProcess.Kill(true);
-                await _scrcpyProcess.WaitForExitAsync();
-                _scrcpyProcess.Dispose();
-                _scrcpyProcess = null;
-            }
-            
-            _cts?.Dispose();
-            _cts = null;
+            cts?.Dispose();
+            cts = null;
             
             logger.Info("scrcpy process stopped successfully");
             return true;
@@ -189,11 +179,25 @@ public class ScreenMirrorService(
         }
         
         //args.Add("--stay-awake"); // Keep the device awake
-        args.Add("--show-touches"); // Show taps on screen
+        //args.Add("--show-touches"); // Show taps on screen
 
-        if (wireless)
+        // Only continue with device selection if the user hasn't already specified a device
+        bool hasDeviceSelectionFlag = !string.IsNullOrEmpty(customArgs) && 
+            (customArgs.Contains(" -s ") || customArgs.Contains(" -d ") || 
+             customArgs.Contains(" -e ") || customArgs.StartsWith("-s ") || 
+             customArgs.StartsWith("-d ") || customArgs.StartsWith("-e "));
+            
+        if (devices.Count > 1 && !hasDeviceSelectionFlag && string.IsNullOrEmpty(deviceId))
         {
-            // TODO: Implement wireless connection
+            var usbDevice = devices.FirstOrDefault(d => d.Type == DeviceType.Usb && d.State == DeviceState.Online);
+            if (usbDevice != null)
+            {
+                args.Add("-d");  // Use USB device
+            }
+            else
+            {
+                args.Add("-e");  // Use TCP device
+            }
         }
         
         return string.Join(" ", args);

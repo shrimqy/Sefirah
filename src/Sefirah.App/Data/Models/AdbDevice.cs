@@ -1,9 +1,16 @@
-﻿namespace Sefirah.App.Data.Models;
+﻿using AdvancedSharpAdbClient.Models;
+
+namespace Sefirah.App.Data.Models;
 public class AdbDevice
 {
-    public string Name { get; set; }
-    public string Id { get; set; }
-    public string Serial { get; set; }
-    public string Product { get; set; }
-    public string Model { get; set; }
+    public string Serial { get; set; } = string.Empty;
+    public string Model { get; set; } = string.Empty;
+    public DeviceState State { get; set; }
+    public DeviceType Type { get; set; }
+}
+
+public enum DeviceType
+{
+    Usb,
+    Tcpip
 }

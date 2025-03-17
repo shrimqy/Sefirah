@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Xaml.Media.Imaging;
+using Sefirah.App.Data.Enums;
 using Sefirah.App.Extensions;
 using Sefirah.App.Helpers;
 
@@ -9,7 +10,7 @@ public class Notification
     public string Key { get; set; } = string.Empty;
     public bool IsPinned { get; set; } = false;
     public string? TimeStamp { get; set; }
-    public string Type { get; set; } = string.Empty;
+    public NotificationType Type { get; set; }
     public string? AppName { get; set; }
     public string? AppPackage { get; set; }
     public string? Title { get; set; }

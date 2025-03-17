@@ -20,10 +20,6 @@ namespace Sefirah.App.Helpers;
 /// </summary>
 public static class AppLifecycleHelper
 {
-    internal static void CloseApp()
-    {
-        MainWindow.Instance.Close();
-    }
 
     /// <summary>
     /// Gets application package version.
@@ -54,8 +50,8 @@ public static class AppLifecycleHelper
         mdnsService.StartDiscovery();
         toastNotificationService.RegisterNotification();
 
-        //var adbDeviceMonitor = Ioc.Default.GetRequiredService<IAdbDeviceMonitor>();
-        //await adbDeviceMonitor.StartAsync();
+        var adbService = Ioc.Default.GetRequiredService<IAdbService>();
+        await adbService.StartAsync();
     }
 
 
@@ -91,7 +87,7 @@ public static class AppLifecycleHelper
                 .AddSingleton<IRemoteAppsRepository, RemoteAppsRepository>()
                 .AddSingleton<DeviceRepository>()
 
-                .AddSingleton<IAdbDeviceMonitor, AdbDeviceMonitor>()
+                .AddSingleton<IAdbService, AdbService>()
 
                 // Services
                 .AddSingleton<IDeviceManager, DeviceManager>()
@@ -103,17 +99,19 @@ public static class AppLifecycleHelper
                 .AddSingleton<IFileTransferService, FileTransferService>()
                 .AddSingleton(sp => (ITcpClientProvider)sp.GetRequiredService<IFileTransferService>())
                 .AddSingleton<IMdnsService, MdnsService>()
+                .AddSingleton<ISmsHandlerService, SmsHandlerService>()
                 .AddSingleton<IClipboardService, ClipboardService>()
                 .AddSingleton<IPlaybackService, PlaybackService>()
                 .AddSingleton<INotificationService, NotificationService>()
                 .AddSingleton<ToastNotificationService>()
-
                 .AddScoped<IMessageHandlerService, MessageHandlerService>()
                 .AddSingleton<Func<IMessageHandlerService>>(sp => () => sp.GetRequiredService<IMessageHandlerService>())
 
                 // ViewModels
                 .AddSingleton<MainPageViewModel>()
                 .AddSingleton<DevicesViewModel>()
+                .AddSingleton<MessagesViewModel>()
+                .AddSingleton<AppsViewModel>()
             ).Build();
     }
 

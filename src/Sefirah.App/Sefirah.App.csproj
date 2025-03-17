@@ -25,7 +25,7 @@
     <ItemGroup>
         <Content CopyToOutputDirectory="PreserveNewest" Include="Assets\**" />
     </ItemGroup>
-    
+
     <ItemGroup>
         <PackageReference Include="AdvancedSharpAdbClient" Version="3.3.13" />
         <PackageReference Include="BouncyCastle.Cryptography" Version="2.5.0" />
@@ -33,7 +33,7 @@
         <PackageReference Include="CommunityToolkit.WinUI.Behaviors" Version="8.1.240916" />
         <PackageReference Include="CommunityToolkit.WinUI.Helpers" Version="8.1.240916" />
         <PackageReference Include="CommunityToolkit.WinUI.Media" Version="8.1.240916" />
-        <PackageReference Include="H.NotifyIcon.WinUI" Version="2.2.0" />
+        <PackageReference Include="H.NotifyIcon.WinUI" Version="2.3.0" />
         <PackageReference Include="MeaMod.DNS" Version="1.0.71" />
         <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.1" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.1" />
@@ -54,7 +54,7 @@
     <ItemGroup>
         <AdditionalFiles Include="Strings\en-US\Resources.resw" />
     </ItemGroup>
-        
+
     <!-- Publish Properties -->
     <PropertyGroup>
         <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
