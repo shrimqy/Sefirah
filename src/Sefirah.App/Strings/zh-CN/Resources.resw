@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string"/>
-              <xsd:attribute name="type" type="xsd:string"/>
-              <xsd:attribute name="mimetype" type="xsd:string"/>
-              <xsd:attribute ref="xml:space"/>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string"/>
-              <xsd:attribute name="name" type="xsd:string"/>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
-              <xsd:attribute ref="xml:space"/>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required"/>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -118,321 +118,320 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="About" xml:space="preserve">
-    <value>关于</value>
+    <value>About</value>
   </data>
   <data name="General" xml:space="preserve">
-    <value>通用</value>
+    <value>General</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>设置</value>
+    <value>Settings</value>
   </data>
   <data name="PrivacyPolicy" xml:space="preserve">
-    <value>隐私政策</value>
+    <value>Privacy Policy</value>
   </data>
   <data name="SupportDevelopment" xml:space="preserve">
-    <value>协助开发</value>
+    <value>Support Development</value>
   </data>
   <data name="OpenLogs" xml:space="preserve">
-    <value>打开日志</value>
+    <value>Open Logs</value>
   </data>
   <data name="GitHubRepository" xml:space="preserve">
-    <value>Github 源码仓库</value>
+    <value>GitHub Repository</value>
   </data>
   <data name="AndroidGitHubRepository" xml:space="preserve">
-    <value>Android GitHub 源码仓库</value>
+    <value>Android GitHub Repository</value>
   </data>
   <data name="Clipboard" xml:space="preserve">
-    <value>剪贴板</value>
+    <value>Clipboard</value>
   </data>
   <data name="Feedback" xml:space="preserve">
-    <value>反馈</value>
+    <value>Feedback</value>
   </data>
   <data name="Notifications" xml:space="preserve">
-    <value>通知</value>
+    <value>Notifications</value>
   </data>
   <data name="ThirdPartyLibraries" xml:space="preserve">
-    <value>第三方库</value>
+    <value>Third party libraries</value>
   </data>
   <data name="SaveLocation" xml:space="preserve">
-    <value>保存位置</value>
+    <value>Save location</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>远程存储位置</value>
+    <value>Remote storage location</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
-    <value>显示剪贴板提示</value>
+    <value>Show clipboard toast</value>
   </data>
   <data name="ImageToClipboard" xml:space="preserve">
-    <value>在剪贴板监视器中包含图像</value>
+    <value>Include images in clipboard monitor</value>
   </data>
   <data name="ClipboardFiles" xml:space="preserve">
-    <value>将收到的文件添加到剪贴板</value>
+    <value>Add received files to clipboard</value>
   </data>
   <data name="NotificationsDescription" xml:space="preserve">
-    <value>从远程设备接收通知</value>
+    <value>Receive notifications from remote device</value>
   </data>
   <data name="GeneralSettings" xml:space="preserve">
-    <value>常规设置</value>
+    <value>General Settings</value>
   </data>
   <data name="ShowNotificationToast" xml:space="preserve">
-    <value>显示通知提示</value>
+    <value>Show notification toast</value>
   </data>
   <data name="IgnoreWindowsApps" xml:space="preserve">
-    <value>忽略活动 Windows 应用程序的远程通知</value>
+    <value>Ignore remote notifications from active Windows apps</value>
   </data>
   <data name="NotificationFilterDisabled.Content" xml:space="preserve">
-    <value>禁用</value>
+    <value>Disabled</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>通知订阅</value>
+    <value>Notification Feed</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>通知订阅 + Toast</value>
+    <value>Notification Feed + Toast</value>
   </data>
   <data name="PairedDevices.Title" xml:space="preserve">
-    <value>已配对设备</value>
+    <value>Paired Devices</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
-    <value>可用设备</value>
+    <value>Available Devices</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
-    <value>正在同一网络中运行应用程序的安卓设备将显示在下方</value>
+    <value>Android devices that are running the app in the same network will show up below</value>
   </data>
   <data name="StartupOption" xml:space="preserve">
-    <value>启动项</value>
+    <value>Startup option</value>
   </data>
   <data name="StartupOptionDescription" xml:space="preserve">
-    <value>选择当 Windows 启动时应用程序的启动方式</value>
+    <value>Choose how the app starts when Windows boots</value>
   </data>
   <data name="StartupOptionMinimized.Content" xml:space="preserve">
-    <value>启动最小化</value>
+    <value>Start minimized</value>
   </data>
   <data name="StartupOptionMaximized.Content" xml:space="preserve">
-    <value>启动最大化</value>
+    <value>Start maximized</value>
   </data>
   <data name="StartupOptionSystemTray.Content" xml:space="preserve">
-    <value>在系统托盘中启动</value>
+    <value>Start in system tray</value>
   </data>
   <data name="StartupOptionDisabled.Content" xml:space="preserve">
-    <value>禁用</value>
+    <value>Disabled</value>
   </data>
   <data name="Theme" xml:space="preserve">
-    <value>主题</value>
+    <value>Theme</value>
   </data>
   <data name="ThemeDescription" xml:space="preserve">
-    <value>选择您默认应用主题</value>
+    <value>Choose your default app theme</value>
   </data>
   <data name="Default" xml:space="preserve">
-    <value>默认</value>
+    <value>Default</value>
   </data>
   <data name="ThemeLight.Content" xml:space="preserve">
-    <value>浅色</value>
+    <value>Light</value>
   </data>
   <data name="ThemeDark.Content" xml:space="preserve">
-    <value>暗色</value>
+    <value>Dark</value>
   </data>
   <data name="RemoveDeviceDialogTitle" xml:space="preserve">
-    <value>删除设备</value>
+    <value>Remove Device</value>
   </data>
   <data name="Remove" xml:space="preserve">
-    <value>删除</value>
+    <value>Remove</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>取消</value>
+    <value>Cancel</value>
   </data>
   <data name="OnboardingWelcome.Title" xml:space="preserve">
-    <value>欢迎使用 Sefirah</value>
+    <value>Welcome to Sefirah</value>
   </data>
   <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
-    <value>要开始下载并通过相应的 github
-页面安装 comapanion 应用程序。</value>
+    <value>To get started download and install the comapanion app through the corresponding github
+page.</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
-    <value>开始</value>
+    <value>Get Started</value>
   </data>
   <data name="OnboardingSkip" xml:space="preserve">
-    <value>跳过</value>
+    <value>Skip for now</value>
   </data>
   <data name="OnboardingDevice.Title" xml:space="preserve">
-    <value>连接您的设备</value>
+    <value>Connect Your Device</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>在您的网络中发现的设备将出现在下面，并从您的
-移动设备启动连接 (请确保引脚匹配)</value>
+    <value>Discovered devices in your network will appear below, and initiate the connection from your
+mobile (Make sure the pin matches)</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>设备连接请求</value>
+    <value>Device Connection Request</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
-    <value>验证两台设备上的密码匹配：</value>
+    <value>Verify the passkey matches on both devices:</value>
   </data>
   <data name="ConnectionRequestRejectButton" xml:space="preserve">
-    <value>拒绝</value>
+    <value>Reject</value>
   </data>
   <data name="NotificationsClearButton" xml:space="preserve">
-    <value>清除</value>
+    <value>Clear all</value>
   </data>
   <data name="ConnectionRequestAcceptButton" xml:space="preserve">
-    <value>同意</value>
+    <value>Accept</value>
   </data>
   <data name="NoDevicesFound" xml:space="preserve">
-    <value>未找到任何设备</value>
+    <value>No devices found</value>
   </data>
   <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
-    <value>密码</value>
+    <value>PASSKEY</value>
   </data>
   <data name="GitHub" xml:space="preserve">
     <value>GitHub</value>
   </data>
   <data name="ClipboardDescription" xml:space="preserve">
-    <value>在不同设备之间同步剪贴板</value>
+    <value>Sync your clipboard across devices</value>
   </data>
   <data name="StartupOptionsDescription" xml:space="preserve">
-    <value>选择当 Windows 启动时应用程序的启动方式</value>
+    <value>Choose how the app starts when Windows boots</value>
   </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
-    <value>在浏览器中打开链接</value>
+    <value>Open links in browser</value>
   </data>
   <data name="Connected.Text" xml:space="preserve">
-    <value>已连接</value>
+    <value>Connected</value>
   </data>
   <data name="Disconnected.Text" xml:space="preserve">
-    <value>未连接</value>
+    <value>Disconnected</value>
   </data>
   <data name="ShowHideWindow" xml:space="preserve">
-    <value>显示/隐藏窗口</value>
+    <value>Show/Hide Window</value>
   </data>
   <data name="Exit" xml:space="preserve">
-    <value>退出</value>
+    <value>Exit</value>
   </data>
   <data name="Features" xml:space="preserve">
-    <value>功能</value>
+    <value>Features</value>
   </data>
   <data name="SelectLocation" xml:space="preserve">
-    <value>选择位置</value>
+    <value>Select location</value>
   </data>
   <data name="RemoveDeviceDialogSubtitle" xml:space="preserve">
-    <value>您确定要删除 '{0}'？此操作不能撤消。</value>
+    <value>Are you sure you want to remove '{0}'? This action cannot be undone.</value>
   </data>
   <data name="AppSpecificSettings" xml:space="preserve">
-    <value>应用特定设置</value>
+    <value>App-specific Settings</value>
   </data>
   <data name="TransferNotificationReceiving.Content" xml:space="preserve">
-    <value>正在接收 {0}</value>
+    <value>Receiving {0}</value>
   </data>
   <data name="TransferNotificationReceivingError" xml:space="preserve">
-    <value>接收 {0} 时出错</value>
+    <value>Error while receiving {0}</value>
   </data>
   <data name="TransferNotificationReceiving.Title" xml:space="preserve">
-    <value>正在接收文件</value>
+    <value>Receiving File</value>
   </data>
   <data name="TransferNotificationReceived.Title" xml:space="preserve">
-    <value>收到的文件</value>
+    <value>Received File</value>
   </data>
   <data name="TransferNotification.Title" xml:space="preserve">
-    <value>文件传输</value>
+    <value>File Transfer</value>
   </data>
   <data name="SendButton" xml:space="preserve">
-    <value>发送</value>
+    <value>Send</value>
   </data>
   <data name="ReplyPlaceholder" xml:space="preserve">
-    <value>输入回复</value>
+    <value>Type a reply</value>
   </data>
   <data name="TransferNotificationActionOpenFile" xml:space="preserve">
-    <value>打开文件</value>
+    <value>Open file</value>
   </data>
   <data name="TransferNotificationActionOpenFolder" xml:space="preserve">
-    <value>打开文件夹</value>
+    <value>Open folder</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
-    <value>关闭从 {0} 的通知</value>
+    <value>Turn off notifications from {0}</value>
   </data>
   <data name="SubmitBugReport" xml:space="preserve">
-    <value>报告错误
-</value>
+    <value>Report a bug</value>
   </data>
   <data name="SubmitFeatureRequest" xml:space="preserve">
-    <value>功能请求</value>
+    <value>Feature request</value>
   </data>
   <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
-    <value>当手机在 DND 时不显示通知</value>
+    <value>Do not show notification toast when phone is in DND</value>
   </data>
   <data name="Devices" xml:space="preserve">
-    <value>设备</value>
+    <value>Devices</value>
   </data>
   <data name="RingerModeNormal.Content" xml:space="preserve">
-    <value>普通</value>
+    <value>Normal</value>
   </data>
   <data name="RingerModeSilent.Content" xml:space="preserve">
-    <value>静音</value>
+    <value>Silent</value>
   </data>
   <data name="RingerModeVibrate.Content" xml:space="preserve">
-    <value>振动</value>
+    <value>Vibrate</value>
   </data>
   <data name="Pin" xml:space="preserve">
-    <value>置顶</value>
+    <value>Pin</value>
   </data>
   <data name="Unpin" xml:space="preserve">
-    <value>取消置顶</value>
+    <value>Unpin</value>
   </data>
   <data name="ScreenMirror" xml:space="preserve">
-    <value>屏幕镜像</value>
+    <value>Screen Mirror</value>
   </data>
   <data name="VideoSettings" xml:space="preserve">
-    <value>视频设置</value>
+    <value>Video Settings</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>音频设置</value>
+    <value>Audio Settings</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
-    <value>在移动应用中打开</value>
+    <value>Open in app</value>
   </data>
   <data name="ScreenOff" xml:space="preserve">
-    <value>镜像时保持设备屏幕关闭</value>
+    <value>Keep device screen off while mirroring</value>
   </data>
   <data name="PhysicalKeyboard" xml:space="preserve">
-    <value>禁用虚拟键盘</value>
+    <value>Disable on-screen keyboard</value>
   </data>
   <data name="Bitrate" xml:space="preserve">
-    <value>码率</value>
+    <value>Bitrate</value>
   </data>
   <data name="Resolution" xml:space="preserve">
-    <value>分辨率</value>
+    <value>Resolution</value>
   </data>
   <data name="Buffer" xml:space="preserve">
-    <value>缓冲</value>
+    <value>Buffer</value>
   </data>
   <data name="Messages" xml:space="preserve">
-    <value>信息</value>
+    <value>Messages</value>
   </data>
   <data name="EmptyMessages" xml:space="preserve">
-    <value>选择要查看消息的对话</value>
+    <value>Select a conversation to view messages</value>
   </data>
   <data name="MessagePlaceholder" xml:space="preserve">
-    <value>输入一条消息</value>
+    <value>Type a message</value>
   </data>
   <data name="Apps" xml:space="preserve">
-    <value>应用程序</value>
+    <value>Apps</value>
   </data>
   <data name="NewMessage" xml:space="preserve">
-    <value>新消息</value>
+    <value>New message</value>
   </data>
   <data name="SearchMessages" xml:space="preserve">
-    <value>搜索消息</value>
+    <value>Search messages</value>
   </data>
   <data name="AddressInputPlaceholder" xml:space="preserve">
-    <value>输入电话号码并按回车键</value>
+    <value>Enter phone number and press Enter</value>
   </data>
   <data name="RemoveAddress" xml:space="preserve">
-    <value>删除地址</value>
+    <value>Remove address</value>
   </data>
   <data name="CopyMessage" xml:space="preserve">
-    <value>复制消息</value>
+    <value>Copy message</value>
   </data>
   <data name="NoApps" xml:space="preserve">
-    <value>未找到应用</value>
+    <value>No apps found</value>
   </data>
   <data name="AllApps" xml:space="preserve">
-    <value>所有应用</value>
+    <value>All Apps</value>
   </data>
 </root>
