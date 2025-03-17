@@ -43,6 +43,20 @@ public class SmsHandlerService(
                             Conversations.Insert(0, newConversation);
                         }
                         break;
+                    case ConversationType.ActiveUpdated:
+                        existingConversation = Conversations.FirstOrDefault(m => m.ThreadId == textConversation.ThreadId);
+                        if (existingConversation != null)
+                        {
+                            logger.Info("Updating existing conversation: {0}", existingConversation.ThreadId);
+                            existingConversation.NewMessageFromConversation(textConversation);
+                        }
+                        else
+                        {
+                            logger.Info("Active conversation not found, creating new: {0}", textConversation.ThreadId);
+                            var newConversation = new SmsConversation(textConversation);
+                            Conversations.Insert(0, newConversation);
+                        }
+                        break;
 
                     case ConversationType.Removed:
                         existingConversation = Conversations.FirstOrDefault(m => m.ThreadId == textConversation.ThreadId);

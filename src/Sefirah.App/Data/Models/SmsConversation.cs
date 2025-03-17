@@ -71,13 +71,51 @@ public partial class SmsConversation : INotifyPropertyChanged
         {
             throw new ArgumentException($"Thread ID mismatch: {textConversation.ThreadId} vs {ThreadId}");
         }
+        
+        // Track existing message IDs
         var existingMessageIds = new HashSet<long>(Messages.Select(m => m.UniqueId));
+        
+        // Track incoming message IDs
+        var incomingMessageIds = new HashSet<long>(textConversation.Messages.Select(m => m.UniqueId));
+        
+        // Find messages that exist locally but not in the incoming conversation (deleted remotely)
+        var messagesToRemove = Messages.Where(m => !incomingMessageIds.Contains(m.UniqueId)).ToList();
+        
+        // Remove messages that were deleted remotely
+        foreach (var message in messagesToRemove)
+        {
+            Messages.Remove(message);
+        }
         
         // Only add messages that don't already exist in our collection
         var newMessages = textConversation.Messages
             .Where(message => !existingMessageIds.Contains(message.UniqueId))
             .ToList();
             
+        foreach (var message in newMessages)
+        {
+            int insertIndex = 0;
+            
+            while (insertIndex < Messages.Count && 
+                   Messages[insertIndex].Timestamp < message.Timestamp)
+            {
+                insertIndex++;
+            }
+            
+            Messages.Insert(insertIndex, message);
+        }
+    }
+
+    public void NewMessageFromConversation(TextConversation textConversation)
+    {
+        // Track existing message IDs
+        var existingMessageIds = new HashSet<long>(Messages.Select(m => m.UniqueId));
+        
+        // Only add messages that don't already exist in our collection
+        var newMessages = textConversation.Messages
+            .Where(message => !existingMessageIds.Contains(message.UniqueId))
+            .ToList();
+
         foreach (var message in newMessages)
         {
             int insertIndex = 0;
