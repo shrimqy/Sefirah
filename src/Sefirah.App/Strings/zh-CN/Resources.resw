@@ -317,9 +317,6 @@
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>应用特定设置</value>
   </data>
-  <data name="AppSpecificSettings1" xml:space="preserve">
-    <value>应用特定设置</value>
-  </data>
   <data name="TransferNotificationReceiving.Content" xml:space="preserve">
     <value>正在接收 {0}</value>
   </data>
