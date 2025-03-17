@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -196,7 +196,7 @@
     <value>利用可能なデバイス</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
-    <value>同じネットワークに接続している Android デバイス</value>
+    <value>同じネットワークでアプリを実行している Android デバイスが以下に表示されます</value>
   </data>
   <data name="StartupOption" xml:space="preserve">
     <value>スタートアップ オプション</value>
@@ -358,46 +358,46 @@
     <value>デバイス</value>
   </data>
   <data name="RingerModeNormal.Content" xml:space="preserve">
-    <value>Normal</value>
+    <value>通常</value>
   </data>
   <data name="RingerModeSilent.Content" xml:space="preserve">
-    <value>Silent</value>
+    <value>サイレント</value>
   </data>
   <data name="RingerModeVibrate.Content" xml:space="preserve">
-    <value>Vibrate</value>
+    <value>振動</value>
   </data>
   <data name="Pin" xml:space="preserve">
-    <value>Pin</value>
+    <value>ピン留め</value>
   </data>
   <data name="Unpin" xml:space="preserve">
-    <value>Unpin</value>
+    <value>ピン留めを解除</value>
   </data>
   <data name="ScreenMirror" xml:space="preserve">
-    <value>Screen Mirror</value>
+    <value>スクリーンミラー</value>
   </data>
   <data name="VideoSettings" xml:space="preserve">
-    <value>Video Settings</value>
+    <value>映像設定</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>Audio Settings</value>
+    <value>オーディオ設定</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
     <value>Open in app</value>
   </data>
   <data name="ScreenOff" xml:space="preserve">
-    <value>Keep device screen off while mirroring</value>
+    <value>ミラーリング中は画面を消灯する</value>
   </data>
   <data name="PhysicalKeyboard" xml:space="preserve">
-    <value>Disable on-screen keyboard</value>
+    <value>オンスクリーンキーボードを無効化</value>
   </data>
   <data name="Bitrate" xml:space="preserve">
-    <value>Bitrate</value>
+    <value>ビットレート</value>
   </data>
   <data name="Resolution" xml:space="preserve">
-    <value>Resolution</value>
+    <value>解像度</value>
   </data>
   <data name="Buffer" xml:space="preserve">
-    <value>Buffer</value>
+    <value>バッファ</value>
   </data>
   <data name="Messages" xml:space="preserve">
     <value>Messages</value>
