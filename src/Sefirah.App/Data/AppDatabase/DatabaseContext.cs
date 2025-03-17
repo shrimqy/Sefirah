@@ -19,6 +19,11 @@ public class DatabaseContext(ILogger logger) : IDisposable
             // Create tables
             using var command = _connection.CreateCommand();
             command.CommandText = @"
+                CREATE TABLE IF NOT EXISTS Version (
+                    Version INTEGER PRIMARY KEY,
+                    AppliedOn DATETIME NOT NULL
+                );
+
                 CREATE TABLE IF NOT EXISTS ApplicationInfo (
                     AppPackage NVARCHAR(2048) PRIMARY KEY,
                     AppName NVARCHAR(2048),
@@ -59,22 +64,11 @@ public class DatabaseContext(ILogger logger) : IDisposable
     {
         try
         {
-            // Create version table if it doesn't exist
-            using (var createVersionTableCommand = _connection.CreateCommand())
-            {
-                createVersionTableCommand.CommandText = @"
-                    CREATE TABLE IF NOT EXISTS SchemaVersion (
-                        Version INTEGER PRIMARY KEY,
-                        AppliedOn DATETIME NOT NULL
-                    );";
-                await createVersionTableCommand.ExecuteNonQueryAsync();
-            }
-
             // Get current schema version
             int currentVersion = 0;
             using (var versionCommand = _connection.CreateCommand())
             {
-                versionCommand.CommandText = "SELECT MAX(Version) FROM SchemaVersion";
+                versionCommand.CommandText = "SELECT MAX(Version) FROM Version";
                 var result = await versionCommand.ExecuteScalarAsync();
                 if (result != null && result != DBNull.Value)
                 {
@@ -90,7 +84,7 @@ public class DatabaseContext(ILogger logger) : IDisposable
 
                 // Record that migration was applied
                 using var insertVersionCommand = _connection.CreateCommand();
-                insertVersionCommand.CommandText = "INSERT INTO SchemaVersion (Version, AppliedOn) VALUES (@Version, @AppliedOn)";
+                insertVersionCommand.CommandText = "INSERT INTO Version (Version, AppliedOn) VALUES (@Version, @AppliedOn)";
                 insertVersionCommand.Parameters.AddWithValue("@Version", migration.Version);
                 insertVersionCommand.Parameters.AddWithValue("@AppliedOn", DateTime.UtcNow);
                 await insertVersionCommand.ExecuteNonQueryAsync();
