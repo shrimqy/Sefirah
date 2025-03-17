@@ -17,6 +17,7 @@ public class NetworkService(
     Func<IMessageHandlerService> messageHandlerFactory,
     IDeviceManager deviceManager,
     IDiscoveryService discoveryService,
+    IAdbService adbService,
     ILogger logger) : INetworkService, ITcpServerProvider, ISessionManager, IDisposable
 {
     private readonly Lazy<IMessageHandlerService> messageHandler = new(messageHandlerFactory);
@@ -294,6 +295,8 @@ public class NetworkService(
                 isFirstMessage = false;
                 isVerified = true;
                 currentSession = session;
+                if (!string.IsNullOrEmpty(ipAddress))
+                    adbService.ConnectWireless(ipAddress);
                 await SendDeviceInfo(deviceInfo.PublicKey!);
                 NotifyClientConnectionChanged(device);
             }
