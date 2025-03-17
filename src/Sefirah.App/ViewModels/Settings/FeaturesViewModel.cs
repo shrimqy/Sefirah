@@ -2,13 +2,15 @@
 using Sefirah.App.Data.AppDatabase.Models;
 using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Enums;
+using Sefirah.App.Services;
 
 namespace Sefirah.App.ViewModels.Settings;
-
+ 
 public sealed partial class FeaturesViewModel : ObservableObject
 {
     private readonly IUserSettingsService UserSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
     private readonly IRemoteAppsRepository RemoteAppsRepository = Ioc.Default.GetRequiredService<IRemoteAppsRepository>();
+    private readonly IAdbService AdbService = Ioc.Default.GetRequiredService<IAdbService>();
     private readonly DispatcherQueue dispatcherQueue;
 
     public ObservableCollection<ApplicationInfoEntity> NotificationPreferences => RemoteAppsRepository.Applications;
@@ -146,6 +148,7 @@ public sealed partial class FeaturesViewModel : ObservableObject
         set
         {
             UserSettingsService.FeatureSettingsService.ScrcpyPath = value;
+            AdbService.StartAsync();
             OnPropertyChanged();
         }
     }

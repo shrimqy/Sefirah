@@ -29,8 +29,6 @@ public class AdbService(
     public ObservableCollection<AdbDevice> Devices { get; } = [];
     public bool IsMonitoring => deviceMonitor != null && !(cts?.IsCancellationRequested ?? true);
 
-    private readonly string adbPath = $"{userSettingsService.FeatureSettingsService.ScrcpyPath}\\adb.exe";
-    
     public async Task StartAsync()
     {
         if (IsMonitoring)
@@ -40,7 +38,7 @@ public class AdbService(
         }
         
         cts = new CancellationTokenSource();
-        
+        string adbPath = $"{userSettingsService.FeatureSettingsService.ScrcpyPath}\\adb.exe";
         try
         {
             // Start the ADB server if it's not running
