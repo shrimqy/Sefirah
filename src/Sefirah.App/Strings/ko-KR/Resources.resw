@@ -178,7 +178,7 @@
     <value>Show notification toast</value>
   </data>
   <data name="IgnoreWindowsApps" xml:space="preserve">
-    <value>Ignore apps if relevant app is active on Windows</value>
+    <value>Ignore remote notifications from active Windows apps</value>
   </data>
   <data name="NotificationFilterDisabled.Content" xml:space="preserve">
     <value>Disabled</value>
@@ -196,7 +196,7 @@
     <value>Available Devices</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
-    <value>Other Android devices that are running the app in the same network</value>
+    <value>Android devices that are running the app in the same network will show up below</value>
   </data>
   <data name="StartupOption" xml:space="preserve">
     <value>Startup option</value>
