@@ -315,6 +315,9 @@
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>アプリ固有の設定</value>
   </data>
+  <data name="AppSpecificSettings1" xml:space="preserve">
+    <value>App-specific Settings</value>
+  </data>
   <data name="TransferNotificationReceiving.Content" xml:space="preserve">
     <value>「{0}」を受信中</value>
   </data>
@@ -382,7 +385,7 @@
     <value>オーディオ設定</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
-    <value>アプリを開く</value>
+    <value>Open in app</value>
   </data>
   <data name="ScreenOff" xml:space="preserve">
     <value>ミラーリング中は画面を消灯する</value>
@@ -398,5 +401,38 @@
   </data>
   <data name="Buffer" xml:space="preserve">
     <value>バッファ</value>
+  </data>
+  <data name="Messages" xml:space="preserve">
+    <value>Messages</value>
+  </data>
+  <data name="EmptyMessages" xml:space="preserve">
+    <value>Select a conversation to view messages</value>
+  </data>
+  <data name="MessagePlaceholder" xml:space="preserve">
+    <value>Type a message</value>
+  </data>
+  <data name="Apps" xml:space="preserve">
+    <value>Apps</value>
+  </data>
+  <data name="NewMessage" xml:space="preserve">
+    <value>New message</value>
+  </data>
+  <data name="SearchMessages" xml:space="preserve">
+    <value>Search messages</value>
+  </data>
+  <data name="AddressInputPlaceholder" xml:space="preserve">
+    <value>Enter phone number and press Enter</value>
+  </data>
+  <data name="RemoveAddress" xml:space="preserve">
+    <value>Remove address</value>
+  </data>
+  <data name="CopyMessage" xml:space="preserve">
+    <value>Copy message</value>
+  </data>
+  <data name="NoApps" xml:space="preserve">
+    <value>No apps found</value>
+  </data>
+  <data name="AllApps" xml:space="preserve">
+    <value>All Apps</value>
   </data>
 </root>
