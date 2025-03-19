@@ -178,7 +178,7 @@
     <value>Показывать всплывающее уведомление</value>
   </data>
   <data name="IgnoreWindowsApps" xml:space="preserve">
-    <value>Ignore remote notifications from active Windows apps</value>
+    <value>Игнорировать удаленные уведомления от активных приложений Windows</value>
   </data>
   <data name="NotificationFilterDisabled.Content" xml:space="preserve">
     <value>Выкл</value>
@@ -301,7 +301,7 @@
     <value>Показать/Скрыть Окно</value>
   </data>
   <data name="Exit" xml:space="preserve">
-    <value>Exit</value>
+    <value>Выход</value>
   </data>
   <data name="Features" xml:space="preserve">
     <value>Функции</value>
@@ -334,7 +334,7 @@
     <value>Отправить</value>
   </data>
   <data name="ReplyPlaceholder" xml:space="preserve">
-    <value>Type a reply</value>
+    <value>Введите ответ</value>
   </data>
   <data name="TransferNotificationActionOpenFile" xml:space="preserve">
     <value>Открыть файл</value>
@@ -343,7 +343,7 @@
     <value>Открыть папку</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
-    <value>Turn off notifications from {0}</value>
+    <value>Выключить уведомления от {0}</value>
   </data>
   <data name="SubmitBugReport" xml:space="preserve">
     <value>Сообщить об ошибке</value>
@@ -352,84 +352,84 @@
     <value>Предложить новую функцию</value>
   </data>
   <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
-    <value>Do not show notification toast when phone is in DND</value>
+    <value>Не отображать всплывающие уведомления, когда устройство находится в беззвучном режиме</value>
   </data>
   <data name="Devices" xml:space="preserve">
-    <value>Devices</value>
+    <value>Устройства</value>
   </data>
   <data name="RingerModeNormal.Content" xml:space="preserve">
-    <value>Normal</value>
+    <value>Обычный</value>
   </data>
   <data name="RingerModeSilent.Content" xml:space="preserve">
-    <value>Silent</value>
+    <value>Без звука</value>
   </data>
   <data name="RingerModeVibrate.Content" xml:space="preserve">
-    <value>Vibrate</value>
+    <value>Вибрация</value>
   </data>
   <data name="Pin" xml:space="preserve">
-    <value>Pin</value>
+    <value>Закрепить</value>
   </data>
   <data name="Unpin" xml:space="preserve">
-    <value>Unpin</value>
+    <value>Открепить</value>
   </data>
   <data name="ScreenMirror" xml:space="preserve">
-    <value>Screen Mirror</value>
+    <value>Зеркальный экран</value>
   </data>
   <data name="VideoSettings" xml:space="preserve">
-    <value>Video Settings</value>
+    <value>Настройки видео</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>Audio Settings</value>
+    <value>Настройки аудио</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
-    <value>Open in app</value>
+    <value>Открыть в приложении</value>
   </data>
   <data name="ScreenOff" xml:space="preserve">
-    <value>Keep device screen off while mirroring</value>
+    <value>Во время трансляции отключайте экран устройства</value>
   </data>
   <data name="PhysicalKeyboard" xml:space="preserve">
-    <value>Disable on-screen keyboard</value>
+    <value>Отключить экранную клавиатуру</value>
   </data>
   <data name="Bitrate" xml:space="preserve">
-    <value>Bitrate</value>
+    <value>Битрейт</value>
   </data>
   <data name="Resolution" xml:space="preserve">
-    <value>Resolution</value>
+    <value>Разрешение</value>
   </data>
   <data name="Buffer" xml:space="preserve">
-    <value>Buffer</value>
+    <value>Буфер</value>
   </data>
   <data name="Messages" xml:space="preserve">
-    <value>Messages</value>
+    <value>Сообщения</value>
   </data>
   <data name="EmptyMessages" xml:space="preserve">
-    <value>Select a conversation to view messages</value>
+    <value>Выберите диалог для просмотра сообщений</value>
   </data>
   <data name="MessagePlaceholder" xml:space="preserve">
-    <value>Type a message</value>
+    <value>Написать сообщение</value>
   </data>
   <data name="Apps" xml:space="preserve">
-    <value>Apps</value>
+    <value>Приложения</value>
   </data>
   <data name="NewMessage" xml:space="preserve">
-    <value>New message</value>
+    <value>Новое сообщение</value>
   </data>
   <data name="SearchMessages" xml:space="preserve">
-    <value>Search messages</value>
+    <value>Поиск сообщений</value>
   </data>
   <data name="AddressInputPlaceholder" xml:space="preserve">
-    <value>Enter phone number and press Enter</value>
+    <value>Введите номер телефона и нажмите Enter</value>
   </data>
   <data name="RemoveAddress" xml:space="preserve">
-    <value>Remove address</value>
+    <value>Удалить адрес</value>
   </data>
   <data name="CopyMessage" xml:space="preserve">
-    <value>Copy message</value>
+    <value>Скопировать сообщение</value>
   </data>
   <data name="NoApps" xml:space="preserve">
-    <value>No apps found</value>
+    <value>Не найдено приложений</value>
   </data>
   <data name="AllApps" xml:space="preserve">
-    <value>All Apps</value>
+    <value>Все приложения</value>
   </data>
 </root>
