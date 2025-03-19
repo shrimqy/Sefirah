@@ -25,7 +25,7 @@
         <converters:MessageTypeToAlignmentConverter x:Key="MessageTypeToAlignmentConverter" />
         <converters:UnixTimestampConverter x:Key="UnixTimestampConverter" />
         <converters:IndexConverter x:Key="IndexConverter" />
-        <converters:GreaterThanOneToVisibilityConverter x:Key="GreaterThanOneToVisibilityConverter" />
+        <converters:GreaterThanOneToBooleanConverter x:Key="GreaterThanOneToBooleanConverter" />
         <converters:SubscriptionToIconConverter x:Key="SubscriptionToIconConverter" />
 
         <DataTemplate x:Key="MessageItemTemplate">
@@ -363,9 +363,9 @@
                 
                 <!-- SIM selection -->
                 <ComboBox x:Name="TheComboBox" Grid.Column="0"
+                    x:Load="{x:Bind ViewModel.PhoneNumbers.Count, Mode=OneWay, Converter={StaticResource GreaterThanOneToBooleanConverter}}"
                     SelectedIndex="{x:Bind ViewModel.SelectedSubscriptionId, Mode=TwoWay, Converter={StaticResource IndexConverter}}"
-                    ItemsSource="{x:Bind ViewModel.PhoneNumbers, Mode=OneWay}"
-                    Visibility="{x:Bind ViewModel.PhoneNumbers.Count, Converter={StaticResource GreaterThanOneToVisibilityConverter}}">
+                    ItemsSource="{x:Bind ViewModel.PhoneNumbers, Mode=OneWay}">
 
                     <!-- Template for dropdown items -->
                     <ComboBox.ItemTemplate>

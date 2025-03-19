@@ -616,22 +616,18 @@ public class IndexConverter : IValueConverter
     {
         if (value is int intValue)
         {
-            // Convert from 0-based index to 1-based SIM ID
+            // Convert from index to subscription ID
             return intValue + 1;
         }
         return 1;
     }
 }
 
-public class GreaterThanOneToVisibilityConverter : IValueConverter
+public class GreaterThanOneToBooleanConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        if (value is int count && count > 1)
-        {
-            return Visibility.Visible;
-        }
-        return Visibility.Collapsed;
+        return value is int count && count > 1;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)

@@ -1,4 +1,6 @@
-﻿using Sefirah.App.Data.AppDatabase.Models;
+﻿using System.Threading.Tasks.Dataflow;
+using CommunityToolkit.WinUI;
+using Sefirah.App.Data.AppDatabase.Models;
 using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Models;
 using static Vanara.PInvoke.Shell32;
@@ -104,8 +106,6 @@ public sealed class MessagesViewModel : BaseViewModel
 
     public MessagesViewModel()
     {
-        LoadPhoneNumbers();
-
         SmsHandlerService.Conversations.CollectionChanged += (s, e) =>
         {
             OnPropertyChanged(nameof(Conversations));
@@ -130,23 +130,26 @@ public sealed class MessagesViewModel : BaseViewModel
 
     private async void LoadPhoneNumbers()
     {
-        var phoneNumbers = await DeviceManager.GetLastConnectedDevicePhoneNumbersAsync();
-        
-        dispatcher.TryEnqueue(() =>
+        try
         {
-            PhoneNumbers = [.. phoneNumbers];
-            if (PhoneNumbers.Count > 0)
+            var phoneNumbers = await DeviceManager.GetLastConnectedDevicePhoneNumbersAsync();
+            await dispatcher.EnqueueAsync(() =>
             {
-                SelectedSubscriptionId = PhoneNumbers[0].SubscriptionId;
-            }
-            else
-            {
-                SelectedSubscriptionId = 0;
-                logger.Warn("No phone numbers available, using default subscription ID 0");
-            }
-            OnPropertyChanged(nameof(PhoneNumbers));
-        });
+                PhoneNumbers = [.. phoneNumbers];
+                if (PhoneNumbers.Count > 0)
+                {
+                    // Set to the first phone number's subscription ID
+                    SelectedSubscriptionId = PhoneNumbers[0].SubscriptionId;
+                }
+                OnPropertyChanged(nameof(PhoneNumbers));
+            });
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Error loading phone numbers", ex);
+        }
     }
+
 
     public void StartNewConversation()
     {
@@ -161,13 +164,10 @@ public sealed class MessagesViewModel : BaseViewModel
         // Set default subscription ID
         if (PhoneNumbers != null && PhoneNumbers.Count > 0)
         {
+            logger.Debug($"Setting default subscription ID: {PhoneNumbers[0].SubscriptionId}");
             SelectedSubscriptionId = PhoneNumbers[0].SubscriptionId;
         }
-        else
-        {
-            SelectedSubscriptionId = 0; 
-        }
-        
+
         MessageText = string.Empty;
     }
     
