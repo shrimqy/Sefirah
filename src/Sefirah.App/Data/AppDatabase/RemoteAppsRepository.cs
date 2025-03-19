@@ -11,13 +11,15 @@ public class RemoteAppsRepository(DatabaseContext context, ILogger logger) : IRe
 {
     public ObservableCollection<ApplicationInfoEntity> Applications { get; set; } = [];
     private readonly DispatcherQueue dispatcher = MainWindow.Instance.DispatcherQueue;
+    private readonly object syncLock = new();
+
     public async Task LoadApplicationsAsync()
     {
         try
         {
             var conn = await context.GetConnectionAsync();
             var command = new SqliteCommand(
-                "SELECT AppPackage, AppName, NotificationFilter, AppIcon FROM ApplicationInfo ORDER BY AppName",
+                "SELECT AppPackage, AppName, NotificationFilter, AppIcon FROM ApplicationInfo",
                 conn);
 
             using var reader = await command.ExecuteReaderAsync();
@@ -136,12 +138,23 @@ public class RemoteAppsRepository(DatabaseContext context, ILogger logger) : IRe
             command.Parameters.AddWithValue("@AppIcon", appInfo.AppIconBytes as object ?? DBNull.Value);
 
             await command.ExecuteNonQueryAsync();
-            if (!Applications.Any(a => a.AppPackage == appInfo.AppPackage))
+            
+            bool shouldAdd;
+            lock (syncLock)
+            {
+                shouldAdd = !Applications.Any(a => a.AppPackage == appInfo.AppPackage);
+            }
+            
+            if (shouldAdd)
             {
                 await dispatcher.EnqueueAsync(async () =>
                 {
                     appInfo.AppIcon = appInfo.AppIconBytes != null ? await appInfo.AppIconBytes.ToBitmapAsync() : null;
-                    Applications.Add(appInfo);
+                    
+                    lock (syncLock)
+                    {
+                        Applications.Add(appInfo);
+                    }
                 });
             }
         }
