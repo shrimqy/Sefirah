@@ -236,7 +236,16 @@ public class NetworkService(
                 }
 
                 string message = bufferedData[..newlineIndex].Trim();
-                bufferedData = bufferedData[(newlineIndex + 1)..];
+                
+                // Check if newlineIndex is at the end of the string
+                if (newlineIndex + 1 >= bufferedData.Length)
+                {
+                    bufferedData = string.Empty;
+                }
+                else
+                {
+                    bufferedData = bufferedData[(newlineIndex + 1)..];
+                }
 
                 if (string.IsNullOrEmpty(message))
                 {
@@ -353,9 +362,16 @@ public class NetworkService(
         try
         {
             logger.Debug($"Processing message: {(message.Length > 100 ? string.Concat(message.AsSpan(0, Math.Min(100, message.Length)), "...") : message)}");
-            var socketMessage = SocketMessageSerializer.DeserializeMessage(message);
-            if (socketMessage != null)
-                await messageHandler.Value.HandleJsonMessage(socketMessage);
+
+            // Check if this looks like a JSON message before attempting to deserialize
+            if (message.TrimStart().StartsWith("{") || message.TrimStart().StartsWith("["))
+            {
+                var socketMessage = SocketMessageSerializer.DeserializeMessage(message);
+                if (socketMessage != null)
+                    await messageHandler.Value.HandleJsonMessage(socketMessage);
+                return;
+            }
+            logger.Debug("Received non-JSON data, skipping JSON parsing");
         }
         catch (JsonException jsonEx)
         {
