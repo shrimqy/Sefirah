@@ -19,7 +19,7 @@ public class RemoteAppsRepository(DatabaseContext context, ILogger logger) : IRe
         {
             var conn = await context.GetConnectionAsync();
             var command = new SqliteCommand(
-                "SELECT AppPackage, AppName, NotificationFilter, AppIcon FROM ApplicationInfo",
+                "SELECT AppPackage, AppName, NotificationFilter, AppIcon FROM ApplicationInfo ORDER BY AppName",
                 conn);
 
             using var reader = await command.ExecuteReaderAsync();
