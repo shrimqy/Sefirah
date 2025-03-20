@@ -4,7 +4,6 @@ using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Enums;
 using Sefirah.App.Data.Models;
 using Sefirah.App.Utils.Serialization;
-using System.Threading;
 
 namespace Sefirah.App.Services;
 public class SmsHandlerService(
@@ -39,8 +38,7 @@ public class SmsHandlerService(
                         else
                         {
                             logger.Info("Active conversation not found, creating new: {0}", textConversation.ThreadId);
-                            var newConversation = new SmsConversation(textConversation);
-                            Conversations.Insert(0, newConversation);
+                            AddNewConversation(textConversation);
                         }
                         break;
                     case ConversationType.ActiveUpdated:
@@ -53,8 +51,7 @@ public class SmsHandlerService(
                         else
                         {
                             logger.Info("Active conversation not found, creating new: {0}", textConversation.ThreadId);
-                            var newConversation = new SmsConversation(textConversation);
-                            Conversations.Insert(0, newConversation);
+                            AddNewConversation(textConversation);
                         }
                         break;
 
@@ -67,9 +64,8 @@ public class SmsHandlerService(
                         }
                         break;
                     case ConversationType.New:
-                        var newConv = new SmsConversation(textConversation);
                         logger.Info("Adding new conversation: {0}", textConversation.ThreadId);
-                        Conversations.Insert(0, newConv);
+                        AddNewConversation(textConversation);
                         break;
                     default:
                         logger.Warn("Unknown conversation type: {0}", textConversation.ConversationType);
@@ -81,6 +77,28 @@ public class SmsHandlerService(
         {
             semaphore.Release();
         }
+    }
+
+    public void AddNewConversation(TextConversation textConversation)
+    {
+        var newConv = new SmsConversation(textConversation);
+        int index = FindInsertionIndex(newConv);
+        Conversations.Insert(index, newConv);
+    }
+
+    private int FindInsertionIndex(SmsConversation conversation)
+    {
+        for (int i = 0; i < Conversations.Count; i++)
+        {
+            // Compare timestamps - if current conversation is older than the new one, insert here
+            if (Conversations[i].LastMessageTimestamp < conversation.LastMessageTimestamp)
+            {
+                return i;
+            }
+        }
+
+        // If we get here, this is the oldest conversation or collection is empty
+        return Conversations.Count;
     }
 
     public async Task RequestThreadHistory(long threadId, long rangeStartTimestamp = -1, long numberToRequest = -1)

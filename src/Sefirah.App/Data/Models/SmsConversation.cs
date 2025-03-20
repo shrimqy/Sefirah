@@ -6,7 +6,7 @@ public partial class SmsConversation : INotifyPropertyChanged
 {
     public long ThreadId { get; }
     
-    public ObservableCollection<TextMessage> Messages { get; } = new();
+    public ObservableCollection<TextMessage> Messages { get; } = [];
 
     private string _snippet = string.Empty;
     public string Snippet 
@@ -64,7 +64,6 @@ public partial class SmsConversation : INotifyPropertyChanged
         }
     }
 
-    // Update this conversation with new messages from a TextConversation
     public void UpdateFromTextConversation(TextConversation textConversation)
     {
         if (textConversation.ThreadId != ThreadId)
@@ -72,10 +71,7 @@ public partial class SmsConversation : INotifyPropertyChanged
             throw new ArgumentException($"Thread ID mismatch: {textConversation.ThreadId} vs {ThreadId}");
         }
         
-        // Track existing message IDs
         var existingMessageIds = new HashSet<long>(Messages.Select(m => m.UniqueId));
-        
-        // Track incoming message IDs
         var incomingMessageIds = new HashSet<long>(textConversation.Messages.Select(m => m.UniqueId));
         
         // Find messages that exist locally but not in the incoming conversation (deleted remotely)
