@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 using Sefirah.App.Data.Enums;
 using Sefirah.App.Data.Models;
 using Sefirah.App.ViewModels;
@@ -256,5 +257,59 @@ public sealed partial class MainPage : Page
 
         T parent = parentObject as T;
         return parent ?? FindParent<T>(parentObject);
+    }
+
+    private void PhoneFrame_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        // Show the overlay with animation
+        var overlay = PhoneFrameOverlay;
+        overlay.Visibility = Visibility.Visible;
+        
+        // Create and start the animation
+        var fadeIn = new Storyboard();
+        var animation = new DoubleAnimation
+        {
+            From = 0,
+            To = 1,
+            Duration = new Duration(TimeSpan.FromMilliseconds(200))
+        };
+        
+        Storyboard.SetTarget(animation, overlay);
+        Storyboard.SetTargetProperty(animation, "Opacity");
+        
+        fadeIn.Children.Add(animation);
+        fadeIn.Begin();
+    }
+
+    private void PhoneFrame_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        // Hide the overlay with animation
+        var overlay = PhoneFrameOverlay;
+        
+        // Create and start the animation
+        var fadeOut = new Storyboard();
+        var animation = new DoubleAnimation
+        {
+            From = 1,
+            To = 0,
+            Duration = new Duration(TimeSpan.FromMilliseconds(200))
+        };
+        
+        Storyboard.SetTarget(animation, overlay);
+        Storyboard.SetTargetProperty(animation, "Opacity");
+        
+        // When animation completes, hide the overlay
+        animation.Completed += (s, args) => 
+        {
+            overlay.Visibility = Visibility.Collapsed;
+        };
+        
+        fadeOut.Children.Add(animation);
+        fadeOut.Begin();
+    }
+
+    private void ToggleScreenMirror(object sender, TappedRoutedEventArgs e)
+    {
+        ViewModel.ToggleScreenMirrorCommand.Execute(null);
     }
 }

@@ -112,33 +112,7 @@ public sealed class MainPageViewModel : BaseViewModel
 
     private async void ToggleScreenMirror()
     {
-        var argsTextBox = new TextBox
-        {
-            PlaceholderText = "Enter command arguments",
-            AcceptsReturn = false,
-            Width = 300,
-            Margin = new Thickness(0, 10, 0, 0)
-        };
-        
-        var panel = new StackPanel();
-        panel.Children.Add(argsTextBox);
-        
-        var dialog = new ContentDialog
-        {
-            XamlRoot = MainWindow.Instance.Content.XamlRoot,
-            Title = "scrcpy",
-            Content = panel,
-            PrimaryButtonText = "Start",
-            CloseButtonText = "Cancel"
-        };
-        
-        var result = await dialog.ShowAsync();
-        
-        if (result == ContentDialogResult.Primary)
-        {
-            string args = argsTextBox.Text?.Trim() ?? string.Empty;
-            await ScreenMirrorService.StartScrcpy(customArgs: args);
-        }
+        await ScreenMirrorService.StartScrcpy();
     }
 
     public async Task OpenApp(Notification notification)

@@ -13,10 +13,7 @@ public class ScreenMirrorService(
     private List<Process> scrcpyProcesses = []; // what was this for anyway
     private CancellationTokenSource? cts;
     
-    public async Task<bool> StartScrcpy(
-        string? deviceId = null, 
-        bool wireless = false,
-        string? customArgs = null)
+    public async Task<bool> StartScrcpy(string? customArgs = null)
     {
         try
         {
@@ -28,7 +25,7 @@ public class ScreenMirrorService(
             }
             
             // Build arguments for scrcpy
-            var args = BuildScrcpyArguments(deviceId, wireless, customArgs);
+            var args = BuildScrcpyArguments(customArgs);
             
             cts = new CancellationTokenSource();
             
@@ -119,7 +116,7 @@ public class ScreenMirrorService(
         }
     }
 
-    private string BuildScrcpyArguments(string? deviceId, bool wireless, string? customArgs)
+    private string BuildScrcpyArguments(string? customArgs = null)
     {
         var args = new List<string>();
         

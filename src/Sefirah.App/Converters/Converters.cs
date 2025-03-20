@@ -368,6 +368,32 @@ public class NullBooleanConverter : IValueConverter
     }
 }
 
+public class InverseNullToBooleanConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        return value == null;
+    }
+    
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class NullToOpacityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        return value == null ? 1.0 : 0.0;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}
+
 
 public class StoragePercentageConverter : IValueConverter
 {

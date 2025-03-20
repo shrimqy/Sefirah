@@ -29,6 +29,8 @@
         <converters:PinConverter x:Key="PinConverter" />
         <converters:RingerModeToIconConverter x:Key="RingerModeToIconConverter" />
         <converters:PinIconConverter x:Key="PinIconConverter" />
+        <converters:InverseNullToBooleanConverter x:Key="InverseNullToBooleanConverter" />
+        <converters:NullToOpacityConverter x:Key="NullToOpacityConverter" />
     </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -100,12 +102,14 @@
                     </Grid.ColumnDefinitions>
 
                     <Grid
+                        x:Name="PhoneFrameGrid"
                         Grid.Column="0" 
                         Width="53"
                         Height="100"
                         Margin="18,0,0,0"
                         VerticalAlignment="Center"
-                        Visibility="{x:Bind ViewModel.DeviceInfo.WallpaperImage, Converter={StaticResource NullToVisibilityConverter}, Mode=OneWay}">
+                        PointerEntered="PhoneFrame_PointerEntered"
+                        PointerExited="PhoneFrame_PointerExited">
                         <!--  Phone frame border  -->
                         <Rectangle
                             Opacity="0.5"
@@ -124,17 +128,40 @@
                             RadiusY="4"
                             Stroke="Black"
                             StrokeThickness="1" />
-                        <!--  Screen content  -->
+                        <!--  Wallpaper  -->
                         <Border Margin="3" CornerRadius="4">
-                            <Image Source="{x:Bind ViewModel.DeviceInfo.WallpaperImage, Mode=OneWay}" Stretch="UniformToFill" />
+                            <Border.Background >
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" Opacity="{x:Bind ViewModel.DeviceInfo.WallpaperImage, Converter={StaticResource NullToOpacityConverter}, Mode=OneWay}">
+                                    <GradientStop Offset="0" Color="#FF0070FF"/>
+                                    <GradientStop Offset="1" Color="#FF2E90FF"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Image 
+                                x:Name="WallpaperImage"
+                                Source="{x:Bind ViewModel.DeviceInfo.WallpaperImage, Mode=OneWay}" 
+                                Stretch="UniformToFill"
+                                x:Load="{x:Bind ViewModel.DeviceInfo.WallpaperImage, Converter={StaticResource NullBooleanConverter}, Mode=OneWay}" />
                         </Border>
+                        
+                        <!-- Overlay that appears on hover -->
+                        <Grid 
+                            x:Name="PhoneFrameOverlay" 
+                            Background="#80000000" 
+                            Opacity="0"
+                            Tapped="ToggleScreenMirror"
+                            Visibility="Collapsed">
+                            <FontIcon Glyph="&#xEC15;" Foreground="White"/>
+                            <ToolTipService.ToolTip>
+                                <ToolTip Content="Screen Mirror" />
+                            </ToolTipService.ToolTip>
+                        </Grid>
                     </Grid>
 
                     <!--  Device Info  -->
                     <StackPanel
                         Grid.Column="1"
-                        Margin="18,20,10,10"
-                        Spacing="10">
+                        Margin="15,20,10,15"
+                        Spacing="5">
 
                         <TextBlock
                             FontSize="14"
@@ -184,16 +211,6 @@
                                 </Button.Flyout>
                             </Button>
 
-                            <!--  Screen Mirror Button  -->
-                            <Button
-                                Grid.Column="3"
-                                Background="Transparent"
-                                BorderThickness="0"
-                                Command="{x:Bind ViewModel.ToggleScreenMirrorCommand}"
-                                Padding="5">
-                                <FontIcon Glyph="&#xEC15;" />
-                            </Button>
-                            
                             <!-- Battery status -->
                             <StackPanel
                                 Orientation="Horizontal"
@@ -401,6 +418,7 @@
                                                     x:Load="{x:Bind HasGroupedMessages, Converter={StaticResource InverseBooleanConverter}}"
                                                     Foreground="Gray"
                                                     Text="{x:Bind Text}"
+                                                    IsTextSelectionEnabled="True"
                                                     TextWrapping="Wrap" />
                                                 <!--  Display GroupedMessages if not empty  -->
                                                 <ItemsRepeater
@@ -424,6 +442,7 @@
                                                                             <TextBlock
                                                                                 Foreground="Gray"
                                                                                 Text="{x:Bind}"
+                                                                                IsTextSelectionEnabled="True"
                                                                                 TextWrapping="Wrap" />
                                                                         </DataTemplate>
                                                                     </ItemsRepeater.ItemTemplate>
