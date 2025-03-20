@@ -20,6 +20,8 @@
         <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
         <converters:StringEqualsConverter x:Key="StringEqualsConverter" />
         <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
+        <converters:NullToOpacityConverter x:Key="NullToOpacityConverter" />
+        <converters:NullBooleanConverter x:Key="NullBooleanConverter" />
     </Page.Resources>
 
     <Page.DataContext>
@@ -64,7 +66,17 @@
                                         Stroke="Black"
                                         StrokeThickness="1" />
                                     <Border Margin="3" CornerRadius="4">
-                                        <Image Source="{x:Bind WallpaperImage}" Stretch="UniformToFill" />
+                                        <Border.Background >
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" Opacity="{x:Bind WallpaperImage, Converter={StaticResource NullToOpacityConverter}, Mode=OneWay}">
+                                                <GradientStop Offset="0" Color="#FF0070FF"/>
+                                                <GradientStop Offset="1" Color="#FF2E90FF"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                        <Image 
+                                            x:Name="WallpaperImage"
+                                            Source="{x:Bind WallpaperImage, Mode=OneWay}" 
+                                            Stretch="UniformToFill"
+                                            x:Load="{x:Bind WallpaperImage, Converter={StaticResource NullBooleanConverter}, Mode=OneWay}" />
                                     </Border>
                                 </Grid>
                             </controls:SettingsBlockControl.Icon>
