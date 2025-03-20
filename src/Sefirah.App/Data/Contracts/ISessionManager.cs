@@ -32,4 +32,10 @@ public interface ISessionManager
     /// </summary>
     /// <returns>The currently connected device.</returns>
     RemoteDeviceEntity? GetCurrentlyConnectedDevice();
+
+    /// <summary>
+    /// return the current session's Ip address
+    /// </summary>
+    /// <returns>The connected session.</returns>
+    string? GetConnectedSessionIpAddress();
 }

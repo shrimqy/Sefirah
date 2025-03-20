@@ -1,12 +1,21 @@
 ﻿using AdvancedSharpAdbClient.Models;
+using CommunityToolkit.WinUI;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Models;
+using Sefirah.App.Extensions;
+using Sefirah.App.ViewModels.Settings;
+using Windows.Storage;
+using Windows.Storage.Pickers;
+using Windows.System;
 
 namespace Sefirah.App.Services;
 public class ScreenMirrorService(
     ILogger logger,
     IUserSettingsService userSettingsService,
-    IAdbService adbService
+    IAdbService adbService,
+    ISessionManager sessionManager
 ) : IScreenMirrorService
 {
     private ObservableCollection<AdbDevice> devices = adbService.Devices;
@@ -20,10 +29,48 @@ public class ScreenMirrorService(
             var scrcpyPath = userSettingsService.FeatureSettingsService.ScrcpyPath;
             if (string.IsNullOrEmpty(scrcpyPath))
             {
-                logger.Error("Scrcpy path is not set");
+                await MainWindow.Instance.DispatcherQueue.EnqueueAsync(async () =>
+                {
+                    var dialog = new ContentDialog
+                    {
+                        XamlRoot = MainWindow.Instance.Content.XamlRoot,
+                        Title = "ScrcpyNotFound".GetLocalizedResource(),
+                        Content = "ScrcpyNotFoundDescription".GetLocalizedResource(),
+                        PrimaryButtonText = "SelectLocation".GetLocalizedResource(),
+                        DefaultButton = ContentDialogButton.Primary,
+                        CloseButtonText = "Dismiss".GetLocalizedResource()
+                    };
+
+                    var result = await dialog.ShowAsync();
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        SelectScrcpyLocation_Click(null, null);
+                    }
+                });
                 return false;
             }
-            
+
+            if (devices.Count == 0 || devices.Any(d => d.State == DeviceState.Offline))
+            {
+                var ipAddress = sessionManager.GetConnectedSessionIpAddress();
+                if (!string.IsNullOrEmpty(ipAddress) && !await adbService.ConnectWireless(ipAddress))
+                {
+                    logger.Warn("Failed to connect to Adb wirelessly");
+                    await MainWindow.Instance.DispatcherQueue.EnqueueAsync(async () =>
+                    {
+                        var dialog = new ContentDialog
+                        {
+                            XamlRoot = MainWindow.Instance.Content.XamlRoot,
+                            Title = "AdbDeviceOffline".GetLocalizedResource(),
+                            Content = "AdbDeviceOfflineDescription".GetLocalizedResource(),
+                            CloseButtonText = "Dismiss".GetLocalizedResource()
+                        };
+                        await dialog.ShowAsync();
+                    });
+                    return false;
+                }
+            }
+
             // Build arguments for scrcpy
             var args = BuildScrcpyArguments(customArgs);
             
@@ -127,7 +174,7 @@ public class ScreenMirrorService(
         {
             args.Add(customArgs);
         }
-        
+
         if (!string.IsNullOrEmpty(preDefinedArgs))
         {
             args.Add(preDefinedArgs);
@@ -137,7 +184,7 @@ public class ScreenMirrorService(
         var settings = userSettingsService.FeatureSettingsService;
         
         // Add settings-based arguments
-        
+
         // General settings
         if (settings.ScreenOff)
         {
@@ -148,8 +195,8 @@ public class ScreenMirrorService(
         {
             args.Add("--keyboard=uhid");
         }
-
-        if (settings.PreferTcpIp)
+        var preferTcpIp = settings.PreferTcpIp;
+        if (preferTcpIp)
         {
             args.Add("--tcpip");
         }
@@ -180,17 +227,14 @@ public class ScreenMirrorService(
         {
             args.Add($"--audio-output-buffer={settings.AudioBuffer}");
         }
-        
+    
         // Only continue with device selection if the user hasn't already specified a device
-        bool hasDeviceSelectionFlag = !string.IsNullOrEmpty(customArgs) && 
-            (customArgs.Contains(" -s ") || customArgs.Contains(" -d ") || 
-             customArgs.Contains(" -e ") || customArgs.StartsWith("-s ") || 
-             customArgs.StartsWith("-d ") || customArgs.StartsWith("-e "));
-            
+        bool hasDeviceSelectionFlag = (args.Contains("-s") || args.Contains("-d") || args.Contains("-e"));
+
         if (devices.Count > 1 && !hasDeviceSelectionFlag)
         {
             var usbDevice = devices.FirstOrDefault(d => d.Type == DeviceType.Usb && d.State == DeviceState.Online);
-            if (usbDevice != null && !settings.PreferTcpIp)
+            if (usbDevice != null && !preferTcpIp)
             {
                 args.Add("-d");  // Use USB device
             }
@@ -201,5 +245,24 @@ public class ScreenMirrorService(
         }
         
         return string.Join(" ", args);
+    }
+
+    public async void SelectScrcpyLocation_Click(object sender, RoutedEventArgs e)
+    {
+        var picker = new FolderPicker
+        {
+            SuggestedStartLocation = PickerLocationId.DocumentsLibrary
+        };
+        picker.FileTypeFilter.Add("*");
+
+        var window = MainWindow.Instance;
+        WinRT.Interop.InitializeWithWindow.Initialize(picker,
+            WinRT.Interop.WindowNative.GetWindowHandle(window));
+        var viewmodel = Ioc.Default.GetRequiredService<FeaturesViewModel>();
+        if (await picker.PickSingleFolderAsync() is StorageFolder folder)
+        {
+            viewmodel.ScrcpyPath = folder.Path;
+            await StartScrcpy();
+        }
     }
 }

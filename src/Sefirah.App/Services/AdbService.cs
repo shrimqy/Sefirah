@@ -12,7 +12,7 @@ public interface IAdbService
 {
     ObservableCollection<AdbDevice> Devices { get; }
     Task StartAsync();
-    void ConnectWireless(string host, int port=5555);
+    Task<bool> ConnectWireless(string host, int port=5555);
     Task StopAsync();
     bool IsMonitoring { get; }
 }
@@ -213,16 +213,22 @@ public class AdbService(
         }
     }
 
-    public async void ConnectWireless(string host, int port=5555)
+    public async Task<bool> ConnectWireless(string host, int port=5555)
     {
         try
         {
             var result = await adbClient.ConnectAsync(host, port);
-            logger.Info($"{host}:{port} - {result}");
+            logger.Info($"{result}");
+            if (result.Contains("failed") || result.Contains("refused"))
+            {
+                return false;
+            }
+            return true;
         }
         catch (Exception ex)
         {
             logger.Error("Error connecting to default wireless device", ex);
+            return false;
         }
     }
 

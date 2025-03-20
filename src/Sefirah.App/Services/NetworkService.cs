@@ -24,6 +24,7 @@ public class NetworkService(
     private Server? server;
     private bool isRunning;
     private int port;
+    private string? connectedSessionIpAddress;
     private readonly IEnumerable<int> PORT_RANGE = Enumerable.Range(5150, 20); // 5150 to 5169
     private ServerSession? currentSession;
     private bool disposed;
@@ -40,6 +41,7 @@ public class NetworkService(
     public RemoteDeviceEntity? GetCurrentlyConnectedDevice() => currentlyConnectedDevice;
 
     public bool IsConnected() => currentlyConnectedDevice != null;
+    public string? GetConnectedSessionIpAddress() => connectedSessionIpAddress;
 
     /// <inheritdoc/>
     public async Task<bool> StartServerAsync()
@@ -294,18 +296,18 @@ public class NetworkService(
                 return;
             }
 
-            var ipAddress = session.Socket.RemoteEndPoint?.ToString()?.Split(':')[0];
-            logger.Info($"Received connection from {ipAddress}");
+            connectedSessionIpAddress = session.Socket.RemoteEndPoint?.ToString()?.Split(':')[0];
+            logger.Info($"Received connection from {connectedSessionIpAddress}");
 
-            var device = await deviceManager.VerifyDevice(deviceInfo, ipAddress);
+            var device = await deviceManager.VerifyDevice(deviceInfo, connectedSessionIpAddress);
 
             if (device != null)
             {
                 isFirstMessage = false;
                 isVerified = true;
                 currentSession = session;
-                if (!string.IsNullOrEmpty(ipAddress))
-                    adbService.ConnectWireless(ipAddress);
+                if (!string.IsNullOrEmpty(connectedSessionIpAddress))
+                    adbService.ConnectWireless(connectedSessionIpAddress);
                 await SendDeviceInfo(deviceInfo.PublicKey!);
                 NotifyClientConnectionChanged(device);
             }
