@@ -36,6 +36,20 @@ public partial class SmsConversation : INotifyPropertyChanged
         }
     }
 
+    private string _displayName = string.Empty;
+    public string DisplayName
+    {
+        get => _displayName;
+        set
+        {
+            if (_displayName != value)
+            {
+                _displayName = value;
+                OnPropertyChanged(nameof(DisplayName));
+            }
+        }
+    }
+
     public SmsConversation(TextConversation textConversation)
     {
         ThreadId = textConversation.ThreadId;
@@ -61,6 +75,13 @@ public partial class SmsConversation : INotifyPropertyChanged
                 Snippet = latestMessage.Body;
                 LastMessageTimestamp = latestMessage.Timestamp;
             }
+
+            var displayName = textConversation.Messages.FirstOrDefault()?.Contacts.FirstOrDefault()?.ContactName ?? string.Empty;
+            if (displayName == string.Empty)
+            {
+                displayName = textConversation.Messages.FirstOrDefault()?.Addresses.FirstOrDefault()?.Address ?? string.Empty;
+            }
+            DisplayName = displayName;
         }
     }
 

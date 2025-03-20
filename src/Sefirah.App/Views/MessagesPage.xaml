@@ -42,7 +42,7 @@
                     </Grid.ColumnDefinitions>
                     
                     <TextBlock Grid.Column="0" 
-                        Text="{Binding Messages[0].Addresses[0].Address, FallbackValue='Unknown'}" 
+                        Text="{Binding DisplayName, FallbackValue='Unknown'}" 
                         FontWeight="SemiBold"
                         TextTrimming="CharacterEllipsis"/>
                     

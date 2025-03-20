@@ -349,6 +349,9 @@ public class TextMessage : SocketMessage
     [JsonPropertyName("addresses")]
     public List<SmsAddress> Addresses { get; set; } = [];
 
+    [JsonPropertyName("contacts")]
+    public List<Contact> Contacts { get; set; } = [];
+
     [JsonPropertyName("threadId")]
     public long? ThreadId { get; set; } = null;
 
@@ -419,3 +422,14 @@ public class PhoneNumber
     public int SubscriptionId { get; set; } = -1;
 }
 
+public class Contact
+{
+    [JsonPropertyName("contactName")]
+    public required string ContactName { get; set; }
+
+    [JsonPropertyName("phoneNumber")]
+    public required string PhoneNumber { get; set; }
+
+    [JsonPropertyName("photoBase64")]
+    public string? PhotoBase64 { get; set; }
+}
