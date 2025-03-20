@@ -434,4 +434,25 @@ mobile (Make sure the pin matches)</value>
   <data name="AllApps" xml:space="preserve">
     <value>All Apps</value>
   </data>
+  <data name="CustomArguments" xml:space="preserve">
+    <value>Custom Arguments</value>
+  </data>
+  <data name="AdbDeviceOffline" xml:space="preserve">
+    <value>Adb device is offline</value>
+  </data>
+  <data name="AdbDeviceOfflineDescription" xml:space="preserve">
+    <value>Connect your device through USB with USB Debugging enabled and then try again</value>
+  </data>
+  <data name="Dismiss" xml:space="preserve">
+    <value>Dismiss</value>
+  </data>
+  <data name="ScrcpyNotFound" xml:space="preserve">
+    <value>Scrcpy not found</value>
+  </data>
+  <data name="ScrcpyNotFoundDescription" xml:space="preserve">
+    <value>Select the folder where scrcpy is located</value>
+  </data>
+  <data name="PreferTcpIp" xml:space="preserve">
+    <value>Prefer Wireless connection</value>
+  </data>
 </root>

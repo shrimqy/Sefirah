@@ -184,7 +184,22 @@
                                 FontWeight="SemiBold"
                                 Text="{helpers:ResourceString Name=GeneralSettings}" />
                             <CheckBox Content="{helpers:ResourceString Name=ScreenOff}" IsChecked="{x:Bind ViewModel.ScreenOff, Mode=TwoWay}" />
+                            <CheckBox Content="{helpers:ResourceString Name=PreferTcpIp}" IsChecked="{x:Bind ViewModel.PreferTcpIp, Mode=TwoWay}" />
                             <CheckBox Content="{helpers:ResourceString Name=PhysicalKeyboard}" IsChecked="{x:Bind ViewModel.PhysicalKeyboard, Mode=TwoWay}" />
+
+                            <TextBox 
+                                Text="{x:Bind ViewModel.CustomArguments, Mode=TwoWay}" 
+                                AcceptsReturn="True" 
+                                TextWrapping="Wrap" 
+                                MinHeight="80"
+                                PlaceholderText="egs: --show-touches --power-off-on-close">
+                                <TextBox.HeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock FontWeight="SemiBold" Text="{helpers:ResourceString Name=CustomArguments}" />
+                                    </DataTemplate>
+                                </TextBox.HeaderTemplate>
+                            </TextBox>
+
                         </StackPanel>
 
                         <StackPanel

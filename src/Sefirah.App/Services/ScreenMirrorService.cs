@@ -123,22 +123,39 @@ public class ScreenMirrorService(
     {
         var args = new List<string>();
         
+        var preDefinedArgs = userSettingsService.FeatureSettingsService.CustomArguments;
+        
         // Add custom arguments if provided 
         if (!string.IsNullOrEmpty(customArgs))
         {
             args.Add(customArgs);
         }
         
-        // Add device selection if specified
-        if (!string.IsNullOrEmpty(deviceId))
+        if (!string.IsNullOrEmpty(preDefinedArgs))
         {
-            args.Add($"--serial={deviceId}");
+            args.Add(preDefinedArgs);
         }
         
         // Get feature settings
         var settings = userSettingsService.FeatureSettingsService;
         
         // Add settings-based arguments
+        
+        // General settings
+        if (settings.ScreenOff)
+        {
+            args.Add("--turn-screen-off");
+        }
+        
+        if (settings.PhysicalKeyboard)
+        {
+            args.Add("--keyboard=uhid");
+        }
+
+        if (settings.PreferTcpIp)
+        {
+            args.Add("--tcpip");
+        }
         
         // Video settings
         if (!string.IsNullOrEmpty(settings.VideoResolution))
@@ -167,30 +184,16 @@ public class ScreenMirrorService(
             args.Add($"--audio-output-buffer={settings.AudioBuffer}");
         }
         
-        // Device control settings
-        if (settings.ScreenOff)
-        {
-            args.Add("--turn-screen-off");
-        }
-        
-        if (settings.PhysicalKeyboard)
-        {
-            args.Add("--keyboard=uhid");
-        }
-        
-        //args.Add("--stay-awake"); // Keep the device awake
-        //args.Add("--show-touches"); // Show taps on screen
-
         // Only continue with device selection if the user hasn't already specified a device
         bool hasDeviceSelectionFlag = !string.IsNullOrEmpty(customArgs) && 
             (customArgs.Contains(" -s ") || customArgs.Contains(" -d ") || 
              customArgs.Contains(" -e ") || customArgs.StartsWith("-s ") || 
              customArgs.StartsWith("-d ") || customArgs.StartsWith("-e "));
             
-        if (devices.Count > 1 && !hasDeviceSelectionFlag && string.IsNullOrEmpty(deviceId))
+        if (devices.Count > 1 && !hasDeviceSelectionFlag)
         {
             var usbDevice = devices.FirstOrDefault(d => d.Type == DeviceType.Usb && d.State == DeviceState.Online);
-            if (usbDevice != null)
+            if (usbDevice != null && !settings.PreferTcpIp)
             {
                 args.Add("-d");  // Use USB device
             }

@@ -179,6 +179,19 @@ public sealed partial class FeaturesViewModel : ObservableObject
         }
     }       
 
+    public bool PreferTcpIp
+    {
+        get => UserSettingsService.FeatureSettingsService.PreferTcpIp;
+        set
+        {
+            if (value != UserSettingsService.FeatureSettingsService.PreferTcpIp)
+            {
+                UserSettingsService.FeatureSettingsService.PreferTcpIp = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public string? VideoBitrate
     {
         get => UserSettingsService.FeatureSettingsService.VideoBitrate;
@@ -239,6 +252,19 @@ public sealed partial class FeaturesViewModel : ObservableObject
             if (value != UserSettingsService.FeatureSettingsService.AudioBuffer)
             {
                 UserSettingsService.FeatureSettingsService.AudioBuffer = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public string? CustomArguments
+    {
+        get => UserSettingsService.FeatureSettingsService.CustomArguments;
+        set
+        {
+            if (value != UserSettingsService.FeatureSettingsService.CustomArguments)
+            {
+                UserSettingsService.FeatureSettingsService.CustomArguments = value;
                 OnPropertyChanged();
             }
         }

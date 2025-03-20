@@ -108,4 +108,14 @@ public interface IFeatureSettingsService : IBaseSettingsService, INotifyProperty
     /// Gets or sets the audio buffer.
     /// </summary>
     string? AudioBuffer { get; set; }
+    
+    /// <summary>
+    /// Gets or sets custom command-line arguments for scrcpy.
+    /// </summary>
+    string? CustomArguments { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to prefer TCP connections.
+    /// </summary>
+    bool PreferTcpIp { get; set; }
 }
