@@ -102,7 +102,7 @@ internal sealed class FeaturesSettingsService : BaseObservableJsonSettings, IFea
 
     public bool PhysicalKeyboard
     {
-        get => Get(true);
+        get => Get(false);
         set => Set(value);
     }
     
@@ -133,6 +133,18 @@ internal sealed class FeaturesSettingsService : BaseObservableJsonSettings, IFea
     public string? AudioBuffer
     {
         get => Get("20");
+        set => Set(value);
+    }
+
+    public string? CustomArguments
+    {
+        get => Get(string.Empty);
+        set => Set(value);
+    }
+
+    public bool PreferTcpIp
+    {
+        get => Get(true);
         set => Set(value);
     }
 }
