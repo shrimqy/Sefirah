@@ -43,10 +43,14 @@ public class PlaybackService(
                     else
                     {
                         // Send at least volume data when no active sessions
-                        SendPlaybackData(new PlaybackData
+                        var volume = VolumeControl.GetMasterVolume(logger) * 100;
+                        if (volume != null)
                         {
-                            Volume = VolumeControl.GetMasterVolume() * 100
-                        });
+                            SendPlaybackData(new PlaybackData
+                            {
+                                Volume = volume
+                            });
+                        }
                     }
                 }
             };
@@ -68,9 +72,10 @@ public class PlaybackService(
         try
         {
             var action = playback.MediaAction ?? throw new Exception("Media action is null");
-            if (action == MediaAction.Volume)
+            if (action == MediaAction.Volume && playback.Volume != null)
             {
-                VolumeControlAsync(playback.Volume);
+                VolumeControl.ChangeVolume(playback.Volume, logger);
+                return;
             }
 
             await ExecuteMediaActionAsync(playback, action);
@@ -115,9 +120,6 @@ public class PlaybackService(
                         break;
                     case MediaAction.PrevQueue:
                         await session.TrySkipPreviousAsync();
-                        break;
-                    case MediaAction.Volume:
-                        VolumeControlAsync(playbackData.Volume);
                         break;
                     case MediaAction.Seek:
                         break;
@@ -284,7 +286,7 @@ public class PlaybackService(
                 Position = timelineProperties?.Position.Ticks,
                 MinSeekTime = timelineProperties?.MinSeekTime.Ticks,
                 MaxSeekTime = timelineProperties?.MaxSeekTime.Ticks,
-                Volume = VolumeControl.GetMasterVolume() * 100
+                Volume = VolumeControl.GetMasterVolume(logger) * 100
             };
 
             if (mediaProperties.Thumbnail != null)
@@ -344,20 +346,6 @@ public class PlaybackService(
             }
         }
         _disposed = true;
-    }
-
-    public void VolumeControlAsync(double volume)
-    {
-        try
-        {
-            VolumeControl.ChangeVolume(volume);
-            logger.Info("Volume changed to {0}", volume);
-        }
-        catch (Exception ex)
-        {
-            logger.Error("Error changing volume to {0}", volume, ex);
-            throw;
-        }
     }
 
     public Task HandleRemotePlaybackMessageAsync(PlaybackData data)

@@ -202,7 +202,7 @@ public class PlaybackData : SocketMessage
     public MediaAction? MediaAction { get; set; }
 
     [JsonPropertyName("volume")]
-    public float Volume { get; set; }
+    public float? Volume { get; set; }
 
     [JsonPropertyName("thumbnail")]
     public string? Thumbnail { get; set; }

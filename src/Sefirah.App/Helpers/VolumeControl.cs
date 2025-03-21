@@ -11,36 +11,60 @@ internal enum HResult : uint
 
 public static class VolumeControl
 {
-    public static float GetMasterVolume()
+    public static float? GetMasterVolume(ILogger logger)
     {
-        var masterVol = GetAudioEndpointVolumeInterface();
-        // Make sure that the audio is not muted
-        masterVol.SetMute(false, Guid.Empty);
-
-        // Only adapt volume if the current level is below the specified minimum level
-        float volume = masterVol.GetMasterVolumeLevelScalar();
-        return volume;
-    }
-
-
-    public static void ChangeVolume(double level)
-    {
-        var volume = level / 100;
-
         try
         {
+            var masterVol = GetAudioEndpointVolumeInterface(logger);
+            if (masterVol == null)
+            {
+                logger.Warn("Failed to get master volume");
+                return null;
+            }
+            // Make sure that the audio is not muted
+            masterVol.SetMute(false, Guid.Empty);
+
+            // Only adapt volume if the current level is below the specified minimum level
+            float volume = masterVol.GetMasterVolumeLevelScalar();
+            return volume;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Failed to get master volume", ex);
+            return null;
+        }
+    }
+
+    public static void ChangeVolume(double? level, ILogger logger)
+    {
+        try
+        {
+            if(level == null) return;
+            
+            var volume = level / 100;
             float newAudioValue = Convert.ToSingle(volume);
-            var masterVol = GetAudioEndpointVolumeInterface();
+            var masterVol = GetAudioEndpointVolumeInterface(logger);
             if (masterVol == null)
                 return;
             masterVol.SetMasterVolumeLevelScalar(newAudioValue, Guid.Empty);
         }
-        catch { }
+        catch (Exception ex)
+        {
+            logger.Error($"Failed to change volume to {level}", ex);
+        }
     }
 
-    private static IAudioEndpointVolume GetAudioEndpointVolumeInterface()
+    private static IAudioEndpointVolume? GetAudioEndpointVolumeInterface(ILogger logger)
     {
         var speakerId = MediaDevice.GetDefaultAudioRenderId(AudioDeviceRole.Default);
+        
+        // Check if a valid speakerId was returned
+        if (string.IsNullOrEmpty(speakerId))
+        {
+            logger.Warn("Failed to get default audio render device");
+            return null;
+        }
+        
         var completionHandler = new ActivateAudioInterfaceCompletionHandler<IAudioEndpointVolume>();
 
         var hr = ActivateAudioInterfaceAsync(
@@ -50,7 +74,11 @@ public static class VolumeControl
             completionHandler,
             out var activateOperation);
 
-        Debug.Assert(hr == (uint)HResult.S_OK);
+        if (hr != (uint)HResult.S_OK)
+        {
+            logger.Error($"Failed to activate audio interface. HRESULT: 0x{hr:X}");
+            return null;
+        }
 
         return completionHandler.WaitForCompletion();
     }
