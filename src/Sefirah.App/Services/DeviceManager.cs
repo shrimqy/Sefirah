@@ -173,12 +173,12 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
             var localSettings = ApplicationData.Current.LocalSettings;
             if (localSettings?.Values["FirstLaunch"] == null)
             {
-                var (firstName, _) = await CurrentUserInformation.GetCurrentUserInfoAsync();
+                var (name, _) = await CurrentUserInformation.GetCurrentUserInfoAsync();
                 var keyPair = EcdhHelper.GetKeyPair();
                 var localDevice = new LocalDeviceEntity
                 {
                     DeviceId = Guid.NewGuid().ToString(),
-                    DeviceName = firstName,
+                    DeviceName = name,
                     PublicKey = ((ECPublicKeyParameters)keyPair.Public).Q.GetEncoded(false),
                     PrivateKey = ((ECPrivateKeyParameters)keyPair.Private).D.ToByteArrayUnsigned(),
                 };

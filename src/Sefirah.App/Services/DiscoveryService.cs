@@ -46,13 +46,13 @@ public class DiscoveryService(
 
             logger.Info($"Address to advertise: {string.Join(", ", localAddresses)}");
 
-            var (username, avatar) = await CurrentUserInformation.GetCurrentUserInfoAsync();
+            var (name, avatar) = await CurrentUserInformation.GetCurrentUserInfoAsync();
             var udpBroadcast = new UdpBroadcast
             {
                 DeviceId = localDevice.DeviceId,
                 IpAddresses = [.. networkInterfaces.Select(i => i.Address.ToString())],
                 Port = serverPort,
-                DeviceName = username,
+                DeviceName = name,
                 PublicKey = publicKey,
             };
 

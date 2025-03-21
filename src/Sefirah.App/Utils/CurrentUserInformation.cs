@@ -7,28 +7,54 @@ namespace Sefirah.App.Utils;
 
 public static class CurrentUserInformation
 {
-    public static async Task<(string firstName, string? avatar)> GetCurrentUserInfoAsync()
+    public static async Task<(string name, string? avatar)> GetCurrentUserInfoAsync()
     {
         try
         {
+            string name = string.Empty;
+            string? avatarBase64 = null;
+            
+            // this returns only the current user always for some reason
             var users = await Windows.System.User.FindAllAsync();
             if (!users.Any())
             {
                 return (GetFallbackUserName(), null);
             }
-
             var currentUser = users[0];
             if (currentUser == null)
             {
+                Debug.WriteLine("currentUser is null");
                 return (GetFallbackUserName(), null);
             }
 
-            // Get user properties
-            var properties = await currentUser.GetPropertiesAsync(["FirstName", "DisplayName", "AccountName"]);
-            string firstName = GetFirstNameFromProperties(properties);
-            string? avatarBase64 = await GetUserAvatarBase64Async(currentUser);
+            avatarBase64 = await GetUserAvatarBase64Async(currentUser);
 
-            return (firstName, avatarBase64);
+            // Try to get the name using properties
+            var properties = await currentUser.GetPropertiesAsync(["FirstName", "DisplayName", "AccountName"]);
+
+            if (properties.Any())
+            {
+                name = GetFirstNameFromProperties(properties);
+            }
+
+            if (string.IsNullOrEmpty(name))
+            {
+                // First try to get name from WindowsIdentity
+                using var identity = WindowsIdentity.GetCurrent();
+                var identityName = identity.Name;
+                if (!string.IsNullOrEmpty(identityName))
+                {
+                    name = name.Split('\\').Last().Split(' ').First();
+                }
+            }
+            
+            // Last resort fallback
+            if (string.IsNullOrEmpty(name))
+            {
+                name = GetFallbackUserName();
+            }
+            
+            return (name, avatarBase64);
         }
         catch (Exception ex)
         {
