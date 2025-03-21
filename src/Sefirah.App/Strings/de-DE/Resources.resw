@@ -124,7 +124,7 @@
     <value>General</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Settings</value>
+    <value>Einstellungen</value>
   </data>
   <data name="PrivacyPolicy" xml:space="preserve">
     <value>Privacy Policy</value>
@@ -190,10 +190,10 @@
     <value>Notification Feed + Toast</value>
   </data>
   <data name="PairedDevices.Title" xml:space="preserve">
-    <value>Paired Devices</value>
+    <value>Gekoppelte Geräte</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
-    <value>Available Devices</value>
+    <value>Verfügbare Geräte</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
     <value>Android devices that are running the app in the same network will show up below</value>
@@ -267,13 +267,13 @@ mobile (Make sure the pin matches)</value>
     <value>Verify the passkey matches on both devices:</value>
   </data>
   <data name="ConnectionRequestRejectButton" xml:space="preserve">
-    <value>Reject</value>
+    <value>Ablehnen</value>
   </data>
   <data name="NotificationsClearButton" xml:space="preserve">
     <value>Clear all</value>
   </data>
   <data name="ConnectionRequestAcceptButton" xml:space="preserve">
-    <value>Accept</value>
+    <value>Annehmen</value>
   </data>
   <data name="NoDevicesFound" xml:space="preserve">
     <value>No devices found</value>
@@ -357,7 +357,7 @@ mobile (Make sure the pin matches)</value>
     <value>Do not show notification toast when phone is in DND</value>
   </data>
   <data name="Devices" xml:space="preserve">
-    <value>Devices</value>
+    <value>Geräte</value>
   </data>
   <data name="RingerModeNormal.Content" xml:space="preserve">
     <value>Normal</value>
