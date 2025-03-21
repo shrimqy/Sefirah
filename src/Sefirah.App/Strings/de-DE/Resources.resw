@@ -127,19 +127,19 @@
     <value>Einstellungen</value>
   </data>
   <data name="PrivacyPolicy" xml:space="preserve">
-    <value>Privacy Policy</value>
+    <value>Datenschutzhinweis</value>
   </data>
   <data name="SupportDevelopment" xml:space="preserve">
-    <value>Support Development</value>
+    <value>Entwicklung unterstützen</value>
   </data>
   <data name="OpenLogs" xml:space="preserve">
     <value>Open Logs</value>
   </data>
   <data name="GitHubRepository" xml:space="preserve">
-    <value>GitHub Repository</value>
+    <value>GitHub-Repository</value>
   </data>
   <data name="AndroidGitHubRepository" xml:space="preserve">
-    <value>Android GitHub Repository</value>
+    <value>GitHub-Repository für Android-App</value>
   </data>
   <data name="Clipboard" xml:space="preserve">
     <value>Zwischenablage</value>
@@ -154,7 +154,7 @@
     <value>Third party libraries</value>
   </data>
   <data name="SaveLocation" xml:space="preserve">
-    <value>Save location</value>
+    <value>Speicherort</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
     <value>Remote storage location</value>
@@ -172,7 +172,7 @@
     <value>Receive notifications from remote device</value>
   </data>
   <data name="GeneralSettings" xml:space="preserve">
-    <value>General Settings</value>
+    <value>Allgemeine Einstellungen</value>
   </data>
   <data name="ShowNotificationToast" xml:space="preserve">
     <value>Show notification toast</value>
@@ -205,19 +205,19 @@
     <value>Choose how the app starts when Windows boots</value>
   </data>
   <data name="StartupOptionMinimized.Content" xml:space="preserve">
-    <value>Start minimized</value>
+    <value>Minimiert starten</value>
   </data>
   <data name="StartupOptionMaximized.Content" xml:space="preserve">
-    <value>Start maximized</value>
+    <value>Maximiert starten</value>
   </data>
   <data name="StartupOptionSystemTray.Content" xml:space="preserve">
     <value>Start in system tray</value>
   </data>
   <data name="StartupOptionDisabled.Content" xml:space="preserve">
-    <value>Disabled</value>
+    <value>Deaktiviert</value>
   </data>
   <data name="Theme" xml:space="preserve">
-    <value>Theme</value>
+    <value>Darstellung</value>
   </data>
   <data name="ThemeDescription" xml:space="preserve">
     <value>Choose your default app theme</value>
@@ -232,10 +232,10 @@
     <value>Dunkel</value>
   </data>
   <data name="RemoveDeviceDialogTitle" xml:space="preserve">
-    <value>Remove Device</value>
+    <value>Gerät entfernen</value>
   </data>
   <data name="Remove" xml:space="preserve">
-    <value>Remove</value>
+    <value>Entfernen</value>
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Abbrechen</value>
@@ -248,13 +248,13 @@
 page.</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
-    <value>Get Started</value>
+    <value>Erste Schritte</value>
   </data>
   <data name="OnboardingSkip" xml:space="preserve">
-    <value>Skip for now</value>
+    <value>Vorerst überspringen</value>
   </data>
   <data name="OnboardingDevice.Title" xml:space="preserve">
-    <value>Connect Your Device</value>
+    <value>Verbinde dein Gerät</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
     <value>Discovered devices in your network will appear below, and initiate the connection from your
@@ -300,7 +300,7 @@ mobile (Make sure the pin matches)</value>
     <value>Verbindung getrennt</value>
   </data>
   <data name="ShowHideWindow" xml:space="preserve">
-    <value>Show/Hide Window</value>
+    <value>Fenster ein-/ausblenden</value>
   </data>
   <data name="Exit" xml:space="preserve">
     <value>Beenden</value>
@@ -312,7 +312,7 @@ mobile (Make sure the pin matches)</value>
     <value>Select location</value>
   </data>
   <data name="RemoveDeviceDialogSubtitle" xml:space="preserve">
-    <value>Are you sure you want to remove '{0}'? This action cannot be undone.</value>
+    <value>Möchtest du '{0}' wirklich entfernen? Diese Aktion kann nicht rückgängig gemacht werden.</value>
   </data>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>App-specific Settings</value>
@@ -330,7 +330,7 @@ mobile (Make sure the pin matches)</value>
     <value>Empfangene Datei</value>
   </data>
   <data name="TransferNotification.Title" xml:space="preserve">
-    <value>File Transfer</value>
+    <value>Datentransfer</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>Senden</value>
@@ -375,13 +375,13 @@ mobile (Make sure the pin matches)</value>
     <value>Unpin</value>
   </data>
   <data name="ScreenMirror" xml:space="preserve">
-    <value>Screen Mirror</value>
+    <value>Bildschirmspiegelung</value>
   </data>
   <data name="VideoSettings" xml:space="preserve">
-    <value>Video Settings</value>
+    <value>Videoeinstellungen</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>Audio Settings</value>
+    <value>Audioeinstellungen</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
     <value>In App öffnen</value>
@@ -390,7 +390,7 @@ mobile (Make sure the pin matches)</value>
     <value>Keep device screen off while mirroring</value>
   </data>
   <data name="PhysicalKeyboard" xml:space="preserve">
-    <value>Disable on-screen keyboard</value>
+    <value>Bildschirmtastatur deaktivieren</value>
   </data>
   <data name="Bitrate" xml:space="preserve">
     <value>Bitrate</value>
@@ -402,7 +402,7 @@ mobile (Make sure the pin matches)</value>
     <value>Buffer</value>
   </data>
   <data name="Messages" xml:space="preserve">
-    <value>Messages</value>
+    <value>Nachrichten</value>
   </data>
   <data name="EmptyMessages" xml:space="preserve">
     <value>Select a conversation to view messages</value>
@@ -423,7 +423,7 @@ mobile (Make sure the pin matches)</value>
     <value>Enter phone number and press Enter</value>
   </data>
   <data name="RemoveAddress" xml:space="preserve">
-    <value>Remove address</value>
+    <value>Adresse entfernen</value>
   </data>
   <data name="CopyMessage" xml:space="preserve">
     <value>Nachricht kopieren</value>
@@ -435,7 +435,7 @@ mobile (Make sure the pin matches)</value>
     <value>Alle Apps</value>
   </data>
   <data name="CustomArguments" xml:space="preserve">
-    <value>Custom Arguments</value>
+    <value>Benutzerdefinierte Argumente</value>
   </data>
   <data name="AdbDeviceOffline" xml:space="preserve">
     <value>Adb device is offline</value>
