@@ -118,10 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="About" xml:space="preserve">
-    <value>About</value>
+    <value>Über</value>
   </data>
   <data name="General" xml:space="preserve">
-    <value>General</value>
+    <value>Allgemein</value>
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Einstellungen</value>
@@ -142,13 +142,13 @@
     <value>Android GitHub Repository</value>
   </data>
   <data name="Clipboard" xml:space="preserve">
-    <value>Clipboard</value>
+    <value>Zwischenablage</value>
   </data>
   <data name="Feedback" xml:space="preserve">
     <value>Feedback</value>
   </data>
   <data name="Notifications" xml:space="preserve">
-    <value>Notifications</value>
+    <value>Benachrichtigungen</value>
   </data>
   <data name="ThirdPartyLibraries" xml:space="preserve">
     <value>Third party libraries</value>
@@ -223,13 +223,13 @@
     <value>Choose your default app theme</value>
   </data>
   <data name="Default" xml:space="preserve">
-    <value>Default</value>
+    <value>Standard</value>
   </data>
   <data name="ThemeLight.Content" xml:space="preserve">
-    <value>Light</value>
+    <value>Hell</value>
   </data>
   <data name="ThemeDark.Content" xml:space="preserve">
-    <value>Dark</value>
+    <value>Dunkel</value>
   </data>
   <data name="RemoveDeviceDialogTitle" xml:space="preserve">
     <value>Remove Device</value>
@@ -238,7 +238,7 @@
     <value>Remove</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>Abbrechen</value>
   </data>
   <data name="OnboardingWelcome.Title" xml:space="preserve">
     <value>Welcome to Sefirah</value>
@@ -276,7 +276,7 @@ mobile (Make sure the pin matches)</value>
     <value>Annehmen</value>
   </data>
   <data name="NoDevicesFound" xml:space="preserve">
-    <value>No devices found</value>
+    <value>Keine Geräte gefunden</value>
   </data>
   <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
     <value>PASSKEY</value>
@@ -291,19 +291,19 @@ mobile (Make sure the pin matches)</value>
     <value>Choose how the app starts when Windows boots</value>
   </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
-    <value>Open links in browser</value>
+    <value>Links im Browser öffnen</value>
   </data>
   <data name="Connected.Text" xml:space="preserve">
-    <value>Connected</value>
+    <value>Verbunden</value>
   </data>
   <data name="Disconnected.Text" xml:space="preserve">
-    <value>Disconnected</value>
+    <value>Verbindung getrennt</value>
   </data>
   <data name="ShowHideWindow" xml:space="preserve">
     <value>Show/Hide Window</value>
   </data>
   <data name="Exit" xml:space="preserve">
-    <value>Exit</value>
+    <value>Beenden</value>
   </data>
   <data name="Features" xml:space="preserve">
     <value>Features</value>
@@ -327,22 +327,22 @@ mobile (Make sure the pin matches)</value>
     <value>Receiving File</value>
   </data>
   <data name="TransferNotificationReceived.Title" xml:space="preserve">
-    <value>Received File</value>
+    <value>Empfangene Datei</value>
   </data>
   <data name="TransferNotification.Title" xml:space="preserve">
     <value>File Transfer</value>
   </data>
   <data name="SendButton" xml:space="preserve">
-    <value>Send</value>
+    <value>Senden</value>
   </data>
   <data name="ReplyPlaceholder" xml:space="preserve">
     <value>Type a reply</value>
   </data>
   <data name="TransferNotificationActionOpenFile" xml:space="preserve">
-    <value>Open file</value>
+    <value>Datei öffnen</value>
   </data>
   <data name="TransferNotificationActionOpenFolder" xml:space="preserve">
-    <value>Open folder</value>
+    <value>Ordner öffnen</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
     <value>Turn off notifications from {0}</value>
@@ -363,10 +363,10 @@ mobile (Make sure the pin matches)</value>
     <value>Normal</value>
   </data>
   <data name="RingerModeSilent.Content" xml:space="preserve">
-    <value>Silent</value>
+    <value>Stumm</value>
   </data>
   <data name="RingerModeVibrate.Content" xml:space="preserve">
-    <value>Vibrate</value>
+    <value>Vibrieren</value>
   </data>
   <data name="Pin" xml:space="preserve">
     <value>Pin</value>
@@ -384,7 +384,7 @@ mobile (Make sure the pin matches)</value>
     <value>Audio Settings</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
-    <value>Open in app</value>
+    <value>In App öffnen</value>
   </data>
   <data name="ScreenOff" xml:space="preserve">
     <value>Keep device screen off while mirroring</value>
@@ -396,7 +396,7 @@ mobile (Make sure the pin matches)</value>
     <value>Bitrate</value>
   </data>
   <data name="Resolution" xml:space="preserve">
-    <value>Resolution</value>
+    <value>Auflösung</value>
   </data>
   <data name="Buffer" xml:space="preserve">
     <value>Buffer</value>
@@ -408,16 +408,16 @@ mobile (Make sure the pin matches)</value>
     <value>Select a conversation to view messages</value>
   </data>
   <data name="MessagePlaceholder" xml:space="preserve">
-    <value>Type a message</value>
+    <value>Eine Nachricht schreiben</value>
   </data>
   <data name="Apps" xml:space="preserve">
     <value>Apps</value>
   </data>
   <data name="NewMessage" xml:space="preserve">
-    <value>New message</value>
+    <value>Neue Nachricht</value>
   </data>
   <data name="SearchMessages" xml:space="preserve">
-    <value>Search messages</value>
+    <value>Nachrichten durchsuchen</value>
   </data>
   <data name="AddressInputPlaceholder" xml:space="preserve">
     <value>Enter phone number and press Enter</value>
@@ -426,13 +426,13 @@ mobile (Make sure the pin matches)</value>
     <value>Remove address</value>
   </data>
   <data name="CopyMessage" xml:space="preserve">
-    <value>Copy message</value>
+    <value>Nachricht kopieren</value>
   </data>
   <data name="NoApps" xml:space="preserve">
-    <value>No apps found</value>
+    <value>Keine Apps gefunden</value>
   </data>
   <data name="AllApps" xml:space="preserve">
-    <value>All Apps</value>
+    <value>Alle Apps</value>
   </data>
   <data name="CustomArguments" xml:space="preserve">
     <value>Custom Arguments</value>
