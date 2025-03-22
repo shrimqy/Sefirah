@@ -433,24 +433,24 @@
     <value>Все приложения</value>
   </data>
   <data name="CustomArguments" xml:space="preserve">
-    <value>Custom Arguments</value>
+    <value>Пользовательские аргументы</value>
   </data>
   <data name="AdbDeviceOffline" xml:space="preserve">
-    <value>Adb device is offline</value>
+    <value>Adb устройство не в сети</value>
   </data>
   <data name="AdbDeviceOfflineDescription" xml:space="preserve">
-    <value>Connect your device through USB with USB Debugging enabled and then try again</value>
+    <value>Подключите устройство через USB с включенной отладкой по USB и повторите попытку</value>
   </data>
   <data name="Dismiss" xml:space="preserve">
     <value>Dismiss</value>
   </data>
   <data name="ScrcpyNotFound" xml:space="preserve">
-    <value>Scrcpy not found</value>
+    <value>Scrcpy не найден</value>
   </data>
   <data name="ScrcpyNotFoundDescription" xml:space="preserve">
-    <value>Select the folder where scrcpy is located</value>
+    <value>Выберите папку, в которой находится scrcpy</value>
   </data>
   <data name="PreferTcpIp" xml:space="preserve">
-    <value>Prefer Wireless connection</value>
+    <value>Предпочитать беспроводное подключение</value>
   </data>
 </root>
