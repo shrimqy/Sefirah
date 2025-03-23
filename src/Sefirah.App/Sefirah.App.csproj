@@ -12,7 +12,7 @@
         <AppxBundlePlatforms>x86|x64|arm64</AppxBundlePlatforms>
         <AppxBundle>Always</AppxBundle>
         <DefaultLanguage>en-US</DefaultLanguage>
-        <AppxDefaultResourceQualifiers>Language=en-US;en-GB;ja-JP</AppxDefaultResourceQualifiers>
+        <AppxDefaultResourceQualifiers>Language=en-US;en-GB;ja-JP;zh-CN;ru-RU;de-DE</AppxDefaultResourceQualifiers>
         <Platforms>x86;x64;arm64</Platforms>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
