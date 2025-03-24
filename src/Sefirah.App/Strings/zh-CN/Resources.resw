@@ -445,15 +445,15 @@
     <value>连接 USB 设备请启用 USB 调试后重试</value>
   </data>
   <data name="Dismiss" xml:space="preserve">
-    <value>Dismiss</value>
+    <value>忽视</value>
   </data>
   <data name="ScrcpyNotFound" xml:space="preserve">
-    <value>Scrcpy not found</value>
+    <value>未找到 Scrcpy</value>
   </data>
   <data name="ScrcpyNotFoundDescription" xml:space="preserve">
-    <value>Select the folder where scrcpy is located</value>
+    <value>选择 Scrcpy 所在文件夹</value>
   </data>
   <data name="PreferTcpIp" xml:space="preserve">
-    <value>Prefer Wireless connection</value>
+    <value>优先无线连接</value>
   </data>
 </root>
