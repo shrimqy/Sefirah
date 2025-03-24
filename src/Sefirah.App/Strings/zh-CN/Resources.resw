@@ -436,13 +436,13 @@
     <value>所有应用</value>
   </data>
   <data name="CustomArguments" xml:space="preserve">
-    <value>Custom Arguments</value>
+    <value>自定义参数</value>
   </data>
   <data name="AdbDeviceOffline" xml:space="preserve">
-    <value>Adb device is offline</value>
+    <value>Adb 设备已离线</value>
   </data>
   <data name="AdbDeviceOfflineDescription" xml:space="preserve">
-    <value>Connect your device through USB with USB Debugging enabled and then try again</value>
+    <value>连接 USB 设备请启用 USB 调试后重试</value>
   </data>
   <data name="Dismiss" xml:space="preserve">
     <value>Dismiss</value>
