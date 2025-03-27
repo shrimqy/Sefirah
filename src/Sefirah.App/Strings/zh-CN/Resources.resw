@@ -244,8 +244,7 @@
     <value>欢迎使用 Sefirah</value>
   </data>
   <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
-    <value>要开始下载并通过相应的 github
-页面安装 comapanion 应用程序。</value>
+    <value>请通过GitHub页面下载并安装配套应用程序以开始使用。</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
     <value>开始</value>
@@ -257,8 +256,8 @@
     <value>连接您的设备</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>在您的网络中发现的设备将出现在下面，并从您的
-移动设备启动连接 (请确保引脚匹配)</value>
+    <value>Discovered devices in your network will appear below, and initiate the connection from your
+mobile (Make sure the pin matches)</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
     <value>设备连接请求</value>
