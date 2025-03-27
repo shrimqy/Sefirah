@@ -178,7 +178,7 @@
     <value>显示通知提示</value>
   </data>
   <data name="IgnoreWindowsApps" xml:space="preserve">
-    <value>忽略活动 Windows 应用程序的远程通知</value>
+    <value>忽略来自活动Windows应用程序的远程通知</value>
   </data>
   <data name="NotificationFilterDisabled.Content" xml:space="preserve">
     <value>禁用</value>
@@ -196,22 +196,22 @@
     <value>可用设备</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
-    <value>正在同一网络中运行应用程序的安卓设备将显示在下方</value>
+    <value>同网络下的安卓设备将自动显示在下方</value>
   </data>
   <data name="StartupOption" xml:space="preserve">
     <value>启动项</value>
   </data>
   <data name="StartupOptionDescription" xml:space="preserve">
-    <value>选择当 Windows 启动时应用程序的启动方式</value>
+    <value>选择本应用在Windows启动时的运行方式</value>
   </data>
   <data name="StartupOptionMinimized.Content" xml:space="preserve">
-    <value>启动最小化</value>
+    <value>最小化</value>
   </data>
   <data name="StartupOptionMaximized.Content" xml:space="preserve">
-    <value>启动最大化</value>
+    <value>最大化</value>
   </data>
   <data name="StartupOptionSystemTray.Content" xml:space="preserve">
-    <value>在系统托盘中启动</value>
+    <value>系统托盘</value>
   </data>
   <data name="StartupOptionDisabled.Content" xml:space="preserve">
     <value>禁用</value>
@@ -256,14 +256,13 @@
     <value>连接您的设备</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>Discovered devices in your network will appear below, and initiate the connection from your
-mobile (Make sure the pin matches)</value>
+    <value>已发现的网络设备将显示在下文，请从您的移动端发起连接（请确保PIN码匹配）</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
     <value>设备连接请求</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
-    <value>验证两台设备上的密码匹配：</value>
+    <value>请验证两台设备上的配对密钥是否匹配：</value>
   </data>
   <data name="ConnectionRequestRejectButton" xml:space="preserve">
     <value>拒绝</value>
@@ -311,7 +310,7 @@ mobile (Make sure the pin matches)</value>
     <value>选择位置</value>
   </data>
   <data name="RemoveDeviceDialogSubtitle" xml:space="preserve">
-    <value>您确定要删除 '{0}'？此操作不能撤消。</value>
+    <value>确定要移除 '{0}' 吗？此操作不可撤销。</value>
   </data>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>应用特定设置</value>
@@ -354,7 +353,7 @@ mobile (Make sure the pin matches)</value>
     <value>功能请求</value>
   </data>
   <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
-    <value>当手机在 DND 时不显示通知</value>
+    <value>当手机处于勿扰模式时，不显示通知弹窗</value>
   </data>
   <data name="Devices" xml:space="preserve">
     <value>设备</value>
@@ -384,10 +383,10 @@ mobile (Make sure the pin matches)</value>
     <value>音频设置</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
-    <value>在移动应用中打开</value>
+    <value>在应用程序中打开</value>
   </data>
   <data name="ScreenOff" xml:space="preserve">
-    <value>镜像时保持设备屏幕关闭</value>
+    <value>镜像投屏时保持设备屏幕关闭</value>
   </data>
   <data name="PhysicalKeyboard" xml:space="preserve">
     <value>禁用虚拟键盘</value>
