@@ -90,16 +90,17 @@ public class AdbService(
     
     public async Task StartAsync()
     {
-        if (IsMonitoring)
-        {
-            logger.Warn("ADB monitoring is already running");
-            return;
-        }
-        
-        cts = new CancellationTokenSource();
-        string adbPath = $"{userSettingsService.FeatureSettingsService.AdbPath}";
         try
         {
+            if (IsMonitoring)
+            {
+                logger.Warn("ADB monitoring is already running");
+                return;
+            }
+
+            cts = new CancellationTokenSource();
+            string adbPath = $"{userSettingsService.FeatureSettingsService.AdbPath}";
+
             // Start the ADB server if it's not running
             StartServerResult startServerResult = await AdbServer.Instance.StartServerAsync(adbPath, false, cts.Token);
             logger.Info($"ADB server start result: {startServerResult}");
@@ -124,7 +125,6 @@ public class AdbService(
         {
             await CleanupAsync();
             logger.Error("Failed to start ADB device monitoring", ex);
-            throw;
         }
     }
     
@@ -203,7 +203,13 @@ public class AdbService(
         try
         {
             logger.Info($"Device state changed: {e.Device.Serial} {e.OldState} -> {e.NewState}");
-            var index = AdbDevices.IndexOf(AdbDevices.FirstOrDefault(d => d.Serial == e.Device.Serial));
+            var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == e.Device.Serial);
+            if (existingDevice == null)
+            {
+                logger.Warn($"Device {e.Device.Serial} not found in device list");
+                return;
+            }
+            var index = AdbDevices.IndexOf(existingDevice);
             
             if (e.NewState == DeviceState.Online && (e.OldState == DeviceState.Authorizing || e.OldState == DeviceState.Offline))
             {
