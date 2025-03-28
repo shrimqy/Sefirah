@@ -15,7 +15,7 @@
     <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
     <DisableXbfLineInfo>False</DisableXbfLineInfo>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
-    <AppxDefaultResourceQualifiers>Language=en-US;en-GB;ja-JP;zh-CN;ru-RU</AppxDefaultResourceQualifiers>
+    <AppxDefaultResourceQualifiers>Language=en-US;en-GB;ja-JP;zh-CN;ru-RU;de-DE</AppxDefaultResourceQualifiers>
     <AppxBundleAutoResourcePackageQualifiers>Scale|DXFeatureLevel</AppxBundleAutoResourcePackageQualifiers>
     <UapAppxPackageBuildMode>StoreUpload</UapAppxPackageBuildMode>
     <AppxBundlePlatforms>x86|x64|arm64</AppxBundlePlatforms>
