@@ -9,6 +9,7 @@
     xmlns:converters="using:Sefirah.App.Converters"
     xmlns:models="using:Sefirah.App.Data.AppDatabase.Models"
     mc:Ignorable="d"
+    x:Name="AppPageRoot"
     xmlns:helpers="using:Sefirah.App.Helpers"
     Background="Transparent">
 
@@ -27,71 +28,129 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
         
         <TextBlock 
             Grid.Row="0"
+            Grid.Column="0"
+            Margin="16,0" 
             Text="{helpers:ResourceString Name=AllApps}" 
             Style="{StaticResource TitleTextBlockStyle}" 
-            Margin="24,24,0,16"/>
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"/>
             
+        <AutoSuggestBox 
+            x:Name="AppSearchBox"
+            Grid.Row="0"
+            Grid.Column="1"
+            PlaceholderText="{helpers:ResourceString Name=SearchApps}"
+            QueryIcon="Find"
+            Margin="16,12" 
+            MinWidth="250"
+            HorizontalAlignment="Right"
+            TextChanged="AppSearchBox_TextChanged"
+            SuggestionChosen="AppSearchBox_SuggestionChosen"
+            QuerySubmitted="AppSearchBox_QuerySubmitted"
+            UpdateTextOnSelect="False"
+            AutomationProperties.Name="App AutoSuggestBox">
+            <AutoSuggestBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Margin="0,8,0,8" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Image Source="{Binding AppIcon, Mode=OneWay}" Width="36" Height="36" Stretch="Uniform"/>
+                        <TextBlock 
+                            Text="{Binding AppName, Mode=OneWay}" 
+                            Margin="12,0,0,0" 
+                            VerticalAlignment="Center"/>
+                    </StackPanel>
+                </DataTemplate>
+            </AutoSuggestBox.ItemTemplate>
+            <AutoSuggestBox.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Padding" Value="12,8"/>
+                    <Setter Property="MinHeight" Value="60"/>
+                </Style>
+            </AutoSuggestBox.ItemContainerStyle>
+        </AutoSuggestBox>
+
         <GridView 
             Grid.Row="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
             x:Name="AppsGridView"
             ItemsSource="{x:Bind ViewModel.Apps, Mode=OneWay}"
             SelectionMode="None"
-            Padding="10"
             IsItemClickEnabled="True"
             ItemClick="AppsGridView_ItemClick"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch">
-            
+
             <GridView.ItemContainerStyle>
-                <Style TargetType="GridViewItem">
-                    <Setter Property="Margin" Value="12"/>
+                <Style TargetType="GridViewItem" BasedOn="{StaticResource DefaultGridViewItemStyle}">
+                    <Setter Property="Margin" Value="12,18,12,18" />
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                     <Setter Property="VerticalContentAlignment" Value="Stretch"/>
                 </Style>
             </GridView.ItemContainerStyle>
-            
+
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid 
+                        x:Name="ItemsWrapGrid"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Top"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="models:ApplicationInfoEntity">
-                    <Grid Width="100" Height="120">
+                    <Grid Width="100" Height="110">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="80"/>
-                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
                         <Image 
-                                Source="{x:Bind AppIcon, Mode=OneWay}" 
-                                Width="48" 
-                                Height="48"
-                                Stretch="Uniform"/>
+                            Grid.Row="0"
+                            Source="{x:Bind AppIcon, Mode=OneWay}" 
+                            Width="48" 
+                            Height="48"
+                            Stretch="Uniform"
+                            Margin="0,10,0,10"
+                            HorizontalAlignment="Center"
+                            Visibility="{x:Bind IsLoading, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                        
+                        <ProgressRing 
+                            Grid.Row="0"
+                            IsActive="{x:Bind IsLoading, Mode=OneWay}"
+                            Width="48" 
+                            Height="48"
+                            Margin="0,10,0,10"
+                            HorizontalAlignment="Center"/>
 
                         <TextBlock 
-                            Grid.Row="1" 
+                            Grid.Row="1"
                             Text="{x:Bind AppName}" 
                             TextWrapping="Wrap"
                             TextAlignment="Center"
-                            VerticalAlignment="Center"
+                            VerticalAlignment="Top"
                             HorizontalAlignment="Center"
+                            MaxLines="2"
                             Style="{StaticResource CaptionTextBlockStyle}"/>
                     </Grid>
                 </DataTemplate>
             </GridView.ItemTemplate>
-            
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid 
-                        Orientation="Horizontal"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Top"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
+
         </GridView>
-        
+
         <ProgressRing 
             IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
             Grid.Row="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
             Width="50" 
             Height="50"
             VerticalAlignment="Center" 
@@ -99,10 +158,13 @@
             
         <TextBlock 
             Grid.Row="1" 
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
             Text="{helpers:ResourceString Name=NoApps}" 
             Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay}"
             VerticalAlignment="Center" 
             HorizontalAlignment="Center"
             Style="{StaticResource BodyTextBlockStyle}"/>
     </Grid>
+
 </Page>

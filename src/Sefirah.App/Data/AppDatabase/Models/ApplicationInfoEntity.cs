@@ -1,8 +1,8 @@
 ﻿using Microsoft.UI.Xaml.Media.Imaging;
 using Sefirah.App.Data.Enums;
 using Sefirah.App.Data.Models;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Sefirah.App.Data.AppDatabase.Models;
 public class ApplicationInfoEntity : BaseEntity
@@ -25,6 +25,17 @@ public class ApplicationInfoEntity : BaseEntity
     {
         get => _notificationFilter;
         set => Set(ref _notificationFilter, value);
+    }
+
+    private bool _isLoading;
+    public bool IsLoading
+    {
+        get => _isLoading;
+        set 
+        {
+            Debug.WriteLine($"Setting IsLoading to {value} for app {AppName}");
+            Set(ref _isLoading, value);
+        }
     }
 
     public static ApplicationInfoEntity FromApplicationInfo(ApplicationInfo info)

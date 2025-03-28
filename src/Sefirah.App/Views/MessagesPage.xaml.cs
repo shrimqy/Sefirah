@@ -131,12 +131,7 @@ public sealed partial class MessagesPage : Page
     {
         if (args.SelectedItem is SmsConversation selectedConversation)
         {
-            // Select the conversation in the ListView
-            ViewModel.SelectedConversation = selectedConversation;
-            
-            // Clear the search box
-            sender.Text = string.Empty;
-            sender.ItemsSource = null;
+            sender.Text = selectedConversation.Messages[0].Addresses[0].Address;
         }
     }
 

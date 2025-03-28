@@ -1,8 +1,11 @@
 ﻿using AdvancedSharpAdbClient;
+using AdvancedSharpAdbClient.DeviceCommands;
 using AdvancedSharpAdbClient.Models;
+using AdvancedSharpAdbClient.Receivers;
 using CommunityToolkit.WinUI;
 using Microsoft.UI.Dispatching;
 using Sefirah.App.Data.Contracts;
+using Sefirah.App.Data.Items;
 using Sefirah.App.Data.Models;
 using System.Net;
 
@@ -10,7 +13,10 @@ namespace Sefirah.App.Services;
 
 public interface IAdbService
 {
-    ObservableCollection<AdbDevice> Devices { get; }
+    ObservableCollection<AdbDevice> AdbDevices { get; }
+    ObservableCollection<ScrcpyPreferenceItem> DisplayOrientationOptions { get; }
+    ObservableCollection<ScrcpyPreferenceItem> VideoCodecOptions { get; }
+    ObservableCollection<ScrcpyPreferenceItem> AudioCodecOptions { get; }
     Task StartAsync();
     Task<bool> ConnectWireless(string host, int port=5555);
     Task StopAsync();
@@ -19,6 +25,7 @@ public interface IAdbService
 
 public class AdbService(
     ILogger logger,
+    IDeviceManager deviceManager,
     IUserSettingsService userSettingsService
 ) : IAdbService
 {
@@ -26,9 +33,61 @@ public class AdbService(
     private DeviceMonitor? deviceMonitor;
     private readonly AdbClient adbClient = new();
     
-    public ObservableCollection<AdbDevice> Devices { get; } = [];
+    public ObservableCollection<AdbDevice> AdbDevices { get; } = [];
     public bool IsMonitoring => deviceMonitor != null && !(cts?.IsCancellationRequested ?? true);
 
+    // Initialize the codec option collections
+    public ObservableCollection<ScrcpyPreferenceItem> DisplayOrientationOptions { get; } = new()
+    {
+        new() { Id = 0, Command = "", Display = "Default" },
+        new() { Id = 1, Command = "0", Display = "0°" },
+        new() { Id = 2, Command = "90", Display = "90°" },
+        new() { Id = 3, Command = "180", Display = "180°" },
+        new() { Id = 4, Command = "270", Display = "270°" },
+        new() { Id = 5, Command = "flip0", Display = "flip-0°" },
+        new() { Id = 6, Command = "flip90", Display = "flip-90°" },
+        new() { Id = 7, Command = "flip180", Display = "flip-180°" },
+        new() { Id = 8, Command = "flip270", Display = "flip-270°" }
+    };
+
+    public ObservableCollection<ScrcpyPreferenceItem> VideoCodecOptions { get; } =
+    [
+        new() { Id = 0, Command = "", Display = "Default" },
+        new() { Id = 1, Command = "--video-codec=h264 --video-encoder=OMX.qcom.video.encoder.avc", Display = "h264 & c2.qti.avc.encoder (hw)" },
+        new() { Id = 2, Command = "--video-codec=h264 --video-encoder=c2.android.avc.encoder", Display = "h264 & c2.android.avc.encoder (sw)" },
+        new() { Id = 4, Command = "--video-codec=h264 --video-encoder=OMX.google.h264.encoder", Display = "h264 & OMX.google.h264.encoder (sw)" },
+        new() { Id = 5, Command = "--video-codec=h265 --video-encoder=OMX.qcom.video.encoder.hevc", Display = "h265 & OMX.qcom.video.encoder.hevc (hw)" },
+        new() { Id = 6, Command = "--video-codec=h265 --video-encoder=c2.android.hevc.encoder", Display = "h265 & c2.android.hevc.encoder (sw)" }
+    ];
+
+    public ObservableCollection<ScrcpyPreferenceItem> AudioCodecOptions { get; } =
+    [
+        new() { Id = 0, Command = "", Display = "Default" },
+        new() { Id = 1, Command = "--audio-codec=opus --audio-encoder=c2.android.opus.encoder", Display = "opus & c2.android.opus.encoder (sw)" },
+        new() { Id = 2, Command = "--audio-codec=aac --audio-encoder=c2.android.aac.encoder", Display = "aac & c2.android.aac.encoder (sw)" },
+        new() { Id = 3, Command = "--audio-codec=aac --audio-encoder=OMX.google.aac.encoder", Display = "aac & OMX.google.aac.encoder (sw)" },
+        new() { Id = 4, Command = "--audio-codec=raw", Display = "raw" }
+    ];
+
+    // Methods to add new options dynamically
+    public void AddDisplayOrientationOption(string command, string display)
+    {
+        int newId = DisplayOrientationOptions.Count > 0 ? DisplayOrientationOptions.Max(x => x.Id) + 1 : 0;
+        DisplayOrientationOptions.Add(new ScrcpyPreferenceItem { Id = newId, Command = command, Display = display });
+    }
+
+    public void AddVideoCodecOption(string command, string display)
+    {
+        int newId = VideoCodecOptions.Count > 0 ? VideoCodecOptions.Max(x => x.Id) + 1 : 0;
+        VideoCodecOptions.Add(new ScrcpyPreferenceItem { Id = newId, Command = command, Display = display });
+    }
+
+    public void AddAudioCodecOption(string command, string display)
+    {
+        int newId = AudioCodecOptions.Count > 0 ? AudioCodecOptions.Max(x => x.Id) + 1 : 0;
+        AudioCodecOptions.Add(new ScrcpyPreferenceItem { Id = newId, Command = command, Display = display });
+    }
+    
     public async Task StartAsync()
     {
         if (IsMonitoring)
@@ -38,7 +97,7 @@ public class AdbService(
         }
         
         cts = new CancellationTokenSource();
-        string adbPath = $"{userSettingsService.FeatureSettingsService.ScrcpyPath}\\adb.exe";
+        string adbPath = $"{userSettingsService.FeatureSettingsService.AdbPath}";
         try
         {
             // Start the ADB server if it's not running
@@ -108,11 +167,17 @@ public class AdbService(
     {
         try
         {
+            // Only proceed if the device is fully online
+            if (e.Device.State != DeviceState.Online)
+            {
+                logger.Info($"Device {e.Device.Serial} connected but not yet online. Current state: {e.Device.State}");
+                return;
+            }
+            
             // Refresh the full device information
             var connectedDevice = await GetFullDeviceInfoAsync(e.Device);
-            Devices.Add(connectedDevice);
+            AdbDevices.Add(connectedDevice);
             logger.Info($"Device connected: {connectedDevice.Model} ({connectedDevice.Serial})");
-            
         }
         catch (Exception ex)
         {
@@ -138,10 +203,27 @@ public class AdbService(
         try
         {
             logger.Info($"Device state changed: {e.Device.Serial} {e.OldState} -> {e.NewState}");
-            var index = Devices.IndexOf(Devices.FirstOrDefault(d => d.Serial == e.Device.Serial));
-            if (index != -1)
+            var index = AdbDevices.IndexOf(AdbDevices.FirstOrDefault(d => d.Serial == e.Device.Serial));
+            
+            if (e.NewState == DeviceState.Online && (e.OldState == DeviceState.Authorizing || e.OldState == DeviceState.Offline))
             {
-                Devices[index].State = e.NewState;
+                var deviceInfo = await GetFullDeviceInfoAsync(e.Device);
+                
+                if (index != -1)
+                {
+                    AdbDevices[index] = deviceInfo;
+                }
+
+                else
+                {
+                    AdbDevices.Add(deviceInfo);
+                }
+                
+                logger.Info($"Device connected: {deviceInfo.Model} ({deviceInfo.Serial})");
+            }
+            else if (index != -1)
+            {
+                AdbDevices[index].State = e.NewState;
             }
         }
         catch (Exception ex)
@@ -158,13 +240,13 @@ public class AdbService(
             if (!devices.Any())
             {
                 logger.Warn("No devices found");
-                Devices.Clear();
+                AdbDevices.Clear();
                 return;
             }
             // Convert to our AdbDevice model and add to collection
             await DispatcherQueue.GetForCurrentThread().EnqueueAsync(() =>
             {
-                Devices.Clear();
+                AdbDevices.Clear();
                 foreach (var device in devices)
                 {
                     var adbDevice = new AdbDevice
@@ -174,7 +256,7 @@ public class AdbService(
                         State = device.State,
                         Type = device.Serial.Contains(':') ? DeviceType.Tcpip : DeviceType.Usb
                     };
-                    Devices.Add(adbDevice);
+                    AdbDevices.Add(adbDevice);
                 }
             });
         }
@@ -191,10 +273,26 @@ public class AdbService(
             // Get full device information including model
             var devices = await adbClient.GetDevicesAsync();
             var fullDeviceData = devices.FirstOrDefault(d => d.Serial == deviceData.Serial);
+            string androidId = string.Empty;
+            try
+            {
+                var androidIdReceiver = new ConsoleOutputReceiver();
+
+                // adb shell cat /storage/emulated/0/Android/data/com.castle.sefirah/files/device_info.txt
+
+                await adbClient.ExecuteShellCommandAsync(deviceData, "cat /storage/emulated/0/Android/data/com.castle.sefirah/files/device_info.txt", androidIdReceiver);
+                androidId = androidIdReceiver.ToString().Trim();
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Error getting Android ID for {deviceData.Serial}", ex);
+            }
+            logger.Info($"Android ID: {androidId}");
             return new AdbDevice
             {
                 Serial = fullDeviceData.Serial,
                 Model = fullDeviceData.Model ?? "Unknown",
+                AndroidId = androidId,
                 State = fullDeviceData.State,
                 Type = fullDeviceData.Serial.Contains(':') ? DeviceType.Tcpip : DeviceType.Usb
             };
@@ -207,6 +305,7 @@ public class AdbService(
             {
                 Serial = deviceData.Serial,
                 Model = "Unknown",
+                AndroidId = "Unknown",
                 State = deviceData.State,
                 Type = deviceData.Serial.Contains(':') ? DeviceType.Tcpip : DeviceType.Usb
             };

@@ -107,6 +107,7 @@
                         Width="53"
                         Height="100"
                         Margin="18,0,0,0"
+                        CornerRadius="7"
                         VerticalAlignment="Center"
                         PointerEntered="PhoneFrame_PointerEntered"
                         PointerExited="PhoneFrame_PointerExited">
@@ -150,10 +151,24 @@
                             Opacity="0"
                             Tapped="ToggleScreenMirror"
                             Visibility="Collapsed">
-                            <FontIcon Glyph="&#xEC15;" Foreground="White"/>
+                            <FontIcon 
+                                Glyph="&#xEC15;" 
+                                Visibility="{x:Bind ViewModel.LoadingScrcpy, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}" 
+                                Foreground="White"/>
                             <ToolTipService.ToolTip>
                                 <ToolTip Content="Screen Mirror" />
                             </ToolTipService.ToolTip>
+                        </Grid>
+                        
+                        <!-- Loading indicator -->
+                        <Grid 
+
+                            Visibility="{x:Bind ViewModel.LoadingScrcpy, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <ProgressRing 
+                                IsActive="{x:Bind ViewModel.LoadingScrcpy, Mode=OneWay}"
+                                Foreground="White"
+                                Width="24" 
+                                Height="24"/>
                         </Grid>
                     </Grid>
 

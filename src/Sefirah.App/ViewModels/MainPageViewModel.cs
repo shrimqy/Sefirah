@@ -7,8 +7,6 @@ using Sefirah.App.Data.Models;
 using Sefirah.App.Extensions;
 using Sefirah.App.Utils.Serialization;
 using System.Windows.Input;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml;
 
 namespace Sefirah.App.ViewModels;
 
@@ -16,7 +14,7 @@ public sealed class MainPageViewModel : BaseViewModel
 {
     private ISessionManager SessionManager { get; } = Ioc.Default.GetRequiredService<ISessionManager>();
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
-    private IRemoteAppsRepository remoteAppsRepository { get; } = Ioc.Default.GetRequiredService<IRemoteAppsRepository>();
+    private IRemoteAppsRepository RemoteAppsRepository { get; } = Ioc.Default.GetRequiredService<IRemoteAppsRepository>();
     private INotificationService NotificationService { get; } = Ioc.Default.GetRequiredService<INotificationService>();
 
     private IScreenMirrorService ScreenMirrorService { get; } = Ioc.Default.GetRequiredService<IScreenMirrorService>();
@@ -24,6 +22,7 @@ public sealed class MainPageViewModel : BaseViewModel
     private RemoteDeviceEntity? _deviceInfo = new();
     private DeviceStatus _deviceStatus = new();
     private bool _connectionStatus = false;
+    private bool _loadingScrcpy = false;
     public ReadOnlyObservableCollection<Notification> RecentNotifications => NotificationService.NotificationHistory;
     public ObservableCollection<DiscoveredDevice> DiscoveredDevices { get; } = [];
 
@@ -52,6 +51,12 @@ public sealed class MainPageViewModel : BaseViewModel
     }
 
     public string ConnectionButtonText => ConnectionStatus ? "Connected/Text".GetLocalizedResource() : "Disconnected/Text".GetLocalizedResource();
+
+    public bool LoadingScrcpy
+    {
+        get => _loadingScrcpy;
+        set => SetProperty(ref _loadingScrcpy, value);
+    }
 
     public ICommand ToggleConnectionCommand { get; }
     public ICommand ClearAllNotificationsCommand { get; }
@@ -112,7 +117,16 @@ public sealed class MainPageViewModel : BaseViewModel
 
     private async void ToggleScreenMirror()
     {
-        await ScreenMirrorService.StartScrcpy();
+        try
+        {
+            LoadingScrcpy = true;
+            await ScreenMirrorService.StartScrcpy();
+        }
+        finally
+        {
+            await Task.Delay(1000);
+            LoadingScrcpy = false;
+        }
     }
 
     public async Task OpenApp(Notification notification)
@@ -123,11 +137,16 @@ public sealed class MainPageViewModel : BaseViewModel
             NotificationKey = notification.Key,
         };
         
-        await ScreenMirrorService.StartScrcpy(customArgs: $"--new-display --start-app={notification.AppPackage}");
+        var started = await ScreenMirrorService.StartScrcpy(customArgs: $"--new-display --start-app={notification.AppPackage}");
+
         // Scrcpy doesn't have a way of opening notifications afaik, so we will just have the notification listener on Android to open it for us
-        // Plus we have to wait (3s will do?) until the app is actually launched to send the intent for launching the notification since Google added a lot more restrictions in this particular case
-        await Task.Delay(3000);
-        SessionManager.SendMessage(SocketMessageSerializer.Serialize(notificationToInvoke));
+        // Plus we have to wait (2s will do ig?) until the app is actually launched to send the intent for launching the notification since Google added a lot more restrictions in this particular case
+        if (started)
+        {
+            await Task.Delay(2000);
+            SessionManager.SendMessage(SocketMessageSerializer.Serialize(notificationToInvoke));
+        }
+
     }
 
     private async void getLastConnectedDevice()
@@ -171,7 +190,7 @@ public sealed class MainPageViewModel : BaseViewModel
 
     public async Task UpdateNotificationFilterAsync(string appPackageName, NotificationFilter filter)
     {
-        await remoteAppsRepository.UpdateFilterAsync(appPackageName, filter);
+        await RemoteAppsRepository.UpdateFilterAsync(appPackageName, filter);
     }
 
     public async Task PinNotificationAsync(string notificationKey)

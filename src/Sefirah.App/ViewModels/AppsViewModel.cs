@@ -16,6 +16,13 @@ public sealed class AppsViewModel : BaseViewModel
         get => _isLoading;
         set => SetProperty(ref _isLoading, value);
     }
+
+    private bool _isAppLoading;
+    public bool IsAppLoading
+    {
+        get => _isAppLoading;
+        set => SetProperty(ref _isAppLoading, value);
+    }
     
     public bool IsEmpty => Apps.Count == 0 && !IsLoading;
     
@@ -37,6 +44,26 @@ public sealed class AppsViewModel : BaseViewModel
 
     public async Task OpenApp(string appPackage)
     {
-        await ScreenMirrorService.StartScrcpy(customArgs: $"--new-display --start-app={appPackage}");
+        await dispatcher.EnqueueAsync(async() =>
+        {
+            var app = Apps.FirstOrDefault(a => a.AppPackage == appPackage);
+            if (app == null) return;
+
+            var index = Apps.IndexOf(app);
+            try
+            {
+                Apps[index].IsLoading = true;
+
+                var started = await ScreenMirrorService.StartScrcpy(customArgs: $"--new-display --start-app={appPackage}");
+                if (started)
+                {
+                    await Task.Delay(2000);
+                }
+            }
+            finally
+            {
+                Apps[index].IsLoading = false;
+            }
+        });
     }
 }

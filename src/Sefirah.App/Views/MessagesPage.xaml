@@ -101,12 +101,14 @@
                 <!-- Search Box -->
                 <AutoSuggestBox 
                     Grid.Row="1"
-                    x:Name="SearchBox"
+                    x:Name="MessagesSearchBox"
                     PlaceholderText="{helpers:ResourceString Name=SearchMessages}"
                     Margin="16,0,16,12"
                     VerticalAlignment="Center"
                     QueryIcon="Find"
+                    AutomationProperties.Name="Messages AutoSuggestBox"
                     TextChanged="SearchBox_TextChanged"
+                    UpdateTextOnSelect="False"
                     SuggestionChosen="SearchBox_SuggestionChosen"
                     QuerySubmitted="SearchBox_QuerySubmitted">
                     <AutoSuggestBox.ItemTemplate>

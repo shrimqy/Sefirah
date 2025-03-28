@@ -16,6 +16,7 @@ namespace Sefirah.App.Services;
 public class NetworkService(
     Func<IMessageHandlerService> messageHandlerFactory,
     IDeviceManager deviceManager,
+    IUserSettingsService userSettingsService,
     IDiscoveryService discoveryService,
     IAdbService adbService,
     ILogger logger) : INetworkService, ITcpServerProvider, ISessionManager, IDisposable
@@ -306,7 +307,7 @@ public class NetworkService(
                 isFirstMessage = false;
                 isVerified = true;
                 currentSession = session;
-                if (!string.IsNullOrEmpty(connectedSessionIpAddress))
+                if (!string.IsNullOrEmpty(connectedSessionIpAddress) && userSettingsService.FeatureSettingsService.AutoConnect)
                     adbService.ConnectWireless(connectedSessionIpAddress);
                 await SendDeviceInfo(deviceInfo.PublicKey!);
                 NotifyClientConnectionChanged(device);
@@ -366,7 +367,7 @@ public class NetworkService(
             logger.Debug($"Processing message: {(message.Length > 100 ? string.Concat(message.AsSpan(0, Math.Min(100, message.Length)), "...") : message)}");
 
             // Check if this looks like a JSON message before attempting to deserialize
-            if (message.TrimStart().StartsWith("{") || message.TrimStart().StartsWith("["))
+            if (message.TrimStart().StartsWith('{') || message.TrimStart().StartsWith('['))
             {
                 var socketMessage = SocketMessageSerializer.DeserializeMessage(message);
                 if (socketMessage != null)
