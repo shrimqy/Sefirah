@@ -307,8 +307,16 @@ public class NetworkService(
                 isFirstMessage = false;
                 isVerified = true;
                 currentSession = session;
-                if (!string.IsNullOrEmpty(connectedSessionIpAddress) && userSettingsService.FeatureSettingsService.AutoConnect)
-                    adbService.ConnectWireless(connectedSessionIpAddress);
+                try
+                {
+                    if (!string.IsNullOrEmpty(connectedSessionIpAddress) && userSettingsService.FeatureSettingsService.AutoConnect 
+                        && !string.IsNullOrEmpty(userSettingsService.FeatureSettingsService.AdbPath))
+                        adbService.ConnectWireless(connectedSessionIpAddress);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Failed to connect to ADB", ex);
+                }
                 await SendDeviceInfo(deviceInfo.PublicKey!);
                 NotifyClientConnectionChanged(device);
             }
