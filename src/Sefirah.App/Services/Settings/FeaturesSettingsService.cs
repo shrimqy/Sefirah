@@ -228,7 +228,7 @@ internal sealed class FeaturesSettingsService : BaseObservableJsonSettings, IFea
 
     public bool AutoConnect
     {
-        get => Get(false);
+        get => Get(true);
         set => Set(value);
     }
 }
