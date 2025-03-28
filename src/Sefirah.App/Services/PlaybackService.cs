@@ -43,11 +43,6 @@ public class PlaybackService(
 
             manager.SessionsChanged += SessionsChanged;
 
-            manager.CurrentSessionChanged += (sender, args) =>
-            {
-                var currentSession = sender.GetCurrentSession();
-            };
-
             sessionManager.ClientConnectionStatusChanged += async (sender, args) =>
             {
                 if (args.IsConnected && AudioDevices.Count != 0)
@@ -62,7 +57,7 @@ public class PlaybackService(
                     {
                         await UpdatePlaybackDataAsync(session);
                     }
-                }
+                } 
             };
 
             logger.Info("PlaybackService initialized successfully");
@@ -161,7 +156,6 @@ public class PlaybackService(
         {
             var activeSessions = manager.GetSessions();
             UpdateSessionsList(activeSessions);
-            TriggerPlaybackDataUpdate();
         }
         catch (Exception ex)
         {
@@ -171,19 +165,25 @@ public class PlaybackService(
 
     private void UpdateSessionsList(IReadOnlyList<GlobalSystemMediaTransportControlsSession> activeSessions)
     {
-        //Remove old sessions
-        foreach (var sessionId in this.activeSessions.Keys.ToList())
+        lock (this.activeSessions)
         {
-            if (!activeSessions.Any(s => s.SourceAppUserModelId == sessionId))
+            var currentSessionIds = new HashSet<string>(activeSessions.Select(s => s.SourceAppUserModelId));
+            
+            foreach (var sessionId in this.activeSessions.Keys.ToList())
             {
-                RemoveSession(sessionId);
+                if (!currentSessionIds.Contains(sessionId))
+                {
+                    RemoveSession(sessionId);
+                }
             }
-        }
 
-        // Add new sessions
-        foreach (var session in activeSessions.Where(s => s != null))
-        {
-            AddSession(session);
+            foreach (var session in activeSessions.Where(s => s != null))
+            {
+                if (!this.activeSessions.ContainsKey(session.SourceAppUserModelId))
+                {
+                    AddSession(session);
+                }
+            }
         }
     }
 
@@ -191,8 +191,8 @@ public class PlaybackService(
     {
         if (activeSessions.TryGetValue(sessionId, out var session))
         {
-            UnsubscribeFromSessionEvents(session);
             activeSessions.Remove(sessionId);
+            UnsubscribeFromSessionEvents(session);
         }
     }
 
@@ -201,6 +201,7 @@ public class PlaybackService(
         if (!activeSessions.ContainsKey(session.SourceAppUserModelId))
         {
             activeSessions[session.SourceAppUserModelId] = session;
+            lastTimelinePosition[session.SourceAppUserModelId] = 0;
             SubscribeToSessionEvents(session);
         }
     }
@@ -214,20 +215,55 @@ public class PlaybackService(
 
     private void Session_TimelinePropertiesChanged(GlobalSystemMediaTransportControlsSession sender, TimelinePropertiesChangedEventArgs args)
     {
-        var timelineProperties = sender.GetTimelineProperties();
-        if (timelineProperties != null && 
-            lastTimelinePosition[sender.SourceAppUserModelId] != timelineProperties.Position.TotalMilliseconds
-            && manager?.GetCurrentSession()?.SourceAppUserModelId == sender.SourceAppUserModelId)
+        try
         {
-            lastTimelinePosition[sender.SourceAppUserModelId] = timelineProperties.Position.TotalMilliseconds;
-            var message = new PlaybackSession
+            if (!activeSessions.ContainsKey(sender.SourceAppUserModelId))
             {
-                SessionType = SessionType.TimelineUpdate,
-                Source = sender.SourceAppUserModelId,
-                Position = timelineProperties.Position.TotalMilliseconds
-            };
-            string jsonMessage = SocketMessageSerializer.Serialize(message);
-            sessionManager.SendMessage(jsonMessage);
+                logger.Info("Ignoring timeline properties change for removed session: {0}", sender.SourceAppUserModelId);
+                return;
+            }
+            
+            var timelineProperties = sender.GetTimelineProperties();
+            var isCurrentSession = manager?.GetCurrentSession()?.SourceAppUserModelId == sender.SourceAppUserModelId;
+            
+            if (timelineProperties == null)
+            {
+                logger.Debug("Null timeline properties for {0}", sender.SourceAppUserModelId);
+                return;
+            }
+
+            if (!isCurrentSession)
+            {
+                return;
+            }
+            
+            if (lastTimelinePosition.TryGetValue(sender.SourceAppUserModelId, out var lastPosition))
+            {
+                double currentPosition = timelineProperties.Position.TotalMilliseconds;
+                if (Math.Abs(currentPosition - lastPosition) < 1000)
+                {
+                    return;
+                }
+                
+                lastTimelinePosition[sender.SourceAppUserModelId] = currentPosition;
+                
+                var message = new PlaybackSession
+                {
+                    SessionType = SessionType.TimelineUpdate,
+                    Source = sender.SourceAppUserModelId,
+                    IsCurrentSession = isCurrentSession,
+                    Position = currentPosition
+                };
+                SendPlaybackData(message);
+            }
+        }
+        catch (COMException ex)
+        {
+            logger.Error("COM Exception in timeline properties for {0}: {1}", sender.SourceAppUserModelId, ex.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Error processing timeline properties for {0}: {1}", sender.SourceAppUserModelId, ex.Message);
         }
     }
 
@@ -236,62 +272,77 @@ public class PlaybackService(
         session.MediaPropertiesChanged -= Session_MediaPropertiesChanged;
         session.PlaybackInfoChanged -= Session_PlaybackInfoChanged;
         session.TimelinePropertiesChanged -= Session_TimelinePropertiesChanged;
+        lastTimelinePosition.Remove(session.SourceAppUserModelId);
+
+        var message = new PlaybackSession
+        {
+            SessionType = SessionType.RemovedSession,
+            Source = session.SourceAppUserModelId
+        };
+        logger.Debug("Removing session {0}", session.SourceAppUserModelId);
+        SendPlaybackData(message);
     }
 
     private async void Session_MediaPropertiesChanged(GlobalSystemMediaTransportControlsSession sender, MediaPropertiesChangedEventArgs args)
     {
-        logger.Debug("Media properties changed for {0}", sender.SourceAppUserModelId);
-        await UpdatePlaybackDataAsync(sender);
+        try
+        {
+            if (manager == null) return;
+            var sessions = manager.GetSessions();
+            if (sessions == null || !sessions.Any(s => s.SourceAppUserModelId == sender.SourceAppUserModelId))
+            {
+                logger.Debug("Ignoring media properties change for removed session: {0}", sender.SourceAppUserModelId);
+                return;
+            }
+            
+            await UpdatePlaybackDataAsync(sender);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Error updating playback data for {0}", sender.SourceAppUserModelId, ex);
+        }
     }
 
     private async void Session_PlaybackInfoChanged(GlobalSystemMediaTransportControlsSession sender, PlaybackInfoChangedEventArgs args)
     {
-        logger.Debug("Playback info changed for {0}", sender.SourceAppUserModelId);
-        await UpdatePlaybackDataAsync(sender);
-    }
-
-    private async void TriggerPlaybackDataUpdate()
-    {
-        if (activeSessions.Count == 0)
+        try
         {
-            return;
+            logger.Debug("Playback info changed for {0}", sender.SourceAppUserModelId);
+            if (manager == null) return;
+            var sessions = manager.GetSessions();
+            if (sessions == null || !sessions.Any(s => s.SourceAppUserModelId == sender.SourceAppUserModelId))
+            {
+                logger.Info("Ignoring playback info change for removed session: {0}", sender.SourceAppUserModelId);
+                return;
+            }
+            await UpdatePlaybackDataAsync(sender);
         }
-
-        var sessions = activeSessions.Values.ToList();
-    
-        foreach (var session in sessions)
+        catch (Exception ex)
         {
-            await UpdatePlaybackDataAsync(session);
+            logger.Error("Error updating playback data for {0}", sender.SourceAppUserModelId, ex);
         }
     }
 
     private async Task UpdatePlaybackDataAsync(GlobalSystemMediaTransportControlsSession session)
     {
-        await dispatcher.EnqueueAsync(async () =>
+        try
         {
-            try
+            await dispatcher.EnqueueAsync(async () =>
             {
-                if (!activeSessions.ContainsKey(session.SourceAppUserModelId) && !sessionManager.IsConnected())
+
+                var playbackSession = await GetPlaybackSessionAsync(session);
+
+                if (playbackSession == null || !activeSessions.ContainsKey(session.SourceAppUserModelId) || !sessionManager.IsConnected())
                 {
                     return;
                 }
-
-                var playbackSession = await GetPlaybackSessionAsync(session);
-                if (playbackSession != null)
-                {
-                    SendPlaybackData(playbackSession);
-                }
-            }
-            catch (COMException ex)
-            {
-                logger.Error("COM Exception updating playback data for {0}", session.SourceAppUserModelId, ex);
-                await dispatcher.EnqueueAsync(() => activeSessions.Remove(session.SourceAppUserModelId));
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Error updating playback data for {0}", session.SourceAppUserModelId, ex);
-            }
-        });
+                SendPlaybackData(playbackSession);
+            });
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Error updating playback data for {0}", session.SourceAppUserModelId, ex);
+        }
     }
 
     private async Task<PlaybackSession?> GetPlaybackSessionAsync(GlobalSystemMediaTransportControlsSession session)
@@ -308,13 +359,19 @@ public class PlaybackService(
                     session.SourceAppUserModelId);
                 return null;
             }
+            var title = mediaProperties.Title;
+            if (string.IsNullOrEmpty(title))
+            {
+                logger.Warn("Media properties title is null for {SessionId}", session.SourceAppUserModelId);
+                return null;
+            }
 
             var currentSession = manager?.GetCurrentSession();
 
             var playbackSession = new PlaybackSession
             {
                 Source = session.SourceAppUserModelId,
-                TrackTitle = mediaProperties.Title ?? "Unknown Title",
+                TrackTitle = title,
                 Artist = mediaProperties.Artist ?? "Unknown Artist",
                 IsPlaying = playbackInfo.PlaybackStatus == GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing,
                 IsShuffleActive = playbackInfo.IsShuffleActive,

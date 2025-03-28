@@ -12,12 +12,6 @@ public interface IPlaybackService
     Task InitializeAsync();
 
     /// <summary>
-    /// Controls the volume of the device.
-    /// </summary>
-    /// <param name="volume">The volume level to set.</param>
-    void VolumeControlAsync(double volume);
-
-    /// <summary>
     /// Executes the corresponding media control action on the current device.
     /// </summary>
     /// <param name="action">The media action to execute.</param>
