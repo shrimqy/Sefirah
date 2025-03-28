@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -118,37 +118,37 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="About" xml:space="preserve">
-    <value>About</value>
+    <value>Über</value>
   </data>
   <data name="General" xml:space="preserve">
-    <value>General</value>
+    <value>Allgemein</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Settings</value>
+    <value>Einstellungen</value>
   </data>
   <data name="PrivacyPolicy" xml:space="preserve">
-    <value>Privacy Policy</value>
+    <value>Datenschutzhinweis</value>
   </data>
   <data name="SupportDevelopment" xml:space="preserve">
-    <value>Support Development</value>
+    <value>Entwicklung unterstützen</value>
   </data>
   <data name="OpenLogs" xml:space="preserve">
     <value>Open Logs</value>
   </data>
   <data name="GitHubRepository" xml:space="preserve">
-    <value>GitHub Repository</value>
+    <value>GitHub-Repository</value>
   </data>
   <data name="AndroidGitHubRepository" xml:space="preserve">
-    <value>Android GitHub Repository</value>
+    <value>GitHub-Repository für Android-App</value>
   </data>
   <data name="Clipboard" xml:space="preserve">
-    <value>Clipboard</value>
+    <value>Zwischenablage</value>
   </data>
   <data name="Feedback" xml:space="preserve">
     <value>Feedback</value>
   </data>
   <data name="Notifications" xml:space="preserve">
-    <value>Notifications</value>
+    <value>Benachrichtigungen</value>
   </data>
   <data name="ThirdPartyLibraries" xml:space="preserve">
     <value>Third party libraries</value>
@@ -172,7 +172,7 @@
     <value>Receive notifications from remote device</value>
   </data>
   <data name="GeneralSettings" xml:space="preserve">
-    <value>General Settings</value>
+    <value>Allgemeine Einstellungen</value>
   </data>
   <data name="ShowNotificationToast" xml:space="preserve">
     <value>Show notification toast</value>
@@ -190,10 +190,10 @@
     <value>Notification Feed + Toast</value>
   </data>
   <data name="PairedDevices.Title" xml:space="preserve">
-    <value>Paired Devices</value>
+    <value>Gekoppelte Geräte</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
-    <value>Available Devices</value>
+    <value>Verfügbare Geräte</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
     <value>Android devices that are running the app in the same network will show up below</value>
@@ -205,40 +205,40 @@
     <value>Choose how the app starts when Windows boots</value>
   </data>
   <data name="StartupOptionMinimized.Content" xml:space="preserve">
-    <value>Start minimized</value>
+    <value>Minimiert starten</value>
   </data>
   <data name="StartupOptionMaximized.Content" xml:space="preserve">
-    <value>Start maximized</value>
+    <value>Maximiert starten</value>
   </data>
   <data name="StartupOptionSystemTray.Content" xml:space="preserve">
     <value>Start in system tray</value>
   </data>
   <data name="StartupOptionDisabled.Content" xml:space="preserve">
-    <value>Disabled</value>
+    <value>Deaktiviert</value>
   </data>
   <data name="Theme" xml:space="preserve">
-    <value>Theme</value>
+    <value>Darstellung</value>
   </data>
   <data name="ThemeDescription" xml:space="preserve">
     <value>Choose your default app theme</value>
   </data>
   <data name="Default" xml:space="preserve">
-    <value>Default</value>
+    <value>Standard</value>
   </data>
   <data name="ThemeLight.Content" xml:space="preserve">
-    <value>Light</value>
+    <value>Hell</value>
   </data>
   <data name="ThemeDark.Content" xml:space="preserve">
-    <value>Dark</value>
+    <value>Dunkel</value>
   </data>
   <data name="RemoveDeviceDialogTitle" xml:space="preserve">
-    <value>Remove Device</value>
+    <value>Gerät entfernen</value>
   </data>
   <data name="Remove" xml:space="preserve">
-    <value>Remove</value>
+    <value>Entfernen</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>Abbrechen</value>
   </data>
   <data name="OnboardingWelcome.Title" xml:space="preserve">
     <value>Welcome to Sefirah</value>
@@ -248,13 +248,13 @@
 page.</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
-    <value>Get Started</value>
+    <value>Erste Schritte</value>
   </data>
   <data name="OnboardingSkip" xml:space="preserve">
-    <value>Skip for now</value>
+    <value>Vorerst überspringen</value>
   </data>
   <data name="OnboardingDevice.Title" xml:space="preserve">
-    <value>Connect Your Device</value>
+    <value>Verbinde dein Gerät</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
     <value>Discovered devices in your network will appear below, and initiate the connection from your
@@ -267,16 +267,16 @@ mobile (Make sure the pin matches)</value>
     <value>Verify the passkey matches on both devices:</value>
   </data>
   <data name="ConnectionRequestRejectButton" xml:space="preserve">
-    <value>Reject</value>
+    <value>Ablehnen</value>
   </data>
   <data name="NotificationsClearButton" xml:space="preserve">
     <value>Clear all</value>
   </data>
   <data name="ConnectionRequestAcceptButton" xml:space="preserve">
-    <value>Accept</value>
+    <value>Annehmen</value>
   </data>
   <data name="NoDevicesFound" xml:space="preserve">
-    <value>No devices found</value>
+    <value>Keine Geräte gefunden</value>
   </data>
   <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
     <value>PASSKEY</value>
@@ -291,19 +291,19 @@ mobile (Make sure the pin matches)</value>
     <value>Choose how the app starts when Windows boots</value>
   </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
-    <value>Open links in browser</value>
+    <value>Links im Browser öffnen</value>
   </data>
   <data name="Connected.Text" xml:space="preserve">
-    <value>Connected</value>
+    <value>Verbunden</value>
   </data>
   <data name="Disconnected.Text" xml:space="preserve">
-    <value>Disconnected</value>
+    <value>Verbindung getrennt</value>
   </data>
   <data name="ShowHideWindow" xml:space="preserve">
-    <value>Show/Hide Window</value>
+    <value>Fenster ein-/ausblenden</value>
   </data>
   <data name="Exit" xml:space="preserve">
-    <value>Exit</value>
+    <value>Beenden</value>
   </data>
   <data name="Features" xml:space="preserve">
     <value>Features</value>
@@ -312,7 +312,7 @@ mobile (Make sure the pin matches)</value>
     <value>Select location</value>
   </data>
   <data name="RemoveDeviceDialogSubtitle" xml:space="preserve">
-    <value>Are you sure you want to remove '{0}'? This action cannot be undone.</value>
+    <value>Möchtest du '{0}' wirklich entfernen? Diese Aktion kann nicht rückgängig gemacht werden.</value>
   </data>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>App-specific Settings</value>
@@ -327,22 +327,22 @@ mobile (Make sure the pin matches)</value>
     <value>Receiving File</value>
   </data>
   <data name="TransferNotificationReceived.Title" xml:space="preserve">
-    <value>Received File</value>
+    <value>Empfangene Datei</value>
   </data>
   <data name="TransferNotification.Title" xml:space="preserve">
-    <value>File Transfer</value>
+    <value>Datentransfer</value>
   </data>
   <data name="SendButton" xml:space="preserve">
-    <value>Send</value>
+    <value>Senden</value>
   </data>
   <data name="ReplyPlaceholder" xml:space="preserve">
     <value>Type a reply</value>
   </data>
   <data name="TransferNotificationActionOpenFile" xml:space="preserve">
-    <value>Open file</value>
+    <value>Datei öffnen</value>
   </data>
   <data name="TransferNotificationActionOpenFolder" xml:space="preserve">
-    <value>Open folder</value>
+    <value>Ordner öffnen</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
     <value>Turn off notifications from {0}</value>
@@ -357,16 +357,16 @@ mobile (Make sure the pin matches)</value>
     <value>Do not show notification toast when phone is in DND</value>
   </data>
   <data name="Devices" xml:space="preserve">
-    <value>Devices</value>
+    <value>Geräte</value>
   </data>
   <data name="RingerModeNormal.Content" xml:space="preserve">
     <value>Normal</value>
   </data>
   <data name="RingerModeSilent.Content" xml:space="preserve">
-    <value>Silent</value>
+    <value>Stumm</value>
   </data>
   <data name="RingerModeVibrate.Content" xml:space="preserve">
-    <value>Vibrate</value>
+    <value>Vibrieren</value>
   </data>
   <data name="Pin" xml:space="preserve">
     <value>Pin</value>
@@ -375,64 +375,64 @@ mobile (Make sure the pin matches)</value>
     <value>Unpin</value>
   </data>
   <data name="ScreenMirror" xml:space="preserve">
-    <value>Screen Mirror</value>
+    <value>Bildschirmspiegelung</value>
   </data>
   <data name="VideoSettings" xml:space="preserve">
-    <value>Video Settings</value>
+    <value>Videoeinstellungen</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>Audio Settings</value>
+    <value>Audioeinstellungen</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
-    <value>Open in app</value>
+    <value>In App öffnen</value>
   </data>
   <data name="ScreenOff" xml:space="preserve">
     <value>Keep device screen off while mirroring</value>
   </data>
   <data name="PhysicalKeyboard" xml:space="preserve">
-    <value>Disable on-screen keyboard</value>
+    <value>Bildschirmtastatur deaktivieren</value>
   </data>
   <data name="Bitrate" xml:space="preserve">
     <value>Bitrate</value>
   </data>
   <data name="Resolution" xml:space="preserve">
-    <value>Resolution</value>
+    <value>Auflösung</value>
   </data>
   <data name="Buffer" xml:space="preserve">
     <value>Buffer</value>
   </data>
   <data name="Messages" xml:space="preserve">
-    <value>Messages</value>
+    <value>Nachrichten</value>
   </data>
   <data name="EmptyMessages" xml:space="preserve">
     <value>Select a conversation to view messages</value>
   </data>
   <data name="MessagePlaceholder" xml:space="preserve">
-    <value>Type a message</value>
+    <value>Eine Nachricht schreiben</value>
   </data>
   <data name="Apps" xml:space="preserve">
     <value>Apps</value>
   </data>
   <data name="NewMessage" xml:space="preserve">
-    <value>New message</value>
+    <value>Neue Nachricht</value>
   </data>
   <data name="SearchMessages" xml:space="preserve">
-    <value>Search messages</value>
+    <value>Nachrichten durchsuchen</value>
   </data>
   <data name="AddressInputPlaceholder" xml:space="preserve">
     <value>Enter phone number and press Enter</value>
   </data>
   <data name="RemoveAddress" xml:space="preserve">
-    <value>Remove address</value>
+    <value>Adresse entfernen</value>
   </data>
   <data name="CopyMessage" xml:space="preserve">
-    <value>Copy message</value>
+    <value>Nachricht kopieren</value>
   </data>
   <data name="NoApps" xml:space="preserve">
-    <value>No apps found</value>
+    <value>Keine Apps gefunden</value>
   </data>
   <data name="AllApps" xml:space="preserve">
-    <value>All Apps</value>
+    <value>Alle Apps</value>
   </data>
   <data name="AdditionalArguments" xml:space="preserve">
     <value>Additional arguments</value>
