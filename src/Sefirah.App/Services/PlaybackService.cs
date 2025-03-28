@@ -2,6 +2,7 @@
 using Microsoft.UI.Dispatching;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
+using NAudio.Utils;
 using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Enums;
 using Sefirah.App.Data.Models;
