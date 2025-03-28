@@ -474,7 +474,7 @@ mobile (Make sure the pin matches)</value>
     <value>Display</value>
   </data>
   <data name="VirtualDisplaySize" xml:space="preserve">
-    <value>Virtual Display Size</value>
+    <value>Virtual display size</value>
   </data>
   <data name="DisplayOrientation" xml:space="preserve">
     <value>Display orientation</value>
