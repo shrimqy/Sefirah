@@ -1,7 +1,4 @@
-using Microsoft.UI.Xaml.Media.Imaging;
 using Sefirah.App.Data.Enums;
-using Sefirah.App.Extensions;
-using static Vanara.PInvoke.AdvApi32.INSTALLSPEC;
 
 namespace Sefirah.App.Data.Models;
 
@@ -13,7 +10,7 @@ namespace Sefirah.App.Data.Models;
 [JsonDerivedType(typeof(NotificationMessage), typeDiscriminator: "4")]
 [JsonDerivedType(typeof(NotificationAction), typeDiscriminator: "5")]
 [JsonDerivedType(typeof(ReplyAction), typeDiscriminator: "6")]
-[JsonDerivedType(typeof(PlaybackData), typeDiscriminator: "7")]
+[JsonDerivedType(typeof(PlaybackSession), typeDiscriminator: "7")]
 [JsonDerivedType(typeof(FileTransfer), typeDiscriminator: "8")]
 [JsonDerivedType(typeof(BulkFileTransfer), typeDiscriminator: "9")]
 [JsonDerivedType(typeof(ApplicationInfo), typeDiscriminator: "10")]
@@ -23,6 +20,8 @@ namespace Sefirah.App.Data.Models;
 [JsonDerivedType(typeof(TextMessage), typeDiscriminator: "14")]
 [JsonDerivedType(typeof(TextConversation), typeDiscriminator: "15")]
 [JsonDerivedType(typeof(ThreadRequest), typeDiscriminator: "16")]
+[JsonDerivedType(typeof(AudioDevice), typeDiscriminator: "17")]
+[JsonDerivedType(typeof(PlaybackAction), typeDiscriminator: "18")]
 public class SocketMessage { }
 
 public class Misc : SocketMessage
@@ -175,10 +174,16 @@ public class DeviceStatus : SocketMessage
     public int RingerMode { get; set; }
 }
 
-public class PlaybackData : SocketMessage
+public class PlaybackSession : SocketMessage
 {
-    [JsonPropertyName("appName")]
-    public string? AppName { get; set; }
+    [JsonPropertyName("sessionType")]
+    public SessionType SessionType { get; set; }
+
+    [JsonPropertyName("isCurrentSession")]
+    public bool IsCurrentSession { get; set; }
+
+    [JsonPropertyName("source")]
+    public string? Source { get; set; }
 
     [JsonPropertyName("trackTitle")]
     public string? TrackTitle { get; set; }
@@ -187,29 +192,58 @@ public class PlaybackData : SocketMessage
     public string? Artist { get; set; }
 
     [JsonPropertyName("isPlaying")]
-    public bool? IsPlaying { get; set; }
+    public bool IsPlaying { get; set; }
+
+    [JsonPropertyName("isShuffleActive")]
+    public bool? IsShuffleActive { get; set; }
+
+    [JsonPropertyName("repeatMode")]
+    public int? RepeatMode { get; set; }
+
+    [JsonPropertyName("playbackRate")]
+    public double? PlaybackRate { get; set; }
 
     [JsonPropertyName("position")]
-    public long? Position { get; set; }
+    public double? Position { get; set; }
 
     [JsonPropertyName("maxSeekTime")]
-    public long? MaxSeekTime { get; set; }
+    public double? MaxSeekTime { get; set; }
 
     [JsonPropertyName("minSeekTime")]
-    public long? MinSeekTime { get; set; }
+    public double? MinSeekTime { get; set; }
 
-    [JsonPropertyName("mediaAction")]
-    public MediaAction? MediaAction { get; set; }
+    [JsonPropertyName("thumbnail")]
+    public string? Thumbnail { get; set; }
+}
+
+public class PlaybackAction : SocketMessage
+{
+    [JsonPropertyName("playbackActionType")]
+    public PlaybackActionType PlaybackActionType { get; set; }
+
+    [JsonPropertyName("source")]
+    public required string Source { get; set; }
+
+    [JsonPropertyName("value")]
+    public double? Value { get; set; }
+}
+
+public class AudioDevice : SocketMessage
+{
+    [JsonPropertyName("audioDeviceType")]
+    public AudioMessageType AudioDeviceType { get; set; }
+
+    [JsonPropertyName("deviceId")]
+    public required string DeviceId { get; set; }
+
+    [JsonPropertyName("deviceName")]
+    public string DeviceName { get; set; } = string.Empty;
 
     [JsonPropertyName("volume")]
     public float Volume { get; set; }
 
-    [JsonPropertyName("thumbnail")]
-    public string? Thumbnail { get; set; }
-
-    [JsonPropertyName("appIcon")]
-    public string? AppIcon { get; set; }
-
+    [JsonPropertyName("isSelected")]
+    public bool IsSelected { get; set; }
 }
 
 public class FileTransfer : SocketMessage

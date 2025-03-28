@@ -41,6 +41,7 @@
         <PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.2.0" />
         <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
         <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250205002" />
+        <PackageReference Include="NAudio.Wasapi" Version="2.2.1" />
         <PackageReference Include="NetCoreServer" Version="8.0.7" />
         <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.1" />
         <PackageReference Include="WinUIEx" Version="2.5.1" />

@@ -10,14 +10,36 @@ public enum FileTransferType
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
-public enum MediaAction
+public enum SessionType
 {
-    Resume,
+    NewSession,
+    TimelineUpdate,
+    MediaUpdate,
+    PlaybackInfoUpdate,
+    RemovedSession
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum PlaybackActionType
+{
+    Play,
     Pause,
-    NextQueue,
-    PrevQueue,
+    Stop,
+    Next,
+    Previous,
     Seek,
-    Volume
+    Shuffle,
+    Repeat,
+    PlaybackRate,
+    DefaultDevice,
+    VolumeUpdate,
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum AudioMessageType
+{
+    New,
+    Removed
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]

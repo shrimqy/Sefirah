@@ -1,12 +1,7 @@
 ﻿using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sefirah.App.Helpers
 {
@@ -53,5 +48,31 @@ namespace Sefirah.App.Helpers
         nint GetForWindow([In] nint appWindow, [In] ref Guid riid);
 
         void ShowShareUIForWindow(nint appWindow);
+    }
+
+    [ComImport, Guid("f8679f50-850a-41cf-9c72-430f290290c8")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    interface IPolicyConfig
+    {
+        void NotImplemented1();
+        void NotImplemented2();
+        void NotImplemented3();
+        void NotImplemented4();
+        void NotImplemented5();
+        void NotImplemented6();
+        void NotImplemented7();
+        void NotImplemented8();
+        void NotImplemented9();
+        void NotImplemented10();
+
+        [PreserveSig]
+        int SetDefaultEndpoint([MarshalAs(UnmanagedType.LPWStr)] string deviceId, [MarshalAs(UnmanagedType.I4)] ERole role);
+    }
+
+    internal enum ERole
+    {
+        eConsole = 0,
+        eMultimedia = 1,
+        eCommunications = 2
     }
 }

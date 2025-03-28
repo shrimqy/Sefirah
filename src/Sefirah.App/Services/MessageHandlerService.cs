@@ -41,9 +41,9 @@ public class MessageHandlerService(
                     await notificationService.HandleNotificationMessage(notificationMessage);
                     break;
 
-                case PlaybackData playbackData:
-                    await playbackService.HandleLocalMediaActionAsync(playbackData);
-                    break;
+                case PlaybackAction action:
+                   await playbackService.HandleMediaActionAsync(action);
+                   break;
 
                 case ApplicationInfo applicationInfo:
                     await remoteAppsRepository.AddOrUpdateAsync(ApplicationInfoEntity.FromApplicationInfo(applicationInfo));

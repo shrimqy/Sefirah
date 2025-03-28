@@ -21,12 +21,12 @@ public interface IPlaybackService
     /// Executes the corresponding media control action on the current device.
     /// </summary>
     /// <param name="action">The media action to execute.</param>
-    Task HandleLocalMediaActionAsync(PlaybackData message);
+    Task HandleMediaActionAsync(PlaybackAction mediaAction);
 
     /// <summary>
     /// Handles a media playback message from the remote device.
     /// </summary>
     /// <param name="data">The playback data containing action details.</param>
-    Task HandleRemotePlaybackMessageAsync(PlaybackData data);
+    Task HandleRemotePlaybackMessageAsync(PlaybackSession data);
 }
 
