@@ -154,7 +154,6 @@ public sealed partial class FeaturesViewModel : ObservableObject
         set
         {
             UserSettingsService.FeatureSettingsService.ScrcpyPath = value;
-            AdbService.StartAsync();
             OnPropertyChanged();
         }
     }

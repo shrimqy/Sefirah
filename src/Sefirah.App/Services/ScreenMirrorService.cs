@@ -6,10 +6,8 @@ using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Enums;
 using Sefirah.App.Data.Models;
 using Sefirah.App.Extensions;
+using Sefirah.App.Utils;
 using Sefirah.App.ViewModels.Settings;
-using Windows.Storage;
-using Windows.Storage.Pickers;
-using Windows.System;
 
 namespace Sefirah.App.Services;
 public class ScreenMirrorService(
@@ -53,32 +51,36 @@ public class ScreenMirrorService(
                 return false;
             }
 
-            // Get unique online devices (avoid duplicates by serial)
-            var onlineDevices = devices.Where(d => d.State == DeviceState.Online)
-                                      .GroupBy(d => d.Serial)
-                                      .Select(g => g.First())
-                                      .ToList();
-
-            if (onlineDevices.Count == 0)
+            List<AdbDevice> onlineDevices = [];
+            if (adbService.IsMonitoring)
             {
-                logger.Warn("No online devices found from adb");
-                var ipAddress = sessionManager.GetConnectedSessionIpAddress();
-                if (!string.IsNullOrEmpty(ipAddress) && !await adbService.ConnectWireless(ipAddress))
+                // Get unique online devices (avoid duplicates by serial)
+                onlineDevices = [.. devices.Where(d => d.State == DeviceState.Online)
+                                          .GroupBy(d => d.Serial)
+                                          .Select(g => g.First())];
+
+
+                if (onlineDevices.Count == 0)
                 {
-                    logger.Warn("Failed to connect to Adb wirelessly");
-                    await dispatcher.EnqueueAsync(async () =>
+                    logger.Warn("No online devices found from adb");
+                    var ipAddress = sessionManager.GetConnectedSessionIpAddress();
+                    if (!string.IsNullOrEmpty(ipAddress) && !await adbService.ConnectWireless(ipAddress))
                     {
-                        var dialog = new ContentDialog
+                        logger.Warn("Failed to connect to Adb wirelessly");
+                        await dispatcher.EnqueueAsync(async () =>
                         {
-                            XamlRoot = MainWindow.Instance.Content.XamlRoot,
-                            Title = "AdbDeviceOffline".GetLocalizedResource(),
-                            Content = "AdbDeviceOfflineDescription".GetLocalizedResource(),
-                            CloseButtonText = "Dismiss".GetLocalizedResource()
-                        };
-                        await dialog.ShowAsync();
-                    });
+                            var dialog = new ContentDialog
+                            {
+                                XamlRoot = MainWindow.Instance.Content.XamlRoot,
+                                Title = "AdbDeviceOffline".GetLocalizedResource(),
+                                Content = "AdbDeviceOfflineDescription".GetLocalizedResource(),
+                                CloseButtonText = "Dismiss".GetLocalizedResource()
+                            };
+                            await dialog.ShowAsync();
+                        });
+                    }
+                    return false;
                 }
-                return false;
             }
 
             // Determine if we need to show the device selection dialog
@@ -389,11 +391,10 @@ public class ScreenMirrorService(
         // Only continue with device selection if the user hasn't already specified a device
         // and we haven't added a device serial above
         bool hasDeviceSelectionFlag = (args.Contains("-s") || args.Contains("-d") || args.Contains("-e"));
-        logger.Info("hasDeviceSelectionFlag: {HasDeviceSelectionFlag}", hasDeviceSelectionFlag);
+
         if (devices.Count > 1 && !hasDeviceSelectionFlag && string.IsNullOrEmpty(deviceSerial))
         {
             var usbDevice = devices.FirstOrDefault(d => d.Type == DeviceType.Usb && d.State == DeviceState.Online);
-            logger.Info("usbDevice: {UsbDevice}", usbDevice);
             if (usbDevice != null && !preferTcpIp)
             {
                 args.Add("-d");  // Use USB device
@@ -403,27 +404,28 @@ public class ScreenMirrorService(
                 args.Add("-e");  // Use TCP device
             }
         }
-        logger.Info("args: {Args}", string.Join(" ", args));
         return string.Join(" ", args);
     }
 
-    public async Task<string> SelectScrcpyLocationClick(object sender, RoutedEventArgs e)
+    public async Task SelectScrcpyLocationClick(object sender, RoutedEventArgs e)
     {
-        var picker = new FileOpenPicker
-        {
-            SuggestedStartLocation = PickerLocationId.DocumentsLibrary
-        };
-        picker.FileTypeFilter.Add("*");
+        var path = await LocationPicker.FileLocationPicker();
 
-        var window = MainWindow.Instance;
-        WinRT.Interop.InitializeWithWindow.Initialize(picker,
-            WinRT.Interop.WindowNative.GetWindowHandle(window));
-        var viewmodel = Ioc.Default.GetRequiredService<FeaturesViewModel>();
-        if (await picker.PickSingleFileAsync() is StorageFile file)
-        {
-            viewmodel.ScrcpyPath = file.Path;
-            return file.Path;
+        if (!string.IsNullOrEmpty(path))
+        {        
+            var viewmodel = Ioc.Default.GetRequiredService<FeaturesViewModel>();
+            viewmodel.ScrcpyPath = path;
+
+            var directory = Path.GetDirectoryName(path);
+            if(string.IsNullOrEmpty(directory) || !string.IsNullOrEmpty(viewmodel.AdbPath)) return;
+            var adbPath = Path.GetFullPath(Path.Combine(directory, "adb.exe"));
+            if (File.Exists(adbPath))
+            {
+                viewmodel.AdbPath = adbPath;
+            }
+            await StartScrcpy();
+            return;
         }
-        return string.Empty;
+        return;
     }
 }
