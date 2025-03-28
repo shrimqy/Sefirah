@@ -35,7 +35,7 @@
                 Content="{helpers:ResourceString Name=Features}"
                 Icon="AllApps"
                 Tag="FeaturesPage" />
-            <NavigationViewItem Content="About" Tag="AboutPage">
+            <NavigationViewItem Content="{helpers:ResourceString Name=About}" Tag="AboutPage">
                 <NavigationViewItem.Icon>
                     <FontIcon Glyph="&#xE946;" />
                 </NavigationViewItem.Icon>

@@ -118,4 +118,74 @@ public interface IFeatureSettingsService : IBaseSettingsService, INotifyProperty
     /// Gets or sets a value indicating whether to prefer TCP connections.
     /// </summary>
     bool PreferTcpIp { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to disable video forwarding.
+    /// </summary>
+    bool DisableVideoForwarding { get; set; }
+
+    /// <summary>
+    /// Gets or sets the video codec.
+    /// </summary>
+    int VideoCodec { get; set; }
+
+    /// <summary>
+    /// Gets or sets the frame rate.
+    /// </summary>
+    string FrameRate { get; set; }
+
+    /// <summary>
+    /// Gets or sets the crop settings.
+    /// </summary>
+    string Crop { get; set; }
+
+    /// <summary>
+    /// Gets or sets the display number.
+    /// </summary>
+    string Display { get; set; }
+
+    /// <summary>
+    /// Gets or sets the virtual display size.
+    /// </summary>
+    string VirtualDisplaySize { get; set; }
+
+    /// <summary>
+    /// Gets or sets the display orientation.
+    /// </summary>
+    int DisplayOrientation { get; set; }
+
+    /// <summary>
+    /// Gets or sets the rotation angle.
+    /// </summary>
+    string RotationAngle { get; set; }
+
+    /// <summary>
+    /// Gets or sets the audio output mode.
+    /// </summary>
+    AudioOutputModeType AudioOutputMode { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to forward microphone.
+    /// </summary>
+    bool ForwardMicrophone { get; set; }
+
+    /// <summary>
+    /// Gets or sets the audio output buffer.
+    /// </summary>
+    string AudioOutputBuffer { get; set; }
+
+    /// <summary>
+    /// Gets or sets the audio codec.
+    /// </summary>
+    int AudioCodec { get; set; }
+
+    /// <summary>
+    /// Gets or sets the path to the adb executable.
+    /// </summary>
+    string? AdbPath { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to automatically connect to devices.
+    /// </summary>
+    bool AutoConnect { get; set; }
 }

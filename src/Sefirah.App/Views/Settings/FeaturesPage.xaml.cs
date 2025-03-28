@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Sefirah.App.Data.AppDatabase.Models;
+using Sefirah.App.Utils;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 
@@ -68,24 +69,6 @@ public sealed partial class FeaturesPage : Page
 
     }
 
-    public async void SelectScrcpyLocation_Click(object sender, RoutedEventArgs e)
-    {
-        var picker = new FolderPicker
-        {
-            SuggestedStartLocation = PickerLocationId.DocumentsLibrary
-        };
-        picker.FileTypeFilter.Add("*");
-
-        var window = MainWindow.Instance;
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, 
-            WinRT.Interop.WindowNative.GetWindowHandle(window));
-
-        if (await picker.PickSingleFolderAsync() is StorageFolder folder)
-        {
-            ViewModel.ScrcpyPath = folder.Path;
-        }
-    }
-
     public void OnMenuFlyoutItemClick(object sender, RoutedEventArgs e)
     {
         if (sender is MenuFlyoutItem menuItem && 
@@ -93,5 +76,47 @@ public sealed partial class FeaturesPage : Page
         {
             ViewModel.ChangeNotificationFilter(settings);
         }
+    }
+
+    public async void SelectScrcpyLocation_Click(object sender, RoutedEventArgs e)
+    {
+        var path = await LocationPicker.FileLocationPicker();
+
+        if (!string.IsNullOrEmpty(path))
+        {
+            ViewModel.ScrcpyPath = path;
+
+            var directory = Path.GetDirectoryName(path);
+            if(string.IsNullOrEmpty(directory) || !string.IsNullOrEmpty(ViewModel.AdbPath)) return;
+            var adbPath = Path.GetFullPath(Path.Combine(directory, "adb.exe"));
+            if (File.Exists(adbPath))
+            {
+                ViewModel.AdbPath = adbPath;
+            }
+        }
+    }
+
+    private async void SelectAdbLocation_Click(object sender, RoutedEventArgs e)
+    {
+        var path = await LocationPicker.FileLocationPicker();
+
+        if (!string.IsNullOrEmpty(path))
+        {
+            ViewModel.AdbPath = path;
+
+            var directory = Path.GetDirectoryName(path);
+            if (string.IsNullOrEmpty(directory) || !string.IsNullOrEmpty(ViewModel.ScrcpyPath)) return;
+            var scrcpyPath = Path.GetFullPath(Path.Combine(directory, "scrcpy.exe"));
+            if (File.Exists(scrcpyPath))
+            {
+                ViewModel.ScrcpyPath = scrcpyPath;
+            }
+        }
+    }
+
+    private void DisplayTextSubmitted(object sender, ComboBoxTextSubmittedEventArgs e)
+    {
+        ViewModel.Display = e.Text;
+        e.Handled = true;
     }
 }

@@ -28,3 +28,10 @@ public enum NotificationLaunchPreference
     OpenInRemoteDevice,
     Dynamic
 }
+
+public enum AudioOutputModeType
+{
+    Desktop,
+    Remote,
+    Both
+}

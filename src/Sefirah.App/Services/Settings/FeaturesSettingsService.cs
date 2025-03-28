@@ -54,7 +54,7 @@ internal sealed class FeaturesSettingsService : BaseObservableJsonSettings, IFea
 
     public NotificationLaunchPreference NotificationLaunchPreference 
     { 
-        get => (NotificationLaunchPreference)Get((long)NotificationLaunchPreference.Dynamic);
+        get => Get(NotificationLaunchPreference.Dynamic);
         set => Set((long)value);
     }
 
@@ -145,6 +145,90 @@ internal sealed class FeaturesSettingsService : BaseObservableJsonSettings, IFea
     public bool PreferTcpIp
     {
         get => Get(true);
+        set => Set(value);
+    }
+
+    public bool DisableVideoForwarding
+    {
+        get => Get(false);
+        set => Set(value);
+    }
+
+    public int VideoCodec
+    {
+        get => Get(0);
+        set => Set(value);
+    }
+     
+    public string FrameRate
+    {
+        get => Get("60");
+        set => Set(value);
+    }
+
+    public string Crop
+    {
+        get => Get(string.Empty);
+        set => Set(value);
+    }
+
+    public string Display
+    {
+        get => Get("0");
+        set => Set(value);
+    }
+
+    public string VirtualDisplaySize
+    {
+        get => Get(string.Empty);
+        set => Set(value);
+    }
+
+    public int DisplayOrientation
+    {
+        get => Get(0);
+        set => Set(value);
+    }
+
+    public string RotationAngle
+    {
+        get => Get("0");
+        set => Set(value);
+    }
+
+    public AudioOutputModeType AudioOutputMode
+    {
+        get => Get(AudioOutputModeType.Desktop);
+        set => Set(value);
+    }
+
+    public bool ForwardMicrophone
+    {
+        get => Get(false);
+        set => Set(value);
+    }
+
+    public string AudioOutputBuffer
+    {
+        get => Get("0");
+        set => Set(value);
+    }
+
+    public int AudioCodec
+    {
+        get => Get(0);
+        set => Set(value);
+    }
+
+    public string? AdbPath
+    {
+        get => Get(string.Empty);
+        set => Set(value);
+    }
+
+    public bool AutoConnect
+    {
+        get => Get(false);
         set => Set(value);
     }
 }

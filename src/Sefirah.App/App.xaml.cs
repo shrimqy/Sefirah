@@ -58,36 +58,32 @@ public partial class App : Application
 
             HookEventsForWindow();
 
+            var window = MainWindow.Instance;
             // Initialize window based on startup options
             if (isStartupTask)
             {
                 // Get the startup preference from user settings
                 var userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
                 var startupOption = userSettingsService.GeneralSettingsService.StartupOption;
-
                 switch (startupOption)
                 {
                     case StartupOptions.InTray:
                         // Don't activate
                         break;
                     case StartupOptions.Minimized:
-                        MainWindow.Instance.Activate();
-                        MainWindow.Instance.WindowState = WindowState.Minimized;
+                        window.Activate();
+                        window.WindowState = WindowState.Minimized;
                         break;
                     default:
-                        MainWindow.Instance.Activate();
-                        MainWindow.Instance.AppWindow.Show();
+                        window.Activate();
+                        window.AppWindow.Show();
                         break;
                 }
             }
             else
             {
-                // For normal launch, always show the window
-                if (!MainWindow.Instance.AppWindow.IsVisible)
-                {
-                    MainWindow.Instance.Activate();
-                    MainWindow.Instance.AppWindow.Show();
-                }
+                window.Activate();
+                window.AppWindow.Show();
             }
 
             // Show Splash Screen only for visible windows

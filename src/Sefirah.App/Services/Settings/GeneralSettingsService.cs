@@ -40,16 +40,16 @@ internal sealed class GeneralSettingsService : BaseObservableJsonSettings, IGene
 
     public StartupOptions StartupOption 
     { 
-        get => (StartupOptions)Get((long)StartupOptions.InTray);
-        set => Set((long)value);
+        get => Get(StartupOptions.InTray);
+        set => Set(value);
     }
 
     public Theme Theme 
     { 
-        get => (Theme)Get((long)Theme.Default);
+        get => Get(Theme.Default);
         set
         {
-            if (Set((long)value))
+            if (Set(value))
             {
                 ApplyTheme(MainWindow.Instance, null, value);
                 ThemeChanged?.Invoke(this, EventArgs.Empty);

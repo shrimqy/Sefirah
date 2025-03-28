@@ -4,6 +4,10 @@ using Sefirah.App.Data.Enums;
 using Sefirah.App.Data.Models;
 using Sefirah.App.Extensions;
 using System.Globalization;
+using System.Linq;
+using System.IO;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Sefirah.App.Converters;
 
@@ -682,7 +686,7 @@ public class SubscriptionToIconConverter : IValueConverter
     {
         throw new NotImplementedException();
     }
-}   
+}
 
 
 

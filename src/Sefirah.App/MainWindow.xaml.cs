@@ -56,7 +56,7 @@ public sealed partial class MainWindow : WindowEx
 
         // Check if onboarding is complete
         var localSettings = ApplicationData.Current.LocalSettings;
-        bool isOnboardingComplete = localSettings.Values["HasCompletedOnboarding"] == null;
+        bool isOnboarding = localSettings.Values["HasCompletedOnboarding"] == null;
 
         var isFirstLaunch = localSettings.Values["IsFirstLaunch"];
         if (isFirstLaunch == null || true)
@@ -65,7 +65,7 @@ public sealed partial class MainWindow : WindowEx
             localSettings.Values["IsFirstLaunch"] = false;
         }
 
-        if (isOnboardingComplete)
+        if (isOnboarding)
         {
             // Navigate to onboarding page and ensure window is visible
             rootFrame.Navigate(typeof(WelcomePage), null, new SuppressNavigationTransitionInfo());

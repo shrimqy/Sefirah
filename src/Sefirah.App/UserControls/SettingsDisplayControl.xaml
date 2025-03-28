@@ -34,15 +34,12 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+
 
         <ContentPresenter
             x:Name="SettingsIconElement"
             MinWidth="42"
-            Margin="2,20,20,20"
+            Margin="2,18,18,18"
             x:Load="{x:Bind Icon, Mode=OneWay, Converter={StaticResource NullToFalseConverter}}"
             Content="{x:Bind Icon, Mode=OneWay}" />
 
@@ -62,7 +59,7 @@
                 x:Name="TitleBlock"
                 x:Load="{x:Bind Title, Mode=OneWay, Converter={StaticResource StringNullOrWhiteSpaceToFalseConverter}}"
                 Text="{x:Bind Title, Mode=OneWay}"
-                TextWrapping="Wrap" />
+                TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
 
             <TextBlock
                 x:Name="DescriptionBlock"
@@ -81,7 +78,7 @@
         <ContentPresenter
             x:Name="ActionableElement"
             Grid.Column="2"
-            Margin="24,0,0,0"
+            Margin="4,4,0,4"
             HorizontalAlignment="Right"
             VerticalAlignment="Center"
             x:Load="{x:Bind SettingsActionableElement, Mode=OneWay, Converter={StaticResource NullToFalseConverter}}"
@@ -93,7 +90,7 @@
                     <VisualState.Setters>
                         <Setter Target="ActionableElement.(Grid.Row)" Value="0" />
                         <Setter Target="ActionableElement.(Grid.Column)" Value="2" />
-                        <Setter Target="ActionableElement.Margin" Value="24,0,0,0" />
+                        <Setter Target="ActionableElement.Margin" Value="4,4,0,4" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="CompactState">
