@@ -154,10 +154,10 @@
     <value>サードパーティー ライブラリ</value>
   </data>
   <data name="SaveLocation" xml:space="preserve">
-    <value>Save Location</value>
+    <value>保存先</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Remote Storage Location</value>
+    <value>リモート ストレージの場所</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>クリップボード トースト通知を表示</value>
