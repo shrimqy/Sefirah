@@ -154,10 +154,10 @@
     <value>Сторонние библиотеки</value>
   </data>
   <data name="SaveLocation" xml:space="preserve">
-    <value>Save Location</value>
+    <value>Путь сохранения</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Remote Storage Location</value>
+    <value>Расположение удаленного хранилища</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>Показать всплывающее окно буфера обмена</value>
