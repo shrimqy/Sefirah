@@ -167,10 +167,23 @@ public class AdbService(
     {
         try
         {
-            // Only proceed if the device is fully online
+
+            var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == e.Device.Serial);
+            if (existingDevice != null) return;
+
+            // get the rudimentary data if it isn't online yet
             if (e.Device.State != DeviceState.Online)
             {
                 logger.Info($"Device {e.Device.Serial} connected but not yet online. Current state: {e.Device.State}");
+
+                var adbDevice = new AdbDevice
+                {
+                    Serial = e.Device.Serial,
+                    Model = e.Device.Model ?? "Unknown",
+                    State = e.Device.State,
+                    Type = e.Device.Serial.Contains(':') ? DeviceType.Tcpip : DeviceType.Usb
+                };
+                AdbDevices.Add(adbDevice);
                 return;
             }
             
