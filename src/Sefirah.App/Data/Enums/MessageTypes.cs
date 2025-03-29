@@ -12,9 +12,8 @@ public enum FileTransferType
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum SessionType
 {
-    NewSession,
+    Session,
     TimelineUpdate,
-    MediaUpdate,
     PlaybackInfoUpdate,
     RemovedSession
 }

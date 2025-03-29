@@ -3,6 +3,7 @@ using Microsoft.UI.Dispatching;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
 using NAudio.Utils;
+using Renci.SshNet;
 using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Enums;
 using Sefirah.App.Data.Models;
@@ -287,15 +288,9 @@ public class PlaybackService(
     {
         try
         {
-            if (manager == null) return;
-            var sessions = manager.GetSessions();
-            if (sessions == null || !sessions.Any(s => s.SourceAppUserModelId == sender.SourceAppUserModelId))
-            {
-                logger.Debug("Ignoring media properties change for removed session: {0}", sender.SourceAppUserModelId);
-                return;
-            }
-            
+            logger.Info("Media properties changed for {0}", sender.SourceAppUserModelId);
             await UpdatePlaybackDataAsync(sender);
+            
         }
         catch (Exception ex)
         {
@@ -303,19 +298,22 @@ public class PlaybackService(
         }
     }
 
-    private async void Session_PlaybackInfoChanged(GlobalSystemMediaTransportControlsSession sender, PlaybackInfoChangedEventArgs args)
+    private void Session_PlaybackInfoChanged(GlobalSystemMediaTransportControlsSession sender, PlaybackInfoChangedEventArgs args)
     {
         try
         {
             logger.Debug("Playback info changed for {0}", sender.SourceAppUserModelId);
-            if (manager == null) return;
-            var sessions = manager.GetSessions();
-            if (sessions == null || !sessions.Any(s => s.SourceAppUserModelId == sender.SourceAppUserModelId))
+            var playbackInfo = sender.GetPlaybackInfo();
+            var message = new PlaybackSession
             {
-                logger.Info("Ignoring playback info change for removed session: {0}", sender.SourceAppUserModelId);
-                return;
-            }
-            await UpdatePlaybackDataAsync(sender);
+                SessionType = SessionType.PlaybackInfoUpdate,
+                Source = sender.SourceAppUserModelId,
+                IsPlaying = playbackInfo.PlaybackStatus == GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing,
+                PlaybackRate = playbackInfo.PlaybackRate,
+                IsShuffleActive = playbackInfo.IsShuffleActive,
+            };
+
+            SendPlaybackData(message);
         }
         catch (Exception ex)
         {
@@ -352,26 +350,15 @@ public class PlaybackService(
             var mediaProperties = await session.TryGetMediaPropertiesAsync();
             var timelineProperties = session.GetTimelineProperties();
             var playbackInfo = session.GetPlaybackInfo();
+
             lastTimelinePosition[session.SourceAppUserModelId] = timelineProperties.Position.TotalMilliseconds;
-            if (mediaProperties == null || playbackInfo == null)
-            {
-                logger.Warn("Failed to get media properties or playback info for {SessionId}",
-                    session.SourceAppUserModelId);
-                return null;
-            }
-            var title = mediaProperties.Title;
-            if (string.IsNullOrEmpty(title))
-            {
-                logger.Warn("Media properties title is null for {SessionId}", session.SourceAppUserModelId);
-                return null;
-            }
 
             var currentSession = manager?.GetCurrentSession();
 
             var playbackSession = new PlaybackSession
             {
                 Source = session.SourceAppUserModelId,
-                TrackTitle = title,
+                TrackTitle = mediaProperties.Title,
                 Artist = mediaProperties.Artist ?? "Unknown Artist",
                 IsPlaying = playbackInfo.PlaybackStatus == GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing,
                 IsShuffleActive = playbackInfo.IsShuffleActive,
