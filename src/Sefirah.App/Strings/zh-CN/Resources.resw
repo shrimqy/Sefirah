@@ -154,10 +154,10 @@
     <value>第三方库</value>
   </data>
   <data name="SaveLocation" xml:space="preserve">
-    <value>Save Location</value>
+    <value>保存位置</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Remote Storage Location</value>
+    <value>远程存储位置</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>显示剪贴板提示</value>
