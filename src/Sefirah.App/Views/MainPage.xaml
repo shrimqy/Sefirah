@@ -555,7 +555,7 @@
                 <NavigationView
                     Grid.Row="0"
                     IsBackButtonVisible="Collapsed"
-                    IsSettingsVisible="False"
+                    IsSettingsVisible="True"
                     PaneDisplayMode="Top"
                     SelectionChanged="NavigationView_SelectionChanged">
                     <NavigationView.MenuItems>
@@ -574,22 +574,20 @@
                                 <FontIcon Glyph="&#xED35;" />
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
-
+                    </NavigationView.MenuItems>
+                    <NavigationView.FooterMenuItems>
                         <NavigationViewItem
-                            Content="{helpers:ResourceString Name=Settings}"
-                            Tag="Settings">
+                            x:Name="UpdateButton"
+                            ToolTipService.ToolTip="Update Available"
+                            Visibility="{x:Bind ViewModel.IsUpdateAvailable, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            SelectsOnInvoked="False"
+                            Tapped="UpdateButtonClick">
                             <NavigationViewItem.Icon>
-                                <AnimatedIcon>
-                                    <AnimatedIcon.Source>
-                                        <animatedVisuals:AnimatedSettingsVisualSource />
-                                    </AnimatedIcon.Source>
-                                    <AnimatedIcon.FallbackIconSource>
-                                        <SymbolIconSource Symbol="Setting" />
-                                    </AnimatedIcon.FallbackIconSource>
-                                </AnimatedIcon>
+                                <FontIcon 
+                                    Glyph="&#xECC5;" />
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
-                    </NavigationView.MenuItems>
+                    </NavigationView.FooterMenuItems>
                 </NavigationView>
 
                 <Frame

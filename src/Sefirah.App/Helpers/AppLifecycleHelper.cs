@@ -44,6 +44,8 @@ public static class AppLifecycleHelper
         var playbackService = Ioc.Default.GetRequiredService<IPlaybackService>();
         var toastNotificationService = Ioc.Default.GetRequiredService<ToastNotificationService>();
 
+        var updateService = Ioc.Default.GetRequiredService<IUpdateService>();
+
         // Start all the required services for startup
         await networkService.StartServerAsync();
         await playbackService.InitializeAsync();
@@ -52,6 +54,8 @@ public static class AppLifecycleHelper
 
         var adbService = Ioc.Default.GetRequiredService<IAdbService>();
         await adbService.StartAsync();
+
+        await updateService.CheckForUpdatesAsync();
     }
 
 
@@ -87,9 +91,9 @@ public static class AppLifecycleHelper
                 .AddSingleton<IRemoteAppsRepository, RemoteAppsRepository>()
                 .AddSingleton<DeviceRepository>()
 
-                .AddSingleton<IAdbService, AdbService>()
-
                 // Services
+                .AddSingleton<IAdbService, AdbService>()
+                .AddSingleton<IUpdateService, AppUpdateService>()
                 .AddSingleton<IDeviceManager, DeviceManager>()
                 .AddSingleton<IDiscoveryService, DiscoveryService>()
                 .AddSingleton<INetworkService, NetworkService>()

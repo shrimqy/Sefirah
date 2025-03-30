@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Sefirah.App.Data.Enums;
 using Sefirah.App.Data.Models;
 using Sefirah.App.ViewModels;
+using Windows.System;
 
 namespace Sefirah.App.Views;
 
@@ -311,5 +312,10 @@ public sealed partial class MainPage : Page
     private void ToggleScreenMirror(object sender, TappedRoutedEventArgs e)
     {
         ViewModel.ToggleScreenMirrorCommand.Execute(null);
+    }
+
+    private void UpdateButtonClick(object sender, TappedRoutedEventArgs e)
+    {
+        Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.ReleasesUrl)).AsTask();
     }
 }

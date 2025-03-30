@@ -20,6 +20,7 @@ public static class Constants
 
     public static class ExternalUrl
     {
+        public const string ReleasesUrl = @"https://github.com/shrimqy/Sefirah/releases/latest";
         public const string AndroidGitHubRepoUrl = @"https://github.com/shrimqy/Sefirah-Android";
         public const string GitHubRepoUrl = @"https://github.com/shrimqy/Sefirah";
         public const string DiscordUrl = @"https://discord.gg/MuvMqv4MES";

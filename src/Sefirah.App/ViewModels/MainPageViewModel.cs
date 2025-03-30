@@ -7,15 +7,18 @@ using Sefirah.App.Data.Models;
 using Sefirah.App.Extensions;
 using Sefirah.App.Utils.Serialization;
 using System.Windows.Input;
+using Windows.System;
 
 namespace Sefirah.App.ViewModels;
 
-public sealed class MainPageViewModel : BaseViewModel
+public partial class MainPageViewModel : BaseViewModel
 {
     private ISessionManager SessionManager { get; } = Ioc.Default.GetRequiredService<ISessionManager>();
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
     private IRemoteAppsRepository RemoteAppsRepository { get; } = Ioc.Default.GetRequiredService<IRemoteAppsRepository>();
     private INotificationService NotificationService { get; } = Ioc.Default.GetRequiredService<INotificationService>();
+
+    private IUpdateService UpdateService = Ioc.Default.GetRequiredService<IUpdateService>();
 
     private IScreenMirrorService ScreenMirrorService { get; } = Ioc.Default.GetRequiredService<IScreenMirrorService>();
 
@@ -58,6 +61,14 @@ public sealed class MainPageViewModel : BaseViewModel
         set => SetProperty(ref _loadingScrcpy, value);
     }
 
+
+    private bool _isUpdateAvailable;
+    public bool IsUpdateAvailable
+    {
+        get => _isUpdateAvailable;
+        set => SetProperty(ref _isUpdateAvailable, value);
+    }
+
     public ICommand ToggleConnectionCommand { get; }
     public ICommand ClearAllNotificationsCommand { get; }
     public ICommand NotificationActionCommand { get; }
@@ -75,6 +86,8 @@ public sealed class MainPageViewModel : BaseViewModel
             NotificationReplyCommand = new RelayCommand<(Notification, string)>(HandleNotificationReply);
             SetRingerModeCommand = new RelayCommand<string>(SetRingerMode);
             ToggleScreenMirrorCommand = new RelayCommand(ToggleScreenMirror);
+
+            UpdateService.PropertyChanged += UpdateService_OnPropertyChanged;
             getLastConnectedDevice();
 
             // Subscribe to device events
@@ -87,6 +100,12 @@ public sealed class MainPageViewModel : BaseViewModel
             throw;
         }
     }
+
+    private void UpdateService_OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        IsUpdateAvailable = UpdateService.IsUpdateAvailable;
+    }
+
 
     private async void OnConnectionStatusChange(object? sender, ConnectedSessionEventArgs args)
     {
