@@ -12,6 +12,6 @@ public class AdbDevice
 
 public enum DeviceType
 {
-    Usb,
-    Tcpip
+    USB,
+    WIFI
 }

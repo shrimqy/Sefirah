@@ -142,12 +142,6 @@ internal sealed class FeaturesSettingsService : BaseObservableJsonSettings, IFea
         set => Set(value);
     }
 
-    public bool PreferTcpIp
-    {
-        get => Get(true);
-        set => Set(value);
-    }
-
     public bool DisableVideoForwarding
     {
         get => Get(false);
@@ -229,6 +223,12 @@ internal sealed class FeaturesSettingsService : BaseObservableJsonSettings, IFea
     public bool AutoConnect
     {
         get => Get(true);
+        set => Set(value);
+    }
+
+    public ScrcpyDevicePreferenceType ScrcpyDevicePreference
+    {
+        get => Get(ScrcpyDevicePreferenceType.Auto);
         set => Set(value);
     }
 }

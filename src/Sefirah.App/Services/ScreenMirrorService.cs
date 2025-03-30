@@ -59,7 +59,7 @@ public class ScreenMirrorService(
                                           .GroupBy(d => d.Serial)
                                           .Select(g => g.First())];
 
-
+                logger.Info(string.Join(", ", onlineDevices.Select(d => $"{d.Serial} - {d.Type} - {d.State}")));
                 if (onlineDevices.Count == 0)
                 {
                     logger.Warn("No online devices found from adb");
@@ -92,7 +92,6 @@ public class ScreenMirrorService(
                 selectedDeviceSerial = await ShowDeviceSelectionDialog(onlineDevices);
                 if (selectedDeviceSerial == null)
                 {
-                    // User canceled the selection
                     logger.Info("User canceled device selection");
                     return false;
                 }
@@ -192,6 +191,10 @@ public class ScreenMirrorService(
 
     private bool ShouldShowDeviceSelectionDialog(List<AdbDevice> onlineDevices)
     {
+        // Always show dialog if selection preference is set to AskEverytime
+        if (userSettingsService.FeatureSettingsService.ScrcpyDevicePreference == ScrcpyDevicePreferenceType.AskEverytime)
+            return true;
+            
         // Always show dialog if there are more than 1 device
         if (onlineDevices.Count <= 1)
             return false;
@@ -202,13 +205,8 @@ public class ScreenMirrorService(
             return true;
         
         // Check if there are multiple WiFi devices of the same model
-        var wifiDevices = onlineDevices.Where(d => d.Type == DeviceType.Tcpip).ToList();
+        var wifiDevices = onlineDevices.Where(d => d.Type == DeviceType.WIFI).ToList();
         if (wifiDevices.Count > 1)
-            return true;
-        
-        // Check if there are multiple USB devices of the same model
-        var usbDevices = onlineDevices.Where(d => d.Type == DeviceType.Usb).ToList();
-        if (usbDevices.Count > 1)
             return true;
         
         // Otherwise, no need to show the dialog
@@ -300,11 +298,7 @@ public class ScreenMirrorService(
             args.Add("--keyboard=uhid");
         }
 
-        var preferTcpIp = settings.PreferTcpIp;
-        if (preferTcpIp)
-        {
-            args.Add("--tcpip");
-        }
+        args.Add("--tcpip");
         
         // Video settings
         if (settings.DisableVideoForwarding)
@@ -394,14 +388,28 @@ public class ScreenMirrorService(
 
         if (devices.Count > 1 && !hasDeviceSelectionFlag && string.IsNullOrEmpty(deviceSerial))
         {
-            var usbDevice = devices.FirstOrDefault(d => d.Type == DeviceType.Usb && d.State == DeviceState.Online);
-            if (usbDevice != null && !preferTcpIp)
+            var deviceSelection = userSettingsService.FeatureSettingsService.ScrcpyDevicePreference;
+            
+            switch (deviceSelection)
             {
-                args.Add("-d");  // Use USB device
-            }
-            else
-            {
-                args.Add("-e");  // Use TCP device
+                case ScrcpyDevicePreferenceType.Usb:
+                    args.Add("-d");  // Use USB device
+                    break;
+                case ScrcpyDevicePreferenceType.Tcpip:
+                    args.Add("-e");  // Use TCP device
+                    break;
+                case ScrcpyDevicePreferenceType.Auto:
+                default:
+                    var usbDevice = devices.FirstOrDefault(d => d.Type == DeviceType.USB && d.State == DeviceState.Online);
+                    if (usbDevice != null)
+                    {
+                        args.Add("-d");  // Use USB device
+                    }
+                    else
+                    {
+                        args.Add("-e");  // Use TCP device
+                    }
+                    break;
             }
         }
         return string.Join(" ", args);

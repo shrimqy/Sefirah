@@ -515,4 +515,19 @@ mobile (Make sure the pin matches)</value>
   <data name="Start" xml:space="preserve">
     <value>Start</value>
   </data>
+  <data name="ScrcpyDevicePreference" xml:space="preserve">
+    <value>Device preference</value>
+  </data>
+  <data name="AskEverytime" xml:space="preserve">
+    <value>Ask every time</value>
+  </data>
+  <data name="Usb" xml:space="preserve">
+    <value>USB</value>
+  </data>
+  <data name="WIFI" xml:space="preserve">
+    <value>WIFI</value>
+  </data>
+  <data name="Auto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
 </root>

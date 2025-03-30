@@ -181,7 +181,7 @@ public class AdbService(
                     Serial = e.Device.Serial,
                     Model = e.Device.Model ?? "Unknown",
                     State = e.Device.State,
-                    Type = e.Device.Serial.Contains(':') ? DeviceType.Tcpip : DeviceType.Usb
+                    Type = e.Device.Serial.Contains(':') || e.Device.Serial.Contains("tcp") ? DeviceType.WIFI : DeviceType.USB
                 };
                 AdbDevices.Add(adbDevice);
                 return;
@@ -198,12 +198,21 @@ public class AdbService(
         }
     }
     
-    private async void DeviceDisconnected(object? sender, DeviceDataEventArgs e)
+    private void DeviceDisconnected(object? sender, DeviceDataEventArgs e)
     {
         try
         {
             logger.Info($"Device disconnected: {e.Device.Serial}");
             
+            var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == e.Device.Serial);
+            if (existingDevice != null)
+            {
+                var index = AdbDevices.IndexOf(existingDevice);
+                if (index != -1)
+                {
+                    AdbDevices.RemoveAt(index);
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -224,13 +233,14 @@ public class AdbService(
             }
             var index = AdbDevices.IndexOf(existingDevice);
             
-            if (e.NewState == DeviceState.Online && (e.OldState == DeviceState.Authorizing || e.OldState == DeviceState.Offline))
+            if (e.NewState == DeviceState.Online)
             {
                 var deviceInfo = await GetFullDeviceInfoAsync(e.Device);
                 
                 if (index != -1)
                 {
                     AdbDevices[index] = deviceInfo;
+                    logger.Info($"Device updated: {deviceInfo.Model} ({deviceInfo.Serial})");
                 }
 
                 else
@@ -242,7 +252,8 @@ public class AdbService(
             }
             else if (index != -1)
             {
-                AdbDevices[index].State = e.NewState;
+                existingDevice.State = e.NewState;
+                AdbDevices[index] = existingDevice;
             }
         }
         catch (Exception ex)
@@ -273,7 +284,7 @@ public class AdbService(
                         Serial = device.Serial,
                         Model = device.Model ?? "Unknown",
                         State = device.State,
-                        Type = device.Serial.Contains(':') ? DeviceType.Tcpip : DeviceType.Usb
+                        Type = device.Serial.Contains(':') || device.Serial.Contains("tcp") ? DeviceType.WIFI : DeviceType.USB
                     };
                     AdbDevices.Add(adbDevice);
                 }
@@ -313,7 +324,7 @@ public class AdbService(
                 Model = fullDeviceData.Model ?? "Unknown",
                 AndroidId = androidId,
                 State = fullDeviceData.State,
-                Type = fullDeviceData.Serial.Contains(':') ? DeviceType.Tcpip : DeviceType.Usb
+                Type = fullDeviceData.Serial.Contains(':') || fullDeviceData.Serial.Contains("tcp") ? DeviceType.WIFI : DeviceType.USB
             };
         }
         catch (Exception ex)
@@ -326,7 +337,7 @@ public class AdbService(
                 Model = "Unknown",
                 AndroidId = "Unknown",
                 State = deviceData.State,
-                Type = deviceData.Serial.Contains(':') ? DeviceType.Tcpip : DeviceType.Usb
+                Type = deviceData.Serial.Contains(':') || deviceData.Serial.Contains("tcp") ? DeviceType.WIFI : DeviceType.USB
             };
         }
     }

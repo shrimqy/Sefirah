@@ -192,11 +192,22 @@
                             <local:SettingsBlockControl.ExpandableContent>
                                 <StackPanel>
                                     <local:SettingsBlockControl 
+                                        Title="{helpers:ResourceString Name=ScrcpyDevicePreference}"
+                                        CornerRadius="0">
+                                        <local:SettingsBlockControl.SettingsActionableElement>
+                                            <ComboBox 
+                                                Width="150"
+                                                ItemsSource="{x:Bind ViewModel.ScrcpyDevicePreferenceOptions.Values}"
+                                                SelectedItem="{x:Bind ViewModel.SelectedScrcpyDevicePreference, Mode=TwoWay}" />
+                                        </local:SettingsBlockControl.SettingsActionableElement>
+                                    </local:SettingsBlockControl>
+                                    
+                                    <local:SettingsBlockControl 
                                         Title="{helpers:ResourceString Name=ScreenOff}"
                                         CornerRadius="0">
                                         <ToggleSwitch Margin="-7,-3,-75,-3" IsOn="{x:Bind ViewModel.ScreenOff, Mode=TwoWay}" />
                                     </local:SettingsBlockControl>
-                                    
+
                                     <local:SettingsBlockControl 
                                         Title="{helpers:ResourceString Name=PreferTcpIp}"
                                         CornerRadius="0">

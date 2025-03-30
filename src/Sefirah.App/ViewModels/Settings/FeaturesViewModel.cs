@@ -184,19 +184,6 @@ public sealed partial class FeaturesViewModel : ObservableObject
         }
     }       
 
-    public bool PreferTcpIp
-    {
-        get => UserSettingsService.FeatureSettingsService.PreferTcpIp;
-        set
-        {
-            if (value != UserSettingsService.FeatureSettingsService.PreferTcpIp)
-            {
-                UserSettingsService.FeatureSettingsService.PreferTcpIp = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
     public string? VideoBitrate
     {
         get => UserSettingsService.FeatureSettingsService.VideoBitrate;
@@ -532,12 +519,47 @@ public sealed partial class FeaturesViewModel : ObservableObject
         { AudioOutputModeType.Both, "Both".GetLocalizedResource() }
     };
 
+    public ScrcpyDevicePreferenceType ScrcpyDevicePreference
+    {
+        get => UserSettingsService.FeatureSettingsService.ScrcpyDevicePreference;
+        set
+        {
+            if (value != UserSettingsService.FeatureSettingsService.ScrcpyDevicePreference)
+            {
+                UserSettingsService.FeatureSettingsService.ScrcpyDevicePreference = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private string selectedScrcpyDevicePreference;
+    public string SelectedScrcpyDevicePreference
+    {
+        get => selectedScrcpyDevicePreference;
+        set
+        {
+            if (SetProperty(ref selectedScrcpyDevicePreference, value))
+            {
+                ScrcpyDevicePreference = ScrcpyDevicePreferenceOptions.First(e => e.Value == value).Key;
+            }
+        }
+    }
+
+    public Dictionary<ScrcpyDevicePreferenceType, string> ScrcpyDevicePreferenceOptions { get; } = new()
+    {
+        { ScrcpyDevicePreferenceType.Auto, "Auto".GetLocalizedResource() },
+        { ScrcpyDevicePreferenceType.Usb, "USB".GetLocalizedResource() },
+        { ScrcpyDevicePreferenceType.Tcpip, "WIFI".GetLocalizedResource() },
+        { ScrcpyDevicePreferenceType.AskEverytime, "AskEverytime".GetLocalizedResource() }
+    };
+
     public FeaturesViewModel()
     {
         dispatcherQueue = DispatcherQueue.GetForCurrentThread();
         LoadNotificationPreferencesAsync();
 
-        selectedAudioOutputMode = AudioOutputModeOptions[AudioOutputMode];   
+        selectedAudioOutputMode = AudioOutputModeOptions[AudioOutputMode];
+        selectedScrcpyDevicePreference = ScrcpyDevicePreferenceOptions[ScrcpyDevicePreference];
     }
 
     private async void LoadNotificationPreferencesAsync()

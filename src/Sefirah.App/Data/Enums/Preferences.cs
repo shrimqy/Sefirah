@@ -35,3 +35,11 @@ public enum AudioOutputModeType
     Remote,
     Both
 }
+
+public enum ScrcpyDevicePreferenceType
+{
+    Auto,
+    Usb,
+    Tcpip,
+    AskEverytime
+}

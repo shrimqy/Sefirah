@@ -115,11 +115,6 @@ public interface IFeatureSettingsService : IBaseSettingsService, INotifyProperty
     string? CustomArguments { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether to prefer TCP connections.
-    /// </summary>
-    bool PreferTcpIp { get; set; }
-
-    /// <summary>
     /// Gets or sets a value indicating whether to disable video forwarding.
     /// </summary>
     bool DisableVideoForwarding { get; set; }
@@ -188,4 +183,9 @@ public interface IFeatureSettingsService : IBaseSettingsService, INotifyProperty
     /// Gets or sets a value indicating whether to automatically connect to devices.
     /// </summary>
     bool AutoConnect { get; set; }
+
+    /// <summary>
+    /// Gets or sets the device selection mode for screen mirroring.
+    /// </summary>
+    ScrcpyDevicePreferenceType ScrcpyDevicePreference { get; set; }
 }
