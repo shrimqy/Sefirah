@@ -27,7 +27,7 @@
 	<Identity
 		Name="shrimqy.Seki-PhoneLink"
 		Publisher="CN=shrimqy"
-		Version="1.1.1.0" />
+		Version="1.1.2.0" />
 
 	<Properties>
 		<DisplayName>Sefirah</DisplayName>
@@ -44,6 +44,7 @@
         <Resource Language="ja-JP"/>
         <Resource Language="zh-CN"/>
         <Resource Language="ru-RU"/>
+        <Resource Language="de-DE"/>
         <Resource Language="x-generate"/>
     </Resources>
 
