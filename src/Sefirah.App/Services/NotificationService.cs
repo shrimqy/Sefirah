@@ -303,7 +303,7 @@ public class NotificationService(
             try
             {
                 notifications.Clear();
-                var command = new Misc { MiscType = MiscType.ClearNotifications };
+                var command = new CommandMessage { CommandType = CommandType.ClearNotifications };
                 string jsonMessage = SocketMessageSerializer.Serialize(command);
                 sessionManager.SendMessage(jsonMessage);
                 logger.Info("Cleared all notifications");

@@ -200,7 +200,7 @@ public partial class MainPageViewModel : BaseViewModel
     {
         if (ConnectionStatus)
         {
-            var message = new Misc { MiscType = MiscType.Disconnect };
+            var message = new CommandMessage { CommandType = CommandType.Disconnect };
             SessionManager.SendMessage(SocketMessageSerializer.Serialize(message));
             await Task.Delay(50);
             SessionManager.DisconnectSession();

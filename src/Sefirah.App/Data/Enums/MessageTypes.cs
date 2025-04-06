@@ -42,16 +42,17 @@ public enum AudioMessageType
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
-public enum MiscType
+public enum CommandType
 {
     Disconnect,
     Lock,
     Shutdown,
     Sleep,
     Hibernate,
-    Mirror,
-    CloseMirror,
-    ClearNotifications
+    ClearNotifications,
+    ShutdownWithDelay,
+    Restart,
+    Logoff
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]

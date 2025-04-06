@@ -94,6 +94,7 @@ public static class AppLifecycleHelper
                 // Services
                 .AddSingleton<IAdbService, AdbService>()
                 .AddSingleton<IUpdateService, AppUpdateService>()
+                .AddSingleton<ICommandService, CommandService>()
                 .AddSingleton<IDeviceManager, DeviceManager>()
                 .AddSingleton<IDiscoveryService, DiscoveryService>()
                 .AddSingleton<INetworkService, NetworkService>()

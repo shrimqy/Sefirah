@@ -3,7 +3,7 @@ using Sefirah.App.Data.Enums;
 namespace Sefirah.App.Data.Models;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
-[JsonDerivedType(typeof(Misc), typeDiscriminator: "0")]
+[JsonDerivedType(typeof(CommandMessage), typeDiscriminator: "0")]
 [JsonDerivedType(typeof(DeviceInfo), typeDiscriminator: "1")]
 [JsonDerivedType(typeof(DeviceStatus), typeDiscriminator: "2")]
 [JsonDerivedType(typeof(ClipboardMessage), typeDiscriminator: "3")]
@@ -24,10 +24,13 @@ namespace Sefirah.App.Data.Models;
 [JsonDerivedType(typeof(PlaybackAction), typeDiscriminator: "18")]
 public class SocketMessage { }
 
-public class Misc : SocketMessage
+public class CommandMessage : SocketMessage
 {
-    [JsonPropertyName("miscType")]
-    public required MiscType MiscType { get; set; }
+    [JsonPropertyName("commandType")]
+    public required CommandType CommandType { get; set; }
+
+    [JsonPropertyName("value")]
+    public string? Value { get; set; } = null;
 }
 
 public class ClipboardMessage : SocketMessage

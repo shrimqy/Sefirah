@@ -13,7 +13,8 @@ public class MessageHandlerService(
     ISftpService sftpService,
     IDeviceManager deviceManager,
     IRemoteAppsRepository remoteAppsRepository,
-    IFileTransferService fileTransferService) : IMessageHandlerService
+    IFileTransferService fileTransferService,
+    ICommandService commandService) : IMessageHandlerService
 {
     public Task HandleBinaryData(byte[] data)
     {
@@ -27,7 +28,8 @@ public class MessageHandlerService(
             
             switch (message)
             {
-                case Misc misc:
+                case CommandMessage commandMessage:
+                    commandService.HandleCommand(commandMessage);
                     break;
                 case DeviceStatus deviceStatus:
                     await deviceManager.UpdateDeviceStatus(deviceStatus);
