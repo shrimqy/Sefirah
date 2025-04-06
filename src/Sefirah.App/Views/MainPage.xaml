@@ -560,6 +560,13 @@
                     SelectionChanged="NavigationView_SelectionChanged">
                     <NavigationView.MenuItems>
                         <NavigationViewItem
+                            Content="{helpers:ResourceString Name=Calls}"
+                            Tag="Calls">
+                            <NavigationViewItem.Icon>
+                                <FontIcon Glyph="&#xE80B;" />
+                            </NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem
                             Content="{helpers:ResourceString Name=Messages}"
                             IsSelected="True"
                             Tag="Messages">

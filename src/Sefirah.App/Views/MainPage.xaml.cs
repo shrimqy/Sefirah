@@ -216,6 +216,9 @@ public sealed partial class MainPage : Page
         var selectedItem = (NavigationViewItem)args.SelectedItem;
         switch (selectedItem.Tag.ToString())
         {
+            case "Calls":
+                ContentFrame.Navigate(typeof(CallsPage));
+                break;
             case "Settings":
                 ContentFrame.Navigate(typeof(SettingsPage));
                 break;

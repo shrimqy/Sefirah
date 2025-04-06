@@ -1,0 +1,21 @@
+<ContentDialog
+    x:Class="Sefirah.App.Dialogs.BluetoothPairingDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Sefirah.App.Dialogs"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    PrimaryButtonText="Confirm"
+    SecondaryButtonText="Cancel"
+    CloseButtonText=""
+    DefaultButton="None">
+
+    <StackPanel Margin="20">
+        <TextBlock Text="Device Name" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,8"/>
+        <TextBlock Text="{x:Bind ViewModel.DeviceName}" TextWrapping="Wrap" Margin="0,0,0,16"/>
+        
+        <TextBlock Text="Pairing Code" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,8"/>
+        <TextBlock Text="{x:Bind ViewModel.PairingCode}" FontSize="24" FontWeight="SemiBold"/>
+    </StackPanel>
+</ContentDialog>

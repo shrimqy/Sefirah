@@ -45,6 +45,8 @@ public static class AppLifecycleHelper
         var toastNotificationService = Ioc.Default.GetRequiredService<ToastNotificationService>();
 
         var updateService = Ioc.Default.GetRequiredService<IUpdateService>();
+        var bluetoothService = Ioc.Default.GetRequiredService<IBluetoothService>();
+        bluetoothService.CreateDeviceWatcher();
 
         // Start all the required services for startup
         await networkService.StartServerAsync();
@@ -92,6 +94,7 @@ public static class AppLifecycleHelper
                 .AddSingleton<DeviceRepository>()
 
                 // Services
+                .AddSingleton<IBluetoothService, BluetoothService>()
                 .AddSingleton<IAdbService, AdbService>()
                 .AddSingleton<IUpdateService, AppUpdateService>()
                 .AddSingleton<IDeviceManager, DeviceManager>()
@@ -117,6 +120,7 @@ public static class AppLifecycleHelper
                 .AddSingleton<MessagesViewModel>()
                 .AddSingleton<AppsViewModel>()
                 .AddSingleton<FeaturesViewModel>()
+                .AddSingleton<CallsViewModel>()
             ).Build();
     }
 

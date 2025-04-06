@@ -530,4 +530,7 @@ mobile (Make sure the pin matches)</value>
   <data name="Auto" xml:space="preserve">
     <value>Auto</value>
   </data>
+  <data name="Calls" xml:space="preserve">
+    <value>Calls</value>
+  </data>
 </root>
