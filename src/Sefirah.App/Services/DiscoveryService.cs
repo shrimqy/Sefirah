@@ -96,15 +96,15 @@ public class DiscoveryService(
                 udpClient.Socket.EnableBroadcast = true;
                 logger.Info("UDP Client connected successfully {0}", port);
 
-                mdnsService.DiscoveredMdnsService += OnDiscoveredMdnsService;
-                mdnsService.ServiceInstanceShutdown += OnServiceInstanceShutdown;
-
                 BroadcastDeviceInfoAsync(udpBroadcast);
             }
             else
             {
                 logger.Error("Failed to connect UDP client");
             }
+
+            mdnsService.DiscoveredMdnsService += OnDiscoveredMdnsService;
+            mdnsService.ServiceInstanceShutdown += OnServiceInstanceShutdown;
 
         }
         catch (Exception ex)
@@ -127,9 +127,9 @@ public class DiscoveryService(
                 {
                     udpClient.Socket.SendTo(messageBytes, endPoint);
                 }
-                catch (Exception ex)
+                catch
                 {
-                    logger.Error("Error sending UDP broadcast: " + ex);
+                    // ignore
                 }
             }
 
@@ -141,36 +141,35 @@ public class DiscoveryService(
     {
         lock (collectionLock)
         {
-            if (!DiscoveredMdnsServices.Any(s => s.DeviceId == service.DeviceId))
+            if (DiscoveredMdnsServices.Any(s => s.DeviceId == service.DeviceId)) return;
+
+            DiscoveredMdnsServices.Add(service);
+            logger.Info("Discovered service instance: {0}, {1}", service.DeviceId, service.DeviceName);
+
+            var sharedSecret = EcdhHelper.DeriveKey(service.PublicKey, localDevice!.PrivateKey);
+            var device = new DiscoveredDevice
             {
-                DiscoveredMdnsServices.Add(service);
-                logger.Info("Discovered service instance: {0}, {1}", service.DeviceId, service.DeviceName);
+                DeviceId = service.DeviceId,
+                DeviceName = service.DeviceName,
+                PublicKey = service.PublicKey,
+                HashedKey = sharedSecret,
+                LastSeen = DateTimeOffset.UtcNow,
+                Origin = DeviceOrigin.MdnsService
+            };
 
-                // Create device from mDNS data
-                var sharedSecret = EcdhHelper.DeriveKey(service.PublicKey, localDevice!.PrivateKey);
-                var device = new DiscoveredDevice
+            dispatcher.EnqueueAsync(() =>
+            {
+                var existing = DiscoveredDevices.FirstOrDefault(d => d.DeviceId == device.DeviceId);
+                if (existing != null)
                 {
-                    DeviceId = service.DeviceId, // Assuming instance name is unique ID
-                    DeviceName = service.DeviceName,
-                    PublicKey = service.PublicKey,
-                    HashedKey = sharedSecret,
-                    LastSeen = DateTimeOffset.UtcNow,
-                    Origin = DeviceOrigin.MdnsService
-                };
-
-                dispatcher.EnqueueAsync(() =>
+                    DiscoveredDevices[DiscoveredDevices.IndexOf(existing)] = device;
+                }
+                else
                 {
-                    var existing = DiscoveredDevices.FirstOrDefault(d => d.DeviceId == device.DeviceId);
-                    if (existing != null)
-                    {
-                        DiscoveredDevices[DiscoveredDevices.IndexOf(existing)] = device;
-                    }
-                    else
-                    {
-                        DiscoveredDevices.Add(device);
-                    }
-                });
-            }
+                    DiscoveredDevices.Add(device);
+                }
+            });
+            
         }
     }
 
@@ -184,7 +183,6 @@ public class DiscoveryService(
             DiscoveredMdnsServices.RemoveAll(s => s.DeviceId == deviceId);
         }
 
-        // Remove corresponding device from main collection
         dispatcher.EnqueueAsync(() =>
         {
             lock (collectionLock)
@@ -206,7 +204,7 @@ public class DiscoveryService(
                 }
                 catch (Exception ex)
                 {
-                    logger.Error("Unexpected error removing device: {Message}", ex.Message);
+                    logger.Warn("Unexpected error removing device: {Message}", ex.Message);
                 }
             }
         });
@@ -257,7 +255,6 @@ public class DiscoveryService(
                 Origin = DeviceOrigin.UdpBroadcast
             };
 
-            // Update or add device to collection
             dispatcher.EnqueueAsync(() =>
             {
                 lock (collectionLock)
@@ -275,13 +272,11 @@ public class DiscoveryService(
                 }
             });
 
-
-            // Start cleanup timer if not already started
             StartCleanupTimer();
         }
         catch (Exception ex)
         {
-            logger.Error("Error processing UDP message: {message}", ex.Message);
+            logger.Warn("Error processing UDP message: {message}", ex.Message);
         }
     }
 

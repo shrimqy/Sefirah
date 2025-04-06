@@ -69,13 +69,7 @@ public class AdbService(
         new() { Id = 4, Command = "--audio-codec=raw", Display = "raw" }
     ];
 
-    // Methods to add new options dynamically
-    public void AddDisplayOrientationOption(string command, string display)
-    {
-        int newId = DisplayOrientationOptions.Count > 0 ? DisplayOrientationOptions.Max(x => x.Id) + 1 : 0;
-        DisplayOrientationOptions.Add(new ScrcpyPreferenceItem { Id = newId, Command = command, Display = display });
-    }
-
+    // TODO: To add new options dynamically
     public void AddVideoCodecOption(string command, string display)
     {
         int newId = VideoCodecOptions.Count > 0 ? VideoCodecOptions.Max(x => x.Id) + 1 : 0;
@@ -108,12 +102,10 @@ public class AdbService(
             // Create and configure the device monitor
             deviceMonitor = new DeviceMonitor(new AdbSocket(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)));
             
-            // Configure event handlers
             deviceMonitor.DeviceConnected += DeviceConnected;
             deviceMonitor.DeviceDisconnected += DeviceDisconnected;
             deviceMonitor.DeviceChanged += DeviceChanged;
             
-            // Start monitoring devices
             await deviceMonitor.StartAsync();
             
             // Get initial list of devices
@@ -144,17 +136,14 @@ public class AdbService(
     {
         if (deviceMonitor != null)
         {
-            // Unregister event handlers
             deviceMonitor.DeviceConnected -= DeviceConnected;
             deviceMonitor.DeviceDisconnected -= DeviceDisconnected;
             deviceMonitor.DeviceChanged -= DeviceChanged;
             
-            // Stop and dispose the monitor
             await deviceMonitor.DisposeAsync();
             deviceMonitor = null;
         }
         
-        // Cancel and dispose the token source
         if (cts != null)
         {
             cts.Cancel();
@@ -309,7 +298,8 @@ public class AdbService(
                 var androidIdReceiver = new ConsoleOutputReceiver();
 
                 // adb shell cat /storage/emulated/0/Android/data/com.castle.sefirah/files/device_info.txt
-
+                // Get the Android ID from the device_info.txt file since we can't directly access the android id of the App 
+                // TODO: Use this for associating the adb devices with paired devices
                 await adbClient.ExecuteShellCommandAsync(deviceData, "cat /storage/emulated/0/Android/data/com.castle.sefirah/files/device_info.txt", androidIdReceiver);
                 androidId = androidIdReceiver.ToString().Trim();
             }

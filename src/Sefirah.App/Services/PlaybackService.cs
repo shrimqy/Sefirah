@@ -3,7 +3,6 @@ using Microsoft.UI.Dispatching;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
 using NAudio.Utils;
-using Renci.SshNet;
 using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Enums;
 using Sefirah.App.Data.Models;
@@ -579,6 +578,5 @@ public class PlaybackService(
         {
             device.Volume = enumerator.GetDevice(pwstrDeviceId).AudioEndpointVolume.MasterVolumeLevelScalar;
         }
-        logger.Info($"Property value changed: {pwstrDeviceId} - {key}");
     }
 }
