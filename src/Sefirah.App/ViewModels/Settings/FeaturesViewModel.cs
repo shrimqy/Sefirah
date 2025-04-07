@@ -143,6 +143,8 @@ public sealed partial class FeaturesViewModel : ObservableObject
             if (value != UserSettingsService.FeatureSettingsService.RemoteStoragePath)
             {
                 UserSettingsService.FeatureSettingsService.RemoteStoragePath = value;
+                var sftpService = Ioc.Default.GetRequiredService<ISftpService>();
+                sftpService.RemoveAllSyncRoots();
                 OnPropertyChanged();
             }
         }

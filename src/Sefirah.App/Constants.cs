@@ -35,6 +35,6 @@ public static class Constants
     {
         public static readonly string DownloadsPath = UserDataPaths.GetDefault().Downloads;
         public static readonly string UserProfilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        public static readonly string DefaultRemoteDevicePath = Path.Combine(UserProfilePath, "RemoteDevice");
+        public static readonly string DefaultRemoteDevicePath = Path.Combine(UserProfilePath, "RemoteDevices");
     }
 }

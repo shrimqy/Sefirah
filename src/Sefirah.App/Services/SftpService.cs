@@ -67,10 +67,28 @@ public class SftpService(
             };
 
             var directory = userSettingsService.FeatureSettingsService.RemoteStoragePath;
+            
+            // Ensure the parent directory exists
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+                logger.Debug("Created main remote storage directory: {0}", directory);
+            }
+
             var remoteDevice = await deviceManager.GetLastConnectedDevice();
+            var deviceDirectory = Path.Combine(directory, remoteDevice!.Name);
+            logger.Debug("RemoteDirectory: {0}", deviceDirectory);
+            
+            // Ensure the device directory exists
+            if (!Directory.Exists(deviceDirectory))
+            {
+                Directory.CreateDirectory(deviceDirectory);
+                logger.Debug("Created device directory: {0}", deviceDirectory);
+            }
+            
             await Register(
                 name: remoteDevice!.Name,
-                directory: directory,
+                directory: deviceDirectory,
                 accountId: remoteDevice!.DeviceId,
                 context: sftpContext
             );
@@ -106,6 +124,19 @@ public class SftpService(
         }
     }
 
+    public void RemoveAllSyncRoots()
+    {
+        logger.Info("Removing all sync roots");
+        if (info != null)
+        {
+            syncProviderPool.StopSyncRoot(info);
+        }
+        foreach (var syncRoot in registrar.GetSyncRoots())
+        {
+            registrar.Unregister(syncRoot.Id);
+        }
+    }
+
     private async Task Register<T>(string name, string directory, string accountId, T context) where T : struct 
     {
         try 
@@ -118,16 +149,7 @@ public class SftpService(
                 PopulationPolicy = PopulationPolicy.Full,
             };
 
-            StorageFolder parentFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(registerCommand.Directory));
-            StorageFolder storageFolder;
-            try
-            {
-                storageFolder = await parentFolder.GetFolderAsync(Path.GetFileName(registerCommand.Directory));
-            }
-            catch (FileNotFoundException)
-            {
-                storageFolder = await parentFolder.CreateFolderAsync(Path.GetFileName(registerCommand.Directory));
-            }
+            StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(directory);
 
             info = registrar.Register(registerCommand, storageFolder, context);
             if (info != null)

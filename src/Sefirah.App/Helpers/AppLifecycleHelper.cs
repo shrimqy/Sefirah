@@ -56,6 +56,15 @@ public static class AppLifecycleHelper
         await adbService.StartAsync();
 
         await updateService.CheckForUpdatesAsync();
+
+        // Remove the previous sync root if it exists so it doesn't conflict with the new one
+        // TODO: REMOVE this check later 
+        var sftpService = Ioc.Default.GetRequiredService<ISftpService>();
+        if (userSettingsService.FeatureSettingsService.RemoteStoragePath.EndsWith("RemoteDevice"))
+        {
+            sftpService.RemoveAllSyncRoots();
+            userSettingsService.FeatureSettingsService.RemoteStoragePath = Constants.UserEnvironmentPaths.DefaultRemoteDevicePath;
+        }
     }
 
 
