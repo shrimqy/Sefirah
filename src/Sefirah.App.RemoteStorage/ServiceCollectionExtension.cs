@@ -102,7 +102,14 @@ public static class ServiceCollectionExtensions
 					contextAccessor.Context.Username,
 					contextAccessor.Context.Password
 				);
-				client.Connect();
+				try
+				{
+					client.Connect();
+				}
+				catch
+				{
+					// ignore
+				}
 				return client;
 			})
 			.AddKeyedScoped<IRemoteReadWriteService, SftpReadWriteService>("sftp")
