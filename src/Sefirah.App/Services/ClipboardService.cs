@@ -64,7 +64,6 @@ public class ClipboardService : IClipboardService
                 var dataPackageView = Clipboard.GetContent();
                 if (dataPackageView == null) return;
 
-                logger.Info($"Clipboard content changed: {string.Join(", ", dataPackageView.AvailableFormats)}");
                 if (dataPackageView.Contains(StandardDataFormats.Text))
                 {
                     await TryHandleTextContent(dataPackageView);
@@ -86,8 +85,12 @@ public class ClipboardService : IClipboardService
         if (!dataPackageView.Contains(StandardDataFormats.Text)) return false;
 
         string? text = await dataPackageView.GetTextAsync();
+        logger.Info($"Clipboard content changed: {text}");
         if (string.IsNullOrEmpty(text)) return false;
 
+        // Convert Windows CRLF to Unix LF 
+        text = text.Replace("\r\n", "\n");
+        
         var message = new ClipboardMessage
         {
             Content = text,
