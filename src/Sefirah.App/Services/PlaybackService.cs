@@ -45,17 +45,17 @@ public class PlaybackService(
 
             sessionManager.ClientConnectionStatusChanged += async (sender, args) =>
             {
-                if (args.IsConnected && AudioDevices.Count != 0)
+                if (args.IsConnected)
                 {
+                    foreach (var session in activeSessions.Values)
+                    {
+                        await UpdatePlaybackDataAsync(session);
+                    }
                     foreach (var device in AudioDevices)
                     {
                         device.AudioDeviceType = AudioMessageType.New;
                         string jsonMessage = SocketMessageSerializer.Serialize(device);
                         sessionManager.SendMessage(jsonMessage);
-                    }
-                    foreach (var session in activeSessions.Values)
-                    {
-                        await UpdatePlaybackDataAsync(session);
                     }
                 } 
             };
@@ -65,7 +65,6 @@ public class PlaybackService(
         catch (Exception ex)
         {
             logger.Error("Failed to initialize PlaybackService", ex);
-            throw;
         }
     }
 
@@ -137,7 +136,6 @@ public class PlaybackService(
             catch (Exception ex)
             {
                 logger.Error("Error executing media action {0} ", mediaAction.PlaybackActionType, ex);
-                throw;
             }
         });
     }
@@ -400,19 +398,6 @@ public class PlaybackService(
         }
     }
 
-    public void VolumeControlAsync(double volume)
-    {
-        try
-        {
-
-        }
-        catch (Exception ex)
-        {
-            logger.Error("Error changing volume to {0}", volume, ex);
-            throw;
-        }
-    }
-
     public Task HandleRemotePlaybackMessageAsync(PlaybackSession data)
     {
         throw new NotImplementedException();
@@ -420,22 +405,29 @@ public class PlaybackService(
 
     public void GetAllAudioDevices()
     {
-        // Get the default device
-        var defaultDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-
-        // List all active devices
-        var devices = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
-        foreach (var device in devices)
+        try
         {
-            AudioDevices.Add(
-                new AudioDevice
-                {
-                    DeviceId = device.ID,
-                    DeviceName = device.FriendlyName,
-                    Volume = device.AudioEndpointVolume.MasterVolumeLevelScalar,
-                    IsSelected = device.ID == defaultDevice.ID
-                }
-            );
+            // Get the default device
+            var defaultDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia).ID;
+
+            // List all active devices
+            var devices = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+            foreach (var device in devices)
+            {
+                AudioDevices.Add(
+                    new AudioDevice
+                    {
+                        DeviceId = device.ID,
+                        DeviceName = device.FriendlyName,
+                        Volume = device.AudioEndpointVolume.MasterVolumeLevelScalar,
+                        IsSelected = device.ID == defaultDevice
+                    }
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Warn("Failed to enumerate audio devices", ex);
         }
     }
 
