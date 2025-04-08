@@ -172,7 +172,7 @@
     <value>Receive notifications from remote device</value>
   </data>
   <data name="GeneralSettings" xml:space="preserve">
-    <value>General Settings</value>
+    <value>Paramètres généraux</value>
   </data>
   <data name="ShowNotificationToast" xml:space="preserve">
     <value>Show notification toast</value>
@@ -181,7 +181,7 @@
     <value>Ignore remote notifications from active Windows apps</value>
   </data>
   <data name="NotificationFilterDisabled.Content" xml:space="preserve">
-    <value>Disabled</value>
+    <value>Désactivé</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
     <value>Fil de notification</value>
@@ -190,7 +190,7 @@
     <value>Notification Feed + Toast</value>
   </data>
   <data name="PairedDevices.Title" xml:space="preserve">
-    <value>Paired Devices</value>
+    <value>Appareils appairés</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>Appareils disponibles</value>
@@ -199,31 +199,31 @@
     <value>Android devices that are running the app in the same network will show up below</value>
   </data>
   <data name="StartupOption" xml:space="preserve">
-    <value>Startup option</value>
+    <value>Option de démarrage</value>
   </data>
   <data name="StartupOptionDescription" xml:space="preserve">
     <value>Choose how the app starts when Windows boots</value>
   </data>
   <data name="StartupOptionMinimized.Content" xml:space="preserve">
-    <value>Start minimized</value>
+    <value>Démarrer minimisé</value>
   </data>
   <data name="StartupOptionMaximized.Content" xml:space="preserve">
-    <value>Start maximized</value>
+    <value>Démarrer maximisé</value>
   </data>
   <data name="StartupOptionSystemTray.Content" xml:space="preserve">
-    <value>Start in system tray</value>
+    <value>Démarrer dans la barre d'état système</value>
   </data>
   <data name="StartupOptionDisabled.Content" xml:space="preserve">
-    <value>Disabled</value>
+    <value>Désactivé</value>
   </data>
   <data name="Theme" xml:space="preserve">
-    <value>Theme</value>
+    <value>Thème</value>
   </data>
   <data name="ThemeDescription" xml:space="preserve">
-    <value>Choose your default app theme</value>
+    <value>Choisissez votre thème d'application par défaut</value>
   </data>
   <data name="Default" xml:space="preserve">
-    <value>Default</value>
+    <value>Défaut</value>
   </data>
   <data name="ThemeLight.Content" xml:space="preserve">
     <value>Clair</value>
