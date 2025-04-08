@@ -389,22 +389,22 @@ connexion à partir de votre téléphone (assurez-vous que le code pin correspon
     <value>Maintenir l'écran de l'appareil éteint pendant la mise en miroir</value>
   </data>
   <data name="PhysicalKeyboard" xml:space="preserve">
-    <value>Disable on-screen keyboard</value>
+    <value>Désactiver le clavier à l'écran</value>
   </data>
   <data name="Bitrate" xml:space="preserve">
-    <value>Bitrate</value>
+    <value>Débit binaire</value>
   </data>
   <data name="Resolution" xml:space="preserve">
     <value>Résolution</value>
   </data>
   <data name="Buffer" xml:space="preserve">
-    <value>Buffer</value>
+    <value>Tampon</value>
   </data>
   <data name="Messages" xml:space="preserve">
     <value>Messages</value>
   </data>
   <data name="EmptyMessages" xml:space="preserve">
-    <value>Select a conversation to view messages</value>
+    <value>Sélectionnez une conversation pour afficher les messages</value>
   </data>
   <data name="MessagePlaceholder" xml:space="preserve">
     <value>Écrivez un message…</value>
@@ -422,7 +422,7 @@ connexion à partir de votre téléphone (assurez-vous que le code pin correspon
     <value>Entrez le numéro de téléphone et appuyez sur Entrée</value>
   </data>
   <data name="RemoveAddress" xml:space="preserve">
-    <value>Remove address</value>
+    <value>Supprimer l'adresse</value>
   </data>
   <data name="CopyMessage" xml:space="preserve">
     <value>Copier le message</value>
