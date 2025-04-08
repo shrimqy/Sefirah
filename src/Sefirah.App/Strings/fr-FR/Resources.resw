@@ -118,43 +118,43 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="About" xml:space="preserve">
-    <value>About</value>
+    <value>À propos</value>
   </data>
   <data name="General" xml:space="preserve">
-    <value>General</value>
+    <value>Général</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Settings</value>
+    <value>Paramètres</value>
   </data>
   <data name="PrivacyPolicy" xml:space="preserve">
-    <value>Privacy Policy</value>
+    <value>Politique de confidentialité</value>
   </data>
   <data name="SupportDevelopment" xml:space="preserve">
-    <value>Support Development</value>
+    <value>Soutenir le développement</value>
   </data>
   <data name="OpenLogs" xml:space="preserve">
-    <value>Open Logs</value>
+    <value>Ouvrir le journal</value>
   </data>
   <data name="GitHubRepository" xml:space="preserve">
-    <value>GitHub Repository</value>
+    <value>Dépôt GitHub</value>
   </data>
   <data name="AndroidGitHubRepository" xml:space="preserve">
     <value>Android GitHub Repository</value>
   </data>
   <data name="Clipboard" xml:space="preserve">
-    <value>Clipboard</value>
+    <value>Presse-papiers</value>
   </data>
   <data name="Feedback" xml:space="preserve">
-    <value>Feedback</value>
+    <value>Commentaires</value>
   </data>
   <data name="Notifications" xml:space="preserve">
     <value>Notifications</value>
   </data>
   <data name="ThirdPartyLibraries" xml:space="preserve">
-    <value>Third party libraries</value>
+    <value>Bibliothèques tierces</value>
   </data>
   <data name="SaveLocation" xml:space="preserve">
-    <value>Save Location</value>
+    <value>Emplacement de sauvegarde</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
     <value>Remote Storage Location</value>
@@ -184,7 +184,7 @@
     <value>Disabled</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Notification Feed</value>
+    <value>Fil de notification</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
     <value>Notification Feed + Toast</value>
@@ -193,7 +193,7 @@
     <value>Paired Devices</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
-    <value>Available Devices</value>
+    <value>Appareils disponibles</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
     <value>Android devices that are running the app in the same network will show up below</value>
@@ -226,35 +226,35 @@
     <value>Default</value>
   </data>
   <data name="ThemeLight.Content" xml:space="preserve">
-    <value>Light</value>
+    <value>Clair</value>
   </data>
   <data name="ThemeDark.Content" xml:space="preserve">
-    <value>Dark</value>
+    <value>Sombre</value>
   </data>
   <data name="RemoveDeviceDialogTitle" xml:space="preserve">
-    <value>Remove Device</value>
+    <value>Supprimer l'appareil</value>
   </data>
   <data name="Remove" xml:space="preserve">
-    <value>Remove</value>
+    <value>Supprimer</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>Annuler</value>
   </data>
   <data name="OnboardingWelcome.Title" xml:space="preserve">
-    <value>Welcome to Sefirah</value>
+    <value>Bienvenue sur Sefirah</value>
   </data>
   <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
     <value>To get started download and install the comapanion app through the corresponding github
 page.</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
-    <value>Get Started</value>
+    <value>Commencer</value>
   </data>
   <data name="OnboardingSkip" xml:space="preserve">
-    <value>Skip for now</value>
+    <value>Ignorer pour le moment</value>
   </data>
   <data name="OnboardingDevice.Title" xml:space="preserve">
-    <value>Connect Your Device</value>
+    <value>Connectez votre appareil</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
     <value>Discovered devices in your network will appear below, and initiate the connection from your
@@ -267,16 +267,16 @@ mobile (Make sure the pin matches)</value>
     <value>Verify the passkey matches on both devices:</value>
   </data>
   <data name="ConnectionRequestRejectButton" xml:space="preserve">
-    <value>Reject</value>
+    <value>Refuser</value>
   </data>
   <data name="NotificationsClearButton" xml:space="preserve">
-    <value>Clear all</value>
+    <value>Tout effacer</value>
   </data>
   <data name="ConnectionRequestAcceptButton" xml:space="preserve">
-    <value>Accept</value>
+    <value>Accepter</value>
   </data>
   <data name="NoDevicesFound" xml:space="preserve">
-    <value>No devices found</value>
+    <value>Aucun appareil trouvé</value>
   </data>
   <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
     <value>PASSKEY</value>
@@ -294,25 +294,25 @@ mobile (Make sure the pin matches)</value>
     <value>Open links in browser</value>
   </data>
   <data name="Connected.Text" xml:space="preserve">
-    <value>Connected</value>
+    <value>Connecté</value>
   </data>
   <data name="Disconnected.Text" xml:space="preserve">
-    <value>Disconnected</value>
+    <value>Déconnecté</value>
   </data>
   <data name="ShowHideWindow" xml:space="preserve">
-    <value>Show/Hide Window</value>
+    <value>Afficher/masquer la fenêtre</value>
   </data>
   <data name="Exit" xml:space="preserve">
-    <value>Exit</value>
+    <value>Quitter</value>
   </data>
   <data name="Features" xml:space="preserve">
-    <value>Features</value>
+    <value>Fonctionnalités</value>
   </data>
   <data name="SelectLocation" xml:space="preserve">
-    <value>Select location</value>
+    <value>Sélectionner un emplacement</value>
   </data>
   <data name="RemoveDeviceDialogSubtitle" xml:space="preserve">
-    <value>Are you sure you want to remove '{0}'? This action cannot be undone.</value>
+    <value>Êtes-vous sûr de vouloir supprimer '{0}' ? Cette action ne peut être annulée.</value>
   </data>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>App-specific Settings</value>
@@ -333,7 +333,7 @@ mobile (Make sure the pin matches)</value>
     <value>File Transfer</value>
   </data>
   <data name="SendButton" xml:space="preserve">
-    <value>Send</value>
+    <value>Envoyer</value>
   </data>
   <data name="ReplyPlaceholder" xml:space="preserve">
     <value>Type a reply</value>
@@ -348,43 +348,43 @@ mobile (Make sure the pin matches)</value>
     <value>Turn off notifications from {0}</value>
   </data>
   <data name="SubmitBugReport" xml:space="preserve">
-    <value>Report a bug</value>
+    <value>Signaler un bug</value>
   </data>
   <data name="SubmitFeatureRequest" xml:space="preserve">
-    <value>Feature request</value>
+    <value>Demande de fonctionnalité</value>
   </data>
   <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
     <value>Do not show notification toast when phone is in DND</value>
   </data>
   <data name="Devices" xml:space="preserve">
-    <value>Devices</value>
+    <value>Appareils</value>
   </data>
   <data name="RingerModeNormal.Content" xml:space="preserve">
-    <value>Normal</value>
+    <value>Son</value>
   </data>
   <data name="RingerModeSilent.Content" xml:space="preserve">
-    <value>Silent</value>
+    <value>Muet</value>
   </data>
   <data name="RingerModeVibrate.Content" xml:space="preserve">
-    <value>Vibrate</value>
+    <value>Vibreur</value>
   </data>
   <data name="Pin" xml:space="preserve">
-    <value>Pin</value>
+    <value>Épingler</value>
   </data>
   <data name="Unpin" xml:space="preserve">
-    <value>Unpin</value>
+    <value>Désépingler</value>
   </data>
   <data name="ScreenMirror" xml:space="preserve">
     <value>Screen Mirror</value>
   </data>
   <data name="VideoSettings" xml:space="preserve">
-    <value>Video Settings</value>
+    <value>Réglages vidéo</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>Audio Settings</value>
+    <value>Réglages audio</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
-    <value>Open in app</value>
+    <value>Ouvrir dans l'app</value>
   </data>
   <data name="ScreenOff" xml:space="preserve">
     <value>Keep device screen off while mirroring</value>
@@ -396,7 +396,7 @@ mobile (Make sure the pin matches)</value>
     <value>Bitrate</value>
   </data>
   <data name="Resolution" xml:space="preserve">
-    <value>Resolution</value>
+    <value>Résolution</value>
   </data>
   <data name="Buffer" xml:space="preserve">
     <value>Buffer</value>
@@ -408,126 +408,126 @@ mobile (Make sure the pin matches)</value>
     <value>Select a conversation to view messages</value>
   </data>
   <data name="MessagePlaceholder" xml:space="preserve">
-    <value>Type a message</value>
+    <value>Écrivez un message…</value>
   </data>
   <data name="Apps" xml:space="preserve">
-    <value>Apps</value>
+    <value>Applis</value>
   </data>
   <data name="NewMessage" xml:space="preserve">
-    <value>New message</value>
+    <value>Nouveau message</value>
   </data>
   <data name="SearchMessages" xml:space="preserve">
-    <value>Search messages</value>
+    <value>Rechercher des messages</value>
   </data>
   <data name="AddressInputPlaceholder" xml:space="preserve">
-    <value>Enter phone number and press Enter</value>
+    <value>Entrez le numéro de téléphone et appuyez sur Entrée</value>
   </data>
   <data name="RemoveAddress" xml:space="preserve">
     <value>Remove address</value>
   </data>
   <data name="CopyMessage" xml:space="preserve">
-    <value>Copy message</value>
+    <value>Copier le message</value>
   </data>
   <data name="NoApps" xml:space="preserve">
-    <value>No apps found</value>
+    <value>Aucune application trouvée</value>
   </data>
   <data name="AllApps" xml:space="preserve">
-    <value>All Apps</value>
+    <value>Toutes les applis</value>
   </data>
   <data name="AdditionalArguments" xml:space="preserve">
-    <value>Additional arguments</value>
+    <value>Arguments supplémentaires</value>
   </data>
   <data name="AdbDeviceOffline" xml:space="preserve">
-    <value>Adb device is offline</value>
+    <value>L'appareil ADB est hors ligne</value>
   </data>
   <data name="AdbDeviceOfflineDescription" xml:space="preserve">
-    <value>Connect your device through USB with USB Debugging enabled and then try again</value>
+    <value>Connectez votre appareil via USB avec le débogage USB activé et réessayez</value>
   </data>
   <data name="Dismiss" xml:space="preserve">
-    <value>Dismiss</value>
+    <value>Rejeter</value>
   </data>
   <data name="ScrcpyNotFound" xml:space="preserve">
-    <value>Scrcpy not found</value>
+    <value>Scrcpy introuvable</value>
   </data>
   <data name="ScrcpyNotFoundDescription" xml:space="preserve">
-    <value>Select the folder where scrcpy is located</value>
+    <value>Sélectionnez le dossier où se trouve scrcpy</value>
   </data>
   <data name="PreferTcpIp" xml:space="preserve">
-    <value>Prefer wireless connection</value>
+    <value>Préférer la connexion sans fil</value>
   </data>
   <data name="SearchApps" xml:space="preserve">
-    <value>Search apps</value>
+    <value>Rechercher des applis</value>
   </data>
   <data name="DisableVideoForwarding" xml:space="preserve">
-    <value>Disable video forwarding</value>
+    <value>Désactiver le transfert vidéo</value>
   </data>
   <data name="VideoCodec" xml:space="preserve">
-    <value>Video codec</value>
+    <value>Codec vidéo</value>
   </data>
   <data name="FrameRate" xml:space="preserve">
-    <value>Frame rate</value>
+    <value>Fréquence d'images</value>
   </data>
   <data name="Crop" xml:space="preserve">
-    <value>Crop</value>
+    <value>Rogner</value>
   </data>
   <data name="Display" xml:space="preserve">
-    <value>Display</value>
+    <value>Affichage</value>
   </data>
   <data name="VirtualDisplaySize" xml:space="preserve">
-    <value>Virtual display size</value>
+    <value>Taille de l'affichage virtuel</value>
   </data>
   <data name="DisplayOrientation" xml:space="preserve">
-    <value>Display orientation</value>
+    <value>Orientation de l'écran</value>
   </data>
   <data name="RotationAngle" xml:space="preserve">
-    <value>Rotation angle</value>
+    <value>Angle de rotation</value>
   </data>
   <data name="AudioOutputMode" xml:space="preserve">
-    <value>Audio output</value>
+    <value>Sortie audio</value>
   </data>
   <data name="ForwardMicrophone" xml:space="preserve">
-    <value>Forward microphone</value>
+    <value>Transfert du microphone</value>
   </data>
   <data name="AudioOutputBuffer" xml:space="preserve">
-    <value>Audio output buffer</value>
+    <value>Tampon de sortie audio</value>
   </data>
   <data name="AudioCodec" xml:space="preserve">
-    <value>Audio codec</value>
+    <value>Codec audio</value>
   </data>
   <data name="AdbSettings" xml:space="preserve">
-    <value>Adb Settings</value>
+    <value>Réglages ADB</value>
   </data>
   <data name="AutoConnect" xml:space="preserve">
-    <value>Auto connect</value>
+    <value>Connexion automatique</value>
   </data>
   <data name="Both" xml:space="preserve">
-    <value>Both</value>
+    <value>Les deux</value>
   </data>
   <data name="DesktopDevice" xml:space="preserve">
-    <value>Desktop device</value>
+    <value>Appareil de bureau</value>
   </data>
   <data name="RemoteDevice" xml:space="preserve">
-    <value>Remote device</value>
+    <value>Appareil distant</value>
   </data>
   <data name="SelectDevice" xml:space="preserve">
-    <value>Select a device</value>
+    <value>Sélectionnez un appareil</value>
   </data>
   <data name="Start" xml:space="preserve">
-    <value>Start</value>
+    <value>Démarrer</value>
   </data>
   <data name="ScrcpyDevicePreference" xml:space="preserve">
-    <value>Device preference</value>
+    <value>Préférence de l'appareil</value>
   </data>
   <data name="AskEverytime" xml:space="preserve">
-    <value>Ask every time</value>
+    <value>Toujours demander</value>
   </data>
   <data name="Usb" xml:space="preserve">
     <value>USB</value>
   </data>
   <data name="WIFI" xml:space="preserve">
-    <value>WIFI</value>
+    <value>Wi-Fi</value>
   </data>
   <data name="Auto" xml:space="preserve">
-    <value>Auto</value>
+    <value>Automatique</value>
   </data>
 </root>
