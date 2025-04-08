@@ -139,7 +139,7 @@
     <value>Dépôt GitHub</value>
   </data>
   <data name="AndroidGitHubRepository" xml:space="preserve">
-    <value>Android GitHub Repository</value>
+    <value>Dépôt GitHub Android</value>
   </data>
   <data name="Clipboard" xml:space="preserve">
     <value>Presse-papiers</value>
@@ -157,28 +157,28 @@
     <value>Emplacement de sauvegarde</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Remote Storage Location</value>
+    <value>Emplacement de stockage à distance</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
-    <value>Show clipboard toast</value>
+    <value>Afficher le toast du presse-papiers</value>
   </data>
   <data name="ImageToClipboard" xml:space="preserve">
-    <value>Include images in clipboard monitor</value>
+    <value>Inclure des images dans le moniteur du presse-papiers</value>
   </data>
   <data name="ClipboardFiles" xml:space="preserve">
-    <value>Add received files to clipboard</value>
+    <value>Ajouter les fichiers reçus au presse-papiers</value>
   </data>
   <data name="NotificationsDescription" xml:space="preserve">
-    <value>Receive notifications from remote device</value>
+    <value>Recevoir des notifications de l'appareil distant</value>
   </data>
   <data name="GeneralSettings" xml:space="preserve">
     <value>Paramètres généraux</value>
   </data>
   <data name="ShowNotificationToast" xml:space="preserve">
-    <value>Show notification toast</value>
+    <value>Afficher les notifications toast</value>
   </data>
   <data name="IgnoreWindowsApps" xml:space="preserve">
-    <value>Ignore remote notifications from active Windows apps</value>
+    <value>Ignorer les notifications à distance provenant d'applications Windows actives</value>
   </data>
   <data name="NotificationFilterDisabled.Content" xml:space="preserve">
     <value>Désactivé</value>
@@ -187,7 +187,7 @@
     <value>Fil de notification</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>Notification Feed + Toast</value>
+    <value>Fil de notification + Toast</value>
   </data>
   <data name="PairedDevices.Title" xml:space="preserve">
     <value>Appareils appairés</value>
@@ -196,13 +196,13 @@
     <value>Appareils disponibles</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
-    <value>Android devices that are running the app in the same network will show up below</value>
+    <value>Les appareils Android qui utilisent l'application dans le même réseau s'afficheront ci-dessous</value>
   </data>
   <data name="StartupOption" xml:space="preserve">
     <value>Option de démarrage</value>
   </data>
   <data name="StartupOptionDescription" xml:space="preserve">
-    <value>Choose how the app starts when Windows boots</value>
+    <value>Choisissez le mode de démarrage de l'application au démarrage de Windows</value>
   </data>
   <data name="StartupOptionMinimized.Content" xml:space="preserve">
     <value>Démarrer minimisé</value>
@@ -244,8 +244,7 @@
     <value>Bienvenue sur Sefirah</value>
   </data>
   <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
-    <value>To get started download and install the comapanion app through the corresponding github
-page.</value>
+    <value>Pour commencer, téléchargez et installez l'application via la page GitHub correspondante.</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
     <value>Commencer</value>
@@ -257,14 +256,14 @@ page.</value>
     <value>Connectez votre appareil</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>Discovered devices in your network will appear below, and initiate the connection from your
-mobile (Make sure the pin matches)</value>
+    <value>Les appareils découverts dans votre réseau apparaîtront ci-dessous, et vous pourrez initier la
+connexion à partir de votre téléphone (assurez-vous que le code pin correspond).</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>Device Connection Request</value>
+    <value>Demande de connexion de l'appareil</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
-    <value>Verify the passkey matches on both devices:</value>
+    <value>Vérifiez que la clé d'accès correspond sur les deux appareils :</value>
   </data>
   <data name="ConnectionRequestRejectButton" xml:space="preserve">
     <value>Refuser</value>
@@ -285,13 +284,13 @@ mobile (Make sure the pin matches)</value>
     <value>GitHub</value>
   </data>
   <data name="ClipboardDescription" xml:space="preserve">
-    <value>Sync your clipboard across devices</value>
+    <value>Synchronisez votre presse-papiers sur tous les appareils</value>
   </data>
   <data name="StartupOptionsDescription" xml:space="preserve">
-    <value>Choose how the app starts when Windows boots</value>
+    <value>Choisissez le mode de démarrage de l'application au démarrage de Windows</value>
   </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
-    <value>Open links in browser</value>
+    <value>Ouvrir les liens dans le navigateur</value>
   </data>
   <data name="Connected.Text" xml:space="preserve">
     <value>Connecté</value>
@@ -315,37 +314,37 @@ mobile (Make sure the pin matches)</value>
     <value>Êtes-vous sûr de vouloir supprimer '{0}' ? Cette action ne peut être annulée.</value>
   </data>
   <data name="AppSpecificSettings" xml:space="preserve">
-    <value>App-specific Settings</value>
+    <value>Réglages spécifiques à l'application</value>
   </data>
   <data name="TransferNotificationReceiving.Content" xml:space="preserve">
-    <value>Receiving {0}</value>
+    <value>Réception de {0}</value>
   </data>
   <data name="TransferNotificationReceivingError" xml:space="preserve">
-    <value>Error while receiving {0}</value>
+    <value>Erreur lors de la réception de {0}</value>
   </data>
   <data name="TransferNotificationReceiving.Title" xml:space="preserve">
-    <value>Receiving File</value>
+    <value>Réception du fichier</value>
   </data>
   <data name="TransferNotificationReceived.Title" xml:space="preserve">
-    <value>Received File</value>
+    <value>Fichier reçu</value>
   </data>
   <data name="TransferNotification.Title" xml:space="preserve">
-    <value>File Transfer</value>
+    <value>Transfert de fichier</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>Envoyer</value>
   </data>
   <data name="ReplyPlaceholder" xml:space="preserve">
-    <value>Type a reply</value>
+    <value>Tapez une réponse</value>
   </data>
   <data name="TransferNotificationActionOpenFile" xml:space="preserve">
-    <value>Open file</value>
+    <value>Ouvrir le fichier</value>
   </data>
   <data name="TransferNotificationActionOpenFolder" xml:space="preserve">
-    <value>Open folder</value>
+    <value>Ouvrir le dossier</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
-    <value>Turn off notifications from {0}</value>
+    <value>Désactiver les notifications de {0}</value>
   </data>
   <data name="SubmitBugReport" xml:space="preserve">
     <value>Signaler un bug</value>
@@ -354,7 +353,7 @@ mobile (Make sure the pin matches)</value>
     <value>Demande de fonctionnalité</value>
   </data>
   <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
-    <value>Do not show notification toast when phone is in DND</value>
+    <value>Ne pas afficher les notifications toast lorsque le téléphone est en mode NPD</value>
   </data>
   <data name="Devices" xml:space="preserve">
     <value>Appareils</value>
@@ -375,7 +374,7 @@ mobile (Make sure the pin matches)</value>
     <value>Désépingler</value>
   </data>
   <data name="ScreenMirror" xml:space="preserve">
-    <value>Screen Mirror</value>
+    <value>Miroir d'écran</value>
   </data>
   <data name="VideoSettings" xml:space="preserve">
     <value>Réglages vidéo</value>
@@ -387,7 +386,7 @@ mobile (Make sure the pin matches)</value>
     <value>Ouvrir dans l'app</value>
   </data>
   <data name="ScreenOff" xml:space="preserve">
-    <value>Keep device screen off while mirroring</value>
+    <value>Maintenir l'écran de l'appareil éteint pendant la mise en miroir</value>
   </data>
   <data name="PhysicalKeyboard" xml:space="preserve">
     <value>Disable on-screen keyboard</value>
