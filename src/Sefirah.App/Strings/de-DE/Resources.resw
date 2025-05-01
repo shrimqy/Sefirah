@@ -181,10 +181,10 @@
     <value>Remote-Benachrichtigungen von aktiven Windows-Apps ignorieren</value>
   </data>
   <data name="NotificationFilterDisabled.Content" xml:space="preserve">
-    <value>Disabled</value>
+    <value>Deaktiviert</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Notification Feed</value>
+    <value>Benachrichtigungs-Feed</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
     <value>Notification Feed + Toast</value>
@@ -199,10 +199,10 @@
     <value>Android devices that are running the app in the same network will show up below</value>
   </data>
   <data name="StartupOption" xml:space="preserve">
-    <value>Startup option</value>
+    <value>Startoptionen</value>
   </data>
   <data name="StartupOptionDescription" xml:space="preserve">
-    <value>Choose how the app starts when Windows boots</value>
+    <value>Wählen Sie, wie die App startet, wenn Windows startet</value>
   </data>
   <data name="StartupOptionMinimized.Content" xml:space="preserve">
     <value>Minimiert starten</value>
@@ -211,7 +211,7 @@
     <value>Maximiert starten</value>
   </data>
   <data name="StartupOptionSystemTray.Content" xml:space="preserve">
-    <value>Start in system tray</value>
+    <value>In die Symbolleiste starten</value>
   </data>
   <data name="StartupOptionDisabled.Content" xml:space="preserve">
     <value>Deaktiviert</value>
@@ -220,7 +220,7 @@
     <value>Darstellung</value>
   </data>
   <data name="ThemeDescription" xml:space="preserve">
-    <value>Choose your default app theme</value>
+    <value>Wählen Sie Ihr Standard-App-Theme</value>
   </data>
   <data name="Default" xml:space="preserve">
     <value>Standard</value>
@@ -350,10 +350,10 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
     <value>Fehler melden</value>
   </data>
   <data name="SubmitFeatureRequest" xml:space="preserve">
-    <value>Feature request</value>
+    <value>Funktion vorschlagen</value>
   </data>
   <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
-    <value>Do not show notification toast when phone is in DND</value>
+    <value>Zeige keine Benachrichtigungen, wann das Handy auf "Bitte nicht stören" gestellt ist</value>
   </data>
   <data name="Devices" xml:space="preserve">
     <value>Geräte</value>
@@ -368,10 +368,10 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
     <value>Vibrieren</value>
   </data>
   <data name="Pin" xml:space="preserve">
-    <value>Pin</value>
+    <value>Anheften</value>
   </data>
   <data name="Unpin" xml:space="preserve">
-    <value>Unpin</value>
+    <value>Loslösen</value>
   </data>
   <data name="ScreenMirror" xml:space="preserve">
     <value>Bildschirmspiegelung</value>
@@ -386,7 +386,7 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
     <value>In App öffnen</value>
   </data>
   <data name="ScreenOff" xml:space="preserve">
-    <value>Keep device screen off while mirroring</value>
+    <value>Bildschirm während des Spiegelns ausschaltet lassen</value>
   </data>
   <data name="PhysicalKeyboard" xml:space="preserve">
     <value>Bildschirmtastatur deaktivieren</value>
@@ -404,7 +404,7 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
     <value>Nachrichten</value>
   </data>
   <data name="EmptyMessages" xml:space="preserve">
-    <value>Select a conversation to view messages</value>
+    <value>Wählen Sie eine Konversation um Nachrichten anzusehen</value>
   </data>
   <data name="MessagePlaceholder" xml:space="preserve">
     <value>Eine Nachricht schreiben</value>
@@ -419,7 +419,7 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
     <value>Nachrichten durchsuchen</value>
   </data>
   <data name="AddressInputPlaceholder" xml:space="preserve">
-    <value>Enter phone number and press Enter</value>
+    <value>Gib eine Telefonnummer ein und drücke die Eingabetaste</value>
   </data>
   <data name="RemoveAddress" xml:space="preserve">
     <value>Adresse entfernen</value>
@@ -434,97 +434,97 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
     <value>Alle Apps</value>
   </data>
   <data name="AdditionalArguments" xml:space="preserve">
-    <value>Additional arguments</value>
+    <value>Zusätzliche Argumente</value>
   </data>
   <data name="AdbDeviceOffline" xml:space="preserve">
-    <value>Adb device is offline</value>
+    <value>ADB-Gerät ist offline</value>
   </data>
   <data name="AdbDeviceOfflineDescription" xml:space="preserve">
-    <value>Connect your device through USB with USB Debugging enabled and then try again</value>
+    <value>Verbinden Sie Ihr Gerät über USB mit aktiviertem USB-Debugging und versuchen Sie es erneut</value>
   </data>
   <data name="Dismiss" xml:space="preserve">
     <value>Dismiss</value>
   </data>
   <data name="ScrcpyNotFound" xml:space="preserve">
-    <value>Scrcpy not found</value>
+    <value>Scrcpy wurde nicht gefunden</value>
   </data>
   <data name="ScrcpyNotFoundDescription" xml:space="preserve">
-    <value>Select the folder where scrcpy is located</value>
+    <value>Wählen Sie den Ordner, in dem sich scrcpy befindet</value>
   </data>
   <data name="PreferTcpIp" xml:space="preserve">
-    <value>Prefer wireless connection</value>
+    <value>Drahtlose Verbindung bevorzugen</value>
   </data>
   <data name="SearchApps" xml:space="preserve">
     <value>Search apps</value>
   </data>
   <data name="DisableVideoForwarding" xml:space="preserve">
-    <value>Disable video forwarding</value>
+    <value>Video-Weiterleitung deaktivieren</value>
   </data>
   <data name="VideoCodec" xml:space="preserve">
-    <value>Video codec</value>
+    <value>Video-Codec</value>
   </data>
   <data name="FrameRate" xml:space="preserve">
-    <value>Frame rate</value>
+    <value>Bildwiederholrate</value>
   </data>
   <data name="Crop" xml:space="preserve">
-    <value>Crop</value>
+    <value>Zuschneiden</value>
   </data>
   <data name="Display" xml:space="preserve">
     <value>Display</value>
   </data>
   <data name="VirtualDisplaySize" xml:space="preserve">
-    <value>Virtual display size</value>
+    <value>Virtuelle Displaygröße</value>
   </data>
   <data name="DisplayOrientation" xml:space="preserve">
-    <value>Display orientation</value>
+    <value>Bildschirmausrichtung</value>
   </data>
   <data name="RotationAngle" xml:space="preserve">
-    <value>Rotation angle</value>
+    <value>Drehwinkel</value>
   </data>
   <data name="AudioOutputMode" xml:space="preserve">
-    <value>Audio output</value>
+    <value>Audioausgabe</value>
   </data>
   <data name="ForwardMicrophone" xml:space="preserve">
-    <value>Forward microphone</value>
+    <value>Mikrofon weiterleiten</value>
   </data>
   <data name="AudioOutputBuffer" xml:space="preserve">
-    <value>Audio output buffer</value>
+    <value>Audio-Ausgabepuffer</value>
   </data>
   <data name="AudioCodec" xml:space="preserve">
-    <value>Audio codec</value>
+    <value>Audio-Codec</value>
   </data>
   <data name="AdbSettings" xml:space="preserve">
-    <value>Adb Settings</value>
+    <value>ADB-Einstellungen</value>
   </data>
   <data name="AutoConnect" xml:space="preserve">
-    <value>Auto connect</value>
+    <value>Automatisch verbinden</value>
   </data>
   <data name="Both" xml:space="preserve">
-    <value>Both</value>
+    <value>Beide</value>
   </data>
   <data name="DesktopDevice" xml:space="preserve">
-    <value>Desktop device</value>
+    <value>Desktop-Gerät</value>
   </data>
   <data name="RemoteDevice" xml:space="preserve">
-    <value>Remote device</value>
+    <value>Remote-Gerät</value>
   </data>
   <data name="SelectDevice" xml:space="preserve">
-    <value>Select a device</value>
+    <value>Ein Gerät wählen</value>
   </data>
   <data name="Start" xml:space="preserve">
     <value>Start</value>
   </data>
   <data name="ScrcpyDevicePreference" xml:space="preserve">
-    <value>Device preference</value>
+    <value>Geräteeinstellungen</value>
   </data>
   <data name="AskEverytime" xml:space="preserve">
-    <value>Ask every time</value>
+    <value>Jedes Mal fragen</value>
   </data>
   <data name="Usb" xml:space="preserve">
     <value>USB</value>
   </data>
   <data name="WIFI" xml:space="preserve">
-    <value>WIFI</value>
+    <value>WLAN</value>
   </data>
   <data name="Auto" xml:space="preserve">
     <value>Auto</value>
