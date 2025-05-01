@@ -133,7 +133,7 @@
     <value>Entwicklung unterstützen</value>
   </data>
   <data name="OpenLogs" xml:space="preserve">
-    <value>Open Logs</value>
+    <value>Protokolle öffnen</value>
   </data>
   <data name="GitHubRepository" xml:space="preserve">
     <value>GitHub-Repository</value>
@@ -151,13 +151,13 @@
     <value>Benachrichtigungen</value>
   </data>
   <data name="ThirdPartyLibraries" xml:space="preserve">
-    <value>Third party libraries</value>
+    <value>Drittanbieter-Bibliotheken</value>
   </data>
   <data name="SaveLocation" xml:space="preserve">
-    <value>Save Location</value>
+    <value>Speicherort festlegen</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Remote Storage Location</value>
+    <value>Remote-Speicherort</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>Show clipboard toast</value>
@@ -169,7 +169,7 @@
     <value>Add received files to clipboard</value>
   </data>
   <data name="NotificationsDescription" xml:space="preserve">
-    <value>Receive notifications from remote device</value>
+    <value>Erhalte Benachrichtigungen vom Remote-Gerät</value>
   </data>
   <data name="GeneralSettings" xml:space="preserve">
     <value>Allgemeine Einstellungen</value>
@@ -178,7 +178,7 @@
     <value>Show notification toast</value>
   </data>
   <data name="IgnoreWindowsApps" xml:space="preserve">
-    <value>Ignore remote notifications from active Windows apps</value>
+    <value>Remote-Benachrichtigungen von aktiven Windows-Apps ignorieren</value>
   </data>
   <data name="NotificationFilterDisabled.Content" xml:space="preserve">
     <value>Disabled</value>
@@ -241,11 +241,10 @@
     <value>Abbrechen</value>
   </data>
   <data name="OnboardingWelcome.Title" xml:space="preserve">
-    <value>Welcome to Sefirah</value>
+    <value>Willkommen bei Sefirah</value>
   </data>
   <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
-    <value>To get started download and install the comapanion app through the corresponding github
-page.</value>
+    <value>Um loszulegen, lade die Comapanion App auf der entsprechenden GitHub-Seite herunter und installiere sie.</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
     <value>Erste Schritte</value>
@@ -257,20 +256,20 @@ page.</value>
     <value>Verbinde dein Gerät</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>Discovered devices in your network will appear below, and initiate the connection from your
-mobile (Make sure the pin matches)</value>
+    <value>In Ihrem Netzwerk entdeckte Geräte werden unten erscheinen. Die Verbindung wird dann von Ihrem
+Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>Device Connection Request</value>
+    <value>Geräteverbindungsanfrage</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
-    <value>Verify the passkey matches on both devices:</value>
+    <value>Überprüfen Sie, dass der Schlüssel auf beiden Geräten übereinstimmt:</value>
   </data>
   <data name="ConnectionRequestRejectButton" xml:space="preserve">
     <value>Ablehnen</value>
   </data>
   <data name="NotificationsClearButton" xml:space="preserve">
-    <value>Clear all</value>
+    <value>Alles leeren</value>
   </data>
   <data name="ConnectionRequestAcceptButton" xml:space="preserve">
     <value>Annehmen</value>
@@ -279,16 +278,16 @@ mobile (Make sure the pin matches)</value>
     <value>Keine Geräte gefunden</value>
   </data>
   <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
-    <value>PASSKEY</value>
+    <value>SCHLÜSSEL</value>
   </data>
   <data name="GitHub" xml:space="preserve">
     <value>GitHub</value>
   </data>
   <data name="ClipboardDescription" xml:space="preserve">
-    <value>Sync your clipboard across devices</value>
+    <value>Zwischenablage zwischen Geräten synchronisieren</value>
   </data>
   <data name="StartupOptionsDescription" xml:space="preserve">
-    <value>Choose how the app starts when Windows boots</value>
+    <value>Wählen Sie, wie die App startet, wenn Windows startet</value>
   </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
     <value>Links im Browser öffnen</value>
@@ -309,22 +308,22 @@ mobile (Make sure the pin matches)</value>
     <value>Features</value>
   </data>
   <data name="SelectLocation" xml:space="preserve">
-    <value>Select location</value>
+    <value>Speicherort auswählen</value>
   </data>
   <data name="RemoveDeviceDialogSubtitle" xml:space="preserve">
     <value>Möchtest du '{0}' wirklich entfernen? Diese Aktion kann nicht rückgängig gemacht werden.</value>
   </data>
   <data name="AppSpecificSettings" xml:space="preserve">
-    <value>App-specific Settings</value>
+    <value>App-spezifische Einstellungen</value>
   </data>
   <data name="TransferNotificationReceiving.Content" xml:space="preserve">
-    <value>Receiving {0}</value>
+    <value>Empfange {0}</value>
   </data>
   <data name="TransferNotificationReceivingError" xml:space="preserve">
-    <value>Error while receiving {0}</value>
+    <value>Fehler beim Empfang von {0}</value>
   </data>
   <data name="TransferNotificationReceiving.Title" xml:space="preserve">
-    <value>Receiving File</value>
+    <value>Empfange Datei</value>
   </data>
   <data name="TransferNotificationReceived.Title" xml:space="preserve">
     <value>Empfangene Datei</value>
@@ -336,7 +335,7 @@ mobile (Make sure the pin matches)</value>
     <value>Senden</value>
   </data>
   <data name="ReplyPlaceholder" xml:space="preserve">
-    <value>Type a reply</value>
+    <value>Antwort eingeben</value>
   </data>
   <data name="TransferNotificationActionOpenFile" xml:space="preserve">
     <value>Datei öffnen</value>
@@ -345,10 +344,10 @@ mobile (Make sure the pin matches)</value>
     <value>Ordner öffnen</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
-    <value>Turn off notifications from {0}</value>
+    <value>Benachrichtigungen von {0} deaktivieren</value>
   </data>
   <data name="SubmitBugReport" xml:space="preserve">
-    <value>Report a bug</value>
+    <value>Fehler melden</value>
   </data>
   <data name="SubmitFeatureRequest" xml:space="preserve">
     <value>Feature request</value>
