@@ -160,13 +160,13 @@
     <value>נתיב שמירת קבצים במכשיר מרוחק</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
-    <value>Show clipboard toast</value>
+    <value>הצג התראות סנכרון לוח העתקה במחשב</value>
   </data>
   <data name="ImageToClipboard" xml:space="preserve">
-    <value>Include images in clipboard monitor</value>
+    <value>כלול תמונות בסנכרון לוח העתקה</value>
   </data>
   <data name="ClipboardFiles" xml:space="preserve">
-    <value>Add received files to clipboard</value>
+    <value>שמירת קבצים שנשלחים מהטלפון בלוח העתקה באופן אוטומטי</value>
   </data>
   <data name="NotificationsDescription" xml:space="preserve">
     <value>Receive notifications from remote device</value>
