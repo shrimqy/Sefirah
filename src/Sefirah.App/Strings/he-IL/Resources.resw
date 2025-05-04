@@ -169,34 +169,34 @@
     <value>שמירת קבצים שנשלחים מהטלפון בלוח העתקה באופן אוטומטי</value>
   </data>
   <data name="NotificationsDescription" xml:space="preserve">
-    <value>Receive notifications from remote device</value>
+    <value>קבלת התראות ממכשיר מרוחק</value>
   </data>
   <data name="GeneralSettings" xml:space="preserve">
-    <value>General Settings</value>
+    <value>הגדרות כלליות</value>
   </data>
   <data name="ShowNotificationToast" xml:space="preserve">
-    <value>Show notification toast</value>
+    <value>הצג התראות Windows על התראות ממכשיר מרוחק</value>
   </data>
   <data name="IgnoreWindowsApps" xml:space="preserve">
     <value>Ignore remote notifications from active Windows apps</value>
   </data>
   <data name="NotificationFilterDisabled.Content" xml:space="preserve">
-    <value>Disabled</value>
+    <value>מושבת</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Notification Feed</value>
+    <value>הצג בפיד ההתראות</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>Notification Feed + Toast</value>
+    <value>הצג בפיד ההתראות וכהתראת Windows</value>
   </data>
   <data name="PairedDevices.Title" xml:space="preserve">
-    <value>Paired Devices</value>
+    <value>התקנים מוצמדים</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
-    <value>Available Devices</value>
+    <value>התקנים זמינים</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
-    <value>Android devices that are running the app in the same network will show up below</value>
+    <value>מכשירי אנדרואיד המריצים את האפליקציה ונמצאים באותה רשת יופיעו כאן למטה</value>
   </data>
   <data name="StartupOption" xml:space="preserve">
     <value>Startup option</value>
