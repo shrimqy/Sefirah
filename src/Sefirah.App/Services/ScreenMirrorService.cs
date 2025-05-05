@@ -8,6 +8,8 @@ using Sefirah.App.Data.Models;
 using Sefirah.App.Extensions;
 using Sefirah.App.Utils;
 using Sefirah.App.ViewModels.Settings;
+using System.Text;
+using Windows.ApplicationModel.DataTransfer;
 
 namespace Sefirah.App.Services;
 public class ScreenMirrorService(
@@ -21,9 +23,11 @@ public class ScreenMirrorService(
     private List<Process> scrcpyProcesses = []; // what was this for anyway
     private CancellationTokenSource? cts;
     private Microsoft.UI.Dispatching.DispatcherQueue dispatcher = MainWindow.Instance.DispatcherQueue;
+    private StringBuilder scrcpyErrorOutput = new();
     
     public async Task<bool> StartScrcpy(string? customArgs = null)
     {
+        Process? process = null; // Declare process here to access in finally block
         try
         {
             var scrcpyPath = userSettingsService.FeatureSettingsService.ScrcpyPath;
@@ -101,10 +105,12 @@ public class ScreenMirrorService(
             var args = BuildScrcpyArguments(customArgs, selectedDeviceSerial);
             
             cts = new CancellationTokenSource();
+            scrcpyErrorOutput.Clear();
             
-            return await Task.Run(() =>
+            // Run the process management in a background task
+            return await Task.Run(async () =>
             {
-                var process = new Process
+                process = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
@@ -124,39 +130,78 @@ public class ScreenMirrorService(
                         logger.Info($"scrcpy: {e.Data}");
                 };
                 
-                process.ErrorDataReceived += (sender, e) => 
+                process.ErrorDataReceived += (sender, e) =>
                 {
                     if (!string.IsNullOrEmpty(e.Data))
+                    {
                         logger.Error($"scrcpy error: {e.Data}");
+                        scrcpyErrorOutput.AppendLine(e.Data);
+                    }
                 };
                 
                 process.Exited += (sender, e) =>
                 {
-                    logger.Info($"scrcpy process exited with code {process.ExitCode}");
-                    process?.Dispose();
-                    cts?.Dispose();
-                    cts = null;
+                     logger.Info($"[Exited Event] scrcpy process terminated.");
                 };
                 
                 bool started = process.Start();
-                if (started)
-                {
-                    process.BeginOutputReadLine();
-                    process.BeginErrorReadLine();
-                    logger.Info("scrcpy process started successfully");
-                }
-                else
+                if (!started)
                 {
                     logger.Error("Failed to start scrcpy process");
+                    return false;
                 }
                 
-                return started;
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+                logger.Info("scrcpy process started successfully and readers initiated.");
+                
+                await process.WaitForExitAsync(cts.Token);
+                logger.Info($"scrcpy process finished execution with code {process.ExitCode}.");
+                
+                if (process.ExitCode != 0 || scrcpyErrorOutput.Length > 0)
+                {
+                    var errorMessage = $"Scrcpy process exited with code {process.ExitCode}.\n\nOutput:\n{scrcpyErrorOutput.ToString().TrimEnd()}";
+                    logger.Error($"Scrcpy failed: {errorMessage}");
+
+                    await dispatcher.EnqueueAsync(async () =>
+                    {
+                        var scrollViewer = new ScrollViewer
+                        {
+                            VerticalScrollBarVisibility = ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = ScrollBarVisibility.Auto, MaxHeight = 300,
+                            Content = new TextBlock { Text = errorMessage, IsTextSelectionEnabled = true, TextWrapping = TextWrapping.Wrap }
+                        };
+                        var errorDialog = new ContentDialog
+                        {
+                            XamlRoot = MainWindow.Instance.Content.XamlRoot, 
+                            Title = "ScrcpyErrorTitle".GetLocalizedResource(),
+                            Content = scrollViewer, 
+                            CloseButtonText = "Dismiss".GetLocalizedResource(), 
+                            SecondaryButtonText = "CopyError".GetLocalizedResource()
+                        };
+                        var result = await errorDialog.ShowAsync();
+                        if (result == ContentDialogResult.Secondary)
+                        {
+                            var dataPackage = new DataPackage(); dataPackage.SetText(errorMessage); Clipboard.SetContent(dataPackage);
+                            logger.Info("Scrcpy error output copied to clipboard.");
+                        }
+                    });
+                    return false;
+                }
+                
+                logger.Info("scrcpy process completed successfully.");
+                return true;
             }, cts.Token);
         }
         catch (Exception ex)
         {
-            logger.Error("Error starting scrcpy process", ex);
+            logger.Error("Error during scrcpy execution", ex);
             return false;
+        }
+        finally
+        {
+            process?.Dispose();
+            cts?.Dispose();
+            cts = null;
         }
     }
     
@@ -284,8 +329,7 @@ public class ScreenMirrorService(
         
         // Get feature settings
         var settings = userSettingsService.FeatureSettingsService;
-        
-        // Add settings-based arguments
+       
 
         // General settings
         if (settings.ScreenOff)
@@ -348,7 +392,7 @@ public class ScreenMirrorService(
         
         if (!string.IsNullOrEmpty(settings.VirtualDisplaySize))
         {
-            args.Add($"--virtual-display-dimensions={settings.VirtualDisplaySize}");
+            args.Add($"--new-display={settings.VirtualDisplaySize}");
         }
         
         // Audio settings
@@ -364,7 +408,7 @@ public class ScreenMirrorService(
         
         if (settings.ForwardMicrophone)
         {
-            args.Add("-audio-source=mic");
+            args.Add("--audio-source=mic");
         }
 
         switch (settings.AudioOutputMode)
