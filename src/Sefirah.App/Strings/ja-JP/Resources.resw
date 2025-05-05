@@ -534,4 +534,7 @@
   <data name="CopyError" xml:space="preserve">
     <value>Copy error</value>
   </data>
+  <data name="DeviceName" xml:space="preserve">
+    <value>Device name</value>
+  </data>
 </root>
