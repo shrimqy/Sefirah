@@ -6,11 +6,11 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:data="using:Sefirah.App.Data.Models"
     xmlns:dataEntity="using:Sefirah.App.Data.AppDatabase.Models"
-    xmlns:local="using:Sefirah.App.UserControls"
     xmlns:helpers="using:Sefirah.App.Helpers"
+    xmlns:local="using:Sefirah.App.UserControls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="using:Sefirah.App.ViewModels.Settings"
     xmlns:system="using:System"
+    xmlns:vm="using:Sefirah.App.ViewModels.Settings"
     x:Name="FeaturePage"
     mc:Ignorable="d">
 
@@ -38,36 +38,28 @@
             <!--  Clipboard Settings  -->
             <local:SettingsBlockControl
                 Title="{helpers:ResourceString Name=Clipboard}"
+                ContentPadding="-16"
                 Description="{helpers:ResourceString Name=ClipboardDescription}"
-                IsExpanded="{x:Bind ViewModel.IsClipboardExpanded, Mode=TwoWay}"
-                ContentPadding="-16">
+                IsExpanded="{x:Bind ViewModel.IsClipboardExpanded, Mode=TwoWay}">
                 <local:SettingsBlockControl.Icon>
                     <FontIcon Glyph="&#xF0E3;" />
                 </local:SettingsBlockControl.Icon>
                 <ToggleSwitch Margin="-7,-3,-75,-3" IsOn="{x:Bind ViewModel.ClipboardSyncEnabled, Mode=TwoWay}" />
                 <local:SettingsBlockControl.ExpandableContent>
                     <StackPanel>
-                        <local:SettingsBlockControl 
-                            Title="{helpers:ResourceString Name=OpenLinksInBrowser}"
-                            CornerRadius="0">
+                        <local:SettingsBlockControl Title="{helpers:ResourceString Name=OpenLinksInBrowser}" CornerRadius="0">
                             <CheckBox Margin="-7,-3,-75,-3" IsChecked="{x:Bind ViewModel.OpenLinksInBrowser, Mode=TwoWay}" />
                         </local:SettingsBlockControl>
-                        
-                        <local:SettingsBlockControl 
-                            Title="{helpers:ResourceString Name=ShowClipboardToast}"
-                            CornerRadius="0">
+
+                        <local:SettingsBlockControl Title="{helpers:ResourceString Name=ShowClipboardToast}" CornerRadius="0">
                             <CheckBox Margin="-7,-3,-75,-3" IsChecked="{x:Bind ViewModel.ShowClipboardToast, Mode=TwoWay}" />
                         </local:SettingsBlockControl>
-                        
-                        <local:SettingsBlockControl 
-                            Title="{helpers:ResourceString Name=ClipboardFiles}"
-                            CornerRadius="0">
+
+                        <local:SettingsBlockControl Title="{helpers:ResourceString Name=ClipboardFiles}" CornerRadius="0">
                             <CheckBox Margin="-7,-3,-75,-3" IsChecked="{x:Bind ViewModel.ClipboardFilesEnabled, Mode=TwoWay}" />
                         </local:SettingsBlockControl>
-                        
-                        <local:SettingsBlockControl 
-                            Title="{helpers:ResourceString Name=ImageToClipboard}"
-                            CornerRadius="0">
+
+                        <local:SettingsBlockControl Title="{helpers:ResourceString Name=ImageToClipboard}" CornerRadius="0">
                             <CheckBox Margin="-7,-3,-75,-3" IsChecked="{x:Bind ViewModel.ImageToClipboardEnabled, Mode=TwoWay}" />
                         </local:SettingsBlockControl>
                     </StackPanel>
@@ -90,29 +82,23 @@
                 <local:SettingsBlockControl.ExpandableContent>
                     <StackPanel>
                         <!--  General Notification Settings as an expander  -->
-                        <local:SettingsBlockControl 
-                            Title="{helpers:ResourceString Name=ShowNotificationToast}"
-                            CornerRadius="0">
+                        <local:SettingsBlockControl Title="{helpers:ResourceString Name=ShowNotificationToast}" CornerRadius="0">
                             <CheckBox Margin="-7,-3,-75,-3" IsChecked="{x:Bind ViewModel.ShowNotificationToast, Mode=TwoWay}" />
                         </local:SettingsBlockControl>
-                                    
-                        <local:SettingsBlockControl 
-                            Title="{helpers:ResourceString Name=IgnoreWindowsApps}"
-                            CornerRadius="0">
+
+                        <local:SettingsBlockControl Title="{helpers:ResourceString Name=IgnoreWindowsApps}" CornerRadius="0">
                             <CheckBox Margin="-7,-3,-75,-3" IsChecked="{x:Bind ViewModel.IgnoreWindowsApps, Mode=TwoWay}" />
                         </local:SettingsBlockControl>
-                                    
-                        <local:SettingsBlockControl 
-                            Title="{helpers:ResourceString Name=IgnoreNotificationDuringDnd}"
-                            CornerRadius="0">
+
+                        <local:SettingsBlockControl Title="{helpers:ResourceString Name=IgnoreNotificationDuringDnd}" CornerRadius="0">
                             <CheckBox Margin="-7,-3,-75,-3" IsChecked="{x:Bind ViewModel.IgnoreNotificationDuringDnd, Mode=TwoWay}" />
                         </local:SettingsBlockControl>
 
                         <!--  App-Specific Settings  -->
                         <local:SettingsBlockControl
                             Title="{helpers:ResourceString Name=AppSpecificSettings}"
-                            CornerRadius="0"
                             ContentPadding="-16"
+                            CornerRadius="0"
                             IsExpanded="{x:Bind ViewModel.IsAppNotificationExpanded, Mode=TwoWay}">
                             <local:SettingsBlockControl.Icon>
                                 <FontIcon Glyph="&#xE7F4;" />
@@ -121,11 +107,12 @@
                                 <ItemsControl ItemsSource="{x:Bind ViewModel.NotificationPreferences, Mode=OneWay}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="dataEntity:ApplicationInfoEntity">
-                                            <local:SettingsBlockControl
-                                                Title="{x:Bind AppName}"
-                                                CornerRadius="0">
+                                            <local:SettingsBlockControl Title="{x:Bind AppName}" CornerRadius="0">
                                                 <local:SettingsBlockControl.Icon>
-                                                    <Image Width="32" Height="32" Source="{x:Bind AppIcon}" />
+                                                    <Image
+                                                        Width="32"
+                                                        Height="32"
+                                                        Source="{x:Bind AppIcon}" />
                                                 </local:SettingsBlockControl.Icon>
                                                 <Button Content="{x:Bind NotificationFilter, Mode=OneWay, Converter={StaticResource NotificationFilterConverter}}">
                                                     <Button.Flyout>
@@ -168,20 +155,20 @@
             </local:SettingsBlockControl>
 
             <!--  Screen Mirror  -->
-            <local:SettingsBlockControl 
+            <local:SettingsBlockControl
                 Title="{helpers:ResourceString Name=ScreenMirror}"
-                Description="{x:Bind ViewModel.ScrcpyPath, Mode=OneWay}" 
                 ContentPadding="0"
+                Description="{x:Bind ViewModel.ScrcpyPath, Mode=OneWay}"
                 IsExpanded="{x:Bind ViewModel.IsScreenMirrorExpanded, Mode=TwoWay}">
                 <local:SettingsBlockControl.Icon>
                     <FontIcon Glyph="&#xEC15;" />
                 </local:SettingsBlockControl.Icon>
                 <local:SettingsBlockControl.SettingsActionableElement>
-                    <Button Content="{helpers:ResourceString Name=SelectLocation}" Click="SelectScrcpyLocation_Click" />
+                    <Button Click="SelectScrcpyLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
                 </local:SettingsBlockControl.SettingsActionableElement>
                 <local:SettingsBlockControl.ExpandableContent>
                     <StackPanel Spacing="5">
-                        <!-- General Settings Section - Convert to expander -->
+                        <!--  General Settings Section - Convert to expander  -->
                         <local:SettingsBlockControl
                             Title="{helpers:ResourceString Name=GeneralSettings}"
                             ContentPadding="-16"
@@ -191,54 +178,48 @@
                             </local:SettingsBlockControl.Icon>
                             <local:SettingsBlockControl.ExpandableContent>
                                 <StackPanel>
-                                    <local:SettingsBlockControl 
-                                        Title="{helpers:ResourceString Name=ScrcpyDevicePreference}"
-                                        CornerRadius="0">
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=ScrcpyDevicePreference}" CornerRadius="0">
                                         <local:SettingsBlockControl.SettingsActionableElement>
-                                            <ComboBox 
+                                            <ComboBox
                                                 Width="150"
                                                 ItemsSource="{x:Bind ViewModel.ScrcpyDevicePreferenceOptions.Values}"
                                                 SelectedItem="{x:Bind ViewModel.SelectedScrcpyDevicePreference, Mode=TwoWay}" />
                                         </local:SettingsBlockControl.SettingsActionableElement>
                                     </local:SettingsBlockControl>
 
-                                    <local:SettingsBlockControl 
-                                        Title="{helpers:ResourceString Name=ScreenOff}"
-                                        CornerRadius="0">
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=ScreenOff}" CornerRadius="0">
                                         <ToggleSwitch Margin="-7,-3,-75,-3" IsOn="{x:Bind ViewModel.ScreenOff, Mode=TwoWay}" />
                                     </local:SettingsBlockControl>
 
-                                    <local:SettingsBlockControl 
-                                        Title="{helpers:ResourceString Name=PhysicalKeyboard}"
-                                        CornerRadius="0">
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=PhysicalKeyboard}" CornerRadius="0">
                                         <ToggleSwitch Margin="-7,-3,-75,-3" IsOn="{x:Bind ViewModel.PhysicalKeyboard, Mode=TwoWay}" />
                                     </local:SettingsBlockControl>
 
-                                    <!-- Custom Arguments as its own section but with matching style -->
+                                    <!--  Custom Arguments as its own section but with matching style  -->
                                     <Grid
+                                        Padding="16,12,16,12"
                                         Background="{ThemeResource ExpanderHeaderBackground}"
                                         BorderBrush="{ThemeResource ExpanderHeaderBorderBrush}"
                                         BorderThickness="{ThemeResource ExpanderHeaderBorderThickness}"
-                                        CornerRadius="0"
-                                        Padding="16,12,16,12">
+                                        CornerRadius="0">
                                         <StackPanel>
-                                            <TextBlock 
-                                                FontWeight="SemiBold" 
-                                                Text="{helpers:ResourceString Name=AdditionalArguments}" 
-                                                Margin="0,0,0,8"/>
-                                            <TextBox 
-                                                Text="{x:Bind ViewModel.CustomArguments, Mode=TwoWay}" 
-                                                AcceptsReturn="True" 
-                                                TextWrapping="Wrap" 
+                                            <TextBlock
+                                                Margin="0,0,0,8"
+                                                FontWeight="SemiBold"
+                                                Text="{helpers:ResourceString Name=AdditionalArguments}" />
+                                            <TextBox
                                                 MinHeight="80"
-                                                PlaceholderText="egs: --show-touches --power-off-on-close" />
+                                                AcceptsReturn="True"
+                                                PlaceholderText="egs: --show-touches --power-off-on-close"
+                                                Text="{x:Bind ViewModel.CustomArguments, Mode=TwoWay}"
+                                                TextWrapping="Wrap" />
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>
                             </local:SettingsBlockControl.ExpandableContent>
                         </local:SettingsBlockControl>
 
-                        <!-- Video Settings Section -->
+                        <!--  Video Settings Section  -->
                         <local:SettingsBlockControl
                             Title="{helpers:ResourceString Name=VideoSettings}"
                             ContentPadding="-16"
@@ -248,96 +229,79 @@
                             </local:SettingsBlockControl.Icon>
                             <local:SettingsBlockControl.ExpandableContent>
                                 <StackPanel>
-                                    <local:SettingsBlockControl 
-                                        Title="{helpers:ResourceString Name=DisableVideoForwarding}"
-                                        CornerRadius="0">
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=DisableVideoForwarding}" CornerRadius="0">
                                         <ToggleSwitch Margin="-7,-3,-75,-3" IsOn="{x:Bind ViewModel.DisableVideoForwarding, Mode=TwoWay}" />
                                     </local:SettingsBlockControl>
-                                    
-                                    <local:SettingsBlockControl 
-                                        Title="{helpers:ResourceString Name=VideoCodec}"
-                                        CornerRadius="0">
+
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=VideoCodec}" CornerRadius="0">
                                         <local:SettingsBlockControl.SettingsActionableElement>
-                                            <ComboBox Width="220" 
-                                                      ItemsSource="{x:Bind ViewModel.VideoCodecOptions}" 
-                                                      SelectedIndex="{x:Bind ViewModel.VideoCodec, Mode=TwoWay}"
-                                                      DisplayMemberPath="Display">
-                                            </ComboBox>
-                                        </local:SettingsBlockControl.SettingsActionableElement>
-                                    </local:SettingsBlockControl>
-                                    
-                                    <local:SettingsBlockControl 
-                                        Title="{helpers:ResourceString Name=Bitrate}"
-                                        CornerRadius="0">
-                                        <local:SettingsBlockControl.SettingsActionableElement>
-                                            <TextBox Text="{x:Bind ViewModel.VideoBitrate, Mode=TwoWay}" />
-                                        </local:SettingsBlockControl.SettingsActionableElement>
-                                    </local:SettingsBlockControl>
-                                    
-                                    <local:SettingsBlockControl 
-                                        Title="{helpers:ResourceString Name=FrameRate}"
-                                        CornerRadius="0">
-                                        <local:SettingsBlockControl.SettingsActionableElement>
-                                            <TextBox Text="{x:Bind ViewModel.FrameRate, Mode=TwoWay}" />
-                                        </local:SettingsBlockControl.SettingsActionableElement>
-                                    </local:SettingsBlockControl>
-                                    
-                                    <local:SettingsBlockControl 
-                                        Title="{helpers:ResourceString Name=Crop}"
-                                        CornerRadius="0">
-                                        <local:SettingsBlockControl.SettingsActionableElement>
-                                            <TextBox Text="{x:Bind ViewModel.Crop, Mode=TwoWay}" />
-                                        </local:SettingsBlockControl.SettingsActionableElement>
-                                    </local:SettingsBlockControl>
-                                    
-                                    <local:SettingsBlockControl 
-                                        Title="{helpers:ResourceString Name=Display}"
-                                        CornerRadius="0">
-                                        <local:SettingsBlockControl.SettingsActionableElement>
-                                            <TextBox PlaceholderText="{helpers:ResourceString Name=Default}" Text="{x:Bind ViewModel.Display, Mode=TwoWay}" />
-                                        </local:SettingsBlockControl.SettingsActionableElement>
-                                    </local:SettingsBlockControl>
-                                    
-                                    <local:SettingsBlockControl 
-                                        Title="{helpers:ResourceString Name=VirtualDisplaySize}"
-                                        CornerRadius="0">
-                                        <local:SettingsBlockControl.SettingsActionableElement>
-                                            <TextBox Text="{x:Bind ViewModel.VirtualDisplaySize, Mode=TwoWay}" />
+                                            <ComboBox
+                                                Width="220"
+                                                DisplayMemberPath="Display"
+                                                ItemsSource="{x:Bind ViewModel.VideoCodecOptions}"
+                                                SelectedIndex="{x:Bind ViewModel.VideoCodec, Mode=TwoWay}" />
                                         </local:SettingsBlockControl.SettingsActionableElement>
                                     </local:SettingsBlockControl>
 
-                                    <local:SettingsBlockControl 
-                                        Title="{helpers:ResourceString Name=DisplayOrientation}"
-                                        CornerRadius="0">
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=Bitrate}" CornerRadius="0">
                                         <local:SettingsBlockControl.SettingsActionableElement>
-                                            <ComboBox Width="150" 
-                                                      ItemsSource="{x:Bind ViewModel.DisplayOrientationOptions}" 
-                                                      SelectedIndex="{x:Bind ViewModel.DisplayOrientation, Mode=TwoWay}"
-                                                      DisplayMemberPath="Display">
-                                            </ComboBox>
-                                        </local:SettingsBlockControl.SettingsActionableElement>
-                                    </local:SettingsBlockControl>
-                                    
-                                    <local:SettingsBlockControl 
-                                        Title="{helpers:ResourceString Name=RotationAngle}"
-                                        CornerRadius="0">
-                                        <local:SettingsBlockControl.SettingsActionableElement>
-                                            <TextBox Text="{x:Bind ViewModel.RotationAngle, Mode=TwoWay}" />
+                                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.VideoBitrate, Mode=TwoWay}" />
                                         </local:SettingsBlockControl.SettingsActionableElement>
                                     </local:SettingsBlockControl>
 
-                                    <local:SettingsBlockControl 
-                                        Title="{helpers:ResourceString Name=Buffer}"
-                                        CornerRadius="0">
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=FrameRate}" CornerRadius="0">
                                         <local:SettingsBlockControl.SettingsActionableElement>
-                                            <TextBox Text="{x:Bind ViewModel.VideoBuffer, Mode=TwoWay}" />
+                                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.FrameRate, Mode=TwoWay}" />
+                                        </local:SettingsBlockControl.SettingsActionableElement>
+                                    </local:SettingsBlockControl>
+
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=Crop}" CornerRadius="0">
+                                        <local:SettingsBlockControl.SettingsActionableElement>
+                                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.Crop, Mode=TwoWay}" />
+                                        </local:SettingsBlockControl.SettingsActionableElement>
+                                    </local:SettingsBlockControl>
+
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=Display}" CornerRadius="0">
+                                        <local:SettingsBlockControl.SettingsActionableElement>
+                                            <TextBox
+                                                KeyDown="OnKeyDown"
+                                                PlaceholderText="{helpers:ResourceString Name=Default}"
+                                                Text="{x:Bind ViewModel.Display, Mode=TwoWay}" />
+                                        </local:SettingsBlockControl.SettingsActionableElement>
+                                    </local:SettingsBlockControl>
+
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=VirtualDisplaySize}" CornerRadius="0">
+                                        <local:SettingsBlockControl.SettingsActionableElement>
+                                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.VirtualDisplaySize, Mode=TwoWay}" />
+                                        </local:SettingsBlockControl.SettingsActionableElement>
+                                    </local:SettingsBlockControl>
+
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=DisplayOrientation}" CornerRadius="0">
+                                        <local:SettingsBlockControl.SettingsActionableElement>
+                                            <ComboBox
+                                                Width="150"
+                                                DisplayMemberPath="Display"
+                                                ItemsSource="{x:Bind ViewModel.DisplayOrientationOptions}"
+                                                SelectedIndex="{x:Bind ViewModel.DisplayOrientation, Mode=TwoWay}" />
+                                        </local:SettingsBlockControl.SettingsActionableElement>
+                                    </local:SettingsBlockControl>
+
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=RotationAngle}" CornerRadius="0">
+                                        <local:SettingsBlockControl.SettingsActionableElement>
+                                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.RotationAngle, Mode=TwoWay}" />
+                                        </local:SettingsBlockControl.SettingsActionableElement>
+                                    </local:SettingsBlockControl>
+
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=Buffer}" CornerRadius="0">
+                                        <local:SettingsBlockControl.SettingsActionableElement>
+                                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.VideoBuffer, Mode=TwoWay}" />
                                         </local:SettingsBlockControl.SettingsActionableElement>
                                     </local:SettingsBlockControl>
                                 </StackPanel>
                             </local:SettingsBlockControl.ExpandableContent>
                         </local:SettingsBlockControl>
-                        
-                        <!-- Audio Settings Section -->
+
+                        <!--  Audio Settings Section  -->
                         <local:SettingsBlockControl
                             Title="{helpers:ResourceString Name=AudioSettings}"
                             ContentPadding="-16"
@@ -347,56 +311,44 @@
                             </local:SettingsBlockControl.Icon>
                             <local:SettingsBlockControl.ExpandableContent>
                                 <StackPanel>
-                                    <local:SettingsBlockControl 
-                                        Title="{helpers:ResourceString Name=AudioOutputMode}"
-                                        CornerRadius="0">
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=AudioOutputMode}" CornerRadius="0">
                                         <local:SettingsBlockControl.SettingsActionableElement>
-                                            <ComboBox 
+                                            <ComboBox
                                                 Width="150"
                                                 ItemsSource="{x:Bind ViewModel.AudioOutputModeOptions.Values}"
                                                 SelectedItem="{x:Bind ViewModel.SelectedAudioOutputMode, Mode=TwoWay}" />
                                         </local:SettingsBlockControl.SettingsActionableElement>
                                     </local:SettingsBlockControl>
-                                    
-                                    <local:SettingsBlockControl 
-                                        Title="{helpers:ResourceString Name=ForwardMicrophone}"
-                                        CornerRadius="0">
+
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=ForwardMicrophone}" CornerRadius="0">
                                         <ToggleSwitch Margin="-7,-3,-75,-3" IsOn="{x:Bind ViewModel.ForwardMicrophone, Mode=TwoWay}" />
                                     </local:SettingsBlockControl>
-                                    
-                                    <local:SettingsBlockControl 
-                                        Title="{helpers:ResourceString Name=AudioOutputBuffer}"
-                                        CornerRadius="0">
+
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=AudioOutputBuffer}" CornerRadius="0">
                                         <local:SettingsBlockControl.SettingsActionableElement>
-                                            <TextBox Text="{x:Bind ViewModel.AudioOutputBuffer, Mode=TwoWay}" />
+                                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.AudioOutputBuffer, Mode=TwoWay}" />
                                         </local:SettingsBlockControl.SettingsActionableElement>
                                     </local:SettingsBlockControl>
-                                    
-                                    <local:SettingsBlockControl 
-                                        Title="{helpers:ResourceString Name=AudioCodec}"
-                                        CornerRadius="0">
+
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=AudioCodec}" CornerRadius="0">
                                         <local:SettingsBlockControl.SettingsActionableElement>
-                                            <ComboBox Width="220" 
-                                                      ItemsSource="{x:Bind ViewModel.AudioCodecOptions}" 
-                                                      SelectedIndex="{x:Bind ViewModel.AudioCodec, Mode=TwoWay}"
-                                                      DisplayMemberPath="Display">
-                                            </ComboBox>
+                                            <ComboBox
+                                                Width="220"
+                                                DisplayMemberPath="Display"
+                                                ItemsSource="{x:Bind ViewModel.AudioCodecOptions}"
+                                                SelectedIndex="{x:Bind ViewModel.AudioCodec, Mode=TwoWay}" />
                                         </local:SettingsBlockControl.SettingsActionableElement>
                                     </local:SettingsBlockControl>
-                                    
-                                    <local:SettingsBlockControl 
-                                        Title="{helpers:ResourceString Name=Bitrate}"
-                                        CornerRadius="0">
+
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=Bitrate}" CornerRadius="0">
                                         <local:SettingsBlockControl.SettingsActionableElement>
-                                            <TextBox Text="{x:Bind ViewModel.AudioBitrate, Mode=TwoWay}" />
+                                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.AudioBitrate, Mode=TwoWay}" />
                                         </local:SettingsBlockControl.SettingsActionableElement>
                                     </local:SettingsBlockControl>
-                                    
-                                    <local:SettingsBlockControl 
-                                        Title="{helpers:ResourceString Name=Buffer}"
-                                        CornerRadius="0">
+
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=Buffer}" CornerRadius="0">
                                         <local:SettingsBlockControl.SettingsActionableElement>
-                                            <TextBox Text="{x:Bind ViewModel.AudioBuffer, Mode=TwoWay}" />
+                                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.AudioBuffer, Mode=TwoWay}" />
                                         </local:SettingsBlockControl.SettingsActionableElement>
                                     </local:SettingsBlockControl>
                                 </StackPanel>
@@ -407,22 +359,20 @@
             </local:SettingsBlockControl>
 
             <!--  Adb Settings  -->
-            <local:SettingsBlockControl 
+            <local:SettingsBlockControl
                 Title="{helpers:ResourceString Name=AdbSettings}"
-                Description="{x:Bind ViewModel.AdbPath, Mode=OneWay}" 
                 ContentPadding="-16"
+                Description="{x:Bind ViewModel.AdbPath, Mode=OneWay}"
                 IsExpanded="{x:Bind ViewModel.IsAdbSettingsExpanded, Mode=TwoWay}">
                 <local:SettingsBlockControl.Icon>
                     <FontIcon Glyph="&#xEC7A;" />
                 </local:SettingsBlockControl.Icon>
                 <local:SettingsBlockControl.SettingsActionableElement>
-                    <Button Content="{helpers:ResourceString Name=SelectLocation}" Click="SelectAdbLocation_Click" />
+                    <Button Click="SelectAdbLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
                 </local:SettingsBlockControl.SettingsActionableElement>
                 <local:SettingsBlockControl.ExpandableContent>
                     <StackPanel>
-                        <local:SettingsBlockControl 
-                            Title="{helpers:ResourceString Name=AutoConnect}"
-                            CornerRadius="0">
+                        <local:SettingsBlockControl Title="{helpers:ResourceString Name=AutoConnect}" CornerRadius="0">
                             <ToggleSwitch Margin="-7,-3,-75,-3" IsOn="{x:Bind ViewModel.AutoConnect, Mode=TwoWay}" />
                         </local:SettingsBlockControl>
                     </StackPanel>
@@ -435,7 +385,10 @@
                     <SymbolIcon Symbol="Folder" />
                 </local:SettingsBlockControl.Icon>
                 <local:SettingsBlockControl.SettingsActionableElement>
-                    <Button Margin="0,0,44,0" Click="SelectSaveLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
+                    <Button
+                        Margin="0,0,44,0"
+                        Click="SelectSaveLocation_Click"
+                        Content="{helpers:ResourceString Name=SelectLocation}" />
                 </local:SettingsBlockControl.SettingsActionableElement>
             </local:SettingsBlockControl>
 
@@ -445,7 +398,10 @@
                     <SymbolIcon Symbol="SyncFolder" />
                 </local:SettingsBlockControl.Icon>
                 <local:SettingsBlockControl.SettingsActionableElement>
-                    <Button Margin="0,0,44,0" Click="SelectRemoteLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
+                    <Button
+                        Margin="0,0,44,0"
+                        Click="SelectRemoteLocation_Click"
+                        Content="{helpers:ResourceString Name=SelectLocation}" />
                 </local:SettingsBlockControl.SettingsActionableElement>
             </local:SettingsBlockControl>
 

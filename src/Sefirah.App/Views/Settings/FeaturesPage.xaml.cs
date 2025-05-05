@@ -1,9 +1,11 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Sefirah.App.Data.AppDatabase.Models;
 using Sefirah.App.Utils;
 using Windows.Storage;
 using Windows.Storage.Pickers;
+using Windows.System;
 
 namespace Sefirah.App.Views.Settings;
 
@@ -111,6 +113,15 @@ public sealed partial class FeaturesPage : Page
             {
                 ViewModel.ScrcpyPath = scrcpyPath;
             }
+        }
+    }
+
+    private void OnKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.Enter)
+        {
+            this.Focus(FocusState.Pointer);
+            e.Handled = true;
         }
     }
 
