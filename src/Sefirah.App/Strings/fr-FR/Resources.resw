@@ -256,8 +256,7 @@
     <value>Connectez votre appareil</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>Les appareils découverts dans votre réseau apparaîtront ci-dessous, et vous pourrez initier la
-connexion à partir de votre téléphone (assurez-vous que le code pin correspond).</value>
+    <value>Les appareils détectés dans votre réseau apparaîtront ci-dessous, et vous pourrez initier la connexion à partir de votre téléphone (assurez-vous que le code pin correspond).</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
     <value>Demande de connexion de l'appareil</value>
