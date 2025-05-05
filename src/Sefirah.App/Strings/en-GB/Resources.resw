@@ -530,4 +530,10 @@ mobile (Make sure the pin matches)</value>
   <data name="Auto" xml:space="preserve">
     <value>Auto</value>
   </data>
+  <data name="ScrcpyErrorTitle" xml:space="preserve">
+    <value>Scrcpy failed to start</value>
+  </data>
+  <data name="CopyError" xml:space="preserve">
+    <value>Copy error</value>
+  </data>
 </root>

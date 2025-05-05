@@ -12,14 +12,13 @@
         <AppxBundlePlatforms>x86|x64|arm64</AppxBundlePlatforms>
         <AppxBundle>Always</AppxBundle>
         <DefaultLanguage>en-US</DefaultLanguage>
-        <AppxDefaultResourceQualifiers>Language=en-US;en-GB;ja-JP;zh-CN;ru-RU;de-DE</AppxDefaultResourceQualifiers>
+        <AppxDefaultResourceQualifiers>Language=en-US;en-GB;ja-JP;zh-CN;ru-RU;de-DE;fr-FR;hi-IN;he-IL</AppxDefaultResourceQualifiers>
         <Platforms>x86;x64;arm64</Platforms>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
         <DefineConstants Condition="'$(Configuration)' == 'Debug'">TRACE;DEBUG;NETFX_CORE;DISABLE_XAML_GENERATED_MAIN</DefineConstants>
         <DefineConstants Condition="'$(Configuration)' != 'Debug'">TRACE;RELEASE;NETFX_CORE;DISABLE_XAML_GENERATED_MAIN</DefineConstants>
         <ApplicationIcon>..\Sefirah.Package\Assets\Icons\SefirahDark.ico</ApplicationIcon>
-        <DefaultLanguage>en-US</DefaultLanguage>
 	</PropertyGroup>
 
     <ItemGroup>
