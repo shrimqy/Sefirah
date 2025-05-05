@@ -33,7 +33,6 @@ public class ApplicationInfoEntity : BaseEntity
         get => _isLoading;
         set 
         {
-            Debug.WriteLine($"Setting IsLoading to {value} for app {AppName}");
             Set(ref _isLoading, value);
         }
     }

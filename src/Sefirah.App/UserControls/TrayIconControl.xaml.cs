@@ -1,10 +1,6 @@
 using Microsoft.UI;
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
-using Microsoft.Win32;
-using System.Diagnostics;
-using System.Runtime;
 using Windows.UI.ViewManagement;
 
 namespace Sefirah.App.UserControls;

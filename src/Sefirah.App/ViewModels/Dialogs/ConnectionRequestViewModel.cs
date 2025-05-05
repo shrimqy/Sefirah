@@ -1,12 +1,8 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
-using Microsoft.UI.Xaml;
+using Sefirah.App.Views;
 using Sefirah.App.Views.Onboarding;
 using Windows.Storage;
-using Sefirah.App.Views;
-using WinRT;
-using Sefirah.App.Data.Enums;
 
 namespace Sefirah.App.ViewModels.Dialogs;
 

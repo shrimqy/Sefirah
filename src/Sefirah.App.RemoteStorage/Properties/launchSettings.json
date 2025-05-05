@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Sefirah.App.RemoteStorage": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

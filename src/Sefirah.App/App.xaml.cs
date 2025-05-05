@@ -95,7 +95,7 @@ public partial class App : Application
             }
 
             // Initialize the main application after splash screen completes
-            _ = MainWindow.Instance.InitializeApplicationAsync(activatedEventArgs.Data);
+            await MainWindow.Instance.InitializeApplicationAsync(activatedEventArgs.Data);
 
             await AppLifecycleHelper.InitializeAppComponentsAsync();
         }

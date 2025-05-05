@@ -33,7 +33,6 @@ public sealed partial class MainWindow : WindowEx
         AppWindow.TitleBar.ButtonBackgroundColor = Colors.Transparent;
         AppWindow.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
         AppWindow.TitleBar.ButtonPressedBackgroundColor = Colors.Transparent;
-        AppWindow.TitleBar.ButtonHoverBackgroundColor = Colors.Transparent;
 
         var iconPath = uiSettings.GetColorValue(UIColorType.Background) == Colors.Black
             ? "Assets/Icons/SefirahDark.ico"
@@ -112,6 +111,7 @@ public sealed partial class MainWindow : WindowEx
 
         return rootFrame;
     }
+
     private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         => new Exception("Failed to load Page " + e.SourcePageType.FullName);
 

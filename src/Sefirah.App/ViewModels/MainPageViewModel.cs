@@ -7,7 +7,6 @@ using Sefirah.App.Data.Models;
 using Sefirah.App.Extensions;
 using Sefirah.App.Utils.Serialization;
 using System.Windows.Input;
-using Windows.System;
 
 namespace Sefirah.App.ViewModels;
 
