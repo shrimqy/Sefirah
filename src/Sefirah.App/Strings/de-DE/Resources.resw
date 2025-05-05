@@ -160,13 +160,13 @@
     <value>Remote-Speicherort</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
-    <value>Show clipboard toast</value>
+    <value>Zwischenablagen-Benachrichtigung anzeigen</value>
   </data>
   <data name="ImageToClipboard" xml:space="preserve">
-    <value>Include images in clipboard monitor</value>
+    <value>Bilder im Zwischenablagen-Anzeige einbeziehen</value>
   </data>
   <data name="ClipboardFiles" xml:space="preserve">
-    <value>Add received files to clipboard</value>
+    <value>Empfangene Benachrichtigungen zur Zwischenablage hinzufügen</value>
   </data>
   <data name="NotificationsDescription" xml:space="preserve">
     <value>Erhalte Benachrichtigungen vom Remote-Gerät</value>
@@ -175,7 +175,7 @@
     <value>Allgemeine Einstellungen</value>
   </data>
   <data name="ShowNotificationToast" xml:space="preserve">
-    <value>Show notification toast</value>
+    <value>Benachrichtigungs-Pop-up anzeigen</value>
   </data>
   <data name="IgnoreWindowsApps" xml:space="preserve">
     <value>Remote-Benachrichtigungen von aktiven Windows-Apps ignorieren</value>
@@ -187,7 +187,7 @@
     <value>Benachrichtigungs-Feed</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>Notification Feed + Toast</value>
+    <value>Benachrichtigungs-Feed + Pop-up</value>
   </data>
   <data name="PairedDevices.Title" xml:space="preserve">
     <value>Gekoppelte Geräte</value>
@@ -196,7 +196,7 @@
     <value>Verfügbare Geräte</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
-    <value>Android devices that are running the app in the same network will show up below</value>
+    <value>Android-Geräte, die die App im selben Netzwerk ausführen, werden unten angezeigt</value>
   </data>
   <data name="StartupOption" xml:space="preserve">
     <value>Startoptionen</value>
@@ -220,7 +220,7 @@
     <value>Darstellung</value>
   </data>
   <data name="ThemeDescription" xml:space="preserve">
-    <value>Wählen Sie Ihr Standard-App-Theme</value>
+    <value>Wählen Sie Ihr Standard-App-Design</value>
   </data>
   <data name="Default" xml:space="preserve">
     <value>Standard</value>
@@ -244,7 +244,7 @@
     <value>Willkommen bei Sefirah</value>
   </data>
   <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
-    <value>Um loszulegen, lade die Comapanion App auf der entsprechenden GitHub-Seite herunter und installiere sie.</value>
+    <value>Um loszulegen, lade die Begleitapp auf der entsprechenden GitHub-Seite herunter und installiere sie.</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
     <value>Erste Schritte</value>
@@ -398,7 +398,7 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
     <value>Auflösung</value>
   </data>
   <data name="Buffer" xml:space="preserve">
-    <value>Buffer</value>
+    <value>Puffer</value>
   </data>
   <data name="Messages" xml:space="preserve">
     <value>Nachrichten</value>
@@ -443,7 +443,7 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
     <value>Verbinden Sie Ihr Gerät über USB mit aktiviertem USB-Debugging und versuchen Sie es erneut</value>
   </data>
   <data name="Dismiss" xml:space="preserve">
-    <value>Dismiss</value>
+    <value>Verwerfen</value>
   </data>
   <data name="ScrcpyNotFound" xml:space="preserve">
     <value>Scrcpy wurde nicht gefunden</value>
@@ -455,7 +455,7 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
     <value>Drahtlose Verbindung bevorzugen</value>
   </data>
   <data name="SearchApps" xml:space="preserve">
-    <value>Search apps</value>
+    <value>Apps durchsuchen</value>
   </data>
   <data name="DisableVideoForwarding" xml:space="preserve">
     <value>Video-Weiterleitung deaktivieren</value>
