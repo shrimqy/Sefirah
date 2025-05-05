@@ -1,13 +1,18 @@
-﻿using Microsoft.UI.Dispatching;
+﻿using CommunityToolkit.WinUI;
+using Microsoft.UI.Dispatching;
+using Sefirah.App.Data.AppDatabase.Models;
 using Sefirah.App.Data.Contracts;
 using Sefirah.App.Data.Enums;
 using Sefirah.App.Extensions;
+using Sefirah.App.Services;
+using System.Threading.Tasks;
 
 namespace Sefirah.App.ViewModels.Settings;
 
 public sealed partial class GeneralViewModel : ObservableObject
 {
     private readonly IUserSettingsService UserSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
+    private readonly IDeviceManager _deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
     private readonly DispatcherQueue dispatcherQueue;
 
     // Theme settings
@@ -81,11 +86,45 @@ public sealed partial class GeneralViewModel : ObservableObject
         }
     }
 
+    private LocalDeviceEntity? localDevice;
+
+    private string _localDeviceName = string.Empty;
+    public string LocalDeviceName
+    {
+        get => _localDeviceName;
+        set
+        {
+            if (SetProperty(ref _localDeviceName, value) && !string.IsNullOrWhiteSpace(value))
+            {
+                Task.Run(async () =>
+                {
+                    if (localDevice != null)
+                    {
+                        localDevice.DeviceName = value;
+                        await _deviceManager.UpdateLocalDevice(localDevice);
+                    }
+                });
+            }
+        }
+    }
+
     public GeneralViewModel()
     {
         dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
         selectedThemeType = ThemeTypes[CurrentTheme];
         selectedStartupType = StartupTypes[StartupOption];
+
+        // Load initial local device name
+        LoadLocalDeviceName();
+    }
+
+    private async void LoadLocalDeviceName()
+    {
+        await dispatcherQueue.EnqueueAsync(async () =>
+        {
+            localDevice = await _deviceManager.GetLocalDeviceAsync();
+            _localDeviceName = localDevice.DeviceName;
+        });
     }
 }

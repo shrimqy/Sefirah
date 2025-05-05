@@ -64,4 +64,9 @@ public interface IDeviceManager
     /// Gets the phone numbers for the last connected device.
     /// </summary>
     Task<List<PhoneNumber>> GetLastConnectedDevicePhoneNumbersAsync();
+
+    /// <summary>
+    /// Updates the local device.
+    /// </summary>
+    Task UpdateLocalDevice(LocalDeviceEntity device);
 }

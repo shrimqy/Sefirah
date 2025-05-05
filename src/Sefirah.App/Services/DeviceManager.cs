@@ -197,6 +197,18 @@ public class DeviceManager(DeviceRepository repository, ILogger logger) : IDevic
         }
     }
 
+    public async Task UpdateLocalDevice(LocalDeviceEntity device)
+    {
+        try
+        {
+            await repository.AddOrUpdateLocalDeviceAsync(device);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Error updating local device", ex);
+        }
+    }
+
     public async Task<byte[]?> GetSharedSecretForLastConnectedDeviceAsync()
     {
         try
