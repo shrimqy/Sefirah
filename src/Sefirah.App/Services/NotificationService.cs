@@ -94,7 +94,6 @@ public class NotificationService(
         catch (Exception ex)
         {
             logger.Error("Error handling notification message", ex);
-            throw;
         }
         finally
         {
@@ -175,7 +174,6 @@ public class NotificationService(
         catch (Exception ex)
         {
             logger.Error("Failed to show Windows notification for {0}", notificationMessage.AppName, ex);
-            throw;
         }
     }
 
