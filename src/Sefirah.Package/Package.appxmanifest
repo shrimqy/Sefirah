@@ -45,6 +45,9 @@
         <Resource Language="zh-CN"/>
         <Resource Language="ru-RU"/>
         <Resource Language="de-DE"/>
+        <Resource Language="hi-IN"/>
+        <Resource Language="he-IL"/>
+        <Resource Language="fr-FR"/>
         <Resource Language="x-generate"/>
     </Resources>
 
