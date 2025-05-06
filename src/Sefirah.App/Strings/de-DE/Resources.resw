@@ -256,7 +256,7 @@
     <value>Verbinde dein Gerät</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>In Ihrem Netzwerk entdeckte Geräte werden unten erscheinen. Die Verbindung wird dann von Ihrem
+    <value>In Ihrem Netzwerk entdeckte Geräte werden unten angezeigt. Die Verbindung wird dann von Ihrem
 Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
