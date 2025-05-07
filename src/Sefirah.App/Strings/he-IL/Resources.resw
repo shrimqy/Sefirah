@@ -529,12 +529,12 @@
     <value>אוטומטי</value>
   </data>
   <data name="ScrcpyErrorTitle" xml:space="preserve">
-    <value>Scrcpy failed to start</value>
+    <value>התוכנה Scrcpy נכשלה בעת הרצתה</value>
   </data>
   <data name="CopyError" xml:space="preserve">
-    <value>Copy error</value>
+    <value>העתק שגיאה</value>
   </data>
   <data name="DeviceName" xml:space="preserve">
-    <value>Device name</value>
+    <value>שם ההתקן</value>
   </data>
 </root>
