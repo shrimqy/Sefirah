@@ -118,22 +118,22 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="About" xml:space="preserve">
-    <value>About</value>
+    <value>Giới thiệu</value>
   </data>
   <data name="General" xml:space="preserve">
-    <value>General</value>
+    <value>Cài đặt chung</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Settings</value>
+    <value>Cài đặt</value>
   </data>
   <data name="PrivacyPolicy" xml:space="preserve">
-    <value>Privacy Policy</value>
+    <value>Chính sách Bảo mật</value>
   </data>
   <data name="SupportDevelopment" xml:space="preserve">
-    <value>Support Development</value>
+    <value>Hỗ trợ phát triển</value>
   </data>
   <data name="OpenLogs" xml:space="preserve">
-    <value>Open Logs</value>
+    <value>Mở Nhật kí</value>
   </data>
   <data name="GitHubRepository" xml:space="preserve">
     <value>GitHub Repository</value>
@@ -142,119 +142,118 @@
     <value>Android GitHub Repository</value>
   </data>
   <data name="Clipboard" xml:space="preserve">
-    <value>Clipboard</value>
+    <value>Bảng sao chép</value>
   </data>
   <data name="Feedback" xml:space="preserve">
-    <value>Feedback</value>
+    <value>Phản hồi</value>
   </data>
   <data name="Notifications" xml:space="preserve">
-    <value>Notifications</value>
+    <value>Thông báo</value>
   </data>
   <data name="ThirdPartyLibraries" xml:space="preserve">
-    <value>Third party libraries</value>
+    <value>Thư viện bên thứ ba</value>
   </data>
   <data name="SaveLocation" xml:space="preserve">
-    <value>Save Location</value>
+    <value>Vị trí Lưu</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Remote Storage Location</value>
+    <value>Vị trí cho lưu trữ từ xa</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
-    <value>Show clipboard toast</value>
+    <value>Hiển thị thông báo khi sao chép</value>
   </data>
   <data name="ImageToClipboard" xml:space="preserve">
-    <value>Include images in clipboard monitor</value>
+    <value>Kèm hình ảnh trong bảng sao chép</value>
   </data>
   <data name="ClipboardFiles" xml:space="preserve">
-    <value>Add received files to clipboard</value>
+    <value>Thêm tệp đã nhận vào bảng sao chép</value>
   </data>
   <data name="NotificationsDescription" xml:space="preserve">
-    <value>Receive notifications from remote device</value>
+    <value>Nhận thông báo từ điện thoại</value>
   </data>
   <data name="GeneralSettings" xml:space="preserve">
-    <value>General Settings</value>
+    <value>Cài đặt chung</value>
   </data>
   <data name="ShowNotificationToast" xml:space="preserve">
-    <value>Show notification toast</value>
+    <value>Hiển thị thông báo nổi</value>
   </data>
   <data name="IgnoreWindowsApps" xml:space="preserve">
-    <value>Ignore remote notifications from active Windows apps</value>
+    <value>Bỏ qua thông báo của điện thoại cho các ứng dụng Windows đang hoạt động</value>
   </data>
   <data name="NotificationFilterDisabled.Content" xml:space="preserve">
-    <value>Disabled</value>
+    <value>Tắt</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Notification Feed</value>
+    <value>Nguồn thông báo</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>Notification Feed + Toast</value>
+    <value>Nguồn thông báo + thông báo nổi</value>
   </data>
   <data name="PairedDevices.Title" xml:space="preserve">
-    <value>Paired Devices</value>
+    <value>Thiết bị được ghép nối</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
-    <value>Available Devices</value>
+    <value>Thiết bị khả dụng</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
-    <value>Android devices that are running the app in the same network will show up below</value>
+    <value>Các thiết bị Android đang chạy ứng dụng trong cùng mạng sẽ xuất hiện bên dưới</value>
   </data>
   <data name="StartupOption" xml:space="preserve">
-    <value>Startup option</value>
+    <value>Tuỳ chọn khởi động</value>
   </data>
   <data name="StartupOptionDescription" xml:space="preserve">
-    <value>Choose how the app starts when Windows boots</value>
+    <value>Chọn cách mà ứng dụng này khởi động khi Windows khởi động</value>
   </data>
   <data name="StartupOptionMinimized.Content" xml:space="preserve">
-    <value>Start minimized</value>
+    <value>Thu nhỏ sau khi khởi động</value>
   </data>
   <data name="StartupOptionMaximized.Content" xml:space="preserve">
-    <value>Start maximized</value>
+    <value>Phóng to sau khi khởi động</value>
   </data>
   <data name="StartupOptionSystemTray.Content" xml:space="preserve">
-    <value>Start in system tray</value>
+    <value>Khởi động ở khay hệ thống</value>
   </data>
   <data name="StartupOptionDisabled.Content" xml:space="preserve">
-    <value>Disabled</value>
+    <value>Tắt</value>
   </data>
   <data name="Theme" xml:space="preserve">
-    <value>Theme</value>
+    <value>Chủ đề</value>
   </data>
   <data name="ThemeDescription" xml:space="preserve">
-    <value>Choose your default app theme</value>
+    <value>Chọn chủ đề mặc định của ứng dụng</value>
   </data>
   <data name="Default" xml:space="preserve">
-    <value>Default</value>
+    <value>Mặc định</value>
   </data>
   <data name="ThemeLight.Content" xml:space="preserve">
-    <value>Light</value>
+    <value>Sáng</value>
   </data>
   <data name="ThemeDark.Content" xml:space="preserve">
-    <value>Dark</value>
+    <value>Tối</value>
   </data>
   <data name="RemoveDeviceDialogTitle" xml:space="preserve">
-    <value>Remove Device</value>
+    <value>Loại bỏ thiết bị</value>
   </data>
   <data name="Remove" xml:space="preserve">
-    <value>Remove</value>
+    <value>Loại bỏ</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>Hủy</value>
   </data>
   <data name="OnboardingWelcome.Title" xml:space="preserve">
-    <value>Welcome to Sefirah</value>
+    <value>Chào mừng đến với Sefirah</value>
   </data>
   <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
-    <value>To get started download and install the comapanion app through the corresponding github
-page.</value>
+    <value>Để bắt đầu, hãy tải xuống và cài đặt ứng dụng hỗ trợ từ trang GitHub tương ứng.</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
-    <value>Get Started</value>
+    <value>Bắt đầu</value>
   </data>
   <data name="OnboardingSkip" xml:space="preserve">
-    <value>Skip for now</value>
+    <value>Tạm thời bỏ qua</value>
   </data>
   <data name="OnboardingDevice.Title" xml:space="preserve">
-    <value>Connect Your Device</value>
+    <value>Kết nối thiết bị của bạn</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
     <value>Discovered devices in your network will appear below, and initiate the connection from your
