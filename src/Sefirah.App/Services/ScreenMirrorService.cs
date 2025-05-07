@@ -20,14 +20,15 @@ public class ScreenMirrorService(
 ) : IScreenMirrorService
 {
     private ObservableCollection<AdbDevice> devices = adbService.AdbDevices;
-    private List<Process> scrcpyProcesses = []; // what was this for anyway
+    private List<Process> scrcpyProcesses = [];
     private CancellationTokenSource? cts;
     private Microsoft.UI.Dispatching.DispatcherQueue dispatcher = MainWindow.Instance.DispatcherQueue;
-    private StringBuilder scrcpyErrorOutput = new();
     
     public async Task<bool> StartScrcpy(string? customArgs = null)
     {
-        Process? process = null; // Declare process here to access in finally block
+        Process? process = null;
+        CancellationTokenSource? processCts = null;
+
         try
         {
             var scrcpyPath = userSettingsService.FeatureSettingsService.ScrcpyPath;
@@ -104,134 +105,167 @@ public class ScreenMirrorService(
             // Build arguments for scrcpy with the selected device
             var args = BuildScrcpyArguments(customArgs, selectedDeviceSerial);
             
-            cts = new CancellationTokenSource();
-            scrcpyErrorOutput.Clear();
+            cts?.Cancel();
+            cts?.Dispose();
+            processCts = new CancellationTokenSource();
+            cts = processCts;
             
-            // Run the process management in a background task
-            return await Task.Run(async () =>
+            process = new Process
             {
-                process = new Process
+                StartInfo = new ProcessStartInfo
                 {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = scrcpyPath,
-                        Arguments = args,
-                        UseShellExecute = false,
-                        CreateNoWindow = true,
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true
-                    },
-                    EnableRaisingEvents = true
-                };
-                
-                process.OutputDataReceived += (sender, e) => 
+                    FileName = scrcpyPath,
+                    Arguments = args,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                },
+                EnableRaisingEvents = true
+            };
+            
+            bool started;
+            try
+            {
+                started = process.Start();
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Failed to start scrcpy: {ex.Message}", ex);
+                process?.Dispose();
+                processCts.Dispose();
+                if (ReferenceEquals(cts, processCts)) cts = null;
+                return false;
+            }
+
+            if (!started)
+            {
+                logger.Error("Failed to start scrcpy process");
+                process?.Dispose();
+                processCts.Dispose();
+                if (ReferenceEquals(cts, processCts)) cts = null;
+                return false;
+            }
+            
+            // Start monitoring process in background
+            StartProcessMonitoring(process, processCts);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Error in StartScrcpy", ex);
+            processCts?.Dispose();
+            if (ReferenceEquals(cts, processCts)) cts = null;
+            process?.Dispose();
+            return false;
+        }
+    }
+
+    private void StartProcessMonitoring(Process process, CancellationTokenSource processCts)
+    {
+        var errorOutput = new StringBuilder();
+        
+        process.OutputDataReceived += (_, e) => 
+        {
+            if (!string.IsNullOrEmpty(e.Data))
+                logger.Info($"scrcpy: {e.Data}");
+        };
+        
+        process.ErrorDataReceived += (_, e) =>
+        {
+            if (!string.IsNullOrEmpty(e.Data))
+            {
+                logger.Error($"scrcpy error: {e.Data}");
+                lock (errorOutput)
                 {
-                    if (!string.IsNullOrEmpty(e.Data))
-                        logger.Info($"scrcpy: {e.Data}");
-                };
-                
-                process.ErrorDataReceived += (sender, e) =>
-                {
-                    if (!string.IsNullOrEmpty(e.Data))
-                    {
-                        logger.Error($"scrcpy error: {e.Data}");
-                        scrcpyErrorOutput.AppendLine(e.Data);
-                    }
-                };
-                
-                process.Exited += (sender, e) =>
-                {
-                     logger.Info($"[Exited Event] scrcpy process terminated.");
-                };
-                
-                bool started = process.Start();
-                if (!started)
-                {
-                    logger.Error("Failed to start scrcpy process");
-                    return false;
+                    errorOutput.AppendLine(e.Data);
                 }
+            }
+        };
+        
+        process.Exited += (_, _) => logger.Info("scrcpy process terminated");
+        
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
+        logger.Info($"scrcpy process started (PID: {process.Id})");
+        
+        lock (scrcpyProcesses)
+        {
+            scrcpyProcesses.Add(process);
+        }
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await process.WaitForExitAsync(processCts.Token);
+                logger.Info($"scrcpy process exited with code {process.ExitCode}");
                 
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-                logger.Info("scrcpy process started successfully and readers initiated.");
-                
-                await process.WaitForExitAsync(cts.Token);
-                logger.Info($"scrcpy process finished execution with code {process.ExitCode}.");
-                
-                if (process.ExitCode != 0 || scrcpyErrorOutput.Length > 0)
+                if (process.ExitCode != 0)
                 {
-                    var errorMessage = $"Scrcpy process exited with code {process.ExitCode}.\n\nOutput:\n{scrcpyErrorOutput.ToString().TrimEnd()}";
+                    string errorMessage;
+                    lock (errorOutput)
+                    {
+                        errorMessage = $"Scrcpy process exited with code {process.ExitCode}\n\nError Output:\n{errorOutput.ToString().TrimEnd()}";
+                    }
                     logger.Error($"Scrcpy failed: {errorMessage}");
 
                     await dispatcher.EnqueueAsync(async () =>
                     {
                         var scrollViewer = new ScrollViewer
                         {
-                            VerticalScrollBarVisibility = ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = ScrollBarVisibility.Auto, MaxHeight = 300,
-                            Content = new TextBlock { Text = errorMessage, IsTextSelectionEnabled = true, TextWrapping = TextWrapping.Wrap }
+                            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+                            MaxHeight = 300,
+                            Content = new TextBlock
+                            {
+                                Text = errorMessage,
+                                IsTextSelectionEnabled = true,
+                                TextWrapping = TextWrapping.Wrap
+                            }
                         };
+                        
                         var errorDialog = new ContentDialog
                         {
-                            XamlRoot = MainWindow.Instance.Content.XamlRoot, 
+                            XamlRoot = MainWindow.Instance.Content.XamlRoot,
                             Title = "ScrcpyErrorTitle".GetLocalizedResource(),
-                            Content = scrollViewer, 
-                            CloseButtonText = "Dismiss".GetLocalizedResource(), 
+                            Content = scrollViewer,
+                            CloseButtonText = "Dismiss".GetLocalizedResource(),
                             SecondaryButtonText = "CopyError".GetLocalizedResource()
                         };
+                        
                         var result = await errorDialog.ShowAsync();
                         if (result == ContentDialogResult.Secondary)
                         {
-                            var dataPackage = new DataPackage(); dataPackage.SetText(errorMessage); Clipboard.SetContent(dataPackage);
-                            logger.Info("Scrcpy error output copied to clipboard.");
+                            var dataPackage = new DataPackage();
+                            dataPackage.SetText(errorMessage);
+                            Clipboard.SetContent(dataPackage);
+                            logger.Info("Scrcpy error output copied to clipboard");
                         }
                     });
-                    return false;
-                }
-                
-                logger.Info("scrcpy process completed successfully.");
-                return true;
-            }, cts.Token);
-        }
-        catch (Exception ex)
-        {
-            logger.Error("Error during scrcpy execution", ex);
-            return false;
-        }
-        finally
-        {
-            process?.Dispose();
-            cts?.Dispose();
-            cts = null;
-        }
-    }
-    
-    public async Task<bool> StopScrcpy()
-    {
-        try
-        {
-            cts?.Cancel();
-            
-            foreach (var process in scrcpyProcesses)
-            {
-                if (process != null && !process.HasExited)
-                {
-                    process.Kill(true);
-                    await process.WaitForExitAsync();
-                    process.Dispose();
                 }
             }
-            
-            cts?.Dispose();
-            cts = null;
-            
-            logger.Info("scrcpy process stopped successfully");
-            return true;
-        }
-        catch (Exception ex)
-        {
-            logger.Error("Error stopping scrcpy process", ex);
-            return false;
-        }
+            catch (Exception ex)
+            {
+                if (!(ex is OperationCanceledException))
+                {
+                    logger.Error($"Error monitoring scrcpy process", ex);
+                }
+            }
+            finally
+            {
+                process.Dispose();
+                lock (scrcpyProcesses)
+                {
+                    scrcpyProcesses.Remove(process);
+                }
+                processCts.Dispose();
+                if (ReferenceEquals(cts, processCts))
+                {
+                    cts = null;
+                }
+            }
+        }, processCts.Token);
     }
 
     private bool ShouldShowDeviceSelectionDialog(List<AdbDevice> onlineDevices)
