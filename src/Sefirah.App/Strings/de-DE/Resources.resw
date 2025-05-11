@@ -538,4 +538,7 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
   <data name="DeviceName" xml:space="preserve">
     <value>Device name</value>
   </data>
+  <data name="EnableVirtualDisplay" xml:space="preserve">
+    <value>Enable virtual display</value>
+  </data>
 </root>
