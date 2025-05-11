@@ -538,4 +538,7 @@
   <data name="DeviceName" xml:space="preserve">
     <value>Device name</value>
   </data>
+  <data name="EnableVirtualDisplay" xml:space="preserve">
+    <value>Enable virtual display</value>
+  </data>
 </root>
