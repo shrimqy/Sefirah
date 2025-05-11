@@ -188,4 +188,9 @@ public interface IFeatureSettingsService : IBaseSettingsService, INotifyProperty
     /// Gets or sets the device selection mode for screen mirroring.
     /// </summary>
     ScrcpyDevicePreferenceType ScrcpyDevicePreference { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to enable virtual display.
+    /// </summary>
+    bool IsVirtualDisplayEnabled { get; set; }
 }

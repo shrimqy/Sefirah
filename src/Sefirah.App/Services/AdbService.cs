@@ -18,7 +18,7 @@ public interface IAdbService
     ObservableCollection<ScrcpyPreferenceItem> VideoCodecOptions { get; }
     ObservableCollection<ScrcpyPreferenceItem> AudioCodecOptions { get; }
     Task StartAsync();
-    Task<bool> ConnectWireless(string host, int port=5555);
+    Task<bool> ConnectWireless(string? host, int port=5555);
     Task StopAsync();
     bool IsMonitoring { get; }
 }
@@ -332,8 +332,10 @@ public class AdbService(
         }
     }
 
-    public async Task<bool> ConnectWireless(string host, int port=5555)
+    public async Task<bool> ConnectWireless(string? host, int port=5555)
     {
+        if (string.IsNullOrEmpty(host)) return false;
+
         try
         {
             var result = await adbClient.ConnectAsync(host, port);

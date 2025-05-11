@@ -231,4 +231,12 @@ internal sealed class FeaturesSettingsService : BaseObservableJsonSettings, IFea
         get => Get(ScrcpyDevicePreferenceType.Auto);
         set => Set(value);
     }
+
+    public bool IsVirtualDisplayEnabled
+    {
+        get => Get(true);
+        set => Set(value);
+    }
+    
+    
 }

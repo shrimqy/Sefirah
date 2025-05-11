@@ -379,6 +379,19 @@ public sealed partial class FeaturesViewModel : ObservableObject
                 OnPropertyChanged();
             }
         }
+    }   
+
+    public bool IsVirtualDisplayEnabled
+    {
+        get => UserSettingsService.FeatureSettingsService.IsVirtualDisplayEnabled;
+        set
+        {
+            if (value != UserSettingsService.FeatureSettingsService.IsVirtualDisplayEnabled)
+            {
+                UserSettingsService.FeatureSettingsService.IsVirtualDisplayEnabled = value;
+                OnPropertyChanged();
+            }
+        }
     }
 
     public string VirtualDisplaySize

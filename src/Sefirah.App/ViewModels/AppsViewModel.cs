@@ -7,7 +7,8 @@ public sealed class AppsViewModel : BaseViewModel
 {
     public IRemoteAppsRepository RemoteAppsRepository { get; } = Ioc.Default.GetRequiredService<IRemoteAppsRepository>();
     private IScreenMirrorService ScreenMirrorService { get; } = Ioc.Default.GetRequiredService<IScreenMirrorService>();
-    
+    private IUserSettingsService UserSettingsService { get; } = Ioc.Default.GetRequiredService<IUserSettingsService>();
+
     public ObservableCollection<ApplicationInfoEntity> Apps => RemoteAppsRepository.Applications;
     
     private bool _isLoading;
@@ -53,8 +54,7 @@ public sealed class AppsViewModel : BaseViewModel
             try
             {
                 Apps[index].IsLoading = true;
-
-                var started = await ScreenMirrorService.StartScrcpy(customArgs: $"--new-display --start-app={appPackage}");
+                var started = await ScreenMirrorService.StartScrcpy(customArgs: $"--start-app={appPackage}");
                 if (started)
                 {
                     await Task.Delay(2000);

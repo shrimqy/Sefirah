@@ -19,10 +19,10 @@ public class ScreenMirrorService(
     ISessionManager sessionManager
 ) : IScreenMirrorService
 {
-    private ObservableCollection<AdbDevice> devices = adbService.AdbDevices;
-    private List<Process> scrcpyProcesses = [];
+    private readonly ObservableCollection<AdbDevice> devices = adbService.AdbDevices;
+    private Dictionary<string, Process> scrcpyProcesses = [];
     private CancellationTokenSource? cts;
-    private Microsoft.UI.Dispatching.DispatcherQueue dispatcher = MainWindow.Instance.DispatcherQueue;
+    private readonly Microsoft.UI.Dispatching.DispatcherQueue dispatcher = MainWindow.Instance.DispatcherQueue;
     
     public async Task<bool> StartScrcpy(string? customArgs = null)
     {
@@ -69,7 +69,7 @@ public class ScreenMirrorService(
                 {
                     logger.Warn("No online devices found from adb");
                     var ipAddress = sessionManager.GetConnectedSessionIpAddress();
-                    if (!string.IsNullOrEmpty(ipAddress) && !await adbService.ConnectWireless(ipAddress))
+                    if (!await adbService.ConnectWireless(ipAddress))
                     {
                         logger.Warn("Failed to connect to Adb wirelessly");
                         await dispatcher.EnqueueAsync(async () =>
@@ -103,7 +103,7 @@ public class ScreenMirrorService(
             }
 
             // Build arguments for scrcpy with the selected device
-            var args = BuildScrcpyArguments(customArgs, selectedDeviceSerial);
+            var (args, deviceSerial) = BuildScrcpyArguments(customArgs, selectedDeviceSerial);
             
             cts?.Cancel();
             cts?.Dispose();
@@ -148,7 +148,7 @@ public class ScreenMirrorService(
             }
             
             // Start monitoring process in background
-            StartProcessMonitoring(process, processCts);
+            StartProcessMonitoring(process, processCts, deviceSerial);
             return true;
         }
         catch (Exception ex)
@@ -161,7 +161,7 @@ public class ScreenMirrorService(
         }
     }
 
-    private void StartProcessMonitoring(Process process, CancellationTokenSource processCts)
+    private void StartProcessMonitoring(Process process, CancellationTokenSource processCts, string deviceSerial)
     {
         var errorOutput = new StringBuilder();
         
@@ -188,11 +188,9 @@ public class ScreenMirrorService(
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
         logger.Info($"scrcpy process started (PID: {process.Id})");
-        
-        lock (scrcpyProcesses)
-        {
-            scrcpyProcesses.Add(process);
-        }
+       
+
+        scrcpyProcesses.Add(deviceSerial, process);
 
         _ = Task.Run(async () =>
         {
@@ -255,10 +253,8 @@ public class ScreenMirrorService(
             finally
             {
                 process.Dispose();
-                lock (scrcpyProcesses)
-                {
-                    scrcpyProcesses.Remove(process);
-                }
+                scrcpyProcesses.Remove(deviceSerial);
+
                 processCts.Dispose();
                 if (ReferenceEquals(cts, processCts))
                 {
@@ -338,7 +334,7 @@ public class ScreenMirrorService(
         return selectedDeviceSerial;
     }
 
-    private string BuildScrcpyArguments(string? customArgs = null, string? deviceSerial = null)
+    private (string, string) BuildScrcpyArguments(string? customArgs = null, string? deviceSerial = null)
     {
         var args = new List<string>();
         
@@ -363,7 +359,6 @@ public class ScreenMirrorService(
         
         // Get feature settings
         var settings = userSettingsService.FeatureSettingsService;
-       
 
         // General settings
         if (settings.ScreenOff)
@@ -423,12 +418,7 @@ public class ScreenMirrorService(
         {
             args.Add($"--display-id={settings.Display}");
         }
-        
-        if (!string.IsNullOrEmpty(settings.VirtualDisplaySize))
-        {
-            args.Add($"--new-display={settings.VirtualDisplaySize}");
-        }
-        
+
         // Audio settings
         if (!string.IsNullOrEmpty(settings.AudioBitrate))
         {
@@ -471,15 +461,16 @@ public class ScreenMirrorService(
             switch (deviceSelection)
             {
                 case ScrcpyDevicePreferenceType.Usb:
-                    args.Add("-d");  // Use USB device
+                    args.Add("-d");  // Use USB
+                    deviceSerial = devices.FirstOrDefault(d => d.Type == DeviceType.USB && d.State == DeviceState.Online)?.Serial;
                     break;
                 case ScrcpyDevicePreferenceType.Tcpip:
                     args.Add("-e");  // Use TCP device
+                    deviceSerial = devices.FirstOrDefault(d => d.Type == DeviceType.WIFI && d.State == DeviceState.Online)?.Serial;
                     break;
-                case ScrcpyDevicePreferenceType.Auto:
                 default:
-                    var usbDevice = devices.FirstOrDefault(d => d.Type == DeviceType.USB && d.State == DeviceState.Online);
-                    if (usbDevice != null)
+                    deviceSerial = devices.FirstOrDefault(d => d.Type == DeviceType.USB && d.State == DeviceState.Online)?.Serial;
+                    if (deviceSerial != null)
                     {
                         args.Add("-d");  // Use USB device
                     }
@@ -490,7 +481,37 @@ public class ScreenMirrorService(
                     break;
             }
         }
-        return string.Join(" ", args);
+
+        if (!string.IsNullOrEmpty(settings.VirtualDisplaySize) && settings.IsVirtualDisplayEnabled)
+        {
+            args.Add($"--new-display={settings.VirtualDisplaySize}");
+        }
+        else if (settings.IsVirtualDisplayEnabled)
+        {
+            args.Add("--new-display");
+        }
+        else if (scrcpyProcesses.Count > 0 && !string.IsNullOrEmpty(deviceSerial))
+        {
+            // Check for existing processes for this device and terminate them
+            // when virtual display is not enabled
+            if (scrcpyProcesses.TryGetValue(deviceSerial, out var existingProcess))
+            {
+                try
+                {
+                    if (!existingProcess.HasExited)
+                    {
+                        existingProcess.Kill();
+                    }
+                    scrcpyProcesses.Remove(deviceSerial);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error($"Failed to terminate existing process: {ex.Message}", ex);
+                }
+            }
+        }
+        
+        return (string.Join(" ", args), deviceSerial ?? string.Empty);
     }
 
     public async Task SelectScrcpyLocationClick(object sender, RoutedEventArgs e)

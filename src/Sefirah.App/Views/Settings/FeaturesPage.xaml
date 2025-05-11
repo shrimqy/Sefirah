@@ -270,6 +270,10 @@
                                         </local:SettingsBlockControl.SettingsActionableElement>
                                     </local:SettingsBlockControl>
 
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=EnableVirtualDisplay}" CornerRadius="0">
+                                        <ToggleSwitch Margin="-7,-3,-75,-3" IsOn="{x:Bind ViewModel.IsVirtualDisplayEnabled, Mode=TwoWay}" />
+                                    </local:SettingsBlockControl>
+
                                     <local:SettingsBlockControl Title="{helpers:ResourceString Name=VirtualDisplaySize}" CornerRadius="0">
                                         <local:SettingsBlockControl.SettingsActionableElement>
                                             <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.VirtualDisplaySize, Mode=TwoWay}" />
