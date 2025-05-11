@@ -537,4 +537,7 @@
   <data name="DeviceName" xml:space="preserve">
     <value>Tên thiết bị</value>
   </data>
+  <data name="EnableVirtualDisplay" xml:space="preserve">
+    <value>Enable virtual display</value>
+  </data>
 </root>
