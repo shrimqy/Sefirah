@@ -60,13 +60,20 @@ public class SyncProviderPool(
         await Task.WhenAll(stopTasks);
     }
 
-    public void StopSyncRoot(StorageProviderSyncRootInfo syncRootInfo)
+    public async Task StopSyncRoot(StorageProviderSyncRootInfo syncRootInfo)
     {
-        if (_threads.TryGetValue(syncRootInfo.Id, out var existingThread))
+        try
         {
-            logger.Debug("Stopping existing sync provider for {id}", syncRootInfo.Id);
-            existingThread.Stop().Wait();
-            _threads.Remove(syncRootInfo.Id);
+            if (_threads.TryGetValue(syncRootInfo.Id, out var existingThread))
+            {
+                logger.Debug("Stopping existing sync provider for {id}", syncRootInfo.Id);
+                await existingThread.Stop();
+                _threads.Remove(syncRootInfo.Id);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Failed to stop sync root", ex);
         }
     }
 

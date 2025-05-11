@@ -17,13 +17,6 @@ public sealed class AppsViewModel : BaseViewModel
         get => _isLoading;
         set => SetProperty(ref _isLoading, value);
     }
-
-    private bool _isAppLoading;
-    public bool IsAppLoading
-    {
-        get => _isAppLoading;
-        set => SetProperty(ref _isAppLoading, value);
-    }
     
     public bool IsEmpty => Apps.Count == 0 && !IsLoading;
     

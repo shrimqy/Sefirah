@@ -262,6 +262,7 @@ public class AdbService(
                 AdbDevices.Clear();
                 return;
             }
+
             // Convert to our AdbDevice model and add to collection
             await DispatcherQueue.GetForCurrentThread().EnqueueAsync(() =>
             {

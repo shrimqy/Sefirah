@@ -2,7 +2,7 @@
 
 namespace Sefirah.App.Data.Models;
 
-public partial class SmsConversation : INotifyPropertyChanged
+public partial class SmsConversation : ObservableObject
 {
     public long ThreadId { get; }
     
@@ -16,8 +16,7 @@ public partial class SmsConversation : INotifyPropertyChanged
         {
             if (_snippet != value)
             {
-                _snippet = value;
-                OnPropertyChanged(nameof(Snippet));
+               SetProperty(ref _snippet, value);
             }
         }
     }
@@ -30,8 +29,7 @@ public partial class SmsConversation : INotifyPropertyChanged
         {
             if (_lastMessageTimestamp != value)
             {
-                _lastMessageTimestamp = value;
-                OnPropertyChanged(nameof(LastMessageTimestamp));
+                SetProperty(ref _lastMessageTimestamp, value);
             }
         }
     }
@@ -44,8 +42,7 @@ public partial class SmsConversation : INotifyPropertyChanged
         {
             if (_displayName != value)
             {
-                _displayName = value;
-                OnPropertyChanged(nameof(DisplayName));
+                SetProperty(ref _displayName, value);
             }
         }
     }
@@ -162,13 +159,4 @@ public partial class SmsConversation : INotifyPropertyChanged
             }
         }
     }
-
-    #region INotifyPropertyChanged Implementation
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    protected virtual void OnPropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-    #endregion
 }

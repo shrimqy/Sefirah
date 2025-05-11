@@ -77,16 +77,12 @@ public sealed partial class TrayIconControl : UserControl
     [RelayCommand]
     public void ExitApplication()
     {
-        // Cleanup
-        uiSettings.ColorValuesChanged -= UpdateTrayIcon;
-        
         App.HandleClosedEvents = false;
         TrayIcon.Dispose();
-       
-        // Close window and exit app
+
         MainWindow.Instance.Close();
         App.Current.Exit();
-        
+
         // Force termination if still needed
         Process.GetCurrentProcess().Kill();
     }

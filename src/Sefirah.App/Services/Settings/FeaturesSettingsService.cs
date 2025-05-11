@@ -132,7 +132,7 @@ internal sealed class FeaturesSettingsService : BaseObservableJsonSettings, IFea
     
     public string? AudioBuffer
     {
-        get => Get("20");
+        get => Get(string.Empty);
         set => Set(value);
     }
 
@@ -160,7 +160,7 @@ internal sealed class FeaturesSettingsService : BaseObservableJsonSettings, IFea
         set => Set(value);
     }
 
-    public string Crop
+    public string? Crop
     {
         get => Get(string.Empty);
         set => Set(value);
@@ -172,7 +172,7 @@ internal sealed class FeaturesSettingsService : BaseObservableJsonSettings, IFea
         set => Set(value);
     }
 
-    public string VirtualDisplaySize
+    public string? VirtualDisplaySize
     {
         get => Get(string.Empty);
         set => Set(value);
@@ -202,9 +202,9 @@ internal sealed class FeaturesSettingsService : BaseObservableJsonSettings, IFea
         set => Set(value);
     }
 
-    public string AudioOutputBuffer
+    public string? AudioOutputBuffer
     {
-        get => Get("0");
+        get => Get(string.Empty);
         set => Set(value);
     }
 
@@ -237,6 +237,4 @@ internal sealed class FeaturesSettingsService : BaseObservableJsonSettings, IFea
         get => Get(true);
         set => Set(value);
     }
-    
-    
 }

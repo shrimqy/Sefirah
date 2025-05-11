@@ -238,19 +238,6 @@ public sealed partial class FeaturesViewModel : ObservableObject
         }
     }       
 
-    public string? AudioBuffer
-    {
-        get => UserSettingsService.FeatureSettingsService.AudioBuffer;
-        set
-        {
-            if (value != UserSettingsService.FeatureSettingsService.AudioBuffer)
-            {
-                UserSettingsService.FeatureSettingsService.AudioBuffer = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
     public string? CustomArguments
     {
         get => UserSettingsService.FeatureSettingsService.CustomArguments;
@@ -441,6 +428,19 @@ public sealed partial class FeaturesViewModel : ObservableObject
             if (value != UserSettingsService.FeatureSettingsService.ForwardMicrophone)
             {
                 UserSettingsService.FeatureSettingsService.ForwardMicrophone = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public string? AudioBuffer
+    {
+        get => UserSettingsService.FeatureSettingsService.AudioBuffer;
+        set
+        {
+            if (value != UserSettingsService.FeatureSettingsService.AudioBuffer)    
+            {
+                UserSettingsService.FeatureSettingsService.AudioBuffer = value;
                 OnPropertyChanged();
             }
         }

@@ -102,34 +102,40 @@ public class SftpService(
         sessionManager.ClientConnectionStatusChanged += OnClientConnectionStatusChanged;
     }
 
-    private void OnClientConnectionStatusChanged(object? sender, ConnectedSessionEventArgs e)
+    private async void OnClientConnectionStatusChanged(object? sender, ConnectedSessionEventArgs e)
     {
         if (!e.IsConnected && info != null)
         {
-            syncProviderPool.StopSyncRoot(info);
-            //registrar.Unregister(info.Id);
+            await syncProviderPool.StopSyncRoot(info);
         }
     }
 
-    public void RemoveSyncRoot(string deviceId)
+    public async void RemoveSyncRoot(string deviceId)
     {
         var id = $"Shrimqy:Sefirah!{WindowsIdentity.GetCurrent().User}!{deviceId}";
-        if (info?.Id == id)
+        try
         {
-            syncProviderPool.StopSyncRoot(info);
+            if (info?.Id == id)
+            {
+                await syncProviderPool.StopSyncRoot(info);
+            }
+            if (registrar.IsRegistered(id))
+            {
+                registrar.Unregister(id);
+            }
         }
-        if (registrar.IsRegistered(id))
+        catch (Exception ex)
         {
-            registrar.Unregister(id);
+            logger.Error("Error removing sync root for device {deviceId}", deviceId, ex);
         }
     }
 
-    public void RemoveAllSyncRoots()
+    public async void RemoveAllSyncRoots()
     {
         logger.Info("Removing all sync roots");
         if (info != null)
         {
-            syncProviderPool.StopSyncRoot(info);
+            await syncProviderPool.StopSyncRoot(info);
         }
         foreach (var syncRoot in registrar.GetSyncRoots())
         {

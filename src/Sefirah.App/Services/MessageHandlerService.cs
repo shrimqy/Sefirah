@@ -72,12 +72,10 @@ public class MessageHandlerService(
         catch (InvalidCastException ex)
         {
             logger.Error($"Invalid message type cast. Expected type: {message.GetType().Name}, Actual type: {ex.GetType().Name}", ex);
-            throw;
         }
         catch (Exception ex)
         {
             logger.Error("Error handling message", ex);
-            throw;
         }
     }
 }

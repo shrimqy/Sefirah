@@ -328,12 +328,6 @@
                                         <ToggleSwitch Margin="-7,-3,-75,-3" IsOn="{x:Bind ViewModel.ForwardMicrophone, Mode=TwoWay}" />
                                     </local:SettingsBlockControl>
 
-                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=AudioOutputBuffer}" CornerRadius="0">
-                                        <local:SettingsBlockControl.SettingsActionableElement>
-                                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.AudioOutputBuffer, Mode=TwoWay}" />
-                                        </local:SettingsBlockControl.SettingsActionableElement>
-                                    </local:SettingsBlockControl>
-
                                     <local:SettingsBlockControl Title="{helpers:ResourceString Name=AudioCodec}" CornerRadius="0">
                                         <local:SettingsBlockControl.SettingsActionableElement>
                                             <ComboBox
@@ -347,6 +341,12 @@
                                     <local:SettingsBlockControl Title="{helpers:ResourceString Name=Bitrate}" CornerRadius="0">
                                         <local:SettingsBlockControl.SettingsActionableElement>
                                             <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.AudioBitrate, Mode=TwoWay}" />
+                                        </local:SettingsBlockControl.SettingsActionableElement>
+                                    </local:SettingsBlockControl>
+
+                                    <local:SettingsBlockControl Title="{helpers:ResourceString Name=AudioOutputBuffer}" CornerRadius="0">
+                                        <local:SettingsBlockControl.SettingsActionableElement>
+                                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.AudioOutputBuffer, Mode=TwoWay}" />
                                         </local:SettingsBlockControl.SettingsActionableElement>
                                     </local:SettingsBlockControl>
 

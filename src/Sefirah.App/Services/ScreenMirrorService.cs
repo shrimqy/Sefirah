@@ -88,6 +88,13 @@ public class ScreenMirrorService(
                 }
             }
 
+            List<string> argBuilder = [];
+
+            if (!string.IsNullOrEmpty(customArgs))
+            {
+                argBuilder.Add(customArgs);
+            }
+
             // Determine if we need to show the device selection dialog
             string? selectedDeviceSerial = null;
             bool shouldShowDialog = ShouldShowDeviceSelectionDialog(onlineDevices);
@@ -95,15 +102,50 @@ public class ScreenMirrorService(
             if (shouldShowDialog)
             {
                 selectedDeviceSerial = await ShowDeviceSelectionDialog(onlineDevices);
-                if (selectedDeviceSerial == null)
+                if (string.IsNullOrEmpty(selectedDeviceSerial))
                 {
                     logger.Info("User canceled device selection");
                     return false;
                 }
+                argBuilder.Add($"-s {selectedDeviceSerial}");
+            }
+            else if (onlineDevices.Count > 1 && string.IsNullOrEmpty(selectedDeviceSerial))
+            {
+                var deviceSelection = userSettingsService.FeatureSettingsService.ScrcpyDevicePreference;
+
+                switch (deviceSelection)
+                {
+                    case ScrcpyDevicePreferenceType.Usb:
+                        argBuilder.Add("-d");
+                        selectedDeviceSerial = onlineDevices.FirstOrDefault(d => d.Type == DeviceType.USB)?.Serial;
+                        break;
+                    case ScrcpyDevicePreferenceType.Tcpip:
+                        argBuilder.Add("-e");
+                        selectedDeviceSerial = onlineDevices.FirstOrDefault(d => d.Type == DeviceType.WIFI)?.Serial;
+                        break;
+                    case ScrcpyDevicePreferenceType.Auto:
+                        if (onlineDevices.FirstOrDefault(d => d.Type == DeviceType.USB) != null)
+                        {
+                            selectedDeviceSerial = onlineDevices.FirstOrDefault(d => d.Type == DeviceType.USB)?.Serial;
+                            argBuilder.Add("-d");
+                        }
+                        else
+                        {
+                            selectedDeviceSerial = onlineDevices.FirstOrDefault(d => d.Type == DeviceType.WIFI)?.Serial;
+                            argBuilder.Add("-e");
+                        }
+                        break;
+                    default:
+                        break;
+                }            
+            }
+            else
+            {
+                selectedDeviceSerial = onlineDevices.First().Serial;
             }
 
             // Build arguments for scrcpy with the selected device
-            var (args, deviceSerial) = BuildScrcpyArguments(customArgs, selectedDeviceSerial);
+            var (args, deviceSerial) = BuildScrcpyArguments(argBuilder, selectedDeviceSerial!);
             
             cts?.Cancel();
             cts?.Dispose();
@@ -192,7 +234,7 @@ public class ScreenMirrorService(
 
         scrcpyProcesses.Add(deviceSerial, process);
 
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             try
             {
@@ -279,11 +321,6 @@ public class ScreenMirrorService(
         if (distinctModels > 1)
             return true;
         
-        // Check if there are multiple WiFi devices of the same model
-        var wifiDevices = onlineDevices.Where(d => d.Type == DeviceType.WIFI).ToList();
-        if (wifiDevices.Count > 1)
-            return true;
-        
         // Otherwise, no need to show the dialog
         return false;
     }
@@ -334,27 +371,14 @@ public class ScreenMirrorService(
         return selectedDeviceSerial;
     }
 
-    private (string, string) BuildScrcpyArguments(string? customArgs = null, string? deviceSerial = null)
+    private (string, string) BuildScrcpyArguments(List<string> args, string deviceSerial)
     {
-        var args = new List<string>();
-        
+
         var preDefinedArgs = userSettingsService.FeatureSettingsService.CustomArguments;
-        
-        // Add custom arguments if provided 
-        if (!string.IsNullOrEmpty(customArgs))
-        {
-            args.Add(customArgs);
-        }
 
         if (!string.IsNullOrEmpty(preDefinedArgs))
         {
             args.Add(preDefinedArgs);
-        }
-        
-        // Add device serial if provided
-        if (!string.IsNullOrEmpty(deviceSerial))
-        {
-            args.Add($"-s {deviceSerial}");
         }
         
         // Get feature settings
@@ -424,10 +448,15 @@ public class ScreenMirrorService(
         {
             args.Add($"--audio-bit-rate={settings.AudioBitrate}");
         }
-        
+
         if (!string.IsNullOrEmpty(settings.AudioBuffer))
         {
-            args.Add($"--audio-output-buffer={settings.AudioBuffer}");
+            args.Add($"--audio-buffer={settings.AudioBuffer}");
+        }
+
+        if (!string.IsNullOrEmpty(settings.AudioOutputBuffer))
+        {
+            args.Add($"--audio-output-buffer={settings.AudioOutputBuffer}");
         }
         
         if (settings.ForwardMicrophone)
@@ -450,68 +479,39 @@ public class ScreenMirrorService(
             args.Add($"{adbService.AudioCodecOptions[settings.AudioCodec].Command}");
         }
 
-        // Only continue with device selection if the user hasn't already specified a device
-        // and we haven't added a device serial above
-        bool hasDeviceSelectionFlag = (args.Contains("-s") || args.Contains("-d") || args.Contains("-e"));
-
-        if (devices.Count > 1 && !hasDeviceSelectionFlag && string.IsNullOrEmpty(deviceSerial))
+        if (args[0].StartsWith ("--start-app"))
         {
-            var deviceSelection = userSettingsService.FeatureSettingsService.ScrcpyDevicePreference;
-            
-            switch (deviceSelection)
+            if (!string.IsNullOrEmpty(settings.VirtualDisplaySize) && settings.IsVirtualDisplayEnabled)
             {
-                case ScrcpyDevicePreferenceType.Usb:
-                    args.Add("-d");  // Use USB
-                    deviceSerial = devices.FirstOrDefault(d => d.Type == DeviceType.USB && d.State == DeviceState.Online)?.Serial;
-                    break;
-                case ScrcpyDevicePreferenceType.Tcpip:
-                    args.Add("-e");  // Use TCP device
-                    deviceSerial = devices.FirstOrDefault(d => d.Type == DeviceType.WIFI && d.State == DeviceState.Online)?.Serial;
-                    break;
-                default:
-                    deviceSerial = devices.FirstOrDefault(d => d.Type == DeviceType.USB && d.State == DeviceState.Online)?.Serial;
-                    if (deviceSerial != null)
-                    {
-                        args.Add("-d");  // Use USB device
-                    }
-                    else
-                    {
-                        args.Add("-e");  // Use TCP device
-                    }
-                    break;
+                args.Add($"--new-display={settings.VirtualDisplaySize}");
             }
-        }
-
-        if (!string.IsNullOrEmpty(settings.VirtualDisplaySize) && settings.IsVirtualDisplayEnabled)
-        {
-            args.Add($"--new-display={settings.VirtualDisplaySize}");
-        }
-        else if (settings.IsVirtualDisplayEnabled)
-        {
-            args.Add("--new-display");
-        }
-        else if (scrcpyProcesses.Count > 0 && !string.IsNullOrEmpty(deviceSerial))
-        {
-            // Check for existing processes for this device and terminate them
-            // when virtual display is not enabled
-            if (scrcpyProcesses.TryGetValue(deviceSerial, out var existingProcess))
+            else if (settings.IsVirtualDisplayEnabled)
             {
-                try
+                args.Add("--new-display");
+            }
+            else if (scrcpyProcesses.Count > 0)
+            {
+                // Check for existing processes for this device and terminate them
+                // when virtual display is not enabled
+                if (scrcpyProcesses.TryGetValue(deviceSerial, out var existingProcess))
                 {
-                    if (!existingProcess.HasExited)
+                    try
                     {
-                        existingProcess.Kill();
+                        if (!existingProcess.HasExited)
+                        {
+                            existingProcess.Kill();
+                        }
+                        scrcpyProcesses.Remove(deviceSerial);
                     }
-                    scrcpyProcesses.Remove(deviceSerial);
-                }
-                catch (Exception ex)
-                {
-                    logger.Error($"Failed to terminate existing process: {ex.Message}", ex);
+                    catch (Exception ex)
+                    {
+                        logger.Error($"Failed to terminate existing process: {ex.Message}", ex);
+                    }
                 }
             }
         }
-        
-        return (string.Join(" ", args), deviceSerial ?? string.Empty);
+
+        return (string.Join(" ", args), deviceSerial);
     }
 
     public async Task SelectScrcpyLocationClick(object sender, RoutedEventArgs e)

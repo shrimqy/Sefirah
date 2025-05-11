@@ -50,10 +50,14 @@
             <!--  Local Device Name  -->
             <local:SettingsBlockControl Title="{helpers:ResourceString Name=DeviceName}">
                 <local:SettingsBlockControl.Icon>
-                    <FontIcon Glyph="&#xE771;" />
+                    <FontIcon Glyph="&#xE70F;" />
                 </local:SettingsBlockControl.Icon>
                 <local:SettingsBlockControl.SettingsActionableElement>
-                    <TextBox x:Name="DeviceNameTextBox" KeyDown="OnKeyDown" MinWidth="200" Text="{x:Bind ViewModel.LocalDeviceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBox
+                        x:Name="DeviceNameTextBox"
+                        MinWidth="200"
+                        KeyDown="OnKeyDown"
+                        Text="{x:Bind ViewModel.LocalDeviceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </local:SettingsBlockControl.SettingsActionableElement>
             </local:SettingsBlockControl>
         </StackPanel>

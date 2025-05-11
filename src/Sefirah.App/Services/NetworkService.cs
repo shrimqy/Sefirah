@@ -56,7 +56,6 @@ public class NetworkService(
         {
 
             certificate = await CertificateHelper.GetOrCreateCertificateAsync();
-
             var context = new SslContext(SslProtocols.Tls12, certificate);
 
             foreach (int port in PORT_RANGE)
@@ -65,31 +64,29 @@ public class NetworkService(
                 {                     
                     server = new Server(context, IPAddress.Any, port, this, logger)
                     {
-                        OptionDualMode = true,
                         OptionReuseAddress = true,
                     };
-                    this.port = port;
-                    break;
+                    
+                    if (server.Start())
+                    {
+                        this.port = port;
+                        isRunning = true;
+                        await discoveryService.StartDiscoveryAsync(port);
+                        logger.Info($"Server started on port: {port}");
+                        return true;
+                    }
+                    else
+                    {
+                        server.Dispose();
+                        server = null;
+                    }
                 }
                 catch (Exception ex)
                 {
-                    logger.Error("Error starting server", ex);
+                    logger.Error($"Error starting server on port {port}", ex);
+                    server?.Dispose();
                     server = null;
                 }
-            }   
-
-            if (server != null)
-            {
-                isRunning = server.Start();
-                // Advertise the specific address clients should connect to
-                await discoveryService.StartDiscoveryAsync(port);
-
-                logger.Info($"Server start on port: {port}");
-            }
-
-            if (isRunning)
-            {
-                return true;
             }
 
             logger.Error("Failed to start server");

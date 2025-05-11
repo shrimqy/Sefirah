@@ -132,7 +132,7 @@ public interface IFeatureSettingsService : IBaseSettingsService, INotifyProperty
     /// <summary>
     /// Gets or sets the crop settings.
     /// </summary>
-    string Crop { get; set; }
+    string? Crop { get; set; }
 
     /// <summary>
     /// Gets or sets the display number.
@@ -142,7 +142,7 @@ public interface IFeatureSettingsService : IBaseSettingsService, INotifyProperty
     /// <summary>
     /// Gets or sets the virtual display size.
     /// </summary>
-    string VirtualDisplaySize { get; set; }
+    string? VirtualDisplaySize { get; set; }
 
     /// <summary>
     /// Gets or sets the display orientation.
@@ -167,7 +167,7 @@ public interface IFeatureSettingsService : IBaseSettingsService, INotifyProperty
     /// <summary>
     /// Gets or sets the audio output buffer.
     /// </summary>
-    string AudioOutputBuffer { get; set; }
+    string? AudioOutputBuffer { get; set; }
 
     /// <summary>
     /// Gets or sets the audio codec.
