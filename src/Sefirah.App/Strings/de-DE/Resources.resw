@@ -530,15 +530,15 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
     <value>Auto</value>
   </data>
   <data name="ScrcpyErrorTitle" xml:space="preserve">
-    <value>Scrcpy failed to start</value>
+    <value>Scrcpy konnte nicht starten</value>
   </data>
   <data name="CopyError" xml:space="preserve">
-    <value>Copy error</value>
+    <value>Kopierfehler</value>
   </data>
   <data name="DeviceName" xml:space="preserve">
-    <value>Device name</value>
+    <value>Gerätename</value>
   </data>
   <data name="EnableVirtualDisplay" xml:space="preserve">
-    <value>Enable virtual display</value>
+    <value>Virtuellen Bildschirm aktivieren</value>
   </data>
 </root>
