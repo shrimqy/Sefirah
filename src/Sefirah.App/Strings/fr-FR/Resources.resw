@@ -241,7 +241,7 @@
     <value>Annuler</value>
   </data>
   <data name="OnboardingWelcome.Title" xml:space="preserve">
-    <value>Bienvenue sur Sefirah</value>
+    <value>Bienvenue sur Sefira</value>
   </data>
   <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
     <value>Pour commencer, téléchargez et installez l'application via la page GitHub correspondante.</value>
@@ -529,10 +529,10 @@
     <value>Automatique</value>
   </data>
   <data name="ScrcpyErrorTitle" xml:space="preserve">
-    <value>Scrcpy failed to start</value>
+    <value>Scrapy n'a pas pu démarrer</value>
   </data>
   <data name="CopyError" xml:space="preserve">
-    <value>Copy error</value>
+    <value>Copier l'erreur</value>
   </data>
   <data name="DeviceName" xml:space="preserve">
     <value>Device name</value>
