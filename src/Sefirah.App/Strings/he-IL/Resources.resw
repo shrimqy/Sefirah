@@ -538,6 +538,6 @@
     <value>שם ההתקן</value>
   </data>
   <data name="EnableVirtualDisplay" xml:space="preserve">
-    <value>Enable virtual display</value>
+    <value>הפעל מסך ווירטואלי</value>
   </data>
 </root>
