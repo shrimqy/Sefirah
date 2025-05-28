@@ -382,7 +382,7 @@
     <value>オーディオ設定</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
-    <value>Open in app</value>
+    <value>アプリで開く</value>
   </data>
   <data name="ScreenOff" xml:space="preserve">
     <value>ミラーリング中は画面を消灯する</value>
@@ -400,46 +400,46 @@
     <value>バッファ</value>
   </data>
   <data name="Messages" xml:space="preserve">
-    <value>Messages</value>
+    <value>メッセージ</value>
   </data>
   <data name="EmptyMessages" xml:space="preserve">
-    <value>Select a conversation to view messages</value>
+    <value>メッセージを表示する会話を選択</value>
   </data>
   <data name="MessagePlaceholder" xml:space="preserve">
-    <value>Type a message</value>
+    <value>メッセージを入力</value>
   </data>
   <data name="Apps" xml:space="preserve">
-    <value>Apps</value>
+    <value>アプリ</value>
   </data>
   <data name="NewMessage" xml:space="preserve">
-    <value>New message</value>
+    <value>新しいメッセージ</value>
   </data>
   <data name="SearchMessages" xml:space="preserve">
-    <value>Search messages</value>
+    <value>メッセージを検索</value>
   </data>
   <data name="AddressInputPlaceholder" xml:space="preserve">
-    <value>Enter phone number and press Enter</value>
+    <value>電話番号を入力してEnterキーを押します</value>
   </data>
   <data name="RemoveAddress" xml:space="preserve">
-    <value>Remove address</value>
+    <value>アドレスを削除</value>
   </data>
   <data name="CopyMessage" xml:space="preserve">
-    <value>Copy message</value>
+    <value>メッセージをコピー</value>
   </data>
   <data name="NoApps" xml:space="preserve">
-    <value>No apps found</value>
+    <value>アプリが見つかりません</value>
   </data>
   <data name="AllApps" xml:space="preserve">
-    <value>All Apps</value>
+    <value>すべてのアプリ</value>
   </data>
   <data name="AdditionalArguments" xml:space="preserve">
-    <value>Additional arguments</value>
+    <value>追加の引数</value>
   </data>
   <data name="AdbDeviceOffline" xml:space="preserve">
-    <value>Adb device is offline</value>
+    <value>Adb デバイスはオフラインです</value>
   </data>
   <data name="AdbDeviceOfflineDescription" xml:space="preserve">
-    <value>Connect your device through USB with USB Debugging enabled and then try again</value>
+    <value>USBデバッグを有効にしてUSB経由でデバイスを接続し、もう一度やり直してください</value>
   </data>
   <data name="Dismiss" xml:space="preserve">
     <value>Dismiss</value>
