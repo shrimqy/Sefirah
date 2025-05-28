@@ -442,102 +442,102 @@
     <value>USBデバッグを有効にしてUSB経由でデバイスを接続し、もう一度やり直してください</value>
   </data>
   <data name="Dismiss" xml:space="preserve">
-    <value>Dismiss</value>
+    <value>閉じる</value>
   </data>
   <data name="ScrcpyNotFound" xml:space="preserve">
-    <value>Scrcpy not found</value>
+    <value>Scrcpy が見つかりません</value>
   </data>
   <data name="ScrcpyNotFoundDescription" xml:space="preserve">
-    <value>Select the folder where scrcpy is located</value>
+    <value>Scrcpy のあるフォルダを選択</value>
   </data>
   <data name="PreferTcpIp" xml:space="preserve">
-    <value>Prefer wireless connection</value>
+    <value>無線接続を優先する</value>
   </data>
   <data name="SearchApps" xml:space="preserve">
-    <value>Search apps</value>
+    <value>アプリを検索</value>
   </data>
   <data name="DisableVideoForwarding" xml:space="preserve">
-    <value>Disable video forwarding</value>
+    <value>ビデオ転送を無効にする</value>
   </data>
   <data name="VideoCodec" xml:space="preserve">
-    <value>Video codec</value>
+    <value>ビデオコーデック</value>
   </data>
   <data name="FrameRate" xml:space="preserve">
-    <value>Frame rate</value>
+    <value>フレームレート</value>
   </data>
   <data name="Crop" xml:space="preserve">
-    <value>Crop</value>
+    <value>クロップ</value>
   </data>
   <data name="Display" xml:space="preserve">
-    <value>Display</value>
+    <value>ディスプレイ</value>
   </data>
   <data name="VirtualDisplaySize" xml:space="preserve">
-    <value>Virtual display size</value>
+    <value>仮想ディスプレイサイズ</value>
   </data>
   <data name="DisplayOrientation" xml:space="preserve">
-    <value>Display orientation</value>
+    <value>画面の向き</value>
   </data>
   <data name="RotationAngle" xml:space="preserve">
-    <value>Rotation angle</value>
+    <value>回転角度</value>
   </data>
   <data name="AudioOutputMode" xml:space="preserve">
-    <value>Audio output</value>
+    <value>オーディオ出力</value>
   </data>
   <data name="ForwardMicrophone" xml:space="preserve">
-    <value>Forward microphone</value>
+    <value>マイクを転送</value>
   </data>
   <data name="AudioOutputBuffer" xml:space="preserve">
-    <value>Audio output buffer</value>
+    <value>オーディオ出力バッファ</value>
   </data>
   <data name="AudioCodec" xml:space="preserve">
-    <value>Audio codec</value>
+    <value>オーディオコーデック</value>
   </data>
   <data name="AdbSettings" xml:space="preserve">
-    <value>Adb Settings</value>
+    <value>Adb 設定</value>
   </data>
   <data name="AutoConnect" xml:space="preserve">
-    <value>Auto connect</value>
+    <value>自動接続</value>
   </data>
   <data name="Both" xml:space="preserve">
-    <value>Both</value>
+    <value>両方</value>
   </data>
   <data name="DesktopDevice" xml:space="preserve">
-    <value>Desktop device</value>
+    <value>デスクトップデバイス</value>
   </data>
   <data name="RemoteDevice" xml:space="preserve">
-    <value>Remote device</value>
+    <value>リモートデバイス</value>
   </data>
   <data name="SelectDevice" xml:space="preserve">
-    <value>Select a device</value>
+    <value>デバイスを選択</value>
   </data>
   <data name="Start" xml:space="preserve">
-    <value>Start</value>
+    <value>スタート</value>
   </data>
   <data name="ScrcpyDevicePreference" xml:space="preserve">
-    <value>Device preference</value>
+    <value>デバイス設定</value>
   </data>
   <data name="AskEverytime" xml:space="preserve">
-    <value>Ask every time</value>
+    <value>毎回確認する</value>
   </data>
   <data name="Usb" xml:space="preserve">
     <value>USB</value>
   </data>
   <data name="WIFI" xml:space="preserve">
-    <value>WIFI</value>
+    <value>Wi-Fi</value>
   </data>
   <data name="Auto" xml:space="preserve">
-    <value>Auto</value>
+    <value>自動</value>
   </data>
   <data name="ScrcpyErrorTitle" xml:space="preserve">
-    <value>Scrcpy failed to start</value>
+    <value>Scrcpy の開始に失敗しました</value>
   </data>
   <data name="CopyError" xml:space="preserve">
-    <value>Copy error</value>
+    <value>コピーのエラー</value>
   </data>
   <data name="DeviceName" xml:space="preserve">
-    <value>Device name</value>
+    <value>デバイス名</value>
   </data>
   <data name="EnableVirtualDisplay" xml:space="preserve">
-    <value>Enable virtual display</value>
+    <value>仮想ディスプレイを有効にする</value>
   </data>
 </root>
