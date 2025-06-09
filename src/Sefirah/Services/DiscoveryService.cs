@@ -291,7 +291,7 @@ public class DiscoveryService(
         _cleanupTimer.Start();
     }
 
-    private void CleanupStaleDevices()
+    private async void CleanupStaleDevices()
     {
         List<DiscoveredDevice> staleDevices;
         lock (collectionLock)
@@ -307,7 +307,7 @@ public class DiscoveryService(
         }
 
         // Process removals on UI thread
-        dispatcher.EnqueueAsync(() =>
+        await dispatcher.EnqueueAsync(() =>
         {
             lock (collectionLock)
             {

@@ -2,9 +2,13 @@ using Sefirah.Data.AppDatabase;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
 using Sefirah.Models;
+#if WINDOWS
+using Sefirah.Platforms.Windows;
+#endif
 using Sefirah.Services;
 using Sefirah.Services.Settings;
 using Sefirah.Services.Socket;
+using Sefirah.ViewModels;
 using Sefirah.ViewModels.Settings;
 using Serilog;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -14,7 +18,7 @@ namespace Sefirah.Helpers;
 /// <summary>
 /// Provides static helper to manage app lifecycle.
 /// </summary>
-public static class AppLifeCycleHelper
+public static class AppLifecycleHelper
 {
     /// <summary>
     /// Gets application package version.
@@ -25,11 +29,20 @@ public static class AppLifeCycleHelper
     public static async Task InitializeAppComponentsAsync()
     {
         var networkService = Ioc.Default.GetRequiredService<INetworkService>();
+        var notificationService = Ioc.Default.GetRequiredService<INotificationService>();
         var deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
+        var adbService = Ioc.Default.GetRequiredService<IAdbService>();
 
+#if WINDOWS
+        var toastNotificationService = Ioc.Default.GetRequiredService<ToastNotificationService>();
+        await toastNotificationService.RegisterNotificationAsync();
+#endif
+
+        notificationService.Initialize();
         await Task.WhenAll(
             deviceManager.Initialize(),
-            networkService.StartServerAsync()
+            networkService.StartServerAsync(),
+            adbService.StartAsync()
         );
     } 
 
@@ -86,6 +99,10 @@ public static class AppLifeCycleHelper
                 .AddSingleton<DeviceRepository>()
                 .AddSingleton<RemoteAppRepository>()
 
+                // Platform-specific services
+#if WINDOWS
+                .AddWindowsServices()
+#endif
                 // Services
                 .AddSingleton<IDeviceManager, DeviceManager>()
                 .AddSingleton(sp => (ITcpServerProvider)sp.GetRequiredService<INetworkService>())
@@ -94,12 +111,28 @@ public static class AppLifeCycleHelper
                 .AddSingleton<IDiscoveryService, DiscoveryService>()
                 .AddSingleton<INetworkService, NetworkService>()
 
+                .AddSingleton<INotificationService, NotificationService>()
+                .AddSingleton<IClipboardService, ClipboardService>()
+
                 .AddSingleton<IMessageHandler, MessageHandler>()
                 .AddSingleton<Func<IMessageHandler>>(sp => () => sp.GetRequiredService<IMessageHandler>())
+                .AddSingleton<IAdbService, AdbService>()
+                .AddSingleton<IScreenMirrorService, ScreenMirrorService>()
 
+                // ViewModels
+                .AddSingleton<MainPageViewModel>()
                 .AddSingleton<DevicesViewModel>()
+                .AddSingleton<AppsViewModel>()
                 )
             );
+    }
+
+    /// <summary>
+    /// Shows exception on the Debug Output.
+    /// </summary>
+    public static void HandleAppUnhandledException(Exception? ex)
+    {
+        Ioc.Default.GetService<ILogger>()?.LogCritical("Unhandled exception {ex}", ex);
     }
 
     public static async Task HandleStartupTaskAsync(bool enable)

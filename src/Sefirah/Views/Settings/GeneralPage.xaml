@@ -1,0 +1,106 @@
+﻿<Page
+    x:Class="Sefirah.Views.Settings.GeneralPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Sefirah.UserControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:Sefirah.Helpers"
+    xmlns:local="using:Sefirah.Views.Settings"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:Sefirah.ViewModels.Settings"
+    mc:Ignorable="d">
+
+    <Page.DataContext>
+        <vm:GeneralViewModel x:Name="ViewModel" />
+    </Page.DataContext>
+
+    <ScrollViewer>
+        <StackPanel Spacing="5">
+            <TextBlock
+                Margin="0,0,0,8"
+                FontSize="28"
+                FontWeight="SemiBold"
+                Text="{helpers:ResourceString Name=General}" />
+
+            <!--  Startup Options  -->
+            <controls:SettingsBlockControl Title="{helpers:ResourceString Name=StartupOption}" Description="{helpers:ResourceString Name=StartupOptionDescription}">
+                <controls:SettingsBlockControl.Icon>
+                    <FontIcon Glyph="&#xE7E8;" />
+                </controls:SettingsBlockControl.Icon>
+                <controls:SettingsBlockControl.SettingsActionableElement>
+                    <ComboBox
+                        MinWidth="140"
+                        ItemsSource="{x:Bind ViewModel.StartupTypes.Values}"
+                        SelectedItem="{x:Bind ViewModel.SelectedStartupType, Mode=TwoWay}" />
+                </controls:SettingsBlockControl.SettingsActionableElement>
+            </controls:SettingsBlockControl>
+
+            <!--  Theme  -->
+            <controls:SettingsBlockControl Title="{helpers:ResourceString Name=Theme}" Description="{helpers:ResourceString Name=ThemeDescription}">
+                <controls:SettingsBlockControl.Icon>
+                    <FontIcon Glyph="&#xE790;" />
+                </controls:SettingsBlockControl.Icon>
+                <controls:SettingsBlockControl.SettingsActionableElement>
+                    <ComboBox
+                        MinWidth="140"
+                        ItemsSource="{x:Bind ViewModel.ThemeTypes.Values}"
+                        SelectedItem="{x:Bind ViewModel.SelectedThemeType, Mode=TwoWay}" />
+                </controls:SettingsBlockControl.SettingsActionableElement>
+            </controls:SettingsBlockControl>
+
+            <!--  Scrcpy location  -->
+            <controls:SettingsBlockControl Title="{helpers:ResourceString Name=ScreenMirror}" Description="{x:Bind ViewModel.ScrcpyPath, Mode=OneWay}">
+                <controls:SettingsBlockControl.Icon>
+                    <FontIcon Glyph="&#xEC15;" />
+                </controls:SettingsBlockControl.Icon>
+                <controls:SettingsBlockControl.SettingsActionableElement>
+                    <Button Click="SelectScrcpyLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
+                </controls:SettingsBlockControl.SettingsActionableElement>
+            </controls:SettingsBlockControl>
+
+            <!--  Adb Settings  -->
+            <controls:SettingsBlockControl Title="{helpers:ResourceString Name=AdbSettings}" Description="{x:Bind ViewModel.AdbPath, Mode=OneWay}">
+                <controls:SettingsBlockControl.Icon>
+                    <FontIcon Glyph="&#xEC7A;" />
+                </controls:SettingsBlockControl.Icon>
+                <controls:SettingsBlockControl.SettingsActionableElement>
+                    <Button Click="SelectAdbLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
+                </controls:SettingsBlockControl.SettingsActionableElement>
+            </controls:SettingsBlockControl>
+
+            <!--  Save Location  -->
+            <controls:SettingsBlockControl Title="{helpers:ResourceString Name=SaveLocation}" Description="{x:Bind ViewModel.ReceivedFilesPath, Mode=OneWay}">
+                <controls:SettingsBlockControl.Icon>
+                    <SymbolIcon Symbol="Folder" />
+                </controls:SettingsBlockControl.Icon>
+                <controls:SettingsBlockControl.SettingsActionableElement>
+                    <Button Click="SelectSaveLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
+                </controls:SettingsBlockControl.SettingsActionableElement>
+            </controls:SettingsBlockControl>
+
+            <!--  Remote Storage Location  -->
+            <controls:SettingsBlockControl Title="{helpers:ResourceString Name=RemoteStorageLocation}" Description="{x:Bind ViewModel.RemoteStoragePath, Mode=OneWay}">
+                <controls:SettingsBlockControl.Icon>
+                    <SymbolIcon Symbol="SyncFolder" />
+                </controls:SettingsBlockControl.Icon>
+                <controls:SettingsBlockControl.SettingsActionableElement>
+                    <Button Click="SelectRemoteLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
+                </controls:SettingsBlockControl.SettingsActionableElement>
+            </controls:SettingsBlockControl>
+
+            <!--  Local Device Name  -->
+            <controls:SettingsBlockControl Title="{helpers:ResourceString Name=DeviceName}">
+                <controls:SettingsBlockControl.Icon>
+                    <FontIcon Glyph="&#xE70F;" />
+                </controls:SettingsBlockControl.Icon>
+                <controls:SettingsBlockControl.SettingsActionableElement>
+                    <TextBox
+                        x:Name="DeviceNameTextBox"
+                        MinWidth="200"
+                        KeyDown="OnKeyDown"
+                        Text="{x:Bind ViewModel.LocalDeviceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </controls:SettingsBlockControl.SettingsActionableElement>
+            </controls:SettingsBlockControl>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

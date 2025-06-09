@@ -15,6 +15,11 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+
+        // Configure exception handlers
+        UnhandledException += (sender, e) => AppLifecycleHelper.HandleAppUnhandledException(e.Exception);
+        AppDomain.CurrentDomain.UnhandledException += (sender, e) => AppLifecycleHelper.HandleAppUnhandledException(e.ExceptionObject as Exception);
+        TaskScheduler.UnobservedTaskException += (sender, e) => AppLifecycleHelper.HandleAppUnhandledException(e.Exception);
     }
     public static bool HandleClosedEvents { get; set; } = true;
     public static Window? MainWindow { get; private set; }
@@ -42,7 +47,7 @@ public partial class App : Application
         EnsureWindowIsInitialized();
 
         InitializeApplicationAsync(args);
-        _ = AppLifeCycleHelper.InitializeAppComponentsAsync();
+        _ = AppLifecycleHelper.InitializeAppComponentsAsync();
     }
 
     public Frame EnsureWindowIsInitialized()

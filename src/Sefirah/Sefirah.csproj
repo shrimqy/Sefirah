@@ -54,6 +54,11 @@
     <PropertyGroup>
         <LangVersion>Preview</LangVersion>
     </PropertyGroup>
+      <ItemGroup>
+    <Content Include="Assets\Icons\IconResource.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
     <ItemGroup>
         <PackageReference Include="AdvancedSharpAdbClient" />
         <PackageReference Include="BouncyCastle.Cryptography" />

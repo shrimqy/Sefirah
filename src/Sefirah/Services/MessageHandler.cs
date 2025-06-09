@@ -7,9 +7,9 @@ namespace Sefirah.Services;
 public class MessageHandler(
     RemoteAppRepository remoteAppRepository,
     IDeviceManager deviceManager,
-    //INotificationService notificationService,
-    //IClipboardService clipboardService,
-    //ISftpService sftpService,
+    INotificationService notificationService,
+    IClipboardService clipboardService,
+    ISftpService sftpService,
     ILogger<MessageHandler> logger) : IMessageHandler
 {
     public async Task HandleMessageAsync(PairedDevice device, SocketMessage message)
@@ -24,20 +24,20 @@ public class MessageHandler(
                 case ApplicationList applicationList:
                     remoteAppRepository.UpdateApplicationList(device, applicationList);
                     break;
-//                case NotificationMessage notificationMessage:
-//                    await notificationService.HandleNotificationMessage(device, notificationMessage);
-//                    break;
-//                case DeviceStatus deviceStatus:
-//                    deviceManager.UpdateDeviceStatus(device, deviceStatus);
-//                    break;
-//                case ClipboardMessage clipboardMessage:
-//                    await clipboardService.SetContentAsync(clipboardMessage.Content);
-//                    break;
-//#if WINDOWS
-//                case SftpServerInfo sftpServerInfo:
-//                    await sftpService.InitializeAsync(device, sftpServerInfo);
-//                    break;
-//#endif
+                case NotificationMessage notificationMessage:
+                    await notificationService.HandleNotificationMessage(device, notificationMessage);
+                    break;
+                case DeviceStatus deviceStatus:
+                    deviceManager.UpdateDeviceStatus(device, deviceStatus);
+                    break;
+                case ClipboardMessage clipboardMessage:
+                    await clipboardService.SetContentAsync(clipboardMessage.Content);
+                    break;
+#if WINDOWS
+                case SftpServerInfo sftpServerInfo:
+                    await sftpService.InitializeAsync(device, sftpServerInfo);
+                    break;
+#endif
                 default:
                     logger.LogWarning("Unknown message type received: {type}", message.GetType().Name);
                     break;
