@@ -1,4 +1,4 @@
-namespace Sefirah;
+namespace Sefirah.Views;
 
 public sealed partial class MainPage : Page
 {

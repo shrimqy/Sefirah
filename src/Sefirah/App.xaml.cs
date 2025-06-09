@@ -1,15 +1,20 @@
+using CommunityToolkit.WinUI;
+using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.Windows.AppLifecycle;
+using Sefirah.Helpers;
+using Sefirah.Models;
+using Sefirah.Views;
+using Sefirah.Views.Onboarding;
 using Uno.Resizetizer;
+using Windows.ApplicationModel.Activation;
+using LaunchActivatedEventArgs = Microsoft.UI.Xaml.LaunchActivatedEventArgs;
 
 namespace Sefirah;
 public partial class App : Application
 {
-    /// <summary>
-    /// Initializes the singleton application object. This is the first line of authored code
-    /// executed, and as such is the logical equivalent of main() or WinMain().
-    /// </summary>
     public App()
     {
-        this.InitializeComponent();
+        InitializeComponent();
     }
 
     protected Window? MainWindow { get; private set; }
@@ -17,56 +22,8 @@ public partial class App : Application
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        var builder = this.CreateBuilder(args)
-            .Configure(host => host
-#if DEBUG
-                // Switch to Development environment when running in DEBUG
-                .UseEnvironment(Environments.Development)
-#endif
-                .UseLogging(configure: (context, logBuilder) =>
-                {
-                    // Configure log levels for different categories of logging
-                    logBuilder
-                        .SetMinimumLevel(
-                            context.HostingEnvironment.IsDevelopment() ?
-                                LogLevel.Information :
-                                LogLevel.Warning)
-
-                        // Default filters for core Uno Platform namespaces
-                        .CoreLogLevel(LogLevel.Warning);
-
-                    // Uno Platform namespace filter groups
-                    // Uncomment individual methods to see more detailed logging
-                    //// Generic Xaml events
-                    //logBuilder.XamlLogLevel(LogLevel.Debug);
-                    //// Layout specific messages
-                    //logBuilder.XamlLayoutLogLevel(LogLevel.Debug);
-                    //// Storage messages
-                    //logBuilder.StorageLogLevel(LogLevel.Debug);
-                    //// Binding related messages
-                    //logBuilder.XamlBindingLogLevel(LogLevel.Debug);
-                    //// Binder memory references tracking
-                    //logBuilder.BinderMemoryReferenceLogLevel(LogLevel.Debug);
-                    //// DevServer and HotReload related
-                    //logBuilder.HotReloadCoreLogLevel(LogLevel.Information);
-                    //// Debug JS interop
-                    //logBuilder.WebAssemblyLogLevel(LogLevel.Debug);
-
-                }, enableUnoLogging: true)
-                .UseSerilog(consoleLoggingEnabled: true, fileLoggingEnabled: true)
-                .UseConfiguration(configure: configBuilder =>
-                    configBuilder
-                        .EmbeddedSource<App>()
-                        .Section<AppConfig>()
-                )
-                // Enable localization (see appsettings.json for supported languages)
-                .UseLocalization()
-                .ConfigureServices((context, services) =>
-                {
-                    // TODO: Register your services
-                    //services.AddSingleton<IMyService, MyService>();
-                })
-            );
+        var builder = this.ConfigureApp(args);
+            
         MainWindow = builder.Window;
 
 #if DEBUG
@@ -75,26 +32,86 @@ public partial class App : Application
         MainWindow.SetWindowIcon();
 
         Host = builder.Build();
+        Ioc.Default.ConfigureServices(Host.Services);
+        Host.StartAsync();
 
-        // Do not repeat app initialization when the Window already has content,
-        // just ensure that the window is active
-        if (MainWindow.Content is not Frame rootFrame)
+        EnsureWindowIsInitialized();
+
+        InitializeApplicationAsync(args);
+        _ = AppLifeCycleHelper.InitializeAppComponentsAsync();
+    }
+
+    public Frame EnsureWindowIsInitialized()
+    {
+        //  NOTE:
+        //  Do not repeat app initialization when the Window already has content,
+        //  just ensure that the window is active
+        if (MainWindow?.Content is not Frame rootFrame)
         {
             // Create a Frame to act as the navigation context and navigate to the first page
-            rootFrame = new Frame();
+            rootFrame = new() { CacheSize = 1 };
+            rootFrame.NavigationFailed += OnNavigationFailed;
 
             // Place the frame in the current Window
-            MainWindow.Content = rootFrame;
+            MainWindow!.Content = rootFrame;
         }
 
-        if (rootFrame.Content == null)
-        {
-            // When the navigation stack isn't restored navigate to the first page,
-            // configuring the new page by passing required information as a navigation
-            // parameter
-            rootFrame.Navigate(typeof(MainPage), args.Arguments);
-        }
-        // Ensure the current window is active
-        MainWindow.Activate();
+        return rootFrame;
     }
+
+    public Task InitializeApplicationAsync(object activatedEventArgs)
+    {
+        var rootFrame = EnsureWindowIsInitialized();
+
+        MainWindow!.Activate();
+        MainWindow.AppWindow.Show();
+
+        bool isOnboarding = ApplicationData.Current.LocalSettings.Values["HasCompletedOnboarding"] == null;
+        if (isOnboarding)
+        {
+            // Navigate to onboarding page and ensure window is visible
+            rootFrame.Navigate(typeof(WelcomePage), null, new SuppressNavigationTransitionInfo());
+        }
+        else
+        {
+            // Navigate to main page and ensure window is visible
+            rootFrame.Navigate(typeof(MainPage), null, new SuppressNavigationTransitionInfo());
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public void ShowSplashScreen()
+    {
+        var rootFrame = EnsureWindowIsInitialized();
+
+        rootFrame.Navigate(typeof(Views.SplashScreen));
+    }
+
+    /// <summary>
+    /// Gets invoked when the application is activated.
+    /// </summary>
+    public async Task OnActivatedAsync(AppActivationArguments activatedEventArgs)
+    {
+        var activatedEventArgsData = activatedEventArgs.Data;
+
+        // InitializeApplication accesses UI, needs to be called on UI thread
+        //await MainWindow!.DispatcherQueue.EnqueueAsync(() => InitializeApplicationAsync(activatedEventArgsData));
+    }
+
+#if WINDOWS
+    private void HandleToastActivation()
+    {
+        // Check if this is a toast activation
+        var activatedArgs = Microsoft.Windows.AppLifecycle.AppInstance.GetCurrent().GetActivatedEventArgs();
+        if (activatedArgs?.Kind == Microsoft.Windows.AppLifecycle.ExtendedActivationKind.ToastNotification)
+        {
+            // The app was launched via toast notification
+            // The ToastNotificationService will handle the actual notification processing
+        }
+    }
+#endif
+
+    private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
+        => new Exception("Failed to load Page " + e.SourcePageType.FullName);
 }

@@ -1,4 +1,4 @@
-<Project Sdk="Uno.Sdk">
+﻿<Project Sdk="Uno.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net9.0-windows10.0.26100;net9.0-desktop</TargetFrameworks>
 
@@ -45,4 +45,29 @@
       SkiaRenderer;
     </UnoFeatures>
   </PropertyGroup>
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100'">
+        <StartupObject>Sefirah.Platforms.Windows.Program</StartupObject>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-desktop'">
+        <StartupObject>Program</StartupObject>
+    </PropertyGroup>
+    <PropertyGroup>
+        <LangVersion>Preview</LangVersion>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="AdvancedSharpAdbClient" />
+        <PackageReference Include="BouncyCastle.Cryptography" />
+        <PackageReference Include="CommunityToolkit.WinUI.Extensions" />
+        <PackageReference Include="H.NotifyIcon.Uno.WinUI" />
+        <PackageReference Include="MeaMod.DNS" />
+        <PackageReference Include="NAudio" />
+        <PackageReference Include="NetCoreServer" />
+        <PackageReference Include="sqlite-net-pcl" />
+        <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" />
+        <PackageReference Include="SQLitePCLRaw.provider.sqlite3" />
+        <PackageReference Include="SSH.NET" />
+        <PackageReference Include="Vanara.PInvoke.CldApi" />
+        <PackageReference Include="Vanara.PInvoke.Ole" />
+        <PackageReference Include="Vanara.PInvoke.Shell32" />
+    </ItemGroup>
 </Project>
