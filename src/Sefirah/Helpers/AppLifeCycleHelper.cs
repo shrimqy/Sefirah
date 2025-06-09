@@ -1,4 +1,11 @@
+using Sefirah.Data.AppDatabase;
+using Sefirah.Data.AppDatabase.Repository;
+using Sefirah.Data.Contracts;
 using Sefirah.Models;
+using Sefirah.Services;
+using Sefirah.Services.Settings;
+using Sefirah.Services.Socket;
+using Sefirah.ViewModels.Settings;
 using Serilog;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -17,7 +24,14 @@ public static class AppLifeCycleHelper
 
     public static async Task InitializeAppComponentsAsync()
     {
-    }
+        var networkService = Ioc.Default.GetRequiredService<INetworkService>();
+        var deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
+
+        await Task.WhenAll(
+            deviceManager.Initialize(),
+            networkService.StartServerAsync()
+        );
+    } 
 
     public static IApplicationBuilder ConfigureApp(this App app, LaunchActivatedEventArgs args)
     {
@@ -57,12 +71,33 @@ public static class AppLifeCycleHelper
                         .EmbeddedSource<App>()
                         .Section<AppConfig>()
                 )
-                // Enable localization (see appsettings.json for supported languages)
                 .UseLocalization()
                 .ConfigureServices((context, services) => services
 
-                // Add plain ILogger for BaseViewModel
                 .AddSingleton<ILogger>(sp => sp.GetRequiredService<ILogger<App>>())
+
+                // Settings Services
+                .AddSingleton<IUserSettingsService, UserSettingsService>()
+                .AddSingleton<IGeneralSettingsService, GeneralSettingsService>(sp => new GeneralSettingsService(((UserSettingsService)sp.GetRequiredService<IUserSettingsService>()).GetSharingContext()))
+                .AddSingleton<IFeatureSettingsService, FeaturesSettingsService>(sp => new FeaturesSettingsService(((UserSettingsService)sp.GetRequiredService<IUserSettingsService>()).GetSharingContext()))
+
+                // Database and Repositories
+                .AddSingleton<DatabaseContext>()
+                .AddSingleton<DeviceRepository>()
+                .AddSingleton<RemoteAppRepository>()
+
+                // Services
+                .AddSingleton<IDeviceManager, DeviceManager>()
+                .AddSingleton(sp => (ITcpServerProvider)sp.GetRequiredService<INetworkService>())
+                .AddSingleton(sp => (ISessionManager)sp.GetRequiredService<INetworkService>())
+                .AddSingleton<IMdnsService, MdnsService>()
+                .AddSingleton<IDiscoveryService, DiscoveryService>()
+                .AddSingleton<INetworkService, NetworkService>()
+
+                .AddSingleton<IMessageHandler, MessageHandler>()
+                .AddSingleton<Func<IMessageHandler>>(sp => () => sp.GetRequiredService<IMessageHandler>())
+
+                .AddSingleton<DevicesViewModel>()
                 )
             );
     }

@@ -18,6 +18,6 @@ public sealed partial class WelcomePage : Page
 
     private void OnGetStartedButton_Click(object sender, RoutedEventArgs e)
     {
-
+        Frame.Navigate(typeof(SyncPage));
     }
 }

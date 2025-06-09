@@ -16,8 +16,8 @@ public partial class App : Application
     {
         InitializeComponent();
     }
-
-    protected Window? MainWindow { get; private set; }
+    public static bool HandleClosedEvents { get; set; } = true;
+    public static Window? MainWindow { get; private set; }
     protected IHost? Host { get; private set; }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
@@ -25,7 +25,11 @@ public partial class App : Application
         var builder = this.ConfigureApp(args);
             
         MainWindow = builder.Window;
-
+#if WINDOWS
+        MainWindow.ExtendsContentIntoTitleBar = true;
+        MainWindow.SystemBackdrop = new MicaBackdrop();
+#endif
+        MainWindow.AppWindow.Title = "Sefirah";
 #if DEBUG
         MainWindow.UseStudio();
 #endif
