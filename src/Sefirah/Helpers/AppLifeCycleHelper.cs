@@ -4,6 +4,8 @@ using Sefirah.Data.Contracts;
 using Sefirah.Models;
 #if WINDOWS
 using Sefirah.Platforms.Windows;
+#else
+using Sefirah.Platforms.Desktop;
 #endif
 using Sefirah.Services;
 using Sefirah.Services.Settings;
@@ -102,6 +104,8 @@ public static class AppLifecycleHelper
                 // Platform-specific services
 #if WINDOWS
                 .AddWindowsServices()
+#else
+                .AddDesktopServices()
 #endif
                 // Services
                 .AddSingleton<IDeviceManager, DeviceManager>()

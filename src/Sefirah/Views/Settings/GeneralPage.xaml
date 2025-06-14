@@ -8,6 +8,7 @@
     xmlns:local="using:Sefirah.Views.Settings"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:Sefirah.ViewModels.Settings"
+    xmlns:wuc="using:CommunityToolkit.WinUI.Controls"
     mc:Ignorable="d">
 
     <Page.DataContext>
@@ -23,84 +24,71 @@
                 Text="{helpers:ResourceString Name=General}" />
 
             <!--  Startup Options  -->
-            <controls:SettingsBlockControl Title="{helpers:ResourceString Name=StartupOption}" Description="{helpers:ResourceString Name=StartupOptionDescription}">
-                <controls:SettingsBlockControl.Icon>
+            <wuc:SettingsCard Description="{helpers:ResourceString Name=StartupOptionDescription}" Header="{helpers:ResourceString Name=StartupOption}">
+                <wuc:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE7E8;" />
-                </controls:SettingsBlockControl.Icon>
-                <controls:SettingsBlockControl.SettingsActionableElement>
-                    <ComboBox
-                        MinWidth="140"
-                        ItemsSource="{x:Bind ViewModel.StartupTypes.Values}"
-                        SelectedItem="{x:Bind ViewModel.SelectedStartupType, Mode=TwoWay}" />
-                </controls:SettingsBlockControl.SettingsActionableElement>
-            </controls:SettingsBlockControl>
+                </wuc:SettingsCard.HeaderIcon>
+                <ComboBox
+                    MinWidth="140"
+                    ItemsSource="{x:Bind ViewModel.StartupTypes.Values}"
+                    SelectedItem="{x:Bind ViewModel.SelectedStartupType, Mode=TwoWay}" />
+            </wuc:SettingsCard>
 
             <!--  Theme  -->
-            <controls:SettingsBlockControl Title="{helpers:ResourceString Name=Theme}" Description="{helpers:ResourceString Name=ThemeDescription}">
-                <controls:SettingsBlockControl.Icon>
+            <wuc:SettingsCard Description="{helpers:ResourceString Name=ThemeDescription}" Header="{helpers:ResourceString Name=Theme}">
+                <wuc:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE790;" />
-                </controls:SettingsBlockControl.Icon>
-                <controls:SettingsBlockControl.SettingsActionableElement>
-                    <ComboBox
-                        MinWidth="140"
-                        ItemsSource="{x:Bind ViewModel.ThemeTypes.Values}"
-                        SelectedItem="{x:Bind ViewModel.SelectedThemeType, Mode=TwoWay}" />
-                </controls:SettingsBlockControl.SettingsActionableElement>
-            </controls:SettingsBlockControl>
+                </wuc:SettingsCard.HeaderIcon>
+                <ComboBox
+                    MinWidth="140"
+                    ItemsSource="{x:Bind ViewModel.ThemeTypes.Values}"
+                    SelectedItem="{x:Bind ViewModel.SelectedThemeType, Mode=TwoWay}" />
+            </wuc:SettingsCard>
 
             <!--  Scrcpy location  -->
-            <controls:SettingsBlockControl Title="{helpers:ResourceString Name=ScreenMirror}" Description="{x:Bind ViewModel.ScrcpyPath, Mode=OneWay}">
-                <controls:SettingsBlockControl.Icon>
+            <wuc:SettingsCard Description="{x:Bind ViewModel.ScrcpyPath, Mode=OneWay}" Header="{helpers:ResourceString Name=ScreenMirror}">
+                <wuc:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xEC15;" />
-                </controls:SettingsBlockControl.Icon>
-                <controls:SettingsBlockControl.SettingsActionableElement>
-                    <Button Click="SelectScrcpyLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
-                </controls:SettingsBlockControl.SettingsActionableElement>
-            </controls:SettingsBlockControl>
+                </wuc:SettingsCard.HeaderIcon>
+                <Button Click="SelectScrcpyLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
+            </wuc:SettingsCard>
 
             <!--  Adb Settings  -->
-            <controls:SettingsBlockControl Title="{helpers:ResourceString Name=AdbSettings}" Description="{x:Bind ViewModel.AdbPath, Mode=OneWay}">
-                <controls:SettingsBlockControl.Icon>
+            <wuc:SettingsCard Description="{x:Bind ViewModel.AdbPath, Mode=OneWay}" Header="{helpers:ResourceString Name=AdbSettings}">
+                <wuc:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xEC7A;" />
-                </controls:SettingsBlockControl.Icon>
-                <controls:SettingsBlockControl.SettingsActionableElement>
-                    <Button Click="SelectAdbLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
-                </controls:SettingsBlockControl.SettingsActionableElement>
-            </controls:SettingsBlockControl>
+                </wuc:SettingsCard.HeaderIcon>
+                <Button Click="SelectAdbLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
+            </wuc:SettingsCard>
 
             <!--  Save Location  -->
-            <controls:SettingsBlockControl Title="{helpers:ResourceString Name=SaveLocation}" Description="{x:Bind ViewModel.ReceivedFilesPath, Mode=OneWay}">
-                <controls:SettingsBlockControl.Icon>
+            <wuc:SettingsCard Description="{x:Bind ViewModel.ReceivedFilesPath, Mode=OneWay}" Header="{helpers:ResourceString Name=SaveLocation}">
+                <wuc:SettingsCard.HeaderIcon>
                     <SymbolIcon Symbol="Folder" />
-                </controls:SettingsBlockControl.Icon>
-                <controls:SettingsBlockControl.SettingsActionableElement>
-                    <Button Click="SelectSaveLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
-                </controls:SettingsBlockControl.SettingsActionableElement>
-            </controls:SettingsBlockControl>
+                </wuc:SettingsCard.HeaderIcon>
+                <Button Click="SelectSaveLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
+            </wuc:SettingsCard>
 
             <!--  Remote Storage Location  -->
-            <controls:SettingsBlockControl Title="{helpers:ResourceString Name=RemoteStorageLocation}" Description="{x:Bind ViewModel.RemoteStoragePath, Mode=OneWay}">
-                <controls:SettingsBlockControl.Icon>
+            <wuc:SettingsCard Description="{x:Bind ViewModel.RemoteStoragePath, Mode=OneWay}" Header="{helpers:ResourceString Name=RemoteStorageLocation}">
+                <wuc:SettingsCard.HeaderIcon>
                     <SymbolIcon Symbol="SyncFolder" />
-                </controls:SettingsBlockControl.Icon>
-                <controls:SettingsBlockControl.SettingsActionableElement>
-                    <Button Click="SelectRemoteLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
-                </controls:SettingsBlockControl.SettingsActionableElement>
-            </controls:SettingsBlockControl>
+                </wuc:SettingsCard.HeaderIcon>
+                <Button Click="SelectRemoteLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
+            </wuc:SettingsCard>
 
             <!--  Local Device Name  -->
-            <controls:SettingsBlockControl Title="{helpers:ResourceString Name=DeviceName}">
-                <controls:SettingsBlockControl.Icon>
+            <wuc:SettingsCard Header="{helpers:ResourceString Name=DeviceName}">
+                <wuc:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE70F;" />
-                </controls:SettingsBlockControl.Icon>
-                <controls:SettingsBlockControl.SettingsActionableElement>
-                    <TextBox
-                        x:Name="DeviceNameTextBox"
-                        MinWidth="200"
-                        KeyDown="OnKeyDown"
-                        Text="{x:Bind ViewModel.LocalDeviceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                </controls:SettingsBlockControl.SettingsActionableElement>
-            </controls:SettingsBlockControl>
+                </wuc:SettingsCard.HeaderIcon>
+                <TextBox
+                    x:Name="DeviceNameTextBox"
+                    MinWidth="200"
+                    KeyDown="OnKeyDown"
+                    Text="{x:Bind ViewModel.LocalDeviceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            </wuc:SettingsCard>
         </StackPanel>
     </ScrollViewer>
 </Page>

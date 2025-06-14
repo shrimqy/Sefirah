@@ -113,6 +113,12 @@ internal sealed class DeviceSettingsService : BaseDeviceAwareJsonSettings, IDevi
         set => Set(value);
     }
     
+    public string? UnlockCommands
+    {
+        get => Get(string.Empty);
+        set => Set(value);
+    }
+
     public string? VideoBitrate
     {
         get => Get("8M");

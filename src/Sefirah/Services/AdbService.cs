@@ -21,7 +21,7 @@ public interface IAdbService
     Task<bool> ConnectWireless(string? host, int port=5555);
     Task StopAsync();   
     Task UninstallApp(string deviceId, string appPackage);
-    Task UnlockDevice(string deviceId);
+    Task UnlockDevice(DeviceData deviceData, List<string> unlockCommands);
     bool IsMonitoring { get; }
 
     AdbClient AdbClient { get; }
@@ -373,26 +373,21 @@ public class AdbService(
         }
     }
 
-    public async Task UnlockDevice(string deviceId)
+    public async Task UnlockDevice(DeviceData deviceData, List<string> commands)
     {
-        logger.LogInformation("Unlocking device {deviceId}", deviceId);
-        var adbDevice = AdbDevices.FirstOrDefault(d => d.Serial == deviceId);
-        if (adbDevice == null) return;
-
+        logger.LogInformation("Unlocking device");
         // Check if device is locked by checking the lock screen state
         ConsoleOutputReceiver consoleReceiver = new();
-        await adbClient.ExecuteShellCommandAsync(adbDevice.DeviceData, "dumpsys window policy | grep 'showing=' | cut -d '=' -f2", consoleReceiver);
+        await adbClient.ExecuteShellCommandAsync(deviceData, "dumpsys window policy | grep 'showing=' | cut -d '=' -f2", consoleReceiver);
         var isLocked = consoleReceiver.ToString().Trim() == "true";
-
         if (isLocked)
         {
-            //var pin = "1970";
-            //adbClient.SendKeyEvent(adbDevice.DeviceData, "26");
-            //await adbClient.SwipeAsync(adbDevice.DeviceData, new System.Drawing.Point(540, 1800), new System.Drawing.Point(540, 900), 100);
-            //await adbClient.SendTextAsync(adbDevice.DeviceData, pin);
-            await adbClient.ExecuteShellCommandAsync(adbDevice.DeviceData, "input keyevent 26", consoleReceiver);
-            await adbClient.ExecuteShellCommandAsync(adbDevice.DeviceData, "input touchscreen swipe 540 1800 540 900", consoleReceiver);
-            await adbClient.ExecuteShellCommandAsync(adbDevice.DeviceData, "input text 1864", consoleReceiver);
+            foreach (var command in commands)
+            {   
+                logger.LogInformation("Executing command: {command}", command);
+                await adbClient.ExecuteShellCommandAsync(deviceData, command, consoleReceiver);
+                await Task.Delay(100);
+            }
         }
     }
 

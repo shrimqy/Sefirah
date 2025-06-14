@@ -53,6 +53,7 @@
     </PropertyGroup>
     <PropertyGroup>
         <LangVersion>Preview</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
       <ItemGroup>
     <Content Include="Assets\Icons\IconResource.dll">
@@ -62,6 +63,7 @@
     <ItemGroup>
         <PackageReference Include="AdvancedSharpAdbClient" />
         <PackageReference Include="BouncyCastle.Cryptography" />
+        <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" />
         <PackageReference Include="CommunityToolkit.WinUI.Extensions" />
         <PackageReference Include="H.NotifyIcon.Uno.WinUI" />
         <PackageReference Include="MeaMod.DNS" />

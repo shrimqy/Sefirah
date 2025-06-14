@@ -23,7 +23,6 @@ public class DatabaseContext
     private static SQLiteConnection TryCreateDatabase()
     {
         var databasePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "sefirah.db");
-
         var db = new SQLiteConnection(databasePath);
 
         if (db.GetTableInfo(nameof(LocalDeviceEntity)).Count == 0)

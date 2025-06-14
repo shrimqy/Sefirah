@@ -125,6 +125,11 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     string? CustomArguments { get; set; }
 
     /// <summary>
+    /// Gets or sets the unlock commands.
+    /// </summary>
+    string? UnlockCommands { get; set; }
+
+    /// <summary>
     /// Gets or sets a value indicating whether to disable video forwarding.
     /// </summary>
     bool DisableVideoForwarding { get; set; }

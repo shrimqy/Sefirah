@@ -1,3 +1,6 @@
+using CommunityToolkit.WinUI;
+using Sefirah.Data.AppDatabase.Models;
+using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Items;
@@ -171,8 +174,6 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
     #region Screen Mirror settings
 
     public bool IsGeneralScreenMirrorSettingsExpanded { get; set; } = true;
-    public bool IsVideoSettingsExpanded { get; set; }
-    public bool IsAudioSettingsExpanded { get; set; }
 
     #region General Settings
 
@@ -252,6 +253,20 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
             }
         }
     }
+
+    public string? UnlockCommands
+    {
+        get => _deviceSettings?.UnlockCommands;
+        set
+        {
+            if (_deviceSettings != null && _deviceSettings.UnlockCommands != value)
+            {
+                _deviceSettings.UnlockCommands = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
 
     public string? CustomArguments
     {
@@ -535,6 +550,8 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
             OnPropertyChanged(nameof(DisplayIpAddresses));
         }
     }
+    private readonly RemoteAppRepository RemoteAppsRepository = Ioc.Default.GetRequiredService<RemoteAppRepository>();
+    public ObservableCollection<ApplicationInfoEntity> RemoteApps { get; set; } = [];
 
     public DeviceSettingsViewModel()
     {
@@ -551,12 +568,25 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         Device = device;
         device.PropertyChanged += (s, e) =>
         {
-            Debug.WriteLine($"Device property changed: {e.PropertyName}");
             OnPropertyChanged(nameof(Device));
         };
 
+        RemoteApps = RemoteAppsRepository.GetApplicationsFromDevice(device.Id).ToObservableCollection();
+        Debug.WriteLine(RemoteApps.Count);
+        foreach (var app in RemoteApps)
+        {
+            app.UpdateNotificationFilter(device.Id);
+        }
         // Get device-specific settings
         _deviceSettings = _userSettingsService.GetDeviceSettings(device.Id);
         OnPropertyChanged(nameof(DeviceSettings));
+    }
+
+    public void ChangeNotificationFilter(string notificationFilter, string appPackage)
+    {
+        var filterKey = ApplicationInfoEntity.NotificationFilterTypes.First(f => f.Value == notificationFilter).Key;
+        RemoteAppsRepository.UpdateAppNotificationFilter(device!.Id, appPackage, filterKey);
+        var existingItem = RemoteApps.First(p => p.AppPackage == appPackage);
+        existingItem.CurrentNotificationFilter = notificationFilter;
     }
 }

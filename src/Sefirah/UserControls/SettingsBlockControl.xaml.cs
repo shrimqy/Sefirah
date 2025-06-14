@@ -104,7 +104,6 @@ public sealed partial class SettingsBlockControl : UserControl
         set => SetValue(ContentPaddingProperty, value);
     }
 
-    // Add Click event
     public event EventHandler<bool> Click;
 
     public SettingsBlockControl()

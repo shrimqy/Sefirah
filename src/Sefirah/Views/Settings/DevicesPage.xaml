@@ -11,6 +11,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:Sefirah.Data.Models"
     xmlns:vm="using:Sefirah.ViewModels.Settings"
+    xmlns:wuc="using:CommunityToolkit.WinUI.Controls"
     x:Name="DevicePage"
     mc:Ignorable="d">
 
@@ -45,60 +46,59 @@
                 </ItemsRepeater.Layout>
                 <ItemsRepeater.ItemTemplate>
                     <DataTemplate x:DataType="models:PairedDevice">
-                        <controls:SettingsBlockControl
-                            Title="{x:Bind Name}"
-                            Description="{x:Bind ConnectionButtonText, Converter={StaticResource DateTimeDevicesConverter}}"
-                            IsClickable="False">
-                            <controls:SettingsBlockControl.Icon>
-                                <Grid Width="30" Height="53">
-                                    <Rectangle
-                                        Opacity="0.5"
-                                        RadiusX="4"
-                                        RadiusY="4"
-                                        Stroke="Black"
-                                        StrokeThickness="2">
-                                        <Rectangle.Fill>
-                                            <SolidColorBrush Opacity="0.1" Color="{ThemeResource SystemBaseLowColor}" />
-                                        </Rectangle.Fill>
-                                    </Rectangle>
-                                    <Rectangle
-                                        Margin="2"
-                                        RadiusX="4"
-                                        RadiusY="4"
-                                        Stroke="Black"
-                                        StrokeThickness="1" />
-                                    <Border Margin="3" CornerRadius="4">
-                                        <Border.Background>
-                                            <LinearGradientBrush Opacity="{x:Bind Wallpaper, Converter={StaticResource NullToOpacityConverter}, Mode=OneWay}" StartPoint="0,0" EndPoint="0,1">
-                                                <GradientStop Offset="0" Color="#FF0070FF" />
-                                                <GradientStop Offset="1" Color="#FF2E90FF" />
-                                            </LinearGradientBrush>
-                                        </Border.Background>
-                                        <Image
-                                            x:Name="WallpaperImage"
-                                            x:Load="{x:Bind Wallpaper, Converter={StaticResource NullBooleanConverter}, Mode=OneWay}"
-                                            Source="{x:Bind Wallpaper, Mode=OneWay}"
-                                            Stretch="UniformToFill" />
-                                    </Border>
-                                </Grid>
-                            </controls:SettingsBlockControl.Icon>
-                            <controls:SettingsBlockControl.SettingsActionableElement>
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <Button Command="{Binding DataContext.OpenDeviceSettingsCommand, ElementName=DevicePage}" CommandParameter="{x:Bind}">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <FontIcon FontSize="14" Glyph="&#xE713;" />
-                                            <TextBlock Text="Settings" />
-                                        </StackPanel>
-                                    </Button>
-                                    <Button
-                                        VerticalAlignment="Stretch"
-                                        Command="{Binding DataContext.RemoveDeviceCommand, ElementName=DevicePage}"
-                                        CommandParameter="{x:Bind}">
-                                        <FontIcon FontSize="14" Glyph="&#xE74D;" />
-                                    </Button>
+                        <wuc:SettingsCard Description="{x:Bind ConnectionButtonText, Converter={StaticResource DateTimeDevicesConverter}}">
+                            <wuc:SettingsCard.Header>
+                                <StackPanel Orientation="Horizontal" Spacing="20">
+                                    <Grid Width="30" Height="53">
+                                        <Rectangle
+                                            Opacity="0.5"
+                                            RadiusX="4"
+                                            RadiusY="4"
+                                            Stroke="Black"
+                                            StrokeThickness="2">
+                                            <Rectangle.Fill>
+                                                <SolidColorBrush Opacity="0.1" Color="{ThemeResource SystemBaseLowColor}" />
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+                                        <Rectangle
+                                            Margin="2"
+                                            RadiusX="4"
+                                            RadiusY="4"
+                                            Stroke="Black"
+                                            StrokeThickness="1" />
+                                        <Border Margin="3" CornerRadius="4">
+                                            <Border.Background>
+                                                <LinearGradientBrush Opacity="{x:Bind Wallpaper, Converter={StaticResource NullToOpacityConverter}, Mode=OneWay}" StartPoint="0,0" EndPoint="0,1">
+                                                    <GradientStop Offset="0" Color="#FF0070FF" />
+                                                    <GradientStop Offset="1" Color="#FF2E90FF" />
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                            <Image
+                                                x:Name="WallpaperImage"
+                                                x:Load="{x:Bind Wallpaper, Converter={StaticResource NullBooleanConverter}, Mode=OneWay}"
+                                                Source="{x:Bind Wallpaper, Mode=OneWay}"
+                                                Stretch="UniformToFill" />
+                                        </Border>
+                                    </Grid>
+                                    <TextBlock VerticalAlignment="Center" Text="{x:Bind Name, Mode=OneWay}" />
                                 </StackPanel>
-                            </controls:SettingsBlockControl.SettingsActionableElement>
-                        </controls:SettingsBlockControl>
+
+                            </wuc:SettingsCard.Header>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button Command="{Binding DataContext.OpenDeviceSettingsCommand, ElementName=DevicePage}" CommandParameter="{x:Bind}">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon FontSize="14" Glyph="&#xE713;" />
+                                        <TextBlock Text="Settings" />
+                                    </StackPanel>
+                                </Button>
+                                <Button
+                                    VerticalAlignment="Stretch"
+                                    Command="{Binding DataContext.RemoveDeviceCommand, ElementName=DevicePage}"
+                                    CommandParameter="{x:Bind}">
+                                    <FontIcon FontSize="14" Glyph="&#xE74D;" />
+                                </Button>
+                            </StackPanel>
+                        </wuc:SettingsCard>
                     </DataTemplate>
                 </ItemsRepeater.ItemTemplate>
             </ItemsRepeater>
@@ -121,14 +121,11 @@
                 </ItemsRepeater.Layout>
                 <ItemsRepeater.ItemTemplate>
                     <DataTemplate x:DataType="models:DiscoveredDevice">
-                        <controls:SettingsBlockControl
-                            Title="{x:Bind DeviceName}"
-                            Description="{x:Bind FormattedKey}"
-                            IsClickable="False">
-                            <controls:SettingsBlockControl.Icon>
+                        <wuc:SettingsCard Description="{x:Bind FormattedKey}" Header="{x:Bind DeviceName}">
+                            <wuc:SettingsCard.HeaderIcon>
                                 <FontIcon Glyph="&#xE8EA;" />
-                            </controls:SettingsBlockControl.Icon>
-                        </controls:SettingsBlockControl>
+                            </wuc:SettingsCard.HeaderIcon>
+                        </wuc:SettingsCard>
                     </DataTemplate>
                 </ItemsRepeater.ItemTemplate>
             </ItemsRepeater>

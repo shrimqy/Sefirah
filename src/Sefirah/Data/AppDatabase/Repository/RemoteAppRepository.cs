@@ -30,6 +30,16 @@ public class RemoteAppRepository(DatabaseContext context, ILogger<RemoteAppRepos
         });
     }
 
+    public List<ApplicationInfoEntity> GetApplicationsFromDevice(string deviceId)
+    {
+        var appsForDevice = context.Database.Table<ApplicationInfoEntity>()
+            .ToList()
+            .Where(a => a.HasDevice(deviceId))
+            .OrderBy(a => a.AppName)
+            .ToList();
+        return appsForDevice;
+    }
+
     public void AddOrUpdateApplication(ApplicationInfoEntity application)
     {
         var existingApp = context.Database.Table<ApplicationInfoEntity>()
@@ -40,7 +50,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger<RemoteAppRepos
             // Update app info (icon, name might be different)
             existingApp.AppName = application.AppName;
             existingApp.AppIconBytes = application.AppIconBytes ?? existingApp.AppIconBytes;
-            existingApp.AddDevice(application.DeviceIds.First());
+            existingApp.AddDevice(application.AppDeviceInfo.First().DeviceId);
             context.Database.Update(existingApp);
 
             App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
@@ -50,7 +60,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger<RemoteAppRepos
                 {
                     appToUpdate.AppName = existingApp.AppName;
                     appToUpdate.AppIconBytes = existingApp.AppIconBytes;
-                    appToUpdate.AddDevice(application.DeviceIds.First());
+                    appToUpdate.AddDevice(application.AppDeviceInfo.First().DeviceId);
                 }
             });
         }
@@ -72,7 +82,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger<RemoteAppRepos
         // Check if this app is associated with the device
         if (app != null && app.HasDevice(deviceId))
         {
-            return app.NotificationFilter;
+            return app.AppDeviceInfo.First(d => d.DeviceId == deviceId).Filter;
         }
         return null;
     }
@@ -86,7 +96,13 @@ public class RemoteAppRepository(DatabaseContext context, ILogger<RemoteAppRepos
         {
             // Add device if not already added and update filter
             app.AddDevice(deviceId);
-            app.NotificationFilter = filter;
+            var deviceInfo = new List<AppDeviceInfo>(app.AppDeviceInfo);
+            var targetDevice = deviceInfo.FirstOrDefault(d => d.DeviceId == deviceId);
+            if (targetDevice != null)
+            {
+                targetDevice.Filter = filter;
+                app.AppDeviceInfo = deviceInfo;
+            }
             context.Database.Update(app);
 
             App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
@@ -95,7 +111,6 @@ public class RemoteAppRepository(DatabaseContext context, ILogger<RemoteAppRepos
                 if (appToUpdate != null)
                 {
                     appToUpdate.AddDevice(deviceId);
-                    appToUpdate.NotificationFilter = filter;
                 }
             });
         }
@@ -106,7 +121,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger<RemoteAppRepos
                 AppPackage = appPackage,
                 AppName = appName,
                 AppIconBytes = appIcon,
-                NotificationFilter = filter
+                AppDeviceInfo = [new AppDeviceInfo { DeviceId = deviceId, Filter = filter }]
             };
             newApp.AddDevice(deviceId);
             context.Database.Insert(newApp);
@@ -118,6 +133,26 @@ public class RemoteAppRepository(DatabaseContext context, ILogger<RemoteAppRepos
         return filter;
     }
 
+
+    public void UpdateAppNotificationFilter(string deviceId, string appPackage, NotificationFilter filter)
+    {
+        var app = context.Database.Table<ApplicationInfoEntity>()
+            .FirstOrDefault(a => a.AppPackage == appPackage);
+        
+        if (app != null)
+        {
+            var deviceInfo = new List<AppDeviceInfo>(app.AppDeviceInfo);
+            var targetDevice = deviceInfo.FirstOrDefault(d => d.DeviceId == deviceId);
+            if (targetDevice != null)
+            {
+                targetDevice.Filter = filter;
+                app.AppDeviceInfo = deviceInfo;
+            }
+            
+            context.Database.Update(app);
+        }
+    }
+
     public void RemoveDeviceFromApplication(string appPackage, string deviceId)
     {
         var app = context.Database.Table<ApplicationInfoEntity>()
@@ -127,7 +162,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger<RemoteAppRepos
         {
             app.RemoveDevice(deviceId);
             
-            if (app.DeviceIds.Count == 0)
+            if (app.AppDeviceInfo.Count == 0)
             {
                 // No more devices have this app, delete it
                 context.Database.Delete(app);
@@ -155,7 +190,6 @@ public class RemoteAppRepository(DatabaseContext context, ILogger<RemoteAppRepos
 
     public void UpdateApplicationList(PairedDevice pairedDevice, ApplicationList applicationList)
     {
-        Debug.WriteLine($"Updating application list for device {pairedDevice.Id}");
         RemoveAllAppsForDevice(pairedDevice.Id);
 
         // Add/update apps from the new list
@@ -182,7 +216,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger<RemoteAppRepos
             if (app.HasDevice(deviceId))
             {
                 app.RemoveDevice(deviceId);
-                if (app.DeviceIds.Count == 0)
+                if (app.AppDeviceInfo.Count == 0)
                 {
                     appsToDelete.Add(app);
                 }

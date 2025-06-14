@@ -5,8 +5,6 @@ using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Extensions;
-using Sefirah.Utils;
-using Sefirah.ViewModels.Settings;
 using Uno.Logging;
 using Windows.ApplicationModel.DataTransfer;
 
@@ -19,15 +17,17 @@ public class ScreenMirrorService(
 ) : IScreenMirrorService
 {
     private readonly ObservableCollection<AdbDevice> devices = adbService.AdbDevices;
+
     private Dictionary<string, Process> scrcpyProcesses = [];
     private CancellationTokenSource? cts;
     private readonly Microsoft.UI.Dispatching.DispatcherQueue? dispatcher = App.MainWindow?.DispatcherQueue;
     
-    public async Task<bool> StartScrcpy(string? customArgs = null, string? iconPath = null)
+    public async Task<bool> StartScrcpy(PairedDevice device, string? customArgs = null, string? iconPath = null)
     {
         Process? process = null;
         CancellationTokenSource? processCts = null;
 
+        var deviceSettings = userSettingsService.GetDeviceSettings(device.Id);
         try
         {
             var scrcpyPath = userSettingsService.FeatureSettingsService.ScrcpyPath;
@@ -55,22 +55,55 @@ public class ScreenMirrorService(
                 return false;
             }
 
-            List<AdbDevice> onlineDevices = [];
-            if (adbService.IsMonitoring)
-            {
-                // Get unique online devices (avoid duplicates by serial)
-                onlineDevices = [.. devices.Where(d => d.State == DeviceState.Online)
-                                          .GroupBy(d => d.Serial)
-                                          .Select(g => g.First())];
+            var devicePreferenceType = userSettingsService.FeatureSettingsService.ScrcpyDevicePreference;
+            string? selectedDeviceSerial = null;
 
-                logger.LogInformation(string.Join(", ", onlineDevices.Select(d => $"{d.Serial} - {d.Type} - {d.State}")));
-                if (onlineDevices.Count == 0)
+            List<string> argBuilder = [];
+            if (!string.IsNullOrEmpty(customArgs))
+            {
+                argBuilder.Add(customArgs);
+            }
+
+            var pairedDevices = devices.Where(d => d != null && d.AndroidId == device.Id).ToList();
+            if (pairedDevices.Count != 0)
+            {
+                var commands = deviceSettings.UnlockCommands?.Trim()
+                    .Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries)
+                    .Select(c => c.Trim())
+                    .Where(c => !string.IsNullOrEmpty(c))
+                    .ToList();
+                if (commands?.Count > 0)
                 {
-                    logger.LogWarning("No online devices found from adb");
-                    var ipAddress = "192.168.1.5";
-                    if (!await adbService.ConnectWireless(ipAddress))
+                    await adbService.UnlockDevice(pairedDevices.First().DeviceData, commands);
+                }
+                switch (devicePreferenceType)
+                {
+                    case ScrcpyDevicePreferenceType.Usb:
+                        selectedDeviceSerial = pairedDevices.FirstOrDefault(d => d.Type == DeviceType.USB)?.Serial;
+                        break;
+                    case ScrcpyDevicePreferenceType.Tcpip:
+                        selectedDeviceSerial = pairedDevices.FirstOrDefault(d => d.Type == DeviceType.WIFI)?.Serial;
+                        break;
+                    case ScrcpyDevicePreferenceType.Auto:
+                        if (pairedDevices.FirstOrDefault(d => d.Type == DeviceType.USB) != null)
+                        {
+                            selectedDeviceSerial = pairedDevices.FirstOrDefault(d => d.Type == DeviceType.USB)?.Serial;
+                        }
+                        else
+                        {
+                            selectedDeviceSerial = pairedDevices.FirstOrDefault(d => d.Type == DeviceType.WIFI)?.Serial;
+                        }
+                        break;
+                }
+            }
+            else
+            {
+                var ipAddress = device.IpAddresses?.FirstOrDefault();
+                if (!await adbService.ConnectWireless(ipAddress))
+                {
+                    if (devices.Count == 0)
                     {
-                        logger.LogWarning("Failed to connect to Adb wirelessly");
+                        logger.LogWarning("No online devices found from adb");
                         dispatcher?.EnqueueAsync(async () =>
                         {
                             var dialog = new ContentDialog
@@ -86,79 +119,11 @@ public class ScreenMirrorService(
                     }
                 }
             }
-            else
-            {
-                await adbService.StartAsync();
-                await StartScrcpy(customArgs);
-                return true;
-            }
-
-            List<string> argBuilder = [];
-
-            if (!string.IsNullOrEmpty(customArgs))
-            {
-                argBuilder.Add(customArgs);
-            }
-
-            // Determine if we need to show the device selection dialog
-            string? selectedDeviceSerial = null;
-            bool shouldShowDialog = ShouldShowDeviceSelectionDialog(onlineDevices);
-            
-            if (shouldShowDialog)
-            {
-                selectedDeviceSerial = await ShowDeviceSelectionDialog(onlineDevices);
-                if (string.IsNullOrEmpty(selectedDeviceSerial))
-                {
-                    logger.LogInformation("User canceled device selection");
-                    return false;
-                }
-                argBuilder.Add($"-s {selectedDeviceSerial}");
-            }
-            else if (onlineDevices.Count > 1 && string.IsNullOrEmpty(selectedDeviceSerial))
-            {
-                var deviceSelection = userSettingsService.FeatureSettingsService.ScrcpyDevicePreference;
-
-                switch (deviceSelection)
-                {
-                    case ScrcpyDevicePreferenceType.Usb:
-                        argBuilder.Add("-d");
-                        selectedDeviceSerial = onlineDevices.FirstOrDefault(d => d.Type == DeviceType.USB)?.Serial;
-                        break;
-                    case ScrcpyDevicePreferenceType.Tcpip:
-                        argBuilder.Add("-e");
-                        selectedDeviceSerial = onlineDevices.FirstOrDefault(d => d.Type == DeviceType.WIFI)?.Serial;
-                        break;
-                    case ScrcpyDevicePreferenceType.Auto:
-                        if (onlineDevices.FirstOrDefault(d => d.Type == DeviceType.USB) != null)
-                        {
-                            selectedDeviceSerial = onlineDevices.FirstOrDefault(d => d.Type == DeviceType.USB)?.Serial;
-                            argBuilder.Add("-d");
-                        }
-                        else
-                        {
-                            selectedDeviceSerial = onlineDevices.FirstOrDefault(d => d.Type == DeviceType.WIFI)?.Serial;
-                            argBuilder.Add("-e");
-                        }
-                        break;
-                    default:
-                        break;
-                }            
-            }
-            else if (onlineDevices.Count > 0)
-            {
-                selectedDeviceSerial = onlineDevices.First().Serial;
-            }
-            else
-            {
-                logger.LogError("No online devices available");
-                return false;
-            }
 
             // Validate that we have a selected device
-            if (string.IsNullOrEmpty(selectedDeviceSerial))
+            if (!string.IsNullOrEmpty(selectedDeviceSerial))
             {
-                logger.LogError("No device serial selected after device selection logic");
-                return false;
+                argBuilder.Add($"-s {selectedDeviceSerial}");
             }
 
             // Build arguments for scrcpy with the selected device
@@ -188,8 +153,6 @@ public class ScreenMirrorService(
                 process.StartInfo.EnvironmentVariables["SCRCPY_ICON_PATH"] = iconPath;
                 logger.Info($"Using custom scrcpy icon: {iconPath}");
             }
-
-            await adbService.UnlockDevice(deviceSerial!);
 
             bool started;
             try
@@ -329,25 +292,6 @@ public class ScreenMirrorService(
                 }
             }
         }, processCts.Token);
-    }
-
-    private bool ShouldShowDeviceSelectionDialog(List<AdbDevice> onlineDevices)
-    {
-        // Always show dialog if selection preference is set to AskEverytime
-        if (userSettingsService.FeatureSettingsService.ScrcpyDevicePreference == ScrcpyDevicePreferenceType.AskEverytime)
-            return true;
-            
-        // Always show dialog if there are more than 1 device
-        if (onlineDevices.Count <= 1)
-            return false;
-        
-        // Check if there are devices with different models
-        var distinctModels = onlineDevices.Select(d => d.Model).Distinct().Count();
-        if (distinctModels > 1)
-            return true;
-        
-        // Otherwise, no need to show the dialog
-        return false;
     }
 
     private async Task<string?> ShowDeviceSelectionDialog(List<AdbDevice> onlineDevices)

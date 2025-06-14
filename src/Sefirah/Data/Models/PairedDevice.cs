@@ -13,9 +13,7 @@ public partial class PairedDevice : ObservableObject
     public string Name { get; set; }
     public List<string>? IpAddresses { get; set; } = [];
     public List<PhoneNumber>? PhoneNumbers { get; set; } = [];
-
     public ImageSource? Wallpaper { get; set; }
-
     public string ConnectionButtonText => ConnectionStatus ? "Connected/Text".GetLocalizedResource() : "Disconnected/Text".GetLocalizedResource();
 
     private bool connectionStatus;

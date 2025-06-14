@@ -38,7 +38,7 @@ public sealed partial class MainPageViewModel : BaseViewModel
         try
         {
             LoadingScrcpy = true;
-            await ScreenMirrorService.StartScrcpy();
+            await ScreenMirrorService.StartScrcpy(Device!);
         }
         finally
         {

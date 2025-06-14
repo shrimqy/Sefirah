@@ -17,6 +17,7 @@ public sealed partial class AppsViewModel : BaseViewModel
     private ISessionManager SessionManager { get; } = Ioc.Default.GetRequiredService<ISessionManager>();
     public ObservableCollection<ApplicationInfoEntity> Apps => RemoteAppsRepository.Applications;
     private IAdbService AdbService { get; } = Ioc.Default.GetRequiredService<IAdbService>();
+
     [ObservableProperty]
     public partial bool IsLoading { get; set; }
 
@@ -125,7 +126,7 @@ public sealed partial class AppsViewModel : BaseViewModel
                     Logger.LogDebug("Opening app: {AppPackage} on device: {DeviceId}", appPackage, activeDevice.Id);
                     var filePath = await ImageUtils.SaveToFilePathAsync(app.AppIconBytes, "appIcon.png");
 
-                    var started = await ScreenMirrorService.StartScrcpy(customArgs: $"--start-app={appPackage} --window-title={appName}", iconPath: filePath);
+                    var started = await ScreenMirrorService.StartScrcpy(device: activeDevice, customArgs: $"--start-app={appPackage} --window-title={appName}", iconPath: filePath);
                     if (started)
                     {
                         await Task.Delay(2000);

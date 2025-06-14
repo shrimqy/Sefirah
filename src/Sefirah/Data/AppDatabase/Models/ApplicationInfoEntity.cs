@@ -4,7 +4,7 @@ using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Helpers;
 using SQLite;
-using System.Text.Json;
+using Sefirah.Extensions;
 
 namespace Sefirah.Data.AppDatabase.Models;
 
@@ -23,28 +23,14 @@ public partial class ApplicationInfoEntity : ObservableObject
         {
             if (SetProperty(ref _appIconBytes, value))
             {
-                // Clear the cached AppIcon so it gets regenerated
                 _appIcon = null;
                 OnPropertyChanged(nameof(AppIcon));
             }
         }
     }
-    
-    // Store device IDs as JSON string
-    public string DeviceIdsJson { get; set; } = "[]";
-    
-    [Ignore]
-    public List<string> DeviceIds
-    {
-        get => string.IsNullOrEmpty(DeviceIdsJson) ? new List<string>() : JsonSerializer.Deserialize<List<string>>(DeviceIdsJson) ?? new List<string>();
-        set 
-        {
-            DeviceIdsJson = JsonSerializer.Serialize(value);
-            OnPropertyChanged();
-        }
-    }
 
     private BitmapImage? _appIcon;
+
     [NotMapped]
     [Ignore]
     public BitmapImage? AppIcon
@@ -59,12 +45,42 @@ public partial class ApplicationInfoEntity : ObservableObject
         }
         set => SetProperty(ref _appIcon, value);
     }
+    [SQLite.Column("AppDeviceInfo")]
+    public string? AppDeviceInfoJson { get; set; }
 
-    private NotificationFilter _notificationFilter;
-    public NotificationFilter NotificationFilter
+    private List<AppDeviceInfo>? _appDeviceInfo;
+
+    [Ignore]
+    public List<AppDeviceInfo> AppDeviceInfo
     {
-        get => _notificationFilter;
-        set => SetProperty(ref _notificationFilter, value);
+        get
+        {
+            if (_appDeviceInfo is null)
+            {
+                if (string.IsNullOrEmpty(AppDeviceInfoJson))
+                {
+                    _appDeviceInfo = [];
+                }
+                else
+                {
+                    try
+                    {
+                        _appDeviceInfo = JsonSerializer.Deserialize<List<AppDeviceInfo>>(AppDeviceInfoJson) ?? [];
+                    }
+                    catch (JsonException)
+                    {
+                        // Handle cases where JSON might be invalid
+                        _appDeviceInfo = [];
+                    }
+                }
+            }
+            return _appDeviceInfo;
+        }
+        set
+        {
+            _appDeviceInfo = value;
+            AppDeviceInfoJson = JsonSerializer.Serialize(value);
+        }
     }
 
     private bool _isLoading;
@@ -79,26 +95,28 @@ public partial class ApplicationInfoEntity : ObservableObject
 
     public void AddDevice(string deviceId)
     {
-        var devices = DeviceIds;
-        if (!devices.Contains(deviceId))
+        var devices = new List<AppDeviceInfo>(AppDeviceInfo);
+        if (!devices.Any(d => d.DeviceId == deviceId))
         {
-            devices.Add(deviceId);
-            DeviceIds = devices;
+            devices.Add(new AppDeviceInfo { DeviceId = deviceId, Filter = NotificationFilter.ToastFeed });
+            AppDeviceInfo = devices;
         }
     }
 
     public void RemoveDevice(string deviceId)
     {
-        var devices = DeviceIds;
-        if (devices.Remove(deviceId))
+        var devices = new List<AppDeviceInfo>(AppDeviceInfo);
+        var deviceToRemove = devices.FirstOrDefault(d => d.DeviceId == deviceId);
+        if (deviceToRemove is not null)
         {
-            DeviceIds = devices;
+            devices.Remove(deviceToRemove);
+            AppDeviceInfo = devices;
         }
     }
 
     public bool HasDevice(string deviceId)
     {
-        return DeviceIds.Contains(deviceId);
+        return AppDeviceInfo.Any(d => d.DeviceId == deviceId);
     }
 
     public static ApplicationInfoEntity FromApplicationInfo(ApplicationInfo info, string deviceId)
@@ -110,8 +128,47 @@ public partial class ApplicationInfoEntity : ObservableObject
             AppIconBytes = !string.IsNullOrEmpty(info.AppIcon) 
                 ? Convert.FromBase64String(info.AppIcon) 
                 : null, 
-            NotificationFilter = NotificationFilter.ToastFeed,
-            DeviceIds = [deviceId]
+            AppDeviceInfo = [new AppDeviceInfo { DeviceId = deviceId, Filter = NotificationFilter.ToastFeed }],
         };
     }
+
+    public static Dictionary<NotificationFilter, string> NotificationFilterTypes { get; } = new()
+    {
+        { NotificationFilter.ToastFeed, "NotificationFilterToastFeed.Content".GetLocalizedResource() },
+        { NotificationFilter.Feed, "NotificationFilterFeed.Content".GetLocalizedResource() },
+        { NotificationFilter.Disabled, "NotificationFilterDisabled.Content".GetLocalizedResource() }
+    };
+
+    public string GetNotificationFilter(string deviceId)
+    {
+        var deviceInfo = AppDeviceInfo.FirstOrDefault(d => d.DeviceId == deviceId);
+        if (deviceInfo != null)
+        {
+            return NotificationFilterTypes[deviceInfo.Filter];
+        }
+        // Return default if device not found
+        return NotificationFilterTypes[NotificationFilter.ToastFeed];
+    }
+
+    public string currentNotificationFilter;
+    public string CurrentNotificationFilter
+    {
+        get => currentNotificationFilter;
+        set
+        {
+            currentNotificationFilter = value;
+            OnPropertyChanged(nameof(CurrentNotificationFilter));
+        }
+    }
+
+    public void UpdateNotificationFilter(string deviceId)
+    {
+        CurrentNotificationFilter = GetNotificationFilter(deviceId);
+    }
+}
+
+public class AppDeviceInfo
+{
+    public string DeviceId { get; set; }
+    public NotificationFilter Filter { get; set; }
 }

@@ -9,7 +9,9 @@ public class MessageHandler(
     IDeviceManager deviceManager,
     INotificationService notificationService,
     IClipboardService clipboardService,
+#if WINDOWS
     ISftpService sftpService,
+#endif
     ILogger<MessageHandler> logger) : IMessageHandler
 {
     public async Task HandleMessageAsync(PairedDevice device, SocketMessage message)
