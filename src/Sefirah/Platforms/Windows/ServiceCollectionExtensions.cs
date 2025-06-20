@@ -2,16 +2,17 @@ using System.Threading.Channels;
 using Microsoft.Extensions.Configuration;
 using Renci.SshNet;
 using Sefirah.Data.Contracts;
-using Sefirah.Platforms.Windows.Abstractions;
-using Sefirah.Platforms.Windows.Configuration;
-using Sefirah.Platforms.Windows.Remote;
-using Sefirah.Platforms.Windows.RemoteAbstractions;
-using Sefirah.Platforms.Windows.RemoteSftp;
-using Sefirah.Platforms.Windows.Shell;
-using Sefirah.Platforms.Windows.Shell.Commands;
-using Sefirah.Platforms.Windows.Shell.Local;
-using Sefirah.Platforms.Windows.Worker;
-using Sefirah.Platforms.Windows.Worker.IO;
+using Sefirah.Platforms.Windows.RemoteStorage.Abstractions;
+using Sefirah.Platforms.Windows.RemoteStorage.Configuration;
+using Sefirah.Platforms.Windows.RemoteStorage.Remote;
+using Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
+using Sefirah.Platforms.Windows.RemoteStorage.Sftp;
+using Sefirah.Platforms.Windows.RemoteStorage.Shell;
+using Sefirah.Platforms.Windows.RemoteStorage.Shell.Commands;
+using Sefirah.Platforms.Windows.RemoteStorage.Shell.Local;
+using Sefirah.Platforms.Windows.RemoteStorage.Worker;
+using Sefirah.Platforms.Windows.RemoteStorage.Worker.IO;
+using Sefirah.Platforms.Windows.Services;
 
 namespace Sefirah.Platforms.Windows;
 
@@ -20,14 +21,11 @@ namespace Sefirah.Platforms.Windows;
 /// </summary>
 public static class ServiceCollectionExtensions
 {
-    /// <summary>
-    /// Adds Windows-specific services to the service collection
-    /// </summary>
     public static IServiceCollection AddWindowsServices(this IServiceCollection services)
     {
-        // Register Windows-specific notification services
         services.AddSingleton<ToastNotificationService>();
         services.AddSingleton<IPlatformNotificationHandler, WindowsNotificationHandler>();
+        services.AddSingleton<IPlaybackService, WindowsPlaybackService>();
 
         // Remote Storage
         services.AddSftpRemoteServices();

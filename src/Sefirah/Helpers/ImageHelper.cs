@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Media.Imaging;
+using Windows.Storage.Streams;
 
 namespace Sefirah.Helpers;
 
@@ -78,20 +79,20 @@ public static class ImageHelper
         }
     }
 
-    //public static async Task<string> ToBase64Async(IRandomAccessStreamReference data)
-    //{
-    //    try
-    //    {
-    //        using var stream = await data.OpenReadAsync();
-    //        var reader = new DataReader(stream.GetInputStreamAt(0));
-    //        var bytes = new byte[stream.Size];
-    //        await reader.LoadAsync((uint)stream.Size);
-    //        reader.ReadBytes(bytes);
-    //        return Convert.ToBase64String(bytes);
-    //    }
-    //    catch (Exception)
-    //    {
-    //        return string.Empty;
-    //    }
-    //}
+    public static async Task<string> ToBase64Async(IRandomAccessStreamReference data)
+    {
+        try
+        {
+            using var stream = await data.OpenReadAsync();
+            var reader = new DataReader(stream.GetInputStreamAt(0));
+            var bytes = new byte[stream.Size];
+            await reader.LoadAsync((uint)stream.Size);
+            reader.ReadBytes(bytes);
+            return Convert.ToBase64String(bytes);
+        }
+        catch (Exception)
+        {
+            return string.Empty;
+        }
+    }
 }

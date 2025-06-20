@@ -1,4 +1,4 @@
-using Sefirah.Platforms.Windows.RemoteAbstractions;
+using Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
 using Vanara.Extensions;
 using Vanara.InteropServices;
 using Vanara.PInvoke;

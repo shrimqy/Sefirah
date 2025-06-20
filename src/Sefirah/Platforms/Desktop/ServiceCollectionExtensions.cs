@@ -8,14 +8,10 @@ namespace Sefirah.Platforms.Desktop;
 /// </summary>
 public static class ServiceCollectionExtensions
 {
-    /// <summary>
-    /// Adds Desktop-specific services to the service collection
-    /// </summary>
     public static IServiceCollection AddDesktopServices(this IServiceCollection services)
     {
-        // Register Desktop-specific notification services
         services.AddSingleton<IPlatformNotificationHandler, DesktopNotificationHandler>();
-
+        services.AddSingleton<IPlaybackService, DesktopPlaybackService>();
         return services;
     }
 } 

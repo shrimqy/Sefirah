@@ -4,6 +4,7 @@ using Sefirah.Data.Contracts;
 using Sefirah.Models;
 #if WINDOWS
 using Sefirah.Platforms.Windows;
+using Sefirah.Platforms.Windows.Services;
 #else
 using Sefirah.Platforms.Desktop;
 #endif
@@ -34,6 +35,7 @@ public static class AppLifecycleHelper
         var notificationService = Ioc.Default.GetRequiredService<INotificationService>();
         var deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
         var adbService = Ioc.Default.GetRequiredService<IAdbService>();
+        var playbackService = Ioc.Default.GetRequiredService<IPlaybackService>();
 
 #if WINDOWS
         var toastNotificationService = Ioc.Default.GetRequiredService<ToastNotificationService>();
@@ -44,7 +46,8 @@ public static class AppLifecycleHelper
         await Task.WhenAll(
             deviceManager.Initialize(),
             networkService.StartServerAsync(),
-            adbService.StartAsync()
+            adbService.StartAsync(),
+            playbackService.InitializeAsync()
         );
     } 
 

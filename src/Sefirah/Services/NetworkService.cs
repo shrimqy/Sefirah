@@ -104,7 +104,6 @@ public class NetworkService(
         catch (Exception ex)
         {
             logger.LogError("Error sending message {ex}", ex);
-            throw;
         }
     }
 
@@ -219,15 +218,15 @@ public class NetworkService(
                 logger.Warn($"Device {device.Id} connected");
                 
                 // Update or add device to collection with connection properties
-                deviceManager.UpdateOrAddDevice(device, connectedDevice =>
+                deviceManager.UpdateOrAddDevice(device, connectedDevice  =>
                 {
+
                     connectedDevice.ConnectionStatus = true;
                     connectedDevice.Session = session;
                     
                     // Set as active device
                     deviceManager.ActiveDevice = connectedDevice;
-                    // Notify that device connected
-                    ConnectionStatusChanged?.Invoke(this, (connectedDevice, true));
+                    device = connectedDevice;
                 });
 
                 var (_, avatar) = await UserInformation.GetCurrentUserInfoAsync();
@@ -247,6 +246,9 @@ public class NetworkService(
                     Nonce = nonce,
                     Proof = proof
                 }));
+
+                // Notify that device connected
+                ConnectionStatusChanged?.Invoke(this, (device, true));
             }
             else
             {

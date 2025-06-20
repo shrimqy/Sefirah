@@ -11,6 +11,7 @@ public class MessageHandler(
     IClipboardService clipboardService,
     SmsHandlerService smsHandlerService,
     IFileTransferService fileTransferService,
+    IPlaybackService playbackService,
 #if WINDOWS
     ISftpService sftpService,
 #endif
@@ -25,18 +26,27 @@ public class MessageHandler(
                 case ApplicationInfo applicationInfo:
                     remoteAppRepository.AddOrUpdateApplication(ApplicationInfoEntity.FromApplicationInfo(applicationInfo, device.Id));
                     break;
+
                 case ApplicationList applicationList:
                     remoteAppRepository.UpdateApplicationList(device, applicationList);
                     break;
+
                 case NotificationMessage notificationMessage:
                     await notificationService.HandleNotificationMessage(device, notificationMessage);
                     break;
+
+                case PlaybackAction action:
+                    await playbackService.HandleMediaActionAsync(action);
+                    break;
+
                 case DeviceStatus deviceStatus:
                     deviceManager.UpdateDeviceStatus(device, deviceStatus);
                     break;
+
                 case ClipboardMessage clipboardMessage:
                     await clipboardService.SetContentAsync(clipboardMessage.Content);
                     break;
+
                 case TextConversation textConversation:
                     await smsHandlerService.HandleTextMessage(device.Id, textConversation);
                     break;
@@ -49,6 +59,7 @@ public class MessageHandler(
                 case FileTransfer fileTransfer:
                     await fileTransferService.ReceiveFile(fileTransfer);
                     break;
+
                 default:
                     logger.LogWarning("Unknown message type received: {type}", message.GetType().Name);
                     break;

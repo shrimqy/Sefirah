@@ -1,7 +1,8 @@
 using System.Runtime.InteropServices;
 using Sefirah.Platforms.Windows.Helpers;
 using Sefirah.Platforms.Windows.Interop.Extensions;
-using Sefirah.Platforms.Windows.RemoteAbstractions;
+using Sefirah.Platforms.Windows.Interop.SyncRoot;
+using Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
 using Vanara.Extensions;
 using Vanara.InteropServices;
 using Vanara.PInvoke;
@@ -415,7 +416,7 @@ public static class CloudFilter
             ProviderVersion = "1.0",
             SyncRootIdentity = contextPtr,
             SyncRootIdentityLength = (uint)context.Length,
-            FileIdentity = IntPtr.Zero,
+            FileIdentity = nint.Zero,
             FileIdentityLength = 0,
         };
 
