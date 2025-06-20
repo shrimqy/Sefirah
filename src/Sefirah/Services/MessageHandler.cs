@@ -9,6 +9,7 @@ public class MessageHandler(
     IDeviceManager deviceManager,
     INotificationService notificationService,
     IClipboardService clipboardService,
+    SmsHandlerService smsHandlerService,
 #if WINDOWS
     ISftpService sftpService,
 #endif
@@ -34,6 +35,9 @@ public class MessageHandler(
                     break;
                 case ClipboardMessage clipboardMessage:
                     await clipboardService.SetContentAsync(clipboardMessage.Content);
+                    break;
+                case TextConversation textConversation:
+                    await smsHandlerService.HandleTextMessage(device.Id, textConversation);
                     break;
 #if WINDOWS
                 case SftpServerInfo sftpServerInfo:

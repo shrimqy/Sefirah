@@ -586,7 +586,10 @@
                     </NavigationView.Resources>
 
                     <NavigationView.MenuItems>
-                        <NavigationViewItem Content="{helpers:ResourceString Name=Messages}" Tag="Messages">
+                        <NavigationViewItem
+                            Content="{helpers:ResourceString Name=Messages}"
+                            IsSelected="True"
+                            Tag="Messages">
                             <NavigationViewItem.Icon>
                                 <FontIcon Glyph="&#xE8BD;" />
                             </NavigationViewItem.Icon>

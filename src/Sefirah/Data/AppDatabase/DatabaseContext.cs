@@ -40,6 +40,26 @@ public class DatabaseContext
             db.CreateTable<ApplicationInfoEntity>();
         }
 
+        if (db.GetTableInfo(nameof(ContactEntity)).Count == 0)
+        {
+            db.CreateTable<ContactEntity>();
+        }
+
+        if (db.GetTableInfo(nameof(SmsConversationEntity)).Count == 0)
+        {
+            db.CreateTable<SmsConversationEntity>();
+        }
+
+        if (db.GetTableInfo(nameof(TextMessageEntity)).Count == 0)
+        {
+            db.CreateTable<TextMessageEntity>();
+        }
+
+        if (db.GetTableInfo(nameof(SmsAttachmentEntity)).Count == 0)
+        {
+            db.CreateTable<SmsAttachmentEntity>();
+        }
+
         return db;
     }
 }

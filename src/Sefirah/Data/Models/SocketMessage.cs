@@ -307,13 +307,6 @@ public class StorageInfo : SocketMessage
 
 }
 
-public class ScreenData : SocketMessage
-{
-    [JsonPropertyName("timestamp")]
-    public long TimeStamp { get; set; }
-
-}
-
 public class ApplicationList : SocketMessage
 {
     public required List<ApplicationInfo> AppList { get; set; }
@@ -389,7 +382,7 @@ public class TextConversation : SocketMessage
 public class TextMessage : SocketMessage
 {
     [JsonPropertyName("addresses")]
-    public List<SmsAddress> Addresses { get; set; } = [];
+    public List<string> Addresses { get; set; } = [];
 
     [JsonPropertyName("contacts")]
     public List<Contact> Contacts { get; set; } = [];
@@ -402,7 +395,7 @@ public class TextMessage : SocketMessage
 
     [JsonPropertyName("timestamp")]
     public long Timestamp { get; set; }
-
+                    
     [JsonPropertyName("messageType")]
     public int MessageType { get; set; }
     
@@ -425,22 +418,14 @@ public class TextMessage : SocketMessage
     public bool HasMultipleRecipients { get; set; } = false;
 }
 
-public class SmsAddress
-{
-    [JsonPropertyName("address")]
-    public required string Address { get; set; }
-}
-
 public class SmsAttachment
 {
-    [JsonPropertyName("mimeType")]
-    public required string MimeType { get; set; }
 
     [JsonPropertyName("base64EncodedFile")]
-    public string? Base64EncodedFile { get; set; }
+    public string? Base64Data { get; set; }
 
     [JsonPropertyName("fileName")]
-    public required string FileName { get; set; }
+    public string? FileName { get; set; }
 }
 
 public class ThreadRequest: SocketMessage

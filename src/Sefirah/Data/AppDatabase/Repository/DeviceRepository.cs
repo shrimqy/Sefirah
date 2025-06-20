@@ -71,6 +71,7 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
         }
     }
 
+
     public void DeletePairedDevice(string deviceId)
     {
         context.Database.Delete(context.Database.Table<RemoteDeviceEntity>().FirstOrDefault(d => d.DeviceId == deviceId));

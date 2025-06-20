@@ -100,6 +100,7 @@ public static class AppLifecycleHelper
                 .AddSingleton<DatabaseContext>()
                 .AddSingleton<DeviceRepository>()
                 .AddSingleton<RemoteAppRepository>()
+                .AddSingleton<SmsRepository>()
 
                 // Platform-specific services
 #if WINDOWS
@@ -117,6 +118,7 @@ public static class AppLifecycleHelper
 
                 .AddSingleton<INotificationService, NotificationService>()
                 .AddSingleton<IClipboardService, ClipboardService>()
+                .AddSingleton<SmsHandlerService>()
 
                 .AddSingleton<IMessageHandler, MessageHandler>()
                 .AddSingleton<Func<IMessageHandler>>(sp => () => sp.GetRequiredService<IMessageHandler>())
@@ -127,6 +129,7 @@ public static class AppLifecycleHelper
                 .AddSingleton<MainPageViewModel>()
                 .AddSingleton<DevicesViewModel>()
                 .AddSingleton<AppsViewModel>()
+                .AddSingleton<MessagesViewModel>()
                 )
             );
     }
