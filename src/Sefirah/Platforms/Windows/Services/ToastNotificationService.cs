@@ -4,39 +4,21 @@ using Sefirah.Data.Models;
 using Sefirah.Services;
 using Windows.System;
 
-namespace Sefirah.Platforms.Windows;
+namespace Sefirah.Platforms.Windows.Services;
 public class ToastNotificationService(ILogger<ToastNotificationService> logger, INotificationService notificationService, IDeviceManager deviceManager)
 {
     public async Task RegisterNotificationAsync()
     {
+        AppNotificationManager.Default.NotificationInvoked -= OnNotificationInvoked;
+        AppNotificationManager.Default.NotificationInvoked += OnNotificationInvoked;
+
         try
         {
-            // Check if AppNotificationManager is available
-            if (!AppNotificationManager.IsSupported())
-            {
-                logger.LogWarning("App notifications are not supported on this system");
-                return;
-            }
-
-            // Unregister first to avoid duplicate registrations
-            AppNotificationManager.Default.NotificationInvoked -= OnNotificationInvoked;
-            AppNotificationManager.Default.NotificationInvoked += OnNotificationInvoked;
-
-            // Register for notifications
             await Task.Run(() => AppNotificationManager.Default.Register());
-            logger.LogDebug("Successfully registered for toast notifications");
-        }
-        catch (System.Runtime.InteropServices.COMException comEx) when (comEx.HResult == unchecked((int)0x80040154))
-        {
-            logger.LogWarning("COM server not registered for notifications. This is expected during development or first run.");
-        }
-        catch (System.Runtime.InteropServices.COMException comEx) when (comEx.HResult == unchecked((int)0x80070490))
-        {
-            logger.LogWarning("Element not found during notification registration. App may not be fully initialized yet.");
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Could not register for notifications, continuing without notifications");
+            logger.LogWarning("Could not register for notifications, continuing without notifications", ex);
         }
     }
 

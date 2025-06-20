@@ -112,11 +112,8 @@ public class WindowsNotificationHandler(ILogger logger) : IPlatformNotificationH
                 // Add action buttons for completion notification
                 if (progress == null && !string.IsNullOrEmpty(fileName))
                 {
-                    var filePath = Path.Combine(
-                        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                        "Downloads",
-                        fileName
-                    );
+                    // For received files, get the default received files location
+                    var filePath = fileName; // This will be the full path passed from FileTransferService
 
                     builder
                         .AddButton(new AppNotificationButton("TransferNotificationActionOpenFile".GetLocalizedResource())

@@ -19,7 +19,8 @@ public class FileTransferService(
     ILogger logger,
     ISessionManager sessionManager,
     IUserSettingsService userSettingsService,
-    IDeviceManager deviceManager
+    IDeviceManager deviceManager,
+    IPlatformNotificationHandler notificationHandler
     ) : IFileTransferService, ITcpClientProvider, ITcpServerProvider
 {
     private readonly string storageLocation = userSettingsService.FeatureSettingsService.ReceivedFilesPath;
@@ -88,7 +89,13 @@ public class FileTransferService(
             }
             logger.Info($"Connected to file transfer server at {serverInfo.IpAddress}:{serverInfo.Port}");
 
-            //await ShowTransferNotification("TransferNotificationReceiving/Title".GetLocalizedResource(), $"{currentFileMetadata.FileName}", 0);
+            await notificationHandler.ShowTransferNotification(
+                "TransferNotificationReceiving/Title".GetLocalizedResource(), 
+                $"Receiving {currentFileMetadata.FileName}", 
+                currentFileMetadata.FileName, 
+                notificationSequence++, 
+                0, 
+                isReceiving: true);
 
             // Adding a small delay for the android to open a read channel
             await Task.Delay(500);
@@ -103,7 +110,13 @@ public class FileTransferService(
                 FileReceived?.Invoke(this, file);
             }
 
-            //await ShowTransferNotification("TransferNotificationReceived/Title".GetLocalizedResource(), $"{currentFileMetadata.FileName} has been saved successfully");
+            await notificationHandler.ShowTransferNotification(
+                "TransferNotificationReceived/Title".GetLocalizedResource(), 
+                $"{currentFileMetadata.FileName} has been saved successfully", 
+                fullPath, 
+                notificationSequence++, 
+                null, 
+                isReceiving: true);
         }
         catch (Exception ex)
         {
@@ -174,21 +187,25 @@ public class FileTransferService(
             var progress = (double)bytesReceived / currentFileMetadata.FileSize * 100;
             if (Math.Floor(progress) > Math.Floor((double)(bytesReceived - size) / currentFileMetadata.FileSize * 100))
             {
-                //await ShowTransferNotification(
-                //    "TransferNotificationReceiving/Title".GetLocalizedResource(),
-                //    $"{currentFileMetadata.FileName}",
-                //    progress,
-                //    isReceiving: true);
+                await notificationHandler.ShowTransferNotification(
+                    "TransferNotificationReceiving/Title".GetLocalizedResource(),
+                    $"Receiving {currentFileMetadata.FileName}",
+                    currentFileMetadata.FileName,
+                    notificationSequence,
+                    progress,
+                    isReceiving: true);
             }
         }
         catch (Exception ex)
         {
             logger.Error("Error processing received file data", ex);
-            //await ShowTransferNotification(
-            //     "TransferNotification/Title".GetLocalizedResource(),
-            //    string.Format("TransferNotificationReceivingError".GetLocalizedResource(), currentFileMetadata?.FileName),
-            //    null,
-            //    isReceiving: true);
+            await notificationHandler.ShowTransferNotification(
+                 "TransferNotification/Title".GetLocalizedResource(),
+                string.Format("TransferNotificationReceivingError".GetLocalizedResource(), currentFileMetadata?.FileName),
+                currentFileMetadata?.FileName ?? "",
+                notificationSequence++,
+                null,
+                isReceiving: true);
             CleanupTransfer(false);
             if (receiveTransferCompletionSource?.Task.IsCompleted == false)
             {
@@ -380,13 +397,36 @@ public class FileTransferService(
             logger.Debug($"Sending metadata: {json}");
             sessionManager.SendMessage(device.Session!, json);
 
+            await notificationHandler.ShowTransferNotification(
+                "TransferNotificationSending/Title".GetLocalizedResource(),
+                $"Sending {metadata.FileName}",
+                metadata.FileName,
+                notificationSequence++,
+                0,
+                isReceiving: false);
+
             sendTransferCompletionSource = new TaskCompletionSource<bool>();
             await SendFileData(metadata, stream);
             await sendTransferCompletionSource.Task;
+
+            await notificationHandler.ShowTransferNotification(
+                "TransferNotificationSent/Title".GetLocalizedResource(),
+                $"{metadata.FileName} has been sent successfully",
+                metadata.FileName,
+                notificationSequence++,
+                null,
+                isReceiving: false);
         }
         catch (Exception ex)
         {
             logger.Error("Error sending stream data", ex);
+            await notificationHandler.ShowTransferNotification(
+                "TransferNotification/Title".GetLocalizedResource(),
+                $"Error sending {metadata.FileName}: {ex.Message}",
+                metadata.FileName,
+                notificationSequence++,
+                null,
+                isReceiving: false);
             throw;
         }
     }
@@ -455,6 +495,7 @@ public class FileTransferService(
             {
                 var buffer = new byte[ChunkSize];
                 long totalBytesRead = 0;
+                double lastReportedProgress = 0;
 
                 while (totalBytesRead < metadata.FileSize && session?.IsConnected == true)
                 {
@@ -465,6 +506,19 @@ public class FileTransferService(
                     totalBytesRead += bytesRead;
 
                     var progress = (double)totalBytesRead / metadata.FileSize * 100;
+                    
+                    // Report progress updates only when progress changes by at least 1%
+                    if (Math.Floor(progress) > Math.Floor(lastReportedProgress))
+                    {
+                        await notificationHandler.ShowTransferNotification(
+                            "TransferNotificationSending/Title".GetLocalizedResource(),
+                            $"Sending {metadata.FileName}",
+                            metadata.FileName,
+                            notificationSequence,
+                            progress,
+                            isReceiving: false);
+                        lastReportedProgress = progress;
+                    }
                 }
             }
         }
