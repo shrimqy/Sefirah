@@ -10,6 +10,7 @@ public class MessageHandler(
     INotificationService notificationService,
     IClipboardService clipboardService,
     SmsHandlerService smsHandlerService,
+    IFileTransferService fileTransferService,
 #if WINDOWS
     ISftpService sftpService,
 #endif
@@ -44,6 +45,10 @@ public class MessageHandler(
                     await sftpService.InitializeAsync(device, sftpServerInfo);
                     break;
 #endif
+
+                case FileTransfer fileTransfer:
+                    await fileTransferService.ReceiveFile(fileTransfer);
+                    break;
                 default:
                     logger.LogWarning("Unknown message type received: {type}", message.GetType().Name);
                     break;

@@ -124,6 +124,7 @@ public static class AppLifecycleHelper
                 .AddSingleton<Func<IMessageHandler>>(sp => () => sp.GetRequiredService<IMessageHandler>())
                 .AddSingleton<IAdbService, AdbService>()
                 .AddSingleton<IScreenMirrorService, ScreenMirrorService>()
+                .AddSingleton<IFileTransferService, FileTransferService>()
 
                 // ViewModels
                 .AddSingleton<MainPageViewModel>()
