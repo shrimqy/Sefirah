@@ -2,12 +2,20 @@ using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.Windows.AppLifecycle;
 using Sefirah.Helpers;
-using Sefirah.Models;
 using Sefirah.Views;
 using Sefirah.Views.Onboarding;
 using Uno.Resizetizer;
 using Windows.ApplicationModel.Activation;
 using LaunchActivatedEventArgs = Microsoft.UI.Xaml.LaunchActivatedEventArgs;
+using H.NotifyIcon;
+using Sefirah.Data.Contracts;
+using System.Runtime.InteropServices;
+
+
+
+#if WINDOWS
+using Sefirah.Platforms.Windows.Helpers;
+#endif
 
 namespace Sefirah;
 public partial class App : Application
@@ -15,7 +23,6 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
-
         // Configure exception handlers
         UnhandledException += (sender, e) => AppLifecycleHelper.HandleAppUnhandledException(e.Exception);
         AppDomain.CurrentDomain.UnhandledException += (sender, e) => AppLifecycleHelper.HandleAppUnhandledException(e.ExceptionObject as Exception);
@@ -44,13 +51,40 @@ public partial class App : Application
         Ioc.Default.ConfigureServices(Host.Services);
         Host.StartAsync();
 
-        EnsureWindowIsInitialized();
+#if WINDOWS
+        HookEventsForWindow();
+#endif
+        var rootFrame = EnsureWindowIsInitialized();
 
-        InitializeApplicationAsync(args);
+        if (rootFrame is null)
+            return;
+
+        switch (args)
+        {
+            default:
+                bool isOnboarding = ApplicationData.Current.LocalSettings.Values["HasCompletedOnboarding"] == null;
+                if (isOnboarding)
+                {
+                    // Navigate to onboarding page and ensure window is visible
+                    rootFrame.Navigate(typeof(WelcomePage), null, new SuppressNavigationTransitionInfo());
+                }
+                else
+                {
+                    // Navigate to main page and ensure window is visible
+                    rootFrame.Navigate(typeof(MainPage), null, new SuppressNavigationTransitionInfo());
+                }
+                break;
+        }
+
+        MainWindow!.Activate();
+        MainWindow.AppWindow.Show();
+
         _ = AppLifecycleHelper.InitializeAppComponentsAsync();
     }
 
-    public Frame EnsureWindowIsInitialized()
+    public Frame? EnsureWindowIsInitialized()
+    {
+        try
     {
         //  NOTE:
         //  Do not repeat app initialization when the Window already has content,
@@ -68,56 +102,85 @@ public partial class App : Application
         return rootFrame;
     }
 
-    public Task InitializeApplicationAsync(object activatedEventArgs)
-    {
-        var rootFrame = EnsureWindowIsInitialized();
-
-        MainWindow!.Activate();
-        MainWindow.AppWindow.Show();
-
-        bool isOnboarding = ApplicationData.Current.LocalSettings.Values["HasCompletedOnboarding"] == null;
-        if (isOnboarding)
+        catch (COMException)
         {
-            // Navigate to onboarding page and ensure window is visible
-            rootFrame.Navigate(typeof(WelcomePage), null, new SuppressNavigationTransitionInfo());
+            return null;
         }
-        else
-        {
-            // Navigate to main page and ensure window is visible
-            rootFrame.Navigate(typeof(MainPage), null, new SuppressNavigationTransitionInfo());
-        }
-
-        return Task.CompletedTask;
     }
+#if WINDOWS
+    public async Task InitializeApplicationAsync(AppActivationArguments activatedEventArgs)
+    {
+        switch (activatedEventArgs.Data)
+        {
+            case ShareTargetActivatedEventArgs:
+                // Handle share target activation
+                await HandleShareTargetActivation(activatedEventArgs.Data as ShareTargetActivatedEventArgs);
+                break;
+
+            default:
+                MainWindow!.AppWindow.Show();
+                MainWindow!.Activate();
+                break;
+    }
+    }
+#endif
 
     public void ShowSplashScreen()
     {
         var rootFrame = EnsureWindowIsInitialized();
+        if (rootFrame is null)
+            return; 
 
         rootFrame.Navigate(typeof(Views.SplashScreen));
     }
 
+#if WINDOWS
     /// <summary>
     /// Gets invoked when the application is activated.
     /// </summary>
     public async Task OnActivatedAsync(AppActivationArguments activatedEventArgs)
     {
-        var activatedEventArgsData = activatedEventArgs.Data;
-
         // InitializeApplication accesses UI, needs to be called on UI thread
-        //await MainWindow!.DispatcherQueue.EnqueueAsync(() => InitializeApplicationAsync(activatedEventArgsData));
+        await MainWindow!.DispatcherQueue.EnqueueAsync(() => InitializeApplicationAsync(activatedEventArgs));
     }
 
-#if WINDOWS
-    private void HandleToastActivation()
+    private void HookEventsForWindow()
     {
-        // Check if this is a toast activation
-        var activatedArgs = Microsoft.Windows.AppLifecycle.AppInstance.GetCurrent().GetActivatedEventArgs();
-        if (activatedArgs?.Kind == Microsoft.Windows.AppLifecycle.ExtendedActivationKind.ToastNotification)
+        MainWindow!.Activated += Window_Activated;
+        MainWindow.Closed += Window_Closed;
+    }
+
+    private void Window_Closed(object sender, WindowEventArgs args)
+    {
+        if (HandleClosedEvents)
         {
-            // The app was launched via toast notification
-            // The ToastNotificationService will handle the actual notification processing
+            // If HandleClosedEvents is true, we hide the window (tray icon exit logic can change this)
+            args.Handled = true;
+            MainWindow!.Hide();
         }
+    }
+
+    private void Window_Activated(object sender, WindowActivatedEventArgs args)
+    {
+        Debug.WriteLine($"Window_Activated: {args.WindowActivationState}");
+        
+        if (args.WindowActivationState == WindowActivationState.CodeActivated ||
+            args.WindowActivationState == WindowActivationState.PointerActivated)
+            return;
+
+            ApplicationData.Current.LocalSettings.Values["INSTANCE_ACTIVE"] = -Environment.ProcessId;
+    }
+
+    public async Task HandleShareTargetActivation(ShareTargetActivatedEventArgs? args)
+    {
+        var shareOperation = args?.ShareOperation;
+        if (shareOperation == null) return;
+        var fileTransferService = Ioc.Default.GetRequiredService<IFileTransferService>();
+
+        await MainWindow!.DispatcherQueue.EnqueueAsync(async () =>
+        {
+            await fileTransferService.ProcessShareAsync(shareOperation);
+        });
     }
 #endif
 
