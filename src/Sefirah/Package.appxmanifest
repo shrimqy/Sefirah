@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package
+    xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+    xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+    xmlns:uap2="http://schemas.microsoft.com/appx/manifest/uap/windows10/2"
+    xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
+    xmlns:uap4="http://schemas.microsoft.com/appx/manifest/uap/windows10/4"
+    xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
+    xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
+    xmlns:uap11="http://schemas.microsoft.com/appx/manifest/uap/windows10/11"
+   
+    xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+    xmlns:rescap5="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities/5"
+    
+    xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+    xmlns:desktop3="http://schemas.microsoft.com/appx/manifest/desktop/windows10/3"
+    xmlns:desktop4="http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
+    xmlns:desktop6="http://schemas.microsoft.com/appx/manifest/desktop/windows10/6"
+    xmlns:desktop7="http://schemas.microsoft.com/appx/manifest/desktop/windows10/7"
+
+    xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
+    xmlns:cloudfiles="http://schemas.microsoft.com/appx/manifest/cloudfiles/windows10"
+    xmlns:cloudfiles2="http://schemas.microsoft.com/appx/manifest/cloudfiles/windows10/2"
+    xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+    IgnorableNamespaces="uap rescap rescap5 uap3 desktop3 desktop4 desktop6 desktop7 cloudfiles cloudfiles2 mp">
+    
+    <Identity  Version="2.0.0.0" Name="shrimqy.Seki-PhoneLink" Publisher="CN=BEC0F2AA-07EB-4762-A2FE-13550AF289A5"/>
+    
+    <Properties >
+        <DisplayName>Sefirah</DisplayName>
+        <PublisherDisplayName>shrimqy</PublisherDisplayName>
+        <Logo>Assets\AppTiles\StoreLogo.png</Logo>
+    </Properties >
+
+    <Dependencies>
+        <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.19041.0"  MaxVersionTested="10.0.22621.0" />
+        <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.22621.0" />
+    </Dependencies>
+
+    <Resources>
+        <Resource Language="x-generate"/>
+    </Resources>
+
+    <Applications>
+        <Application Id="App"
+            Executable="$targetnametoken$.exe"
+            EntryPoint="$targetentrypoint$">
+            <uap:VisualElements  DisplayName="Sefirah" Description="Connect and sync with your android devices." BackgroundColor="transparent"
+			  Square150x150Logo="Assets\AppTiles\Square150x150Logo.png"
+			  Square44x44Logo="Assets\AppTiles\Square44x44Logo.png">
+                <uap:DefaultTile Wide310x150Logo="Assets\AppTiles\Wide310x150Logo.png"  Square71x71Logo="Assets\AppTiles\SmallTile.png" Square310x310Logo="Assets\AppTiles\LargeTile.png">
+                    <uap:ShowNameOnTiles>
+                        <uap:ShowOn Tile="square150x150Logo"/>
+                        <uap:ShowOn Tile="wide310x150Logo"/>
+                        <uap:ShowOn Tile="square310x310Logo"/>
+                    </uap:ShowNameOnTiles>
+                </uap:DefaultTile >
+                <uap:SplashScreen Image="Assets\AppTiles\SplashScreen.png" />
+            </uap:VisualElements >
+            <Extensions>
+                <uap:Extension Category="windows.shareTarget">
+                    <uap:ShareTarget>
+                        <uap:SupportedFileTypes>
+                            <uap:SupportsAnyFileType/>
+                        </uap:SupportedFileTypes>
+                        <uap:DataFormat>StorageItems</uap:DataFormat>
+                    </uap:ShareTarget>
+                </uap:Extension>
+                <uap5:Extension Category="windows.startupTask">
+                    <uap5:StartupTask
+                    TaskId="8B5D3E3F-9B69-4E8A-A9F7-BFCA793B9AF0"
+                    Enabled="false"
+                    DisplayName="Sefirah" />
+                </uap5:Extension>
+                <cloudfiles:Extension Category="windows.cloudFiles">
+                    <cloudfiles:CloudFiles>
+                        <cloudfiles:CustomStateHandler Clsid="20000000-0000-0000-0000-000000000001"/>
+                        <!--<cloudfiles:ThumbnailProviderHandler Clsid="703e61b4-f4a4-4803-b824-9d23dad651bc"/>-->
+                        <cloudfiles:ThumbnailProviderHandler Clsid="20000000-0000-0000-0000-000000000001"/>
+                        <cloudfiles:ExtendedPropertyHandler Clsid="20000000-0000-0000-0000-000000000001"/>
+                        <cloudfiles:BannersHandler Clsid="20000000-0000-0000-0000-000000000001"/>
+                        <cloudfiles:CloudFilesContextMenus>
+                            <cloudfiles:Verb Id="Sync" Clsid="942952b6-3bdc-4e50-8fe2-8d2d869ca70f"/>
+                            <cloudfiles:Verb Id="Upload" Clsid="4a3c9b56-f075-4499-b4ee-ba4b88d1fe05"/>
+                        </cloudfiles:CloudFilesContextMenus>
+                        <cloudfiles:ContentUriSource Clsid="20000000-0000-0000-0000-000000000001"/>
+                        <!--<cloudfiles2:StorageProviderStatusUISourceFactory Clsid="d3252227-1396-40a5-bfe9-1fcc49333ab3"/>-->
+                    </cloudfiles:CloudFiles>
+                </cloudfiles:Extension>
+                <desktop:Extension Category="windows.toastNotificationActivation">
+                    <desktop:ToastNotificationActivation ToastActivatorCLSID="2b6c1f58-0e8d-4c66-9bff-d6d2c58e52b6" />
+                </desktop:Extension>
+                <com:Extension Category="windows.comServer">
+                    <com:ComServer>
+                        <com:ExeServer Executable="Sefirah.exe" DisplayName="Sefirah" Arguments="----AppNotificationActivated:">
+                            <com:Class Id="2b6c1f58-0e8d-4c66-9bff-d6d2c58e52b6" />
+                        </com:ExeServer>
+                        <com:ExeServer DisplayName="Sync Command Handler" Executable="$targetnametoken$.exe">
+                            <com:Class Id="942952b6-3bdc-4e50-8fe2-8d2d869ca70f"/>
+                        </com:ExeServer>
+                        <com:ExeServer DisplayName="Upload Command Handler" Executable="$targetnametoken$.exe">
+                            <com:Class Id="4a3c9b56-f075-4499-b4ee-ba4b88d1fe05"/>
+                        </com:ExeServer>
+                    </com:ComServer>
+                </com:Extension>
+            </Extensions>
+        </Application>
+    </Applications>   
+
+    <Capabilities>
+        <Capability Name="internetClient" />
+        <rescap:Capability Name="runFullTrust" />
+        <rescap:Capability Name="appDiagnostics"/>
+        <uap3:Capability Name="backgroundMediaPlayback"/>
+        <Capability Name="internetClientServer"/>
+        <uap3:Capability Name="userNotificationListener"/>
+        <uap:Capability Name="userAccountInformation"/>
+        <uap:Capability Name="removableStorage"/>
+        <DeviceCapability Name="bluetooth"/>
+    </Capabilities>
+</Package>

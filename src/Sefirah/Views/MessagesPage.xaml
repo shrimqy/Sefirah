@@ -1,0 +1,436 @@
+﻿<Page
+    x:Class="Sefirah.Views.MessagesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:Sefirah.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:Sefirah.Helpers"
+    xmlns:local="using:Sefirah.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:Sefirah.Data.Models"
+    xmlns:vm="using:Sefirah.ViewModels"
+    Background="Transparent"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <converters:StringNullOrEmptyToBooleanConverter x:Key="StringNullOrEmptyToBooleanConverter" />
+        <converters:NullBooleanConverter x:Key="NullBooleanConverter" />
+        <converters:DateTimeConverter x:Key="DateTimeConverter" />
+        <converters:BatteryStatusToIconConverter x:Key="BatteryStatusToIconConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+        <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
+        <converters:MessageTypeToAlignmentConverter x:Key="MessageTypeToAlignmentConverter" />
+        <converters:UnixTimestampConverter x:Key="UnixTimestampConverter" />
+        <converters:IndexConverter x:Key="IndexConverter" />
+        <converters:GreaterThanOneToBooleanConverter x:Key="GreaterThanOneToBooleanConverter" />
+        <converters:SubscriptionToIconConverter x:Key="SubscriptionToIconConverter" />
+
+        <DataTemplate x:Key="MessageItemTemplate">
+            <Grid Height="72" Padding="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        FontWeight="SemiBold"
+                        Text="{Binding DisplayName, FallbackValue='Unknown'}"
+                        TextTrimming="CharacterEllipsis" />
+
+                    <TextBlock
+                        Grid.Column="1"
+                        FontSize="12"
+                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                        Text="{Binding LastMessageTimestamp, Converter={StaticResource UnixTimestampConverter}, FallbackValue=''}" />
+                </Grid>
+
+                <TextBlock
+                    Grid.Row="1"
+                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                    MaxLines="1"
+                    Text="{Binding LastMessage, FallbackValue='No content'}"
+                    TextTrimming="CharacterEllipsis" />
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+
+    <SplitView
+        x:Name="MessagesSplitView"
+        CompactPaneLength="48"
+        DisplayMode="Inline"
+        IsPaneOpen="True"
+        OpenPaneLength="320"
+        PaneBackground="Transparent">
+
+        <!--  Left panel - Contacts/Message threads list  -->
+        <SplitView.Pane>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="16,12"
+                        FontSize="20"
+                        FontWeight="SemiBold"
+                        Text="{helpers:ResourceString Name=Messages}" />
+
+                    <Button
+                        x:Name="NewMessageButton"
+                        Grid.Column="1"
+                        Margin="8,12,16,12"
+                        Click="NewMessageButton_Click"
+                        ToolTipService.ToolTip="{helpers:ResourceString Name=NewMessage}">
+                        <FontIcon FontSize="20" Glyph="&#xE932;" />
+                    </Button>
+                </Grid>
+
+                <!--  Search Box  -->
+                <AutoSuggestBox
+                    x:Name="MessagesSearchBox"
+                    Grid.Row="1"
+                    Margin="16,0,16,12"
+                    VerticalAlignment="Center"
+                    AutomationProperties.Name="Messages AutoSuggestBox"
+                    PlaceholderText="{helpers:ResourceString Name=SearchMessages}"
+                    QueryIcon="Find"
+                    QuerySubmitted="SearchBox_QuerySubmitted"
+                    SuggestionChosen="SearchBox_SuggestionChosen"
+                    TextChanged="SearchBox_TextChanged"
+                    UpdateTextOnSelect="False">
+                    <AutoSuggestBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,8,0,8">
+                                <TextBlock
+                                    MaxWidth="280"
+                                    FontWeight="SemiBold"
+                                    Text="{Binding DisplayName}"
+                                    TextTrimming="CharacterEllipsis" />
+                                <TextBlock
+                                    MaxWidth="280"
+                                    Margin="0,4,0,0"
+                                    FontSize="12"
+                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                    Text="{Binding LastMessage}"
+                                    TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </AutoSuggestBox.ItemTemplate>
+                    <AutoSuggestBox.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Padding" Value="12,8" />
+                            <Setter Property="MinHeight" Value="60" />
+                        </Style>
+                    </AutoSuggestBox.ItemContainerStyle>
+                </AutoSuggestBox>
+
+                <ListView
+                    x:Name="MessagesList"
+                    Grid.Row="2"
+                    Margin="0,8,0,0"
+                    ItemTemplate="{StaticResource MessageItemTemplate}"
+                    ItemsSource="{x:Bind ViewModel.Conversations, Mode=OneWay}"
+                    SelectedItem="{x:Bind ViewModel.SelectedConversation, Mode=TwoWay}"
+                    SelectionMode="Single" />
+
+            </Grid>
+        </SplitView.Pane>
+
+        <!--  Right panel - Message content  -->
+        <Grid
+            Padding="8,0,0,0"
+            BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}"
+            BorderThickness="1,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!--  Empty state message  -->
+            <TextBlock
+                Grid.Row="1"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                Text="{helpers:ResourceString Name=EmptyMessages}"
+                Visibility="{x:Bind ViewModel.ShouldShowEmptyState, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+            <!--  New conversation guidance  -->
+            <StackPanel
+                Grid.Row="1"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Visibility="{x:Bind ViewModel.IsNewConversation, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TextBlock
+                    Margin="0,0,0,12"
+                    HorizontalAlignment="Center"
+                    FontSize="18"
+                    FontWeight="SemiBold"
+                    Text="New Message" />
+                <TextBlock
+                    Margin="20,0"
+                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                    Text="Enter addresses above and compose your message below"
+                    TextAlignment="Center"
+                    TextWrapping="Wrap" />
+            </StackPanel>
+
+            <!--  Message header  -->
+            <Grid
+                Grid.Row="0"
+                Padding="20,12"
+                BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}"
+                BorderThickness="0,0,0,1">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!--  Regular conversation display  -->
+                <TextBlock
+                    Grid.Row="0"
+                    FontSize="18"
+                    FontWeight="SemiBold"
+                    IsTextSelectionEnabled="True"
+                    Text="{x:Bind ViewModel.SelectedConversation.DisplayName, Mode=OneWay, FallbackValue=''}"
+                    TextWrapping="Wrap"
+                    Visibility="{x:Bind ViewModel.IsExistingConversationSelected, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                <!--  New conversation address input  -->
+                <Grid Grid.Row="0" Visibility="{x:Bind ViewModel.IsNewConversation, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBox
+                        x:Name="NewAddressTextBox"
+                        FontSize="16"
+                        KeyDown="NewAddressTextBox_KeyDown"
+                        PlaceholderText="{helpers:ResourceString Name=AddressInputPlaceholder}"
+                        Text="{x:Bind ViewModel.NewConversationAddress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+
+                <!--  Address list  -->
+                <ListView
+                    Grid.Row="1"
+                    MaxHeight="120"
+                    Margin="0,8,0,0"
+                    ItemsSource="{x:Bind ViewModel.NewConversationAddresses, Mode=OneWay}"
+                    Visibility="{x:Bind ViewModel.IsNewConversation, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <Border
+                                MaxWidth="280"
+                                Padding="12,4"
+                                HorizontalAlignment="Left"
+                                Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
+                                BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}"
+                                BorderThickness="1"
+                                CornerRadius="16">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        Margin="0,0,12,0"
+                                        VerticalAlignment="Center"
+                                        Text="{x:Bind}" />
+
+                                    <Button
+                                        Grid.Column="1"
+                                        MinWidth="24"
+                                        MinHeight="24"
+                                        Padding="4"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Click="RemoveAddressButton_Click"
+                                        CornerRadius="12"
+                                        Tag="{x:Bind}"
+                                        ToolTipService.ToolTip="{helpers:ResourceString Name=RemoveAddress}">
+                                        <FontIcon FontSize="10" Glyph="&#xE711;" />
+                                    </Button>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Padding" Value="12,2" />
+                            <Setter Property="MinHeight" Value="36" />
+                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListViewItem">
+                                        <ContentPresenter
+                                            x:Name="ContentPresenter"
+                                            Padding="{TemplateBinding Padding}"
+                                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                            Content="{TemplateBinding Content}"
+                                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                                            ContentTransitions="{TemplateBinding ContentTransitions}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+            </Grid>
+
+            <!--  Message content  -->
+            <ScrollViewer
+                x:Name="MessagesScrollViewer"
+                Grid.Row="1"
+                Padding="20"
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto"
+                Visibility="{x:Bind ViewModel.IsExistingConversationSelected, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <ItemsControl ItemsSource="{x:Bind ViewModel.Messages, Mode=OneWay}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel VerticalAlignment="Bottom" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border
+                                MaxWidth="500"
+                                Margin="0,8"
+                                Padding="12"
+                                HorizontalAlignment="{Binding MessageType, Converter={StaticResource MessageTypeToAlignmentConverter}}"
+                                Background="{ThemeResource SystemControlBackgroundListLowBrush}"
+                                CanBeScrollAnchor="True"
+                                CornerRadius="8">
+                                <Border.ContextFlyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem
+                                            Click="CopyMessage_Click"
+                                            Icon="Copy"
+                                            Tag="{Binding Body}"
+                                            Text="{helpers:ResourceString Name=CopyMessage}" />
+                                    </MenuFlyout>
+                                </Border.ContextFlyout>
+                                <StackPanel>
+                                    <TextBlock
+                                        IsTextSelectionEnabled="True"
+                                        SelectionHighlightColor="{ThemeResource SystemControlHighlightAccentBrush}"
+                                        Text="{Binding Body}"
+                                        TextWrapping="Wrap">
+                                        <TextBlock.ContextFlyout>
+                                            <MenuFlyout>
+                                                <MenuFlyoutItem
+                                                    Click="CopyMessage_Click"
+                                                    Icon="Copy"
+                                                    Tag="{Binding Body}"
+                                                    Text="{helpers:ResourceString Name=CopyMessage}" />
+                                            </MenuFlyout>
+                                        </TextBlock.ContextFlyout>
+                                    </TextBlock>
+                                    <TextBlock
+                                        Margin="0,4,0,0"
+                                        HorizontalAlignment="Right"
+                                        FontSize="10"
+                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                        IsTextSelectionEnabled="True"
+                                        Text="{Binding Timestamp, Converter={StaticResource UnixTimestampConverter}}" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!--  Message composer  -->
+            <Grid
+                Grid.Row="2"
+                Padding="20,12"
+                BorderThickness="0,0,0,0"
+                Visibility="{x:Bind ViewModel.ShouldShowComposeUI, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TextBox
+                    x:Name="MessageTextBox"
+                    MinHeight="36"
+                    MaxHeight="100"
+                    AcceptsReturn="True"
+                    AutomationProperties.Name="Message input"
+                    PlaceholderText="{helpers:ResourceString Name=MessagePlaceholder}"
+                    PreviewKeyDown="MessageTextBox_KeyDown"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    ScrollViewer.VerticalScrollMode="Auto"
+                    Text="{x:Bind ViewModel.MessageText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    TextWrapping="Wrap" />
+            </Grid>
+
+            <!--  SIM selection and Send button  -->
+            <Grid
+                Grid.Row="3"
+                Padding="20,4,20,12"
+                Visibility="{x:Bind ViewModel.ShouldShowComposeUI, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!--  SIM selection  -->
+                <ComboBox
+                    x:Name="TheComboBox"
+                    Grid.Column="0"
+                    x:Load="{x:Bind ViewModel.PhoneNumbers.Count, Mode=OneWay, Converter={StaticResource GreaterThanOneToBooleanConverter}}"
+                    ItemsSource="{x:Bind ViewModel.PhoneNumbers, Mode=OneWay}"
+                    SelectedIndex="{x:Bind ViewModel.SelectedSubscriptionId, Mode=TwoWay, Converter={StaticResource IndexConverter}}">
+
+                    <!--  Template for dropdown items  -->
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Grid>
+                                    <FontIcon FontSize="14" Glyph="{Binding SubscriptionId, Converter={StaticResource SubscriptionToIconConverter}}" />
+                                    <FontIcon
+                                        Margin="6,0,0,0"
+                                        FontSize="14"
+                                        Glyph="&#xED2A;" />
+                                </Grid>
+                                <TextBlock
+                                    Margin="6,0,0,0"
+                                    FontSize="14"
+                                    Text="{Binding Number}"
+                                    Visibility="{Binding IsDropDownOpen, ElementName=TheComboBox, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <!--  Send button  -->
+                <Button
+                    x:Name="SendButton"
+                    Grid.Column="2"
+                    VerticalAlignment="Bottom"
+                    AutomationProperties.Name="Send message"
+                    Click="SendButton_Click">
+                    <SymbolIcon Symbol="Send" />
+                </Button>
+            </Grid>
+        </Grid>
+    </SplitView>
+</Page>

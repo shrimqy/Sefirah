@@ -1,0 +1,51 @@
+name: sefirah
+base: core24
+version: '1.0'
+summary: Sefirah powered by Uno Platform
+description: |
+  Sefirah is a cross-platform application built with Uno Platform,
+  providing seamless functionality across different operating systems.
+
+grade: devel
+confinement: classic
+
+platforms:
+  amd64:
+
+apps:
+  sefirah:
+    command: Sefirah
+    environment:
+      DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: 1
+
+parts:
+  sefirah:
+    plugin: dump
+    source: bin/Release/net9.0-desktop/linux-x64/
+    stage-packages:
+      - libgtk-3-0
+      - libglib2.0-0
+      - libgdk-pixbuf2.0-0
+      - libcairo2
+      - libpango-1.0-0
+      - libatk1.0-0
+      - libfontconfig1
+      - libfreetype6
+      - libx11-6
+      - libxext6
+      - libxrender1
+      - libxrandr2
+      - libxi6
+      - libxcursor1
+      - libxcomposite1
+      - libxdamage1
+      - libxfixes3
+      - libxss1
+      - libxtst6
+      - libasound2
+      - libpulse0
+      - libgl1-mesa-glx
+    organize:
+      '*': opt/sefirah/
+    stage:
+      - opt/sefirah/ 

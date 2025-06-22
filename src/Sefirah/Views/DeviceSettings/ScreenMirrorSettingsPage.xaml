@@ -1,0 +1,238 @@
+﻿<Page
+    x:Class="Sefirah.Views.DeviceSettings.ScreenMirrorSettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Sefirah.UserControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:Sefirah.Helpers"
+    xmlns:local="using:Sefirah.Views.DeviceSettings"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:wuc="using:CommunityToolkit.WinUI.Controls"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <Style
+            x:Key="CustomToggleSwitchStyle"
+            BasedOn="{StaticResource DefaultToggleSwitchStyle}"
+            TargetType="ToggleSwitch">
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,0,0,0" />
+            <Setter Property="OnContent" Value="" />
+            <Setter Property="OffContent" Value="" />
+            <Setter Property="HorizontalContentAlignment" Value="Right" />
+        </Style>
+    </Page.Resources>
+
+    <ScrollViewer>
+        <StackPanel Margin="20" Spacing="16">
+            <TextBlock FontSize="16" Text="Screen Mirror Settings" />
+            <StackPanel Spacing="5">
+                <!--  General Settings  -->
+                <wuc:SettingsExpander Header="{helpers:ResourceString Name=GeneralSettings}" IsExpanded="{x:Bind ViewModel.IsGeneralScreenMirrorSettingsExpanded, Mode=TwoWay}">
+                    <wuc:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE713;" />
+                    </wuc:SettingsExpander.HeaderIcon>
+                    <wuc:SettingsExpander.Items>
+                        <wuc:SettingsCard Header="Connection preference">
+                            <ComboBox
+                                Width="150"
+                                ItemsSource="{x:Bind ViewModel.ScrcpyDevicePreferenceOptions.Values}"
+                                SelectedItem="{x:Bind ViewModel.SelectedScrcpyDevicePreference, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=ScreenOff}">
+                            <ToggleSwitch IsOn="{x:Bind ViewModel.ScreenOff, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=PhysicalKeyboard}">
+                            <ToggleSwitch IsOn="{x:Bind ViewModel.PhysicalKeyboard, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+
+                        <!--  Custom Unlock Device Settings Card  -->
+                        <wuc:SettingsCard
+                            HorizontalContentAlignment="Stretch"
+                            ContentAlignment="Vertical"
+                            Header="{helpers:ResourceString Name=AdditionalArguments}">
+                            <TextBox
+                                MinHeight="80"
+                                AcceptsReturn="True"
+                                PlaceholderText="egs: --show-touches --power-off-on-close"
+                                Text="{x:Bind ViewModel.CustomArguments, Mode=TwoWay}"
+                                TextWrapping="Wrap" />
+                        </wuc:SettingsCard>
+                    </wuc:SettingsExpander.Items>
+                    <wuc:SettingsExpander.ItemsFooter>
+                        <Grid
+                            Padding="58,16,44,8"
+                            Background="{ThemeResource ExpanderHeaderBackground}"
+                            BorderBrush="{ThemeResource ExpanderHeaderBorderBrush}"
+                            BorderThickness="0,1,0,0"
+                            CornerRadius="0">
+                            <StackPanel Spacing="3">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel
+                                        Grid.Column="0"
+                                        VerticalAlignment="Center"
+                                        Orientation="Horizontal"
+                                        Spacing="8">
+                                        <TextBlock Text="Unlock device before launching scrcpy" />
+                                        <Button
+                                            Padding="4"
+                                            Background="Transparent"
+                                            BorderThickness="0">
+                                            <FontIcon
+                                                FontSize="14"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Glyph="&#xE946;" />
+                                            <Button.Flyout>
+                                                <Flyout>
+                                                    <StackPanel MaxWidth="350" Spacing="5">
+                                                        <TextBlock
+                                                            FontWeight="SemiBold"
+                                                            Foreground="{ThemeResource AccentAAFillColorDefaultBrush}"
+                                                            Text="{helpers:ResourceString Name=UnlockDeviceHelpTitle}" />
+                                                        <TextBlock
+                                                            FontSize="13"
+                                                            Text="{helpers:ResourceString Name=UnlockDeviceHelpDescription}"
+                                                            TextWrapping="Wrap" />
+                                                        <TextBlock
+                                                            FontWeight="SemiBold"
+                                                            Foreground="{ThemeResource AccentAAFillColorDefaultBrush}"
+                                                            Text="{helpers:ResourceString Name=UnlockDeviceHelpExample}" />
+                                                        <TextBlock
+                                                            FontFamily="Consolas"
+                                                            FontSize="13"
+                                                            Text="input keyevent 26&#x0a;input keyevent 66&#x0a;input text password" />
+                                                    </StackPanel>
+                                                </Flyout>
+                                            </Button.Flyout>
+                                        </Button>
+                                    </StackPanel>
+                                    <ToggleSwitch
+                                        Grid.Column="1"
+                                        IsOn="{x:Bind ViewModel.UnlockDeviceBeforeLaunch, Mode=TwoWay}"
+                                        Style="{StaticResource CustomToggleSwitchStyle}" />
+                                </Grid>
+                                <TextBox
+                                    MinHeight="80"
+                                    AcceptsReturn="True"
+                                    PlaceholderText="input keyevent 26&#x0a;input touchscreen swipe 540 1800 540 900"
+                                    Text="{x:Bind ViewModel.UnlockCommands, Mode=TwoWay}"
+                                    TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Grid>
+                    </wuc:SettingsExpander.ItemsFooter>
+                </wuc:SettingsExpander>
+
+                <!--  Video Settings  -->
+                <wuc:SettingsExpander Header="{helpers:ResourceString Name=VideoSettings}">
+                    <wuc:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE714;" />
+                    </wuc:SettingsExpander.HeaderIcon>
+                    <wuc:SettingsExpander.Items>
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=DisableVideoForwarding}">
+                            <ToggleSwitch IsOn="{x:Bind ViewModel.DisableVideoForwarding, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=VideoCodec}">
+                            <ComboBox
+                                Width="220"
+                                DisplayMemberPath="Display"
+                                ItemsSource="{x:Bind ViewModel.VideoCodecOptions}"
+                                SelectedIndex="{x:Bind ViewModel.VideoCodec, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=Bitrate}">
+                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.VideoBitrate, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=FrameRate}">
+                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.FrameRate, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=Crop}">
+                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.Crop, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=Display}">
+                            <TextBox
+                                KeyDown="OnKeyDown"
+                                PlaceholderText="{helpers:ResourceString Name=Default}"
+                                Text="{x:Bind ViewModel.Display, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=EnableVirtualDisplay}">
+                            <ToggleSwitch IsOn="{x:Bind ViewModel.IsVirtualDisplayEnabled, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=VirtualDisplaySize}">
+                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.VirtualDisplaySize, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=DisplayOrientation}">
+                            <ComboBox
+                                Width="150"
+                                DisplayMemberPath="Display"
+                                ItemsSource="{x:Bind ViewModel.DisplayOrientationOptions}"
+                                SelectedIndex="{x:Bind ViewModel.DisplayOrientation, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=RotationAngle}">
+                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.RotationAngle, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=Buffer}">
+                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.VideoBuffer, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+                    </wuc:SettingsExpander.Items>
+                </wuc:SettingsExpander>
+
+                <!--  Audio Settings  -->
+                <wuc:SettingsExpander Header="{helpers:ResourceString Name=AudioSettings}">
+                    <wuc:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE767;" />
+                    </wuc:SettingsExpander.HeaderIcon>
+                    <wuc:SettingsExpander.Items>
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=AudioOutputMode}">
+                            <ComboBox
+                                Width="150"
+                                ItemsSource="{x:Bind ViewModel.AudioOutputModeOptions.Values}"
+                                SelectedItem="{x:Bind ViewModel.SelectedAudioOutputMode, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=ForwardMicrophone}">
+                            <ToggleSwitch IsOn="{x:Bind ViewModel.ForwardMicrophone, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=AudioCodec}">
+                            <ComboBox
+                                Width="220"
+                                DisplayMemberPath="Display"
+                                ItemsSource="{x:Bind ViewModel.AudioCodecOptions}"
+                                SelectedIndex="{x:Bind ViewModel.AudioCodec, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=Bitrate}">
+                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.AudioBitrate, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=AudioOutputBuffer}">
+                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.AudioOutputBuffer, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=Buffer}">
+                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.AudioBuffer, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+                    </wuc:SettingsExpander.Items>
+                </wuc:SettingsExpander>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>
