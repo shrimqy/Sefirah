@@ -4,7 +4,6 @@ using Sefirah.Data.Models;
 namespace Sefirah.Platforms.Desktop;
 public class DesktopPlaybackService : IPlaybackService
 {
-    // To be implemented
     public Task HandleMediaActionAsync(PlaybackAction mediaAction)
     {
         return Task.CompletedTask;

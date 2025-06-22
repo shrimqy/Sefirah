@@ -46,7 +46,7 @@ public class DesktopNotificationHandler(
             _notificationService = new NotificationsService(_connection, "org.freedesktop.Notifications");
             _notifications = _notificationService.CreateNotifications("/org/freedesktop/Notifications");
 
-            // Check availablility
+            // Test if the notification service is available
             var serverInfo = await _notifications.GetServerInformationAsync();
             logger.LogDebug("Notification server: {Name} {Version}, Vendor: {Vendor}", 
                 serverInfo.Name, serverInfo.Version, serverInfo.Vendor);

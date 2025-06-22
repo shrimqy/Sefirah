@@ -3,11 +3,10 @@ using Microsoft.Windows.AppNotifications.Builder;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 using Sefirah.Extensions;
+using Sefirah.Services;
 using Sefirah.Utils;
 using Uno.Logging;
 using Windows.System;
-using System.Diagnostics;
-using Sefirah.Services;
 
 namespace Sefirah.Platforms.Windows.Services;
 
@@ -272,7 +271,7 @@ public class WindowsNotificationHandler(
         }
         catch (Exception ex)
         {
-            logger.LogWarning("Could not register for notifications, continuing without notifications", ex);
+            logger.LogWarning("Could not register for notifications, continuing without notifications {ex}", ex);
         }
     }
 
