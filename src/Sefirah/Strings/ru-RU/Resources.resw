@@ -118,339 +118,337 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="About" xml:space="preserve">
-    <value>About</value>
+    <value>О программе</value>
   </data>
   <data name="General" xml:space="preserve">
-    <value>General</value>
+    <value>Основные</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Settings</value>
+    <value>Настройки</value>
   </data>
   <data name="PrivacyPolicy" xml:space="preserve">
-    <value>Privacy Policy</value>
+    <value>Политика конфиденциальности</value>
   </data>
   <data name="SupportDevelopment" xml:space="preserve">
-    <value>Support Development</value>
+    <value>Поддержать разработку</value>
   </data>
   <data name="OpenLogs" xml:space="preserve">
-    <value>Open Logs</value>
+    <value>Открыть логи</value>
   </data>
   <data name="GitHubRepository" xml:space="preserve">
-    <value>GitHub Repository</value>
+    <value>Репозиторий на GitHub</value>
   </data>
   <data name="AndroidGitHubRepository" xml:space="preserve">
-    <value>Android GitHub Repository</value>
+    <value>Репозиторий GitHub Android</value>
   </data>
   <data name="Clipboard" xml:space="preserve">
-    <value>Clipboard</value>
+    <value>Буфер обмена</value>
   </data>
   <data name="Feedback" xml:space="preserve">
-    <value>Feedback</value>
+    <value>Обратная связь</value>
   </data>
   <data name="Notifications" xml:space="preserve">
-    <value>Notifications</value>
+    <value>Уведомления</value>
   </data>
   <data name="ThirdPartyLibraries" xml:space="preserve">
-    <value>Third party libraries</value>
+    <value>Сторонние библиотеки</value>
   </data>
   <data name="SaveLocation" xml:space="preserve">
-    <value>Save Location</value>
+    <value>Путь сохранения</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Remote Storage Location</value>
+    <value>Расположение удаленного хранилища</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
-    <value>Show clipboard toast</value>
+    <value>Показать всплывающее окно буфера обмена</value>
   </data>
   <data name="ImageToClipboard" xml:space="preserve">
-    <value>Include images in clipboard monitor</value>
+    <value>Включать изображения в буфер мониторинга</value>
   </data>
   <data name="ClipboardFiles" xml:space="preserve">
-    <value>Add received files to clipboard</value>
+    <value>Добавить полученные файлы в буфер обмена</value>
   </data>
   <data name="NotificationsDescription" xml:space="preserve">
-    <value>Receive notifications from remote device</value>
+    <value>Получать уведомления с удаленного устройства</value>
   </data>
   <data name="GeneralSettings" xml:space="preserve">
-    <value>General Settings</value>
+    <value>Общие Настройки</value>
   </data>
   <data name="ShowNotificationToast" xml:space="preserve">
-    <value>Show notification toast</value>
+    <value>Показывать всплывающее уведомление</value>
   </data>
   <data name="IgnoreWindowsApps" xml:space="preserve">
-    <value>Ignore remote notifications from active Windows apps</value>
+    <value>Игнорировать удаленные уведомления от активных приложений Windows</value>
   </data>
   <data name="NotificationFilterDisabled.Content" xml:space="preserve">
-    <value>Disabled</value>
+    <value>Выкл</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Notification Feed</value>
+    <value>Лента уведомлений</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>Notification Feed + Toast</value>
+    <value>Лента уведомлений + Всплывающие уведомления</value>
   </data>
   <data name="PairedDevices.Title" xml:space="preserve">
-    <value>Paired Devices</value>
+    <value>Сопряженные устройства</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
-    <value>Available Devices</value>
+    <value>Доступные устройства</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
-    <value>Android devices that are running the app in the same network will show up below</value>
+    <value>Android устройства, запущенные в одной сети, будут показаны ниже</value>
   </data>
   <data name="StartupOption" xml:space="preserve">
-    <value>Startup option</value>
+    <value>Параметры запуска</value>
   </data>
   <data name="StartupOptionDescription" xml:space="preserve">
-    <value>Choose how the app starts when Windows boots</value>
+    <value>Выберите, как запускается приложение при загрузке Windows</value>
   </data>
   <data name="StartupOptionMinimized.Content" xml:space="preserve">
-    <value>Start minimized</value>
+    <value>Запускать свернутым</value>
   </data>
   <data name="StartupOptionMaximized.Content" xml:space="preserve">
-    <value>Start maximized</value>
+    <value>В полный экран</value>
   </data>
   <data name="StartupOptionSystemTray.Content" xml:space="preserve">
-    <value>Start in system tray</value>
+    <value>Запустить в системном трее</value>
   </data>
   <data name="StartupOptionDisabled.Content" xml:space="preserve">
-    <value>Disabled</value>
+    <value>Выкл</value>
   </data>
   <data name="Theme" xml:space="preserve">
-    <value>Theme</value>
+    <value>Тема</value>
   </data>
   <data name="ThemeDescription" xml:space="preserve">
-    <value>Choose your default app theme</value>
+    <value>Выберите тему приложения по умолчанию</value>
   </data>
   <data name="Default" xml:space="preserve">
-    <value>Default</value>
+    <value>По умолчанию</value>
   </data>
   <data name="ThemeLight.Content" xml:space="preserve">
-    <value>Light</value>
+    <value>Светлый</value>
   </data>
   <data name="ThemeDark.Content" xml:space="preserve">
-    <value>Dark</value>
+    <value>Тёмная</value>
   </data>
   <data name="RemoveDeviceDialogTitle" xml:space="preserve">
-    <value>Remove Device</value>
+    <value>Удалить устройство</value>
   </data>
   <data name="Remove" xml:space="preserve">
-    <value>Remove</value>
+    <value>Удалить</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>Отменить</value>
   </data>
   <data name="OnboardingWelcome.Title" xml:space="preserve">
-    <value>Welcome to Sefirah</value>
+    <value>Добро пожаловать в Sefirah</value>
   </data>
   <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
-    <value>To get started download and install the comapanion app through the corresponding github
-page.</value>
+    <value>Чтобы начать загрузку и установку Comapanion приложения через соответствующую страницу github.</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
-    <value>Get Started</value>
+    <value>Начнём</value>
   </data>
   <data name="OnboardingSkip" xml:space="preserve">
-    <value>Skip for now</value>
+    <value>Пропустить</value>
   </data>
   <data name="OnboardingDevice.Title" xml:space="preserve">
-    <value>Connect Your Device</value>
+    <value>Подключите свое устройство</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>Discovered devices in your network will appear below, and initiate the connection from your
-mobile (Make sure the pin matches)</value>
+    <value>Обнаруженные устройства в вашей сети появятся ниже и инициируют соединение с вашего мобильного телефона (убедитесь, что пин-код совпадает)</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>Device Connection Request</value>
+    <value>Запрос на подключение устройства</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
-    <value>Verify the passkey matches on both devices:</value>
+    <value>Проверьте, совпадает ли ключ доступа на обоих устройствах:</value>
   </data>
   <data name="ConnectionRequestRejectButton" xml:space="preserve">
-    <value>Reject</value>
+    <value>Отклонить</value>
   </data>
   <data name="NotificationsClearButton" xml:space="preserve">
-    <value>Clear all</value>
+    <value>Очистить все</value>
   </data>
   <data name="ConnectionRequestAcceptButton" xml:space="preserve">
-    <value>Accept</value>
+    <value>Принять</value>
   </data>
   <data name="NoDevicesFound" xml:space="preserve">
-    <value>No devices found</value>
+    <value>Устройств не найдено</value>
   </data>
   <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
-    <value>PASSKEY</value>
+    <value>Ключ доступа</value>
   </data>
   <data name="GitHub" xml:space="preserve">
     <value>GitHub</value>
   </data>
   <data name="ClipboardDescription" xml:space="preserve">
-    <value>Sync your clipboard across devices</value>
+    <value>Синхронизировать буфер обмена между устройствами</value>
   </data>
   <data name="StartupOptionsDescription" xml:space="preserve">
-    <value>Choose how the app starts when Windows boots</value>
+    <value>Выберите, как запускается приложение при загрузке Windows</value>
   </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
-    <value>Open links in browser</value>
+    <value>Открывать ссылки в браузере</value>
   </data>
   <data name="Connected.Text" xml:space="preserve">
-    <value>Connected</value>
+    <value>Подключен</value>
   </data>
   <data name="Disconnected.Text" xml:space="preserve">
-    <value>Disconnected</value>
+    <value>Отключен</value>
   </data>
   <data name="ShowHideWindow" xml:space="preserve">
-    <value>Show/Hide Window</value>
+    <value>Показать/Скрыть Окно</value>
   </data>
   <data name="Exit" xml:space="preserve">
-    <value>Exit</value>
+    <value>Выход</value>
   </data>
   <data name="Features" xml:space="preserve">
-    <value>Features</value>
+    <value>Функции</value>
   </data>
   <data name="SelectLocation" xml:space="preserve">
-    <value>Select location</value>
+    <value>Выберите местоположение</value>
   </data>
   <data name="RemoveDeviceDialogSubtitle" xml:space="preserve">
-    <value>Are you sure you want to remove '{0}'? This action cannot be undone.</value>
+    <value>Вы уверены, что хотите удалить '{0}'? Это действие нельзя отменить.</value>
   </data>
   <data name="AppSpecificSettings" xml:space="preserve">
-    <value>App-specific Settings</value>
+    <value>Настройки для отдельных приложений</value>
   </data>
   <data name="TransferNotificationReceiving.Content" xml:space="preserve">
-    <value>Receiving {0}</value>
+    <value>Получение {0}</value>
   </data>
   <data name="TransferNotificationReceivingError" xml:space="preserve">
-    <value>Error while receiving {0}</value>
+    <value>Ошибка при получении {0}</value>
   </data>
   <data name="TransferNotificationReceiving.Title" xml:space="preserve">
-    <value>Receiving File</value>
+    <value>Получение файла</value>
   </data>
   <data name="TransferNotificationReceived.Title" xml:space="preserve">
-    <value>Received File</value>
+    <value>Полученный файл</value>
   </data>
   <data name="TransferNotification.Title" xml:space="preserve">
-    <value>File Transfer</value>
+    <value>Передача файлов</value>
   </data>
   <data name="SendButton" xml:space="preserve">
-    <value>Send</value>
+    <value>Отправить</value>
   </data>
   <data name="ReplyPlaceholder" xml:space="preserve">
-    <value>Type a reply</value>
+    <value>Введите ответ</value>
   </data>
   <data name="TransferNotificationActionOpenFile" xml:space="preserve">
-    <value>Open file</value>
+    <value>Открыть файл</value>
   </data>
   <data name="TransferNotificationActionOpenFolder" xml:space="preserve">
-    <value>Open folder</value>
+    <value>Открыть папку</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
-    <value>Turn off notifications from {0}</value>
+    <value>Выключить уведомления от {0}</value>
   </data>
   <data name="SubmitBugReport" xml:space="preserve">
-    <value>Report a bug</value>
+    <value>Сообщить об ошибке</value>
   </data>
   <data name="SubmitFeatureRequest" xml:space="preserve">
-    <value>Feature request</value>
+    <value>Предложить новую функцию</value>
   </data>
   <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
-    <value>Do not show notification toast when phone is in DND</value>
+    <value>Не отображать всплывающие уведомления, когда устройство находится в беззвучном режиме</value>
   </data>
   <data name="Devices" xml:space="preserve">
-    <value>Devices</value>
+    <value>Устройства</value>
   </data>
   <data name="RingerModeNormal.Content" xml:space="preserve">
-    <value>Normal</value>
+    <value>Обычный</value>
   </data>
   <data name="RingerModeSilent.Content" xml:space="preserve">
-    <value>Silent</value>
+    <value>Без звука</value>
   </data>
   <data name="RingerModeVibrate.Content" xml:space="preserve">
-    <value>Vibrate</value>
+    <value>Вибрация</value>
   </data>
   <data name="Pin" xml:space="preserve">
-    <value>Pin</value>
+    <value>Закрепить</value>
   </data>
   <data name="Unpin" xml:space="preserve">
-    <value>Unpin</value>
+    <value>Открепить</value>
   </data>
   <data name="ScreenMirror" xml:space="preserve">
-    <value>Screen Mirror</value>
+    <value>Зеркальный экран</value>
   </data>
   <data name="VideoSettings" xml:space="preserve">
-    <value>Video Settings</value>
+    <value>Настройки видео</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>Audio Settings</value>
+    <value>Настройки аудио</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
-    <value>Open in app</value>
+    <value>Открыть в приложении</value>
   </data>
   <data name="ScreenOff" xml:space="preserve">
-    <value>Keep device screen off while mirroring</value>
+    <value>Во время трансляции отключайте экран устройства</value>
   </data>
   <data name="PhysicalKeyboard" xml:space="preserve">
-    <value>Disable on-screen keyboard</value>
+    <value>Отключить экранную клавиатуру</value>
   </data>
   <data name="Bitrate" xml:space="preserve">
-    <value>Bitrate</value>
+    <value>Битрейт</value>
   </data>
   <data name="Resolution" xml:space="preserve">
-    <value>Resolution</value>
+    <value>Разрешение</value>
   </data>
   <data name="Buffer" xml:space="preserve">
-    <value>Buffer</value>
+    <value>Буфер</value>
   </data>
   <data name="Messages" xml:space="preserve">
-    <value>Messages</value>
+    <value>Сообщения</value>
   </data>
   <data name="EmptyMessages" xml:space="preserve">
-    <value>Select a conversation to view messages</value>
+    <value>Выберите диалог для просмотра сообщений</value>
   </data>
   <data name="MessagePlaceholder" xml:space="preserve">
-    <value>Type a message</value>
+    <value>Написать сообщение</value>
   </data>
   <data name="Apps" xml:space="preserve">
-    <value>Apps</value>
+    <value>Приложения</value>
   </data>
   <data name="NewMessage" xml:space="preserve">
-    <value>New message</value>
+    <value>Новое сообщение</value>
   </data>
   <data name="SearchMessages" xml:space="preserve">
-    <value>Search messages</value>
+    <value>Поиск сообщений</value>
   </data>
   <data name="AddressInputPlaceholder" xml:space="preserve">
-    <value>Enter phone number and press Enter</value>
+    <value>Введите номер телефона и нажмите Enter</value>
   </data>
   <data name="RemoveAddress" xml:space="preserve">
-    <value>Remove address</value>
+    <value>Удалить адрес</value>
   </data>
   <data name="CopyMessage" xml:space="preserve">
-    <value>Copy message</value>
+    <value>Скопировать сообщение</value>
   </data>
   <data name="NoApps" xml:space="preserve">
-    <value>No apps found</value>
+    <value>Не найдено приложений</value>
   </data>
   <data name="AllApps" xml:space="preserve">
-    <value>All Apps</value>
+    <value>Все приложения</value>
   </data>
   <data name="AdditionalArguments" xml:space="preserve">
     <value>Additional arguments</value>
   </data>
   <data name="AdbDeviceOffline" xml:space="preserve">
-    <value>Adb device is offline</value>
+    <value>Adb устройство не в сети</value>
   </data>
   <data name="AdbDeviceOfflineDescription" xml:space="preserve">
-    <value>Connect your device through USB with USB Debugging enabled and then try again</value>
+    <value>Подключите устройство через USB с включенной отладкой по USB и повторите попытку</value>
   </data>
   <data name="Dismiss" xml:space="preserve">
     <value>Dismiss</value>
   </data>
   <data name="ScrcpyNotFound" xml:space="preserve">
-    <value>Scrcpy not found</value>
+    <value>Scrcpy не найден</value>
   </data>
   <data name="ScrcpyNotFoundDescription" xml:space="preserve">
-    <value>Select the folder where scrcpy is located</value>
+    <value>Выберите папку, в которой находится scrcpy</value>
   </data>
   <data name="PreferTcpIp" xml:space="preserve">
     <value>Prefer wireless connection</value>
