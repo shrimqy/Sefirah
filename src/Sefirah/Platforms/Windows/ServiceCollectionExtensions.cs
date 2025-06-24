@@ -37,7 +37,7 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<ShellWorker>();
 
         services.AddSingleton<SyncProviderWorker>();
-        services.AddSingleton<ISftpService, SftpService>();
+        services.AddSingleton<ISftpService, WindowsSftpService>();
         return services;
     }
 

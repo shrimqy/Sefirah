@@ -15,9 +15,7 @@ public partial class DevicesViewModel : ObservableObject
     private ISessionManager SessionManager { get; } = Ioc.Default.GetRequiredService<ISessionManager>();
     private IDiscoveryService DiscoveryService { get; } = Ioc.Default.GetRequiredService<IDiscoveryService>();
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
-#if WINDOWS
     private ISftpService SftpService { get; } = Ioc.Default.GetRequiredService<ISftpService>();
-#endif
     public ObservableCollection<PairedDevice> PairedDevices => DeviceManager.PairedDevices;
     public ObservableCollection<DiscoveredDevice> DiscoveredDevices => DiscoveryService.DiscoveredDevices;
 
@@ -65,9 +63,9 @@ public partial class DevicesViewModel : ObservableObject
 
                     SessionManager.DisconnectSession(device.Session!);
                 }
-#if WINDOWS
-                SftpService.RemoveSyncRoot(device.Id);
-#endif
+
+                SftpService.Remove(device.Id);
+
                 DeviceManager.RemoveDevice(device);
             }
             catch (Exception ex)

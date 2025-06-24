@@ -9,7 +9,7 @@ using Windows.System.Profile;
 
 namespace Sefirah.Platforms.Windows.Services;
 
-public class SftpService(
+public class WindowsSftpService(
     ILogger logger,
     SyncRootRegistrar registrar,
     SyncProviderPool syncProviderPool,  
@@ -95,7 +95,7 @@ public class SftpService(
         }
     }
 
-    public async void RemoveSyncRoot(string deviceId)
+    public async void Remove(string deviceId)
     {
         var id = $"Shrimqy:Sefirah!{WindowsIdentity.GetCurrent().User}!{deviceId}";
         try
@@ -112,19 +112,6 @@ public class SftpService(
         catch (Exception ex)
         {
             logger.LogError(ex, "Error removing sync root for device {deviceId}", deviceId);
-        }
-    }
-
-    public async void RemoveAllSyncRoots()
-    {
-        logger.LogInformation("Removing all sync roots");
-        if (info != null)
-        {
-            await syncProviderPool.StopSyncRoot(info);
-        }
-        foreach (var syncRoot in registrar.GetSyncRoots())
-        {
-            registrar.Unregister(syncRoot.Id);
         }
     }
 

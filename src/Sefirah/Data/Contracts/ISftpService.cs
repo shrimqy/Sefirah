@@ -11,10 +11,5 @@ public interface ISftpService
     /// <summary>
     /// Removes the sync root.
     /// </summary>
-    void RemoveSyncRoot(string deviceId);
-
-    /// <summary>
-    /// Removes all sync roots.
-    /// </summary>
-    void RemoveAllSyncRoots();
+    void Remove(string deviceId);
 }
