@@ -208,4 +208,19 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// Gets or sets a value indicating whether to enable virtual display.
     /// </summary>
     bool IsVirtualDisplayEnabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to sync media/audio sessions.
+    /// </summary>
+    bool MediaSessionSyncEnabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to enable TCP/IP mode for ADB.
+    /// </summary>
+    bool AdbTcpipModeEnabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to automatically connect via ADB.
+    /// </summary>
+    bool AdbAutoConnect { get; set; }
 } 

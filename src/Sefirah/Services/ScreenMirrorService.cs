@@ -1,6 +1,7 @@
 using System.Text;
 using AdvancedSharpAdbClient.Models;
 using CommunityToolkit.WinUI;
+using Renci.SshNet;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
@@ -65,17 +66,8 @@ public class ScreenMirrorService(
             }
 
             var pairedDevices = devices.Where(d => d != null && d.AndroidId == device.Id).ToList();
-            if (pairedDevices.Count != 0)
+            if (pairedDevices.Count > 0)
             {
-                var commands = deviceSettings.UnlockCommands?.Trim()
-                    .Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries)
-                    .Select(c => c.Trim())
-                    .Where(c => !string.IsNullOrEmpty(c))
-                    .ToList();
-                if (commands?.Count > 0)
-                {
-                    await adbService.UnlockDevice(pairedDevices.First().DeviceData, commands);
-                }
                 switch (devicePreferenceType)
                 {
                     case ScrcpyDevicePreferenceType.Usb:
@@ -87,6 +79,10 @@ public class ScreenMirrorService(
                     case ScrcpyDevicePreferenceType.Auto:
                         if (pairedDevices.FirstOrDefault(d => d.Type == DeviceType.USB) != null)
                         {
+                            if (deviceSettings.AdbTcpipModeEnabled) 
+                            {
+                                argBuilder.Add("--tcpip");
+                            }
                             selectedDeviceSerial = pairedDevices.FirstOrDefault(d => d.Type == DeviceType.USB)?.Serial;
                         }
                         else
@@ -94,36 +90,62 @@ public class ScreenMirrorService(
                             selectedDeviceSerial = pairedDevices.FirstOrDefault(d => d.Type == DeviceType.WIFI)?.Serial;
                         }
                         break;
+                    case ScrcpyDevicePreferenceType.AskEverytime:
+                        selectedDeviceSerial = await ShowDeviceSelectionDialog(pairedDevices);
+                        if (string.IsNullOrEmpty(selectedDeviceSerial))
+                        {
+                            logger.LogWarning("No device selected for scrcpy");
+                            return false;
+                        }
+                        break;
+                }
+                var commands = deviceSettings.UnlockCommands?.Trim()
+                    .Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries)
+                    .Select(c => c.Trim())
+                    .Where(c => !string.IsNullOrEmpty(c))
+                    .ToList();
+                if (commands?.Count > 0)
+                {
+                    var adbDevice = pairedDevices.FirstOrDefault(d => d.Serial == selectedDeviceSerial);   
+                    if (adbDevice != null && adbDevice.DeviceData != null)
+                    {
+                        adbService.UnlockDevice(adbDevice.DeviceData.Value, commands);
+                    }
+                }
+            }
+            else if(deviceSettings.AdbTcpipModeEnabled && device.Session != null)
+            {
+                var connectedSessionIpAddress = device.Session.Socket.RemoteEndPoint?.ToString()?.Split(':')[0];
+                if (await adbService.ConnectWireless(connectedSessionIpAddress))
+                {
+                    selectedDeviceSerial = $"{connectedSessionIpAddress}:5555";
                 }
             }
             else
             {
-                var ipAddress = device.IpAddresses?.FirstOrDefault();
-                if (!await adbService.ConnectWireless(ipAddress))
+                logger.LogWarning("No online devices found from adb");
+                dispatcher?.EnqueueAsync(async () =>
                 {
-                    if (devices.Count == 0)
+                    var dialog = new ContentDialog
                     {
-                        logger.LogWarning("No online devices found from adb");
-                        dispatcher?.EnqueueAsync(async () =>
-                        {
-                            var dialog = new ContentDialog
-                            {
-                                XamlRoot = App.MainWindow!.Content!.XamlRoot,
-                                Title = "AdbDeviceOffline".GetLocalizedResource(),
-                                Content = "AdbDeviceOfflineDescription".GetLocalizedResource(),
-                                CloseButtonText = "Dismiss".GetLocalizedResource()
-                            };
-                            await dialog.ShowAsync();
-                        });
-                        return false;
-                    }
-                }
+                        XamlRoot = App.MainWindow!.Content!.XamlRoot,
+                        Title = "AdbDeviceOffline".GetLocalizedResource(),
+                        Content = "AdbDeviceOfflineDescription".GetLocalizedResource(),
+                        CloseButtonText = "Dismiss".GetLocalizedResource()
+                    };
+                    await dialog.ShowAsync();
+                });
+                return false;
             }
 
             // Validate that we have a selected device
             if (!string.IsNullOrEmpty(selectedDeviceSerial))
             {
                 argBuilder.Add($"-s {selectedDeviceSerial}");
+            }
+            else
+            {
+                return false;
             }
 
             // Build arguments for scrcpy with the selected device
@@ -229,7 +251,7 @@ public class ScreenMirrorService(
                 await process.WaitForExitAsync(processCts.Token);
                 logger.LogInformation($"scrcpy process exited with code {process.ExitCode}");
                 
-                if (process.ExitCode != 0)
+                if (process.ExitCode != 0 && process.ExitCode != 2)
                 {
                     string errorMessage;
                     lock (errorOutput)
@@ -275,9 +297,9 @@ public class ScreenMirrorService(
             }
             catch (Exception ex)
             {
-                if (!(ex is OperationCanceledException))
+                if (ex is not OperationCanceledException)
                 {
-                    logger.LogError($"Error monitoring scrcpy process", ex);
+                    logger.LogError($"Error monitoring scrcpy process {ex}", ex);
                 }
             }
             finally
@@ -360,8 +382,6 @@ public class ScreenMirrorService(
         {
             args.Add("--keyboard=uhid");
         }
-
-        args.Add("--tcpip");
         
         // Video settings
         if (settings.DisableVideoForwarding)

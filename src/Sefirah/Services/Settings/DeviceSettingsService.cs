@@ -250,4 +250,22 @@ internal sealed class DeviceSettingsService : BaseDeviceAwareJsonSettings, IDevi
         get => Get(true);
         set => Set(value);
     }
+
+    public bool MediaSessionSyncEnabled
+    {
+        get => Get(false);
+        set => Set(value);
+    }
+
+    public bool AdbTcpipModeEnabled
+    {
+        get => Get(false);
+        set => Set(value);
+    }
+
+    public bool AdbAutoConnect
+    {
+        get => Get(true);
+        set => Set(value);
+    }
 } 

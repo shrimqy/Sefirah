@@ -18,12 +18,13 @@
     <Page.Resources>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <converters:StringNullOrEmptyToBooleanConverter x:Key="StringNullOrEmptyToBooleanConverter" />
-        <converters:DateTimeDevicesConverter x:Key="DateTimeDevicesConverter" />
         <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
         <converters:StringEqualsConverter x:Key="StringEqualsConverter" />
-        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
+        <converters:CountToVisibilityConverter x:Key="InverseCountToVisibilityConverter" Inverse="True" />
         <converters:NullToOpacityConverter x:Key="NullToOpacityConverter" />
         <converters:NullBooleanConverter x:Key="NullBooleanConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
     </Page.Resources>
 
     <Page.DataContext>
@@ -38,7 +39,7 @@
                 FontSize="24"
                 FontWeight="SemiBold"
                 Text="{helpers:ResourceString Name=PairedDevices/Title}"
-                Visibility="{x:Bind ViewModel.PairedDevices.Count, Mode=OneWay, Converter={StaticResource CountToVisibilityConverter}}" />
+                Visibility="{x:Bind ViewModel.PairedDevices.Count, Mode=OneWay, Converter={StaticResource InverseCountToVisibilityConverter}}" />
 
             <ItemsRepeater ItemsSource="{x:Bind ViewModel.PairedDevices, Mode=OneWay}">
                 <ItemsRepeater.Layout>
@@ -46,9 +47,9 @@
                 </ItemsRepeater.Layout>
                 <ItemsRepeater.ItemTemplate>
                     <DataTemplate x:DataType="models:PairedDevice">
-                        <wuc:SettingsCard Description="{x:Bind ConnectionButtonText, Converter={StaticResource DateTimeDevicesConverter}}">
-                            <wuc:SettingsCard.Header>
-                                <StackPanel Orientation="Horizontal" Spacing="20">
+                        <wuc:SettingsExpander ItemsSource="{x:Bind ConnectedAdbDevices, Mode=OneWay}">
+                            <wuc:SettingsExpander.Header>
+                                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                     <Grid Width="30" Height="53">
                                         <Rectangle
                                             Opacity="0.5"
@@ -75,15 +76,65 @@
                                             </Border.Background>
                                             <Image
                                                 x:Name="WallpaperImage"
-                                                Visibility="{x:Bind Wallpaper, Converter={StaticResource NullToVisibilityConverter}, Mode=OneWay}"
+                                                x:Load="{x:Bind Wallpaper, Converter={StaticResource NullBooleanConverter}, Mode=OneWay}"
                                                 Source="{x:Bind Wallpaper, Mode=OneWay}"
                                                 Stretch="UniformToFill" />
                                         </Border>
                                     </Grid>
-                                    <TextBlock VerticalAlignment="Center" Text="{x:Bind Name, Mode=OneWay}" />
-                                </StackPanel>
+                                    <StackPanel Margin="15,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock Text="{x:Bind Name, Mode=OneWay}" />
+                                        <TextBlock Text="{x:Bind ConnectionButtonText, Mode=OneWay}" />
+                                    </StackPanel>
 
-                            </wuc:SettingsCard.Header>
+                                </StackPanel>
+                            </wuc:SettingsExpander.Header>
+                            <wuc:SettingsExpander.ItemTemplate>
+                                <DataTemplate x:DataType="models:AdbDevice">
+                                    <wuc:SettingsCard Description="{x:Bind Serial}" Header="{x:Bind DisplayName}">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <Border
+                                                Padding="8,4"
+                                                Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                                CornerRadius="12">
+                                                <TextBlock
+                                                    FontSize="10"
+                                                    FontWeight="SemiBold"
+                                                    Foreground="White"
+                                                    Text="{x:Bind TypeDisplay}" />
+                                            </Border>
+                                        </StackPanel>
+                                    </wuc:SettingsCard>
+                                </DataTemplate>
+                            </wuc:SettingsExpander.ItemTemplate>
+
+                            <wuc:SettingsExpander.ItemsHeader>
+                                <Grid
+                                    Padding="16,12"
+                                    Background="{ThemeResource CardBackgroundFillColorDefault}"
+                                    Visibility="{x:Bind HasAdbConnection, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <FontIcon
+                                        Grid.Column="0"
+                                        Margin="0,0,16,0"
+                                        VerticalAlignment="Center"
+                                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                        Glyph="&#xE783;" />
+
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock FontWeight="SemiBold" Text="No ADB devices connected" />
+                                        <TextBlock
+                                            FontSize="12"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Text="Connect your device via USB or WiFi to see it here"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </Grid>
+                            </wuc:SettingsExpander.ItemsHeader>
+
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <Button Command="{Binding DataContext.OpenDeviceSettingsCommand, ElementName=DevicePage}" CommandParameter="{x:Bind}">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
@@ -98,7 +149,7 @@
                                     <FontIcon FontSize="14" Glyph="&#xE74D;" />
                                 </Button>
                             </StackPanel>
-                        </wuc:SettingsCard>
+                        </wuc:SettingsExpander>
                     </DataTemplate>
                 </ItemsRepeater.ItemTemplate>
             </ItemsRepeater>

@@ -40,4 +40,9 @@ public sealed partial class DeviceSettingsPage : Page
     {
         Frame.Navigate(typeof(ScreenMirrorSettingsPage), ViewModel, new DrillInNavigationTransitionInfo());
     }
+
+    private void OpenAdbSettings(object sender, RoutedEventArgs e)
+    {
+        Frame.Navigate(typeof(AdbSettingsPage), ViewModel, new DrillInNavigationTransitionInfo());
+    }
 }

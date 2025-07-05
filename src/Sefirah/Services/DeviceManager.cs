@@ -33,7 +33,6 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
 
     /// <summary>
     /// Updates an existing device in the collection or adds it if it doesn't exist.
-    /// This method is thread-safe and handles UI thread dispatching internally.
     /// </summary>
     public void UpdateOrAddDevice(PairedDevice device, Action<PairedDevice>? updateAction = null)
     {

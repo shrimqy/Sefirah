@@ -8,6 +8,7 @@ using Sefirah.Data.Contracts;
 using Sefirah.Data.Items;
 using Sefirah.Data.Models;
 using System.Net;
+using System.Diagnostics;
 
 namespace Sefirah.Services;
 
@@ -21,10 +22,10 @@ public interface IAdbService
     Task<bool> ConnectWireless(string? host, int port=5555);
     Task StopAsync();   
     Task UninstallApp(string deviceId, string appPackage);
-    Task UnlockDevice(DeviceData deviceData, List<string> unlockCommands);
+    void UnlockDevice(DeviceData deviceData, List<string> unlockCommands);
     bool IsMonitoring { get; }
-
     AdbClient AdbClient { get; }
+    void TryConnectTcp(string host);
 }
 
 public class AdbService(
@@ -160,7 +161,7 @@ public class AdbService(
     {
         try
         {
-
+            // Check if device already exists in collection
             var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == e.Device.Serial);
             if (existingDevice != null) return;
 
@@ -178,129 +179,136 @@ public class AdbService(
                     DeviceData = e.Device,
                     AndroidId = "" // Will be populated when device comes online
                 };
-                AdbDevices.Add(adbDevice);
+
+                await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+                {
+                    AdbDevices.Add(adbDevice);
+                });
                 return;
             }
             
             // Refresh the full device information
             var connectedDevice = await GetFullDeviceInfoAsync(e.Device);
-            AdbDevices.Add(connectedDevice);
+            
+            await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+            {
+                AdbDevices.Add(connectedDevice);
+            });
             logger.LogInformation($"Device connected: {connectedDevice.Model} ({connectedDevice.Serial})");
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error handling device connection for {e.Device.Serial}", ex);
+            logger.LogError($"Error handling device connection for {e.Device.Serial}: {ex.Message}", ex);
         }
     }
     
-    private void DeviceDisconnected(object? sender, DeviceDataEventArgs e)
+    private async void DeviceDisconnected(object? sender, DeviceDataEventArgs e)
     {
-        try
+        logger.LogInformation($"Device disconnected: {e.Device.Serial}");
+        var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == e.Device.Serial);
+        if (existingDevice != null)
         {
-            logger.LogInformation($"Device disconnected: {e.Device.Serial}");
-            
-            var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == e.Device.Serial);
-            if (existingDevice != null)
+            await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
             {
                 var index = AdbDevices.IndexOf(existingDevice);
                 if (index != -1)
                 {
                     AdbDevices.RemoveAt(index);
                 }
-            }
-        }
-        catch (Exception ex)
-        {
-            logger.LogError($"Error handling device disconnection for {e.Device.Serial}", ex);
+            });
         }
     }
     
     private async void DeviceChanged(object? sender, DeviceDataChangeEventArgs e)
     {
-        try
-        {
-            logger.LogInformation($"Device state changed: {e.Device.Serial} {e.OldState} -> {e.NewState}");
-            var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == e.Device.Serial);
-            if (existingDevice == null)
-            {
-                logger.LogWarning($"Device {e.Device.Serial} not found in device list");
-                return;
-            }
-            var index = AdbDevices.IndexOf(existingDevice);
-            
-            if (e.NewState == DeviceState.Online)
-            {
-                var deviceInfo = await GetFullDeviceInfoAsync(e.Device);
-                
-                if (index != -1)
-                {
-                    AdbDevices[index] = deviceInfo;
-                    logger.LogInformation($"Device updated: {deviceInfo.Model} ({deviceInfo.Serial})");
-                }
 
+        logger.LogInformation($"Device state changed: {e.Device.Serial} {e.OldState} -> {e.NewState}");
+        var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == e.Device.Serial);
+            
+        if (e.NewState == DeviceState.Online)
+        {
+            var deviceInfo = await GetFullDeviceInfoAsync(e.Device);
+                
+            await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+            {
+                if (existingDevice != null)
+                {
+                    // Update existing device
+                    var index = AdbDevices.IndexOf(existingDevice);
+                    if (index != -1)
+                    {
+                        AdbDevices[index] = deviceInfo;
+                        logger.LogInformation($"Device updated: {deviceInfo.Model} ({deviceInfo.Serial})");
+                    }
+                }
                 else
                 {
+                    // Only add if device doesn't exist
                     AdbDevices.Add(deviceInfo);
+                    logger.LogInformation($"Device added: {deviceInfo.Model} ({deviceInfo.Serial})");
                 }
+            });
                 
-                logger.LogInformation($"Device connected: {deviceInfo.Model} ({deviceInfo.Serial})");
-            }
-            else if (index != -1)
-            {
-                existingDevice.State = e.NewState;
-                AdbDevices[index] = existingDevice;
-            }
+            logger.LogInformation($"Device connected: {deviceInfo.Model} ({deviceInfo.Serial})");
         }
-        catch (Exception ex)
+        else
         {
-            logger.LogError($"Error handling device state change for {e.Device.Serial}", ex);
+            // Device is going offline/authorizing - just update the state if it exists
+            if (existingDevice != null)
+            {
+                await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+                {
+                    var index = AdbDevices.IndexOf(existingDevice);
+                    if (index != -1)
+                    {
+                        existingDevice.State = e.NewState;
+                        AdbDevices[index] = existingDevice;
+                    }
+                });
+            }
         }
     }
     
     private async Task RefreshDevicesAsync()
     {
-        try
+        var devices = await adbClient.GetDevicesAsync();
+        if (!devices.Any())
         {
-            var devices = await adbClient.GetDevicesAsync();
-            if (!devices.Any())
-            {
-                logger.LogWarning("No devices found");
-                AdbDevices.Clear();
-                return;
-            }
-
-            // Convert to our AdbDevice model and add to collection
-            await DispatcherQueue.GetForCurrentThread().EnqueueAsync(async () =>
+            logger.LogWarning("No devices found");
+            await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
             {
                 AdbDevices.Clear();
-                foreach (var device in devices)
-                {
-                    AdbDevice adbDevice;
-                    if (device.State == DeviceState.Online)
-                    {
-                        // Get full device info including AndroidId for online devices
-                        adbDevice = await GetFullDeviceInfoAsync(device);
-                    }
-                    else
-                    {
-                        // Create basic device info for non-online devices
-                        adbDevice = new AdbDevice
-                        {
-                            Serial = device.Serial,
-                            Model = device.Model ?? "Unknown",
-                            State = device.State,
-                            Type = device.Serial.Contains(':') || device.Serial.Contains("tcp") ? DeviceType.WIFI : DeviceType.USB,
-                            DeviceData = device
-                        };
-                    }
-                    AdbDevices.Add(adbDevice);
-                }
             });
+            return;
         }
-        catch (Exception ex)
+
+        await App.MainWindow!.DispatcherQueue.EnqueueAsync(async() =>
         {
-            logger.LogError("Error refreshing device list: {ex}", ex);
-        }
+            var adbDevices = new List<AdbDevice>();
+            foreach (var device in devices)
+            {
+                AdbDevice adbDevice;
+                if (device.State == DeviceState.Online)
+                {
+                    // Get full device info including AndroidId for online devices
+                    adbDevice = await GetFullDeviceInfoAsync(device);
+                }
+                else
+                {
+                    // Create basic device info for non-online devices
+                    adbDevice = new AdbDevice
+                    {
+                        Serial = device.Serial,
+                        Model = device.Model ?? "Unknown",
+                        State = device.State,
+                        Type = device.Serial.Contains(':') || device.Serial.Contains("tcp") ? DeviceType.WIFI : DeviceType.USB,
+                        DeviceData = device,
+                        AndroidId = ""
+                    };
+                }
+                AdbDevices.Add(adbDevice);
+            }
+        });
     }
     
     private async Task<AdbDevice> GetFullDeviceInfoAsync(DeviceData deviceData)
@@ -326,7 +334,7 @@ public class AdbService(
                 logger.LogError($"Error getting Android ID for {deviceData.Serial}", ex);
             }
             logger.LogInformation($"Android ID: {androidId}");
-            return new AdbDevice
+            var device = new AdbDevice
             {
                 Serial = fullDeviceData.Serial,
                 Model = fullDeviceData.Model ?? "Unknown",
@@ -335,12 +343,14 @@ public class AdbService(
                 Type = fullDeviceData.Serial.Contains(':') || fullDeviceData.Serial.Contains("tcp") ? DeviceType.WIFI : DeviceType.USB,
                 DeviceData = fullDeviceData
             };
+            
+            return device;
         }
         catch (Exception ex)
         {
             logger.LogError($"Error getting full device info for {deviceData.Serial}", ex);
             // Return basic information if we can't get full details
-            return new AdbDevice
+            var device = new AdbDevice
             {
                 Serial = deviceData.Serial,
                 Model = "Unknown",
@@ -349,6 +359,8 @@ public class AdbService(
                 Type = deviceData.Serial.Contains(':') || deviceData.Serial.Contains("tcp") ? DeviceType.WIFI : DeviceType.USB,
                 DeviceData = deviceData
             };
+            
+            return device;
         }
     }
 
@@ -373,21 +385,48 @@ public class AdbService(
         }
     }
 
-    public async Task UnlockDevice(DeviceData deviceData, List<string> commands)
+    public async Task<bool> Pair(AdbDevice device, string pairingCode, string host, int port=5555)
     {
-        logger.LogInformation("Unlocking device");
-        // Check if device is locked by checking the lock screen state
-        ConsoleOutputReceiver consoleReceiver = new();
-        await adbClient.ExecuteShellCommandAsync(deviceData, "dumpsys window policy | grep 'showing=' | cut -d '=' -f2", consoleReceiver);
-        var isLocked = consoleReceiver.ToString().Trim() == "true";
-        if (isLocked)
+        if (string.IsNullOrEmpty(host)) return false;
+        try
         {
-            foreach (var command in commands)
-            {   
-                logger.LogInformation("Executing command: {command}", command);
-                await adbClient.ExecuteShellCommandAsync(deviceData, command, consoleReceiver);
-                await Task.Delay(100);
+            var result = await adbClient.PairAsync(host, port, pairingCode);
+            logger.LogInformation($"{result}");
+            if (result.Contains("failed") || result.Contains("refused"))
+            {
+                return false;
             }
+            return true;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("Error connecting to wireless device {device.Serial}: {ex}", device.Serial, ex);
+            return false;
+        }
+    }
+
+    public async void UnlockDevice(DeviceData deviceData, List<string> commands)
+    {
+        try
+        {
+            logger.LogInformation("Unlocking device");
+            // Check if device is locked by checking the lock screen state
+            ConsoleOutputReceiver consoleReceiver = new();
+            await adbClient.ExecuteShellCommandAsync(deviceData, "dumpsys window policy | grep 'showing=' | cut -d '=' -f2", consoleReceiver);
+            var isLocked = consoleReceiver.ToString().Trim() == "true";
+            if (isLocked)
+            {
+                foreach (var command in commands)
+                {
+                    logger.LogInformation("Executing command: {command}", command);
+                    await adbClient.ExecuteShellCommandAsync(deviceData, command, consoleReceiver);
+                    await Task.Delay(250);
+                }
+            }
+        }
+        catch (Exception ex)
+        { 
+            logger.LogError("Error unlocking device: {ex}", ex);
         }
     }
 
@@ -396,7 +435,132 @@ public class AdbService(
         logger.LogInformation("Uninstalling app {appPackage} from {deviceId}", appPackage, deviceId);
 
         var adbDevice = AdbDevices.FirstOrDefault(d => d.AndroidId == deviceId);
-        if (adbDevice == null) return;
-        await adbClient.UninstallPackageAsync(adbDevice.DeviceData, appPackage);
+        if (adbDevice?.DeviceData == null) return;
+        
+        var deviceData = adbDevice.DeviceData.Value;
+        await adbClient.UninstallPackageAsync(deviceData, appPackage);
+    }
+
+    /// <summary>
+    /// Enables TCP/IP mode by restarting ADB with tcpip 5555 command
+    /// </summary>
+    private async Task<bool> EnableTcpipMode()
+    {
+        try
+        {
+            string adbPath = userSettingsService.GeneralSettingsService.AdbPath;
+            if (string.IsNullOrEmpty(adbPath))
+            {
+                logger.LogError("ADB path not configured");
+                return false;
+            }
+
+            logger.LogInformation("Enabling TCP/IP mode using ADB at: {AdbPath}", adbPath);
+            
+            // Run "adb tcpip 5555" to enable TCP/IP mode
+            var processInfo = new ProcessStartInfo
+            {
+                FileName = adbPath,
+                Arguments = "tcpip 5555",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = Process.Start(processInfo);
+            if (process == null)
+            {
+                logger.LogError("Failed to start ADB process");
+                return false;
+            }
+
+            await process.WaitForExitAsync();
+            var output = await process.StandardOutput.ReadToEndAsync();
+            var error = await process.StandardError.ReadToEndAsync();
+            
+            logger.LogInformation("ADB tcpip command output: {Output}", output);
+            if (!string.IsNullOrEmpty(error))
+            {
+                logger.LogWarning("ADB tcpip command error: {Error}", error);
+            }
+
+            // Restart our ADB client to pick up the changes
+            await RestartAdbClient();
+            
+            return process.ExitCode == 0;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to enable TCP/IP mode");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Restarts the ADB client to pick up TCP/IP mode changes
+    /// </summary>
+    private async Task RestartAdbClient()
+    {
+        try
+        {
+            logger.LogInformation("Restarting ADB client");
+            var wasMonitoring = IsMonitoring;
+            if (wasMonitoring)
+            {
+                await CleanupAsync();
+            }
+            await Task.Delay(200);
+
+            if (wasMonitoring)
+            {
+                await StartAsync();
+            }
+            logger.LogInformation("ADB client restarted successfully");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to restart ADB client");
+        }
+    }
+
+    public async void TryConnectTcp(string host)
+    {
+        try
+        {
+            var result = await ConnectWireless(host);
+            if (result)
+            {
+                logger.LogInformation("Successfully connected to {Host}", host);
+            }
+
+            if (AdbDevices.FirstOrDefault(d => d.Type == DeviceType.USB) == null) return;
+            
+            // If connection failed, try to enable TCP/IP mode using ADB if USB is connected
+            var tcpipEnabled = await EnableTcpipMode();
+            if (!tcpipEnabled)
+            {
+                logger.LogError("Failed to enable TCP/IP mode");
+                return;
+            }
+
+            await Task.Delay(200);
+
+            // Retry the connection after enabling TCP/IP mode
+            result = await ConnectWireless(host);
+            if (result)
+            {
+                logger.LogInformation("Successfully connected to {Host} after enabling TCP/IP mode", host);
+                return;
+            }
+
+            logger.LogError("TCP/IP connection still failed after enabling TCP/IP mode");
+            return;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error in TryConnectTcp for {Host}", host);
+            return;
+        }
     }
 }

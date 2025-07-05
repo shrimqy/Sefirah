@@ -9,12 +9,16 @@
     xmlns:local="using:Sefirah.Views.DevicePreferences"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:wuc="using:CommunityToolkit.WinUI.Controls"
+    x:Name="LayoutRoot"
     mc:Ignorable="d">
 
     <Page.Resources>
         <converters:NullToOpacityConverter x:Key="NullToOpacityConverter" />
         <converters:NullBooleanConverter x:Key="NullBooleanConverter" />
         <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
     </Page.Resources>
 
     <ScrollViewer>
@@ -139,6 +143,29 @@
                     <wuc:SettingsCard.ActionIcon>
                         <FontIcon FontSize="11" Glyph="&#xE76C;" />
                     </wuc:SettingsCard.ActionIcon>
+                </wuc:SettingsCard>
+
+                <!--  ADB Settings  -->
+                <wuc:SettingsCard
+                    Click="OpenAdbSettings"
+                    Description="Configure ADB connection and manage addresses"
+                    Header="ADB Settings"
+                    IsClickEnabled="True">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xEC7A;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <wuc:SettingsCard.ActionIcon>
+                        <FontIcon FontSize="11" Glyph="&#xE76C;" />
+                    </wuc:SettingsCard.ActionIcon>
+                </wuc:SettingsCard>
+
+
+                <!--  Media Session Settings  -->
+                <wuc:SettingsCard Description="Sync media and audio sessions" Header="Media Sessions">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xEA69;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.MediaSessionSyncEnabled, Mode=TwoWay}" />
                 </wuc:SettingsCard>
             </StackPanel>
 

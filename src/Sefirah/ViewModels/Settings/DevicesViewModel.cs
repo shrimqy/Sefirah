@@ -6,6 +6,8 @@ using Sefirah.Data.Models;
 using Sefirah.Extensions;
 using Sefirah.Utils.Serialization;
 using Sefirah.Views;
+using Sefirah.Services;
+using CommunityToolkit.WinUI;
 
 namespace Sefirah.ViewModels.Settings;
 
@@ -16,12 +18,36 @@ public partial class DevicesViewModel : ObservableObject
     private IDiscoveryService DiscoveryService { get; } = Ioc.Default.GetRequiredService<IDiscoveryService>();
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
     private ISftpService SftpService { get; } = Ioc.Default.GetRequiredService<ISftpService>();
+    private IAdbService AdbService { get; } = Ioc.Default.GetRequiredService<IAdbService>();
+    
     public ObservableCollection<PairedDevice> PairedDevices => DeviceManager.PairedDevices;
     public ObservableCollection<DiscoveredDevice> DiscoveredDevices => DiscoveryService.DiscoveredDevices;
 
     public DevicesViewModel()
     {
         Dispatcher = DispatcherQueue.GetForCurrentThread();
+        AdbService.AdbDevices.CollectionChanged += OnAdbDevicesChanged;
+    }
+
+    private async void OnAdbDevicesChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        try
+        {
+            if (Dispatcher != null)
+            {
+                await Dispatcher.EnqueueAsync(() =>
+                {
+                    foreach (var device in PairedDevices)
+                    {
+                        device.RefreshAdbStatus();
+                    }
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error updating ADB status in DevicesViewModel: {ex.Message}");
+        }
     }
 
     [RelayCommand]

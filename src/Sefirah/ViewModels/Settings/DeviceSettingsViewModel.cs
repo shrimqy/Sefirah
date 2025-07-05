@@ -533,6 +533,95 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     #endregion
 
+    #region Media Session Settings
+
+    public bool MediaSessionSyncEnabled
+    {
+        get => _deviceSettings?.MediaSessionSyncEnabled ?? false;
+        set
+        {
+            if (_deviceSettings != null && _deviceSettings.MediaSessionSyncEnabled != value)
+            {
+                _deviceSettings.MediaSessionSyncEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    #endregion
+
+    #region ADB Settings
+
+    public bool AdbTcpipModeEnabled
+    {
+        get => _deviceSettings?.AdbTcpipModeEnabled ?? false;
+        set
+        {
+            if (_deviceSettings != null && _deviceSettings.AdbTcpipModeEnabled != value)
+            {
+                _deviceSettings.AdbTcpipModeEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool AdbAutoConnect
+    {
+        get => _deviceSettings?.AdbAutoConnect ?? true;
+        set
+        {
+            if (_deviceSettings != null && _deviceSettings.AdbAutoConnect != value)
+            {
+                _deviceSettings.AdbAutoConnect = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private async void OnAdbDevicesChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        try
+        {
+            // Update ADB connection status for the current device
+            if (App.MainWindow?.DispatcherQueue != null && Device != null)
+            {
+                await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+                {
+                    try
+                    {
+                        Device.RefreshAdbStatus();
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Error refreshing ADB status: {ex.Message}");
+                    }
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log error but don't throw to avoid crashing the app
+            System.Diagnostics.Debug.WriteLine($"Error updating ADB display properties: {ex.Message}");
+        }
+    }
+
+    private async Task ShowErrorDialog(string title, string content)
+    {
+        await App.MainWindow?.DispatcherQueue.EnqueueAsync(async () =>
+        {
+            var dialog = new ContentDialog
+            {
+                XamlRoot = App.MainWindow.Content?.XamlRoot,
+                Title = title,
+                Content = content,
+                CloseButtonText = "OK"
+            };
+            await dialog.ShowAsync();
+        });
+    }
+
+    #endregion
+
     private readonly IUserSettingsService _userSettingsService;
     private IDeviceSettingsService? _deviceSettings;
 
@@ -556,9 +645,6 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
     public DeviceSettingsViewModel()
     {
         _userSettingsService = Ioc.Default.GetService<IUserSettingsService>()!;
-
-        selectedAudioOutputMode = AudioOutputModeOptions[AudioOutputMode];
-        selectedScrcpyDevicePreference = ScrcpyDevicePreferenceOptions[ScrcpyDevicePreference];
     }
 
     public IDeviceSettingsService? DeviceSettings => _deviceSettings;
@@ -566,21 +652,35 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
     public void SetDevice(PairedDevice device)
     {
         Device = device;
+        
         device.PropertyChanged += (s, e) =>
         {
             OnPropertyChanged(nameof(Device));
         };
 
+        _deviceSettings = device.DeviceSettings;
+        OnPropertyChanged(nameof(DeviceSettings));
+
+        selectedAudioOutputMode = AudioOutputModeOptions[AudioOutputMode];
+        selectedScrcpyDevicePreference = ScrcpyDevicePreferenceOptions[ScrcpyDevicePreference];
+        
+        OnPropertyChanged(nameof(SelectedAudioOutputMode));
+        OnPropertyChanged(nameof(SelectedScrcpyDevicePreference));
+
+        // Subscribe to ADB device changes to update connection status
+        AdbService.AdbDevices.CollectionChanged += OnAdbDevicesChanged;
+
+        // Initial ADB status refresh
+        Device.RefreshAdbStatus();
+
         RemoteApps = RemoteAppsRepository.GetApplicationsFromDevice(device.Id).ToObservableCollection();
-        Debug.WriteLine(RemoteApps.Count);
         foreach (var app in RemoteApps)
         {
             app.UpdateNotificationFilter(device.Id);
         }
-        
-        _deviceSettings = device.DeviceSettings;
-        OnPropertyChanged(nameof(DeviceSettings));
     }
+
+
 
     public void ChangeNotificationFilter(string notificationFilter, string appPackage)
     {

@@ -5,6 +5,7 @@ using Sefirah.Data.Contracts;
 using Sefirah.Extensions;
 using Sefirah.Helpers;
 using Sefirah.Services.Socket;
+using Sefirah.Services;
 
 namespace Sefirah.Data.Models;
 
@@ -15,6 +16,7 @@ public partial class PairedDevice : ObservableObject
     public List<string>? IpAddresses { get; set; } = [];
     public List<PhoneNumber>? PhoneNumbers { get; set; } = [];
     public ImageSource? Wallpaper { get; set; }
+
     public string ConnectionButtonText => ConnectionStatus ? "Connected/Text".GetLocalizedResource() : "Disconnected/Text".GetLocalizedResource();
 
     private bool connectionStatus;
@@ -49,6 +51,52 @@ public partial class PairedDevice : ObservableObject
             if (SetProperty(ref _session, value))
             {
                 OnPropertyChanged(nameof(ConnectionButtonText));
+            }
+        }
+    }
+
+    // ADB Connection Properties
+    public bool HasAdbConnection
+    {
+        get
+        {
+            try
+            {
+                var adbService = Ioc.Default.GetService<IAdbService>();
+                if (adbService == null) return false;
+
+                return adbService.AdbDevices.Any(adbDevice => 
+                    adbDevice.IsOnline && 
+                    !string.IsNullOrEmpty(adbDevice.AndroidId) && 
+                    adbDevice.AndroidId == Id);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+    }
+
+    public ObservableCollection<AdbDevice> ConnectedAdbDevices
+    {
+        get
+        {
+            try
+            {
+                var adbService = Ioc.Default.GetService<IAdbService>();
+                if (adbService == null) return new ObservableCollection<AdbDevice>();
+
+                var connectedDevices = adbService.AdbDevices
+                    .Where(adbDevice => adbDevice.IsOnline && 
+                                       !string.IsNullOrEmpty(adbDevice.AndroidId) && 
+                                       adbDevice.AndroidId == Id)
+                    .ToList();
+
+                return new ObservableCollection<AdbDevice>(connectedDevices);
+            }
+            catch
+            {
+                return new ObservableCollection<AdbDevice>();
             }
         }
     }
@@ -106,5 +154,14 @@ public partial class PairedDevice : ObservableObject
             PhoneNumbers = device.PhoneNumbers,
             Wallpaper = wallPaper,
         };
+    }
+
+    /// <summary>
+    /// Call this method to refresh ADB connection status when ADB devices change
+    /// </summary>
+    public void RefreshAdbStatus()
+    {
+        OnPropertyChanged(nameof(HasAdbConnection));
+        OnPropertyChanged(nameof(ConnectedAdbDevices));
     }
 }

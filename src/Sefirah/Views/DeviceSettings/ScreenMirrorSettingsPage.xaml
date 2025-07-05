@@ -109,6 +109,7 @@
                                                         <TextBlock
                                                             FontFamily="Consolas"
                                                             FontSize="13"
+                                                            IsTextSelectionEnabled="True"
                                                             Text="input keyevent 26&#x0a;input keyevent 66&#x0a;input text password" />
                                                     </StackPanel>
                                                 </Flyout>

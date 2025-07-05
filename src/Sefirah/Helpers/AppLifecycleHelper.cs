@@ -43,11 +43,12 @@ public static class AppLifecycleHelper
 #endif
 
         notificationService.Initialize();
+        await deviceManager.Initialize();
+        
         await Task.WhenAll(
-            deviceManager.Initialize(),
             networkService.StartServerAsync(),
-            adbService.StartAsync(),
-            playbackService.InitializeAsync()
+            playbackService.InitializeAsync(),
+            adbService.StartAsync()
         );
     } 
 
