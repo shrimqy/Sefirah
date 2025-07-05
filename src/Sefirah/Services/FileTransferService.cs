@@ -489,7 +489,7 @@ public class FileTransferService(
                 session = await connectionSource.Task;
             }
 
-            const int ChunkSize = 81920 * 2;
+            const int ChunkSize = 524288; // 512KB
 
             using (stream)
             {
@@ -502,12 +502,10 @@ public class FileTransferService(
                     int bytesRead = await stream.ReadAsync(buffer);
                     if (bytesRead == 0) break;
 
-                    session.SendAsync(buffer, 0, bytesRead);
+                    session.Send(buffer, 0, bytesRead);
                     totalBytesRead += bytesRead;
 
                     var progress = (double)totalBytesRead / metadata.FileSize * 100;
-                    
-                    // Report progress updates only when progress changes by at least 1%
                     if (Math.Floor(progress) > Math.Floor(lastReportedProgress))
                     {
                         await notificationHandler.ShowTransferNotification(
@@ -521,6 +519,8 @@ public class FileTransferService(
                     }
                 }
             }
+
+            logger.Info($"Completed file transfer for {metadata.FileName}");
         }
         catch (Exception ex)
         {
