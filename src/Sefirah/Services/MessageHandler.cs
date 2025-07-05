@@ -13,9 +13,7 @@ public class MessageHandler(
     IFileTransferService fileTransferService,
     IPlaybackService playbackService,
     IActionService actionService,
-#if WINDOWS
     ISftpService sftpService,
-#endif
     ILogger<MessageHandler> logger) : IMessageHandler
 {
     public async Task HandleMessageAsync(PairedDevice device, SocketMessage message)
@@ -53,13 +51,12 @@ public class MessageHandler(
                     break;
 
                 case ActionMessage action:
-                    actionService.HandleDefaultCommand(action);
+                    actionService.HandleActionMessage(action);
                     break;
-#if WINDOWS
+
                 case SftpServerInfo sftpServerInfo:
                     await sftpService.InitializeAsync(device, sftpServerInfo);
                     break;
-#endif
 
                 case FileTransfer fileTransfer:
                     await fileTransferService.ReceiveFile(fileTransfer, device);

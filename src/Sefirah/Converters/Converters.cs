@@ -325,30 +325,15 @@ public class NullToVisibilityConverter : IValueConverter
 
 public class CountToVisibilityConverter : IValueConverter
 {
+    public bool Inverse { get; set; }
+
     public object Convert(object value, Type targetType, object parameter, string language)
     {
         if (value is int count && count == 0)
         {
-            return Visibility.Collapsed;
+            return Inverse ? Visibility.Collapsed : Visibility.Visible;
         }
-        return Visibility.Visible;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-public class InverseCountToVisibilityConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, string language)
-    {
-        if (value is int count && count == 0)
-        {
-            return Visibility.Visible;
-        }
-        return Visibility.Collapsed;
+        return Inverse ? Visibility.Visible : Visibility.Collapsed;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)
@@ -410,26 +395,6 @@ public class NullToOpacityConverter : IValueConverter
     }
 }
 
-public class NotificationLaunchPreferenceConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, string language)
-    {
-        if (value is NotificationLaunchPreference preference)
-        {
-            return preference == NotificationLaunchPreference.OpenInRemoteDevice;
-        }
-        return false;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        if (value is bool isChecked)
-        {
-            return isChecked ? NotificationLaunchPreference.OpenInRemoteDevice : NotificationLaunchPreference.Nothing;
-        }
-        return NotificationLaunchPreference.Nothing;
-    }
-}
 
 public class BooleanToOpacityConverter : IValueConverter
 {
@@ -604,8 +569,6 @@ public class SubscriptionToIconConverter : IValueConverter
         throw new NotImplementedException();
     }
 }
-
-
 
 public class PinConverter : IValueConverter
 {

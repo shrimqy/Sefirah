@@ -36,6 +36,7 @@ public static class AppLifecycleHelper
         var deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
         var adbService = Ioc.Default.GetRequiredService<IAdbService>();
         var playbackService = Ioc.Default.GetRequiredService<IPlaybackService>();
+        var actionService = Ioc.Default.GetRequiredService<IActionService>();
 
 #if WINDOWS
         var windowsNotificationHandler = Ioc.Default.GetRequiredService<IPlatformNotificationHandler>();
@@ -48,6 +49,7 @@ public static class AppLifecycleHelper
         await Task.WhenAll(
             networkService.StartServerAsync(),
             playbackService.InitializeAsync(),
+            actionService.InitializeAsync(),
             adbService.StartAsync()
         );
     } 

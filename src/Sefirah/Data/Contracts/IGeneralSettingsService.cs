@@ -1,5 +1,7 @@
 using Microsoft.UI.Windowing;
 using Sefirah.Data.Enums;
+using Sefirah.Data.Models;
+using Sefirah.Data.Models.Actions;
 
 namespace Sefirah.Data.Contracts;
 public interface IGeneralSettingsService : IBaseSettingsService, INotifyPropertyChanged
@@ -46,4 +48,24 @@ public interface IGeneralSettingsService : IBaseSettingsService, INotifyProperty
     /// Gets or sets the path for received files.
     /// </summary>
     string ReceivedFilesPath { get; set; }
+
+    /// <summary>
+    /// Gets or sets the list of custom actions.
+    /// </summary>
+    List<BaseAction> Actions { get; set; }
+
+    /// <summary>
+    /// Adds a new action to the settings.
+    /// </summary>
+    void AddAction(BaseAction action);
+
+    /// <summary>
+    /// Updates an existing action in the settings.
+    /// </summary>
+    void UpdateAction(BaseAction action);
+
+    /// <summary>
+    /// Removes an action from the settings.
+    /// </summary>
+    void RemoveAction(BaseAction action);
 }

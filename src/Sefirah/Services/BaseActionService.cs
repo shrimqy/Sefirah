@@ -1,28 +1,46 @@
-using Uno.Logging;
+using Sefirah.Data.Contracts;
+using Sefirah.Data.Models;
+using Sefirah.Data.Models.Actions;
+using Sefirah.Utils.Serialization;
 
 namespace Sefirah.Services;
 
-public abstract class BaseActionService(ILogger logger)
+public abstract class BaseActionService(
+    IGeneralSettingsService generalSettingsService, 
+    ISessionManager sessionManager,
+    ILogger logger) : IActionService
 {
-    protected readonly ILogger Logger = logger;
-
-    protected void ExecuteProcess(string fileName, string arguments)
+    public virtual Task InitializeAsync()
     {
-        Logger.LogInformation("Executing process: {FileName} {Arguments}", fileName, arguments);
-        var psi = new ProcessStartInfo(fileName, arguments)
-        {
-            CreateNoWindow = true,
-            UseShellExecute = false
-        };
-        Process.Start(psi);
+        sessionManager.ConnectionStatusChanged += OnConnectionStatusChanged;
+        return Task.CompletedTask;
     }
 
-    protected void ExecuteDelayed(string fileName, string arguments, int delay)
+    private void OnConnectionStatusChanged(object? sender, (PairedDevice Device, bool IsConnected) args)
     {
-        Task.Run(async () =>
+        if (args.IsConnected && args.Device.Session != null)
         {
-            await Task.Delay(delay * 1000);
-            ExecuteProcess(fileName, arguments);
-        });
+            var actions = generalSettingsService.Actions;
+            foreach (var action in actions)
+            {
+                var actionMessage = new ActionMessage 
+                { 
+                    ActionId = action.Id, 
+                    ActionName = action.Name 
+                };
+                sessionManager.SendMessage(args.Device.Session, SocketMessageSerializer.Serialize(actionMessage));
+            }
+        }
+    }
+
+    public virtual void HandleActionMessage(ActionMessage action)
+    {
+        logger.LogInformation($"Executing action with ID: {action.ActionId}");
+        var actionToExecute = generalSettingsService.Actions.FirstOrDefault(a => a.Id == action.ActionId);
+
+        if (actionToExecute is not null && actionToExecute is ProcessAction processAction)
+        {
+            processAction.ExecuteAsync();
+        }
     }
 } 

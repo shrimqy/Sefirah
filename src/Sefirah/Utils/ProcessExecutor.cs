@@ -4,11 +4,8 @@ namespace Sefirah.Utils;
 
 public static class ProcessExecutor
 {
-    private static readonly ILogger Logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger(nameof(ProcessExecutor));
-
     public static void ExecuteProcess(string fileName, string? arguments)
     {
-        Logger.LogInformation("Executing process: {FileName} {Arguments}", fileName, arguments);
         var psi = new ProcessStartInfo(fileName)
         {
             Arguments = arguments ?? string.Empty,

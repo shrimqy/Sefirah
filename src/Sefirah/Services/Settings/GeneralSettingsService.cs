@@ -3,6 +3,8 @@ using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
+using Sefirah.Data.Models;
+using Sefirah.Data.Models.Actions;
 using Sefirah.Utils.Serialization;
 using Windows.UI;
 using Windows.UI.ViewManagement;
@@ -138,5 +140,41 @@ internal sealed class GeneralSettingsService : BaseObservableJsonSettings, IGene
     {
         get => Get(string.Empty);
         set => Set(value);
+    }
+
+    public List<BaseAction> Actions
+    {
+        get => Get<List<BaseAction>>(new List<BaseAction>());
+        set => Set(value);
+    }
+
+    public void AddAction(BaseAction action)
+    {
+        var actions = Actions.ToList();
+        actions.Add(action);
+        Actions = actions;
+    }
+
+    public void UpdateAction(BaseAction action)
+    {
+        var actions = Actions.ToList();
+        var index = actions.FindIndex(a => a.Id == action.Id);
+        if (index != -1)
+        {
+            actions.RemoveAt(index);
+            actions.Insert(index, action);
+            Actions = actions;
+        }
+    }
+
+    public void RemoveAction(BaseAction action)
+    {
+        var actions = Actions.ToList();
+        var index = actions.FindIndex(a => a.Id == action.Id);
+        if (index != -1)
+        {
+            actions.RemoveAt(index);
+            Actions = actions;
+        }
     }
 }

@@ -15,7 +15,7 @@
         <vm:GeneralViewModel x:Name="ViewModel" />
     </Page.DataContext>
 
-    <ScrollViewer>
+    <ScrollViewer>  
         <StackPanel Spacing="5">
             <TextBlock
                 Margin="0,0,0,8"
@@ -88,6 +88,20 @@
                     KeyDown="OnKeyDown"
                     Text="{x:Bind ViewModel.LocalDeviceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
+            </wuc:SettingsCard>
+
+            <!--  Actions  -->
+            <wuc:SettingsCard
+                Click="OpenActionsSettings"
+                Description="Configure custom actions and executable commands"
+                Header="Actions"
+                IsClickEnabled="True">
+                <wuc:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE8F7;" />
+                </wuc:SettingsCard.HeaderIcon>
+                <wuc:SettingsCard.ActionIcon>
+                    <FontIcon FontSize="11" Glyph="&#xE76C;" />
+                </wuc:SettingsCard.ActionIcon>
             </wuc:SettingsCard>
         </StackPanel>
     </ScrollViewer>

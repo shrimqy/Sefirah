@@ -33,11 +33,11 @@ public class CommandMessage : SocketMessage
 
 public class ActionMessage : SocketMessage
 {
-    [JsonPropertyName("actionType")]
-    public required ActionType ActionType { get; set; }
+    [JsonPropertyName("actionId")]
+    public required string ActionId { get; set; }
 
-    [JsonPropertyName("value")]
-    public string? Value { get; set; } = null;
+    [JsonPropertyName("actionName")]
+    public required string ActionName { get; set; }
 }
 
 public class CustomActionMessage : SocketMessage

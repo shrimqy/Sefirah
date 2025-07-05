@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media.Animation;
 using Sefirah.Utils;
 using Windows.System;
 
@@ -79,6 +80,11 @@ public sealed partial class GeneralPage : Page
         {
             setPath(companionPath);
         }
+    }
+
+    private void OpenActionsSettings(object sender, RoutedEventArgs e)
+    {
+        Frame.Navigate(typeof(ActionsPage), null, new SuppressNavigationTransitionInfo());
     }
 }
  
