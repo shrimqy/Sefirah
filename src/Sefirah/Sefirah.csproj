@@ -44,6 +44,7 @@
       ThemeService;
       SkiaRenderer;
     </UnoFeatures>
+    <Platforms>x64;ARM64;x86</Platforms>
   </PropertyGroup>
     <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100'">
         <StartupObject>Sefirah.Platforms.Windows.Program</StartupObject>
@@ -55,10 +56,30 @@
         <LangVersion>Preview</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
+        <PackageCertificateThumbprint>276047138A50F9695B57C0E0763E5A414C03B049</PackageCertificateThumbprint>
+        <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
+        <PackageCertificateKeyFile>Sefirah_TemporaryKey.pfx</PackageCertificateKeyFile>
     </PropertyGroup>
+  
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100'">
+        <PublishTrimmed>false</PublishTrimmed>
+        <TrimMode>partial</TrimMode>
+
+        <!-- Disable ILLink  -->
+        <RunILLink>false</RunILLink>
+
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+    </PropertyGroup>
+    
+    <ItemGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100'">
+        <RuntimeHostConfigurationOption Include="System.Runtime.InteropServices.BuiltInComInterop.IsSupported" Value="true" />
+        <RuntimeHostConfigurationOption Include="System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization" Value="false" />
+    </ItemGroup>
+
     <ItemGroup>
         <Content Include="Assets\Icons\IconResource.dll">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory> 
         </Content>
     </ItemGroup>
     <ItemGroup>
