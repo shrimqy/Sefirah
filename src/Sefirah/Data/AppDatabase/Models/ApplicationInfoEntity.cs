@@ -119,6 +119,23 @@ public partial class ApplicationInfoEntity : ObservableObject
         return AppDeviceInfo.Any(d => d.DeviceId == deviceId);
     }
 
+    public bool IsPinned(string deviceId)
+    {
+        var deviceInfo = AppDeviceInfo.FirstOrDefault(d => d.DeviceId == deviceId);
+        return deviceInfo?.Pinned ?? false;
+    }
+
+    public void SetPinned(string deviceId, bool pinned)
+    {
+        var devices = new List<AppDeviceInfo>(AppDeviceInfo);
+        var deviceInfo = devices.FirstOrDefault(d => d.DeviceId == deviceId);
+        if (deviceInfo != null)
+        {
+            deviceInfo.Pinned = pinned;
+            AppDeviceInfo = devices;
+        }
+    }
+
     public static ApplicationInfoEntity FromApplicationInfo(ApplicationInfo info, string deviceId)
     {
         return new ApplicationInfoEntity
@@ -171,4 +188,5 @@ public class AppDeviceInfo
 {
     public string DeviceId { get; set; }
     public NotificationFilter Filter { get; set; }
+    public bool Pinned { get; set; } = false;
 }

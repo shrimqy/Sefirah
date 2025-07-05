@@ -7,6 +7,7 @@ namespace Sefirah.Data.AppDatabase.Repository;
 public class RemoteAppRepository(DatabaseContext context, ILogger<RemoteAppRepository> logger)
 {
     public ObservableCollection<ApplicationInfoEntity> Applications { get; set; } = [];
+    public ObservableCollection<ApplicationInfoEntity> PinnedApplications { get; set; } = [];
     
     // Event to notify when application list update is complete
     public event EventHandler<string>? ApplicationListUpdated;
@@ -16,6 +17,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger<RemoteAppRepos
         App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
         {
             Applications.Clear();
+            PinnedApplications.Clear();
             
             var appsForDevice = context.Database.Table<ApplicationInfoEntity>()
                 .ToList()
@@ -26,6 +28,10 @@ public class RemoteAppRepository(DatabaseContext context, ILogger<RemoteAppRepos
             foreach (var app in appsForDevice)
             {
                 Applications.Add(app);
+                if (app.IsPinned(deviceId))
+                {
+                    PinnedApplications.Add(app);
+                }
             }
         });
     }
@@ -245,5 +251,56 @@ public class RemoteAppRepository(DatabaseContext context, ILogger<RemoteAppRepos
             .ToList()
             .Where(a => a.HasDevice(deviceId))
             .ToList();
+    }
+
+    public void PinApp(string appPackage, string deviceId)
+    {
+        var app = context.Database.Table<ApplicationInfoEntity>()
+            .FirstOrDefault(a => a.AppPackage == appPackage);
+
+        if (app != null && app.HasDevice(deviceId))
+        {
+            app.SetPinned(deviceId, true);
+            context.Database.Update(app);
+
+            App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+            {
+                var appToUpdate = Applications.FirstOrDefault(a => a.AppPackage == appPackage);
+                if (appToUpdate != null)
+                {
+                    appToUpdate.SetPinned(deviceId, true);
+                    if (!PinnedApplications.Contains(appToUpdate))
+                    {
+                        PinnedApplications.Add(appToUpdate);
+                    }
+                }
+            });
+        }
+    }
+
+    public void UnpinApp(string appPackage, string deviceId)
+    {
+        var app = context.Database.Table<ApplicationInfoEntity>()
+            .FirstOrDefault(a => a.AppPackage == appPackage);
+
+        if (app != null && app.HasDevice(deviceId))
+        {
+            app.SetPinned(deviceId, false);
+            context.Database.Update(app);
+
+            App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+            {
+                var appToUpdate = Applications.FirstOrDefault(a => a.AppPackage == appPackage);
+                if (appToUpdate != null)
+                {
+                    appToUpdate.SetPinned(deviceId, false);
+                    var pinnedApp = PinnedApplications.FirstOrDefault(a => a.AppPackage == appPackage);
+                    if (pinnedApp != null)
+                    {
+                        PinnedApplications.Remove(pinnedApp);
+                    }
+                }
+            });
+        }
     }
 }

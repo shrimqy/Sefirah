@@ -434,6 +434,9 @@ mobile (Make sure the pin matches)</value>
   <data name="AllApps" xml:space="preserve">
     <value>All Apps</value>
   </data>
+  <data name="PinnedApps" xml:space="preserve">
+    <value>Pinned Apps</value>
+  </data>
   <data name="AdditionalArguments" xml:space="preserve">
     <value>Additional arguments</value>
   </data>

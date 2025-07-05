@@ -16,6 +16,7 @@ public sealed partial class AppsViewModel : BaseViewModel
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
     private ISessionManager SessionManager { get; } = Ioc.Default.GetRequiredService<ISessionManager>();
     public ObservableCollection<ApplicationInfoEntity> Apps => RemoteAppsRepository.Applications;
+    public ObservableCollection<ApplicationInfoEntity> PinnedApps => RemoteAppsRepository.PinnedApplications;
     private IAdbService AdbService { get; } = Ioc.Default.GetRequiredService<IAdbService>();
 
     [ObservableProperty]
@@ -25,6 +26,7 @@ public sealed partial class AppsViewModel : BaseViewModel
     public partial string? Name { get; set; }
 
     public bool IsEmpty => !Apps.Any() && !IsLoading;
+    public bool HasPinnedApps => PinnedApps.Any();
 
     public AppsViewModel()
     {
@@ -78,6 +80,7 @@ public sealed partial class AppsViewModel : BaseViewModel
             IsLoading = false;
             LoadApps();
             OnPropertyChanged(nameof(IsEmpty));
+            OnPropertyChanged(nameof(HasPinnedApps));
         });
     }
 
@@ -96,6 +99,38 @@ public sealed partial class AppsViewModel : BaseViewModel
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error uninstalling app: {AppPackage}", app?.AppPackage);
+        }
+    }
+
+    [RelayCommand]
+    public void PinApp(ApplicationInfoEntity app)
+    {
+        try
+        {
+            if (app == null || DeviceManager.ActiveDevice == null) return;
+
+            RemoteAppsRepository.PinApp(app.AppPackage, DeviceManager.ActiveDevice.Id);
+            OnPropertyChanged(nameof(HasPinnedApps));
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error pinning app: {AppPackage}", app?.AppPackage);
+        }
+    }
+
+    [RelayCommand]
+    public void UnpinApp(ApplicationInfoEntity app)
+    {
+        try
+        {
+            if (app == null || DeviceManager.ActiveDevice == null) return;
+
+            RemoteAppsRepository.UnpinApp(app.AppPackage, DeviceManager.ActiveDevice.Id);
+            OnPropertyChanged(nameof(HasPinnedApps));
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error unpinning app: {AppPackage}", app?.AppPackage);
         }
     }
 
