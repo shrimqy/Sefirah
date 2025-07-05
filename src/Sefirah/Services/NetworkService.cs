@@ -18,6 +18,7 @@ public class NetworkService(
     Func<IMessageHandler> messageHandlerFactory,
     ILogger<NetworkService> logger,
     IDeviceManager deviceManager,
+    IAdbService adbService,
     IDiscoveryService discoveryService) : INetworkService, ISessionManager, ITcpServerProvider
 {
     private Server? server;
@@ -227,6 +228,12 @@ public class NetworkService(
                     // Set as active device
                     deviceManager.ActiveDevice = connectedDevice;
                     device = connectedDevice;
+
+                    // Connect to device via TCP/IP if enabled
+                    if (device.DeviceSettings.AdbAutoConnect && connectedSessionIpAddress != null)
+                    {
+                        adbService.TryConnectTcp(connectedSessionIpAddress);
+                    }
                 });
 
                 var (_, avatar) = await UserInformation.GetCurrentUserInfoAsync();
@@ -294,6 +301,7 @@ public class NetworkService(
         try
         {
             session.Disconnect();
+            session.Dispose();
             var device = PairedDevices.FirstOrDefault(d => d.Session == session);   
             if (device != null)
             {
