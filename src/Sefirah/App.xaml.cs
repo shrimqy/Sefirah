@@ -65,15 +65,21 @@ public partial class App : Application
                 bool isOnboarding = ApplicationData.Current.LocalSettings.Values["HasCompletedOnboarding"] == null;
                 if (isOnboarding)
                 {
-                    // Navigate to onboarding page and ensure window is visible
+                    // Navigate to onboarding page
                     rootFrame.Navigate(typeof(WelcomePage), null, new SuppressNavigationTransitionInfo());
                 }
                 else
                 {
-                    // Navigate to main page and ensure window is visible
+                    // Navigate to main page
                     rootFrame.Navigate(typeof(MainPage), null, new SuppressNavigationTransitionInfo());
                 }
                 break;
+        }
+        bool isStartupRegistered = ApplicationData.Current.LocalSettings.Values["isStartupRegistered"] == null;
+        if (isStartupRegistered)
+        {
+            AppLifecycleHelper.HandleStartupTaskAsync(true);
+            ApplicationData.Current.LocalSettings.Values["isStartupRegistered"] = true;
         }
 
         MainWindow!.Activate();
