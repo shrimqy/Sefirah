@@ -86,8 +86,8 @@
                 <wuc:SettingsExpander.HeaderIcon>
                     <FontIcon Glyph="&#xE72D;" />
                 </wuc:SettingsExpander.HeaderIcon>
-                <wuc:SettingsExpander.Items>
-                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.ThirdPartyLibraries}">
+                <wuc:SettingsExpander.ItemsHeader>
+                    <ItemsRepeater Margin="10" ItemsSource="{x:Bind ViewModel.ThirdPartyLibraries}">
                         <ItemsRepeater.Layout>
                             <UniformGridLayout
                                 ItemsStretch="Fill"
@@ -117,7 +117,7 @@
                             </DataTemplate>
                         </ItemsRepeater.ItemTemplate>
                     </ItemsRepeater>
-                </wuc:SettingsExpander.Items>
+                </wuc:SettingsExpander.ItemsHeader>
             </wuc:SettingsExpander>
 
             <!--  Support  -->
