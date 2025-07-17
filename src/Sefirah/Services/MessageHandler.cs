@@ -50,6 +50,10 @@ public class MessageHandler(
                     await smsHandlerService.HandleTextMessage(device.Id, textConversation);
                     break;
 
+                case ContactMessage contactMessage:
+                    await smsHandlerService.HandleContactMessage(device.Id, contactMessage);
+                    break;
+
                 case ActionMessage action:
                     actionService.HandleActionMessage(action);
                     break;

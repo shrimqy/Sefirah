@@ -4,10 +4,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="using:Sefirah.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:entity="using:Sefirah.Data.AppDatabase.Models"
     xmlns:helpers="using:Sefirah.Helpers"
     xmlns:local="using:Sefirah.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:models="using:Sefirah.Data.Models"
+    xmlns:models="using:Sefirah.Data.Models.Messages"
     xmlns:vm="using:Sefirah.ViewModels"
     Background="Transparent"
     mc:Ignorable="d">
@@ -23,43 +24,79 @@
         <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
         <converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
         <converters:MessageTypeToAlignmentConverter x:Key="MessageTypeToAlignmentConverter" />
+        <converters:MessageTypeToVisibilityConverter x:Key="MessageTypeToVisibilityConverter" />
+        <converters:InverseMessageTypeToVisibilityConverter x:Key="InverseMessageTypeToVisibilityConverter" />
         <converters:UnixTimestampConverter x:Key="UnixTimestampConverter" />
         <converters:IndexConverter x:Key="IndexConverter" />
         <converters:GreaterThanOneToBooleanConverter x:Key="GreaterThanOneToBooleanConverter" />
         <converters:SubscriptionToIconConverter x:Key="SubscriptionToIconConverter" />
 
-        <DataTemplate x:Key="MessageItemTemplate">
+        <DataTemplate x:Key="MessageItemTemplate" x:DataType="models:Conversation">
             <Grid Height="72" Padding="12">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock
-                        Grid.Column="0"
-                        FontWeight="SemiBold"
-                        Text="{Binding DisplayName, FallbackValue='Unknown'}"
-                        TextTrimming="CharacterEllipsis" />
-
-                    <TextBlock
-                        Grid.Column="1"
-                        FontSize="12"
-                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                        Text="{Binding LastMessageTimestamp, Converter={StaticResource UnixTimestampConverter}, FallbackValue=''}" />
+                <!--  Avatar Column  -->
+                <Grid
+                    Grid.Column="0"
+                    Width="48"
+                    Height="48"
+                    Margin="0,0,12,0"
+                    VerticalAlignment="Center">
+                    <PersonPicture
+                        Width="48"
+                        DisplayName="{x:Bind DisplayName}"
+                        ProfilePicture="{x:Bind AvatarImage}"
+                        Visibility="{x:Bind AvatarImage, Converter={StaticResource NullToVisibilityConverter}}" />
+                    <Border
+                        Width="48"
+                        Height="48"
+                        CornerRadius="24"
+                        DataContextChanged="ConversationAvatarBorder_DataContextChanged"
+                        Visibility="{x:Bind AvatarImage, Converter={StaticResource InverseNullToVisibilityConverter}}">
+                        <FontIcon
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="22"
+                            Glyph="{x:Bind AvatarGlyph}" />
+                    </Border>
                 </Grid>
 
-                <TextBlock
-                    Grid.Row="1"
-                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                    MaxLines="1"
-                    Text="{Binding LastMessage, FallbackValue='No content'}"
-                    TextTrimming="CharacterEllipsis" />
+                <!--  Text Column  -->
+                <Grid Grid.Column="1" VerticalAlignment="Center">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock
+                            Grid.Column="0"
+                            FontWeight="SemiBold"
+                            Text="{x:Bind DisplayName, Mode=OneWay, FallbackValue='Unknown'}"
+                            TextTrimming="CharacterEllipsis" />
+
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                            Text="{x:Bind LastMessageTimestamp, Mode=OneWay, Converter={StaticResource UnixTimestampConverter}, FallbackValue=''}" />
+                    </Grid>
+
+                    <TextBlock
+                        Grid.Row="1"
+                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                        MaxLines="1"
+                        Text="{x:Bind LastMessage, Mode=OneWay, FallbackValue='No content'}"
+                        TextTrimming="CharacterEllipsis" />
+                </Grid>
             </Grid>
         </DataTemplate>
     </Page.Resources>
@@ -69,7 +106,7 @@
         CompactPaneLength="48"
         DisplayMode="Inline"
         IsPaneOpen="True"
-        OpenPaneLength="320"
+        OpenPaneLength="420"
         PaneBackground="Transparent">
 
         <!--  Left panel - Contacts/Message threads list  -->
@@ -111,6 +148,7 @@
                     Margin="16,0,16,12"
                     VerticalAlignment="Center"
                     AutomationProperties.Name="Messages AutoSuggestBox"
+                    ItemsSource="{x:Bind ViewModel.SearchResults, Mode=OneWay}"
                     PlaceholderText="{helpers:ResourceString Name=SearchMessages}"
                     QueryIcon="Find"
                     QuerySubmitted="SearchBox_QuerySubmitted"
@@ -118,21 +156,55 @@
                     TextChanged="SearchBox_TextChanged"
                     UpdateTextOnSelect="False">
                     <AutoSuggestBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Margin="0,8,0,8">
-                                <TextBlock
-                                    MaxWidth="280"
-                                    FontWeight="SemiBold"
-                                    Text="{Binding DisplayName}"
-                                    TextTrimming="CharacterEllipsis" />
-                                <TextBlock
-                                    MaxWidth="280"
-                                    Margin="0,4,0,0"
-                                    FontSize="12"
-                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                                    Text="{Binding LastMessage}"
-                                    TextTrimming="CharacterEllipsis" />
-                            </StackPanel>
+                        <DataTemplate x:DataType="models:Conversation">
+                            <Grid Margin="0,8,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <!--  Avatar Column  -->
+                                <Grid
+                                    Grid.Column="0"
+                                    Width="40"
+                                    Height="40"
+                                    Margin="0,0,12,0"
+                                    VerticalAlignment="Center">
+                                    <PersonPicture
+                                        Width="40"
+                                        DisplayName="{x:Bind DisplayName}"
+                                        ProfilePicture="{x:Bind AvatarImage}"
+                                        Visibility="{x:Bind AvatarImage, Converter={StaticResource NullToVisibilityConverter}}" />
+                                    <Border
+                                        Width="40"
+                                        Height="40"
+                                        CornerRadius="20"
+                                        DataContextChanged="ConversationAvatarBorder_DataContextChanged"
+                                        Visibility="{x:Bind AvatarImage, Converter={StaticResource InverseNullToVisibilityConverter}}">
+                                        <FontIcon
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontSize="20"
+                                            Glyph="{x:Bind AvatarGlyph}" />
+                                    </Border>
+                                </Grid>
+
+                                <!--  Text Column  -->
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock
+                                        MaxWidth="280"
+                                        FontWeight="SemiBold"
+                                        Text="{x:Bind DisplayName}"
+                                        TextTrimming="CharacterEllipsis" />
+                                    <TextBlock
+                                        MaxWidth="280"
+                                        Margin="0,4,0,0"
+                                        FontSize="12"
+                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                        Text="{x:Bind LastMessage}"
+                                        TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                            </Grid>
                         </DataTemplate>
                     </AutoSuggestBox.ItemTemplate>
                     <AutoSuggestBox.ItemContainerStyle>
@@ -147,19 +219,17 @@
                     x:Name="MessagesList"
                     Grid.Row="2"
                     Margin="0,8,0,0"
+                    IsItemClickEnabled="True"
+                    ItemClick="MessagesList_ItemClick"
                     ItemTemplate="{StaticResource MessageItemTemplate}"
                     ItemsSource="{x:Bind ViewModel.Conversations, Mode=OneWay}"
-                    SelectedItem="{x:Bind ViewModel.SelectedConversation, Mode=TwoWay}"
-                    SelectionMode="Single" />
+                    SelectionMode="None" />
 
             </Grid>
         </SplitView.Pane>
 
         <!--  Right panel - Message content  -->
-        <Grid
-            Padding="8,0,0,0"
-            BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}"
-            BorderThickness="1,0,0,0">
+        <Grid BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}" BorderThickness="1,0,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -167,16 +237,29 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!--  Empty state message  -->
-            <TextBlock
+            <!--  Empty state  -->
+            <Grid
                 Grid.Row="1"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                Text="{helpers:ResourceString Name=EmptyMessages}"
-                Visibility="{x:Bind ViewModel.ShouldShowEmptyState, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                RowSpacing="12"
+                Visibility="{x:Bind ViewModel.ShouldShowEmptyState, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <FontIcon
+                    Grid.Row="0"
+                    FontSize="50"
+                    Glyph="&#xE8F2;" />
+                <TextBlock
+                    Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                    Text="{helpers:ResourceString Name=EmptyMessages}" />
+            </Grid>
 
-            <!--  New conversation guidance  -->
             <StackPanel
                 Grid.Row="1"
                 HorizontalAlignment="Center"
@@ -197,49 +280,141 @@
             </StackPanel>
 
             <!--  Message header  -->
-            <Grid
-                Grid.Row="0"
-                Padding="20,12"
-                BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}"
-                BorderThickness="0,0,0,1">
-
+            <Grid Grid.Row="0" Padding="20,12,20,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <!--  Regular conversation display  -->
-                <TextBlock
-                    Grid.Row="0"
-                    FontSize="18"
-                    FontWeight="SemiBold"
-                    IsTextSelectionEnabled="True"
-                    Text="{x:Bind ViewModel.SelectedConversation.DisplayName, Mode=OneWay, FallbackValue=''}"
-                    TextWrapping="Wrap"
-                    Visibility="{x:Bind ViewModel.IsExistingConversationSelected, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                <Grid Grid.Row="0" Visibility="{x:Bind ViewModel.SelectedConversation, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!--  Avatar  -->
+                    <Grid
+                        Grid.Column="0"
+                        Width="48"
+                        Height="48"
+                        Margin="0,0,12,0"
+                        VerticalAlignment="Top">
+                        <PersonPicture
+                            Width="48"
+                            DisplayName="{x:Bind ViewModel.SelectedConversation.DisplayName, Mode=OneWay}"
+                            ProfilePicture="{x:Bind ViewModel.SelectedConversation.AvatarImage, Mode=OneWay}"
+                            Visibility="{x:Bind ViewModel.SelectedConversation.AvatarImage, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}" />
+                        <Border
+                            x:Name="AvatarGlyphBorder"
+                            Width="48"
+                            Height="48"
+                            CornerRadius="24"
+                            Visibility="{x:Bind ViewModel.SelectedConversation.AvatarImage, Mode=OneWay, Converter={StaticResource InverseNullToVisibilityConverter}}">
+                            <FontIcon
+                                x:Name="AvatarGlyphIcon"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="24"
+                                Glyph="{x:Bind ViewModel.SelectedConversation.AvatarGlyph, Mode=OneWay}" />
+                        </Border>
+                    </Grid>
+
+                    <!--  Name and Address  -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            IsTextSelectionEnabled="True"
+                            Text="{x:Bind ViewModel.SelectedConversation.DisplayName, Mode=OneWay, FallbackValue=''}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            FontSize="14"
+                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                            IsTextSelectionEnabled="True"
+                            Text="{x:Bind ViewModel.SelectedConversation.Contacts[0].Address, Mode=OneWay, FallbackValue=''}"
+                            TextWrapping="Wrap" />
+                    </StackPanel>
+                </Grid>
 
                 <!--  New conversation address input  -->
-                <Grid Grid.Row="0" Visibility="{x:Bind ViewModel.IsNewConversation, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <TextBox
-                        x:Name="NewAddressTextBox"
-                        FontSize="16"
-                        KeyDown="NewAddressTextBox_KeyDown"
+                <Grid
+                    Grid.Row="0"
+                    Margin="0,16"
+                    Visibility="{x:Bind ViewModel.IsNewConversation, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <AutoSuggestBox
+                        x:Name="AddressInput"
+                        AutomationProperties.Name="New conversation address input"
+                        ItemsSource="{x:Bind ViewModel.SearchContactsResults, Mode=OneWay}"
                         PlaceholderText="{helpers:ResourceString Name=AddressInputPlaceholder}"
-                        Text="{x:Bind ViewModel.NewConversationAddress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        QuerySubmitted="AddressInput_QuerySubmitted"
+                        SuggestionChosen="AddressInput_SuggestionChosen"
+                        TextChanged="AddressInput_TextChanged"
+                        UpdateTextOnSelect="False">
+                        <AutoSuggestBox.ItemTemplate>
+                            <DataTemplate x:DataType="models:Contact">
+                                <Grid Margin="0,8,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!--  Avatar Column  -->
+                                    <Grid
+                                        Grid.Column="0"
+                                        Width="40"
+                                        Height="40"
+                                        Margin="0,0,12,0"
+                                        VerticalAlignment="Center">
+                                        <PersonPicture
+                                            Width="40"
+                                            DisplayName="{x:Bind DisplayName}"
+                                            ProfilePicture="{x:Bind Avatar}"
+                                            Visibility="{x:Bind Avatar, Converter={StaticResource NullToVisibilityConverter}}" />
+                                        <Border
+                                            Width="40"
+                                            Height="40"
+                                            VerticalAlignment="Center"
+                                            CornerRadius="20"
+                                            DataContextChanged="ConversationAvatarBorder_DataContextChanged"
+                                            Visibility="{x:Bind Avatar, Converter={StaticResource InverseNullToVisibilityConverter}}">
+                                            <TextBlock
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontSize="18" />
+                                        </Border>
+                                    </Grid>
+
+                                    <!--  Text Column  -->
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock
+                                            MaxWidth="280"
+                                            FontWeight="SemiBold"
+                                            Text="{x:Bind DisplayName}"
+                                            TextTrimming="CharacterEllipsis" />
+                                        <TextBlock
+                                            MaxWidth="280"
+                                            Margin="0,4,0,0"
+                                            FontSize="12"
+                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                            Text="{x:Bind Address}"
+                                            TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </AutoSuggestBox.ItemTemplate>
+                    </AutoSuggestBox>
                 </Grid>
 
                 <!--  Address list  -->
                 <ListView
                     Grid.Row="1"
-                    MaxHeight="120"
                     Margin="0,8,0,0"
-                    ItemsSource="{x:Bind ViewModel.NewConversationAddresses, Mode=OneWay}"
+                    ItemsSource="{x:Bind ViewModel.NewConversationRecipients, Mode=OneWay}"
                     Visibility="{x:Bind ViewModel.IsNewConversation, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="x:String">
+                        <DataTemplate x:DataType="models:Contact">
                             <Border
-                                MaxWidth="280"
-                                Padding="12,4"
+                                Padding="4,4"
                                 HorizontalAlignment="Left"
                                 Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
                                 BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}"
@@ -250,13 +425,41 @@
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-
-                                    <TextBlock
-                                        Grid.Column="0"
-                                        Margin="0,0,12,0"
-                                        VerticalAlignment="Center"
-                                        Text="{x:Bind}" />
-
+                                    <Grid Grid.Column="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid
+                                            Grid.Column="0"
+                                            Width="24"
+                                            Height="24"
+                                            Margin="0,0,12,0"
+                                            VerticalAlignment="Center">
+                                            <PersonPicture
+                                                Width="24"
+                                                DisplayName="{x:Bind DisplayName}"
+                                                ProfilePicture="{x:Bind Avatar}"
+                                                Visibility="{x:Bind Avatar, Converter={StaticResource NullToVisibilityConverter}}" />
+                                            <Border
+                                                Width="24"
+                                                Height="24"
+                                                VerticalAlignment="Center"
+                                                CornerRadius="12"
+                                                DataContextChanged="ConversationAvatarBorder_DataContextChanged"
+                                                Visibility="{x:Bind Avatar, Converter={StaticResource InverseNullToVisibilityConverter}}">
+                                                <TextBlock
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    FontSize="18" />
+                                            </Border>
+                                        </Grid>
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            Margin="0,0,12,0"
+                                            VerticalAlignment="Center"
+                                            Text="{x:Bind DisplayName}" />
+                                    </Grid>
                                     <Button
                                         Grid.Column="1"
                                         MinWidth="24"
@@ -296,70 +499,184 @@
                         </Style>
                     </ListView.ItemContainerStyle>
                 </ListView>
+
+                <Rectangle
+                    Grid.Row="2"
+                    Height="1"
+                    Margin="0,20,0,4"
+                    Fill="{StaticResource SystemControlForegroundBaseLowBrush}"
+                    Visibility="{x:Bind ViewModel.SelectedConversation, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}" />
             </Grid>
 
             <!--  Message content  -->
-            <ScrollViewer
-                x:Name="MessagesScrollViewer"
+            <ListView
+                x:Name="MessagesListView"
                 Grid.Row="1"
-                Padding="20"
-                HorizontalScrollBarVisibility="Disabled"
-                VerticalScrollBarVisibility="Auto"
-                Visibility="{x:Bind ViewModel.IsExistingConversationSelected, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <ItemsControl ItemsSource="{x:Bind ViewModel.Messages, Mode=OneWay}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel VerticalAlignment="Bottom" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border
+                Padding="20,0,20,0"
+                IsItemClickEnabled="False"
+                ItemsSource="{x:Bind ViewModel.MessageGroups, Mode=OneWay}"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                ScrollViewer.VerticalScrollMode="Enabled"
+                SelectionMode="None"
+                ShowsScrollingPlaceholders="True"
+                Visibility="{x:Bind ViewModel.SelectedConversation, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}">
+
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ItemsStackPanel VerticalAlignment="Bottom" ItemsUpdatingScrollMode="KeepLastItemInView" />
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
+
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="models:MessageGroup">
+                        <Grid Margin="0,8" CanBeScrollAnchor="True">
+                            <!--  Received Message Group Layout  -->
+                            <Grid
                                 MaxWidth="500"
-                                Margin="0,8"
-                                Padding="12"
-                                HorizontalAlignment="{Binding MessageType, Converter={StaticResource MessageTypeToAlignmentConverter}}"
-                                Background="{ThemeResource SystemControlBackgroundListLowBrush}"
-                                CanBeScrollAnchor="True"
-                                CornerRadius="8">
-                                <Border.ContextFlyout>
-                                    <MenuFlyout>
-                                        <MenuFlyoutItem
-                                            Click="CopyMessage_Click"
-                                            Icon="Copy"
-                                            Tag="{Binding Body}"
-                                            Text="{helpers:ResourceString Name=CopyMessage}" />
-                                    </MenuFlyout>
-                                </Border.ContextFlyout>
-                                <StackPanel>
+                                HorizontalAlignment="Left"
+                                Visibility="{x:Bind IsReceived, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <!--  Avatar  -->
+                                <Grid
+                                    Grid.Column="0"
+                                    Width="32"
+                                    Height="32"
+                                    Margin="0,0,8,0"
+                                    VerticalAlignment="Top">
+                                    <PersonPicture
+                                        Width="32"
+                                        Height="32"
+                                        DisplayName="{x:Bind Sender.DisplayName}"
+                                        ProfilePicture="{x:Bind Sender.Avatar}"
+                                        Visibility="{x:Bind Sender.Avatar, Converter={StaticResource NullToVisibilityConverter}}" />
+                                    <Border
+                                        Width="32"
+                                        Height="32"
+                                        CornerRadius="16"
+                                        DataContextChanged="MessageAvatarBorder_DataContextChanged"
+                                        Visibility="{x:Bind Sender.Avatar, Converter={StaticResource InverseNullToVisibilityConverter}}">
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontSize="14" />
+                                    </Border>
+                                </Grid>
+
+                                <StackPanel Grid.Column="1">
+                                    <!--  Sender Name  -->
                                     <TextBlock
-                                        IsTextSelectionEnabled="True"
-                                        SelectionHighlightColor="{ThemeResource SystemControlHighlightAccentBrush}"
-                                        Text="{Binding Body}"
-                                        TextWrapping="Wrap">
-                                        <TextBlock.ContextFlyout>
-                                            <MenuFlyout>
-                                                <MenuFlyoutItem
-                                                    Click="CopyMessage_Click"
-                                                    Icon="Copy"
-                                                    Tag="{Binding Body}"
-                                                    Text="{helpers:ResourceString Name=CopyMessage}" />
-                                            </MenuFlyout>
-                                        </TextBlock.ContextFlyout>
-                                    </TextBlock>
-                                    <TextBlock
-                                        Margin="0,4,0,0"
-                                        HorizontalAlignment="Right"
-                                        FontSize="10"
+                                        Margin="4,0,0,4"
+                                        FontWeight="SemiBold"
                                         Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                                        IsTextSelectionEnabled="True"
-                                        Text="{Binding Timestamp, Converter={StaticResource UnixTimestampConverter}}" />
+                                        Text="{x:Bind Sender.DisplayName}" />
+
+                                    <!--  Message Bubbles  -->
+                                    <ItemsControl ItemsSource="{x:Bind Messages}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="models:Message">
+                                                <Border
+                                                    Margin="0,2"
+                                                    Padding="12"
+                                                    Background="{ThemeResource ControlFillColorDefaultBrush}"
+                                                    CornerRadius="0,8,8,8">
+                                                    <ToolTipService.ToolTip>
+                                                        <ToolTip>
+                                                            <TextBlock Text="{x:Bind Timestamp, Converter={StaticResource UnixTimestampConverter}, ConverterParameter='F'}" />
+                                                        </ToolTip>
+                                                    </ToolTipService.ToolTip>
+                                                    <Border.ContextFlyout>
+                                                        <MenuFlyout>
+                                                            <MenuFlyoutItem
+                                                                Click="CopyMessage_Click"
+                                                                Icon="Copy"
+                                                                Tag="{x:Bind Body}"
+                                                                Text="{helpers:ResourceString Name=CopyMessage}" />
+                                                        </MenuFlyout>
+                                                    </Border.ContextFlyout>
+                                                    <TextBlock
+                                                        Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                                        IsTextSelectionEnabled="True"
+                                                        Text="{x:Bind Body}"
+                                                        TextWrapping="Wrap" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                                 </StackPanel>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+                            </Grid>
+
+                            <!--  Sent Message Group Layout  -->
+                            <Grid
+                                MaxWidth="500"
+                                HorizontalAlignment="Right"
+                                Visibility="{x:Bind IsReceived, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+
+                                <!--  Message Bubbles  -->
+                                <ItemsControl ItemsSource="{x:Bind Messages}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="models:Message">
+                                            <Border
+                                                Margin="0,2"
+                                                Padding="12"
+                                                Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                                CornerRadius="8,8,0,8">
+                                                <ToolTipService.ToolTip>
+                                                    <ToolTip>
+                                                        <TextBlock Text="{x:Bind Timestamp, Converter={StaticResource UnixTimestampConverter}, ConverterParameter='F'}" />
+                                                    </ToolTip>
+                                                </ToolTipService.ToolTip>
+                                                <Border.ContextFlyout>
+                                                    <MenuFlyout>
+                                                        <MenuFlyoutItem
+                                                            Click="CopyMessage_Click"
+                                                            Icon="Copy"
+                                                            Tag="{x:Bind Body}"
+                                                            Text="{helpers:ResourceString Name=CopyMessage}" />
+                                                    </MenuFlyout>
+                                                </Border.ContextFlyout>
+                                                <TextBlock
+                                                    Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                                    IsTextSelectionEnabled="True"
+                                                    SelectionHighlightColor="{ThemeResource SystemControlHighlightListAccentHighBrush}"
+                                                    Text="{x:Bind Body}"
+                                                    TextWrapping="Wrap" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="Margin" Value="0" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListViewItem">
+                                    <ContentPresenter
+                                        x:Name="ContentPresenter"
+                                        Padding="{TemplateBinding Padding}"
+                                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        Content="{TemplateBinding Content}"
+                                        ContentTemplate="{TemplateBinding ContentTemplate}"
+                                        ContentTransitions="{TemplateBinding ContentTransitions}" />
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
 
             <!--  Message composer  -->
             <Grid

@@ -1,6 +1,5 @@
 using System.Globalization;
 using Microsoft.UI.Xaml.Data;
-using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Extensions;
 
@@ -466,6 +465,34 @@ public class MessageTypeToAlignmentConverter : IValueConverter
     }
 }
 
+public class MessageTypeToVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        // INBOX (and other received types) should be Visible, SENT should be Collapsed.
+        return (int)value != 2 ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class InverseMessageTypeToVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        // SENT should be Visible, INBOX (and others) should be Collapsed.
+        return (int)value == 2 ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}
+
 public class UnixTimestampConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
@@ -475,7 +502,38 @@ public class UnixTimestampConverter : IValueConverter
             // Convert Unix timestamp (milliseconds) to DateTime
             DateTime dateTime = DateTimeOffset.FromUnixTimeMilliseconds(unixTimestampMs).LocalDateTime;
 
-            // Format based on how recent the message is
+            // Check if parameter is provided for full format (with time always included)
+            if (parameter?.ToString() == "F")
+            {
+                // Format based on how recent the message is, but always include time
+                if (dateTime.Date == DateTime.Today)
+                {
+                    // Today - show "Today" + time
+                    return "Today " + dateTime.ToString("h:mm tt");
+                }
+                else if (dateTime.Date == DateTime.Today.AddDays(-1))
+                {
+                    // Yesterday - show "Yesterday" + time
+                    return "Yesterday " + dateTime.ToString("h:mm tt");
+                }
+                else if (dateTime.Date > DateTime.Today.AddDays(-7))
+                {
+                    // Within the last week - show day + time
+                    return dateTime.ToString("dddd") + " " + dateTime.ToString("h:mm tt"); // Full day name + time
+                }
+                else if (dateTime.Year == DateTime.Today.Year)
+                {
+                    // This year - show full month, day + time
+                    return dateTime.ToString("MMMM d") + " " + dateTime.ToString("h:mm tt");
+                }
+                else
+                {
+                    // Older - show full month, day, year + time
+                    return dateTime.ToString("MMMM d, yyyy") + " " + dateTime.ToString("h:mm tt");
+                }
+            }
+
+            // Format based on how recent the message is (default behavior)
             if (dateTime.Date == DateTime.Today)
             {
                 // Today - show only time

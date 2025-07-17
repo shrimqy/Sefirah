@@ -5,10 +5,9 @@ using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
+using Sefirah.Data.Models.Messages;
 using Sefirah.Services.Socket;
 using Sefirah.Utils.Serialization;
-using Uno.Extensions;
-using Uno.Logging;
 
 namespace Sefirah.Services;
 public class SmsHandlerService(
@@ -16,21 +15,20 @@ public class SmsHandlerService(
     SmsRepository smsRepository,
     ILogger<SmsHandlerService> logger)
 {
-    // Device-specific conversations for UI binding
-    private readonly Dictionary<string, ObservableCollection<SmsConversation>> deviceConversations = new();
+    private readonly Dictionary<string, ObservableCollection<Conversation>> deviceConversations = [];
     private readonly SemaphoreSlim semaphore = new(1, 1);
     private readonly DispatcherQueue dispatcher = App.MainWindow!.DispatcherQueue;
 
-    // Event to notify when conversations are updated for a device
-    public event EventHandler<string>? ConversationsUpdated;
+    public event EventHandler<(string DeviceId, long ThreadId)>? ConversationsUpdated;
 
-    public ObservableCollection<SmsConversation> GetConversationsForDevice(string deviceId)
+    public ObservableCollection<Conversation> GetConversationsForDevice(string deviceId)
     {
-        if (!deviceConversations.ContainsKey(deviceId))
+        if (!deviceConversations.TryGetValue(deviceId, out ObservableCollection<Conversation>? value))
         {
-            deviceConversations[deviceId] = [];
+            value = [];
+            deviceConversations[deviceId] = value;
         }
-        return deviceConversations[deviceId];
+        return value;
     }
 
     public async Task LoadConversationsFromDatabase(string deviceId)
@@ -42,29 +40,19 @@ public class SmsHandlerService(
             var conversationEntities = await smsRepository.GetConversationsAsync(deviceId);
             var conversations = GetConversationsForDevice(deviceId);
             
-            await dispatcher.EnqueueAsync(() =>
+            await dispatcher.EnqueueAsync(async () =>
             {
                 conversations.Clear();
                 
+                var conversationList = new List<Conversation>();
                 foreach (var entity in conversationEntities)
                 {
-                    // Create SmsConversation from database entity
-                    var conversation = new SmsConversation
-                    {
-                        ThreadId = entity.ThreadId,
-                        LastMessage = entity.LastMessageBody ?? string.Empty,
-                        LastMessageTimestamp = entity.LastMessageTimestamp,
-                        DisplayName = entity.DisplayName
-                    };
-                    
+                    var conversation = await entity.ToConversationAsync(smsRepository);
                     conversations.Add(conversation);
                 }
-
-                // Fire event to notify listeners
-                ConversationsUpdated?.Invoke(this, deviceId);
+                
+                ConversationsUpdated?.Invoke(this, (deviceId, -1)); // -1 indicates all conversations updated
             });
-            
-            logger.LogInformation("Loaded {Count} conversations for device: {DeviceId}", conversationEntities.Count, deviceId);
         }
         catch (Exception ex)
         {
@@ -74,9 +62,6 @@ public class SmsHandlerService(
 
     public async Task HandleTextMessage(string deviceId, TextConversation textConversation)
     {
-        logger.LogInformation("Received text conversation: {ThreadId} with type: {ConversationType} from device: {DeviceId}", 
-            textConversation.ThreadId, textConversation.ConversationType, deviceId);
-
         await semaphore.WaitAsync();
         try
         {
@@ -102,8 +87,7 @@ public class SmsHandlerService(
                     break;
             }
 
-            // Fire event to notify listeners that conversations were updated
-            ConversationsUpdated?.Invoke(this, deviceId);
+            ConversationsUpdated?.Invoke(this, (deviceId, textConversation.ThreadId));
         }
         finally
         {
@@ -111,64 +95,50 @@ public class SmsHandlerService(
         }
     }
 
-    private async Task HandleActiveOrNewConversation(string deviceId, TextConversation textConversation, ObservableCollection<SmsConversation> conversations)
+    private async Task HandleActiveOrNewConversation(string deviceId, TextConversation textConversation, ObservableCollection<Conversation> conversations)
     {
         try
         {
-            // Save/update conversation in database
             var conversationEntity = await smsRepository.GetConversationAsync(deviceId, textConversation.ThreadId);
-            var isNewConversation = conversationEntity == null;
-            
-            // Save contacts
-            await SaveContactsFromConversation(deviceId, textConversation);
-            
-            // Save messages
-            await SaveMessagesFromConversation(deviceId, textConversation);
-            
-            // Create or update conversation entity
-            var smsConversation = isNewConversation ? new SmsConversation(textConversation) : null;
-            
-            if (smsConversation != null)
+            if (conversationEntity == null)
             {
-                conversationEntity = SmsRepository.ToEntity(smsConversation, deviceId);
+                conversationEntity = SmsRepository.ToEntity(textConversation, deviceId);
             }
             else
             {
-                // Update existing entity
+                // Update existing conversation entity
                 if (textConversation.Messages.Count > 0)
                 {
                     var latestMessage = textConversation.Messages.OrderByDescending(m => m.Timestamp).First();
-                    conversationEntity!.LastMessageTimestamp = latestMessage.Timestamp;
-                    conversationEntity.LastMessageBody = latestMessage.Body;
-                    
-                    var displayName = textConversation.Messages.FirstOrDefault()?.Contacts.FirstOrDefault()?.ContactName ?? string.Empty;
-                    if (string.IsNullOrEmpty(displayName))
-                    {
-                        displayName = textConversation.Messages.FirstOrDefault()?.Addresses.FirstOrDefault() ?? string.Empty;
-                    }
-                    conversationEntity.DisplayName = displayName;
+                    conversationEntity.LastMessageTimestamp = latestMessage.Timestamp;
+                    conversationEntity.LastMessage = latestMessage.Body;
                 }
+                
+                if (textConversation.Recipients.Count > 0)
+                {
+                    conversationEntity.AddressesJson = JsonSerializer.Serialize(textConversation.Recipients);
+                }
+                
+                conversationEntity.HasRead = textConversation.Messages.Any(m => m.Read);
             }
+            await smsRepository.SaveConversationAsync(conversationEntity);
+            var messageEntities = await SaveMessagesFromConversation(deviceId, textConversation);
             
-            await smsRepository.SaveConversationAsync(conversationEntity!);
-            
-            // Update UI
-            await dispatcher.EnqueueAsync(() =>
+            await dispatcher.EnqueueAsync(async () =>
             {
                 var existingConversation = conversations.FirstOrDefault(c => c.ThreadId == textConversation.ThreadId);
                 
                 if (existingConversation != null)
                 {
-                    logger.LogInformation("Updating existing conversation: {ThreadId}", existingConversation.ThreadId);
-                    existingConversation.UpdateFromTextConversation(textConversation);
+                    await existingConversation.UpdateFromTextConversationAsync(textConversation, smsRepository, deviceId);
+                    
+                    // Move conversation to correct position based on new timestamp
+                    InsertOrMoveConversation(existingConversation, conversations);
                 }
                 else
                 {
-                    logger.LogInformation("Adding new conversation: {ThreadId}", textConversation.ThreadId);
-                    if (smsConversation != null)
-                    {
-                        AddNewConversation(smsConversation, conversations);
-                    }
+                    var newConversation = await conversationEntity.ToConversationAsync(smsRepository);
+                    InsertOrMoveConversation(newConversation, conversations);
                 }
             });
         }
@@ -178,40 +148,45 @@ public class SmsHandlerService(
         }
     }
 
-    private async Task HandleUpdatedConversation(string deviceId, TextConversation textConversation, ObservableCollection<SmsConversation> conversations)
+    private async Task HandleUpdatedConversation(string deviceId, TextConversation textConversation, ObservableCollection<Conversation> conversations)
     {
         try
         {
-            // Save new contacts
-            await SaveContactsFromConversation(deviceId, textConversation);
-            
-            // Save new messages
             await SaveMessagesFromConversation(deviceId, textConversation);
-            
-            // Update conversation entity
+            var latestMessage = textConversation.Messages.OrderByDescending(m => m.Timestamp).First();
+
             var conversationEntity = await smsRepository.GetConversationAsync(deviceId, textConversation.ThreadId);
             if (conversationEntity != null && textConversation.Messages.Count > 0)
             {
-                var latestMessage = textConversation.Messages.OrderByDescending(m => m.Timestamp).First();
                 conversationEntity.LastMessageTimestamp = latestMessage.Timestamp;
-                conversationEntity.LastMessageBody = latestMessage.Body;
+                conversationEntity.LastMessage = latestMessage.Body;
+                if (textConversation.Recipients.Count > 0)
+                {
+                    conversationEntity.AddressesJson = JsonSerializer.Serialize(textConversation.Recipients);
+                }
+
                 await smsRepository.SaveConversationAsync(conversationEntity);
             }
             
-            // Update UI
-            await dispatcher.EnqueueAsync(() =>
+            await dispatcher.EnqueueAsync(async () =>
             {
                 var existingConversation = conversations.FirstOrDefault(c => c.ThreadId == textConversation.ThreadId);
                 if (existingConversation != null)
                 {
                     logger.LogInformation("Adding new messages to conversation: {ThreadId}", existingConversation.ThreadId);
-                    existingConversation.NewMessageFromConversation(textConversation);
+                    existingConversation.LastMessageTimestamp = latestMessage.Timestamp;
+                    existingConversation.LastMessage = latestMessage.Body;
+                    await existingConversation.NewMessageFromConversationAsync(textConversation, smsRepository, deviceId);
+                    
+                    // Move conversation to correct position based on new timestamp
+                    InsertOrMoveConversation(existingConversation, conversations);
                 }
                 else
                 {
                     logger.LogInformation("Updated conversation not found in UI, creating new: {ThreadId}", textConversation.ThreadId);
-                    var newConversation = new SmsConversation(textConversation);
-                    AddNewConversation(newConversation, conversations);
+                    var conversationEntity = SmsRepository.ToEntity(textConversation, deviceId);
+                    var newConversation = await conversationEntity.ToConversationAsync(smsRepository);
+                    InsertOrMoveConversation(newConversation, conversations);
                 }
             });
         }
@@ -221,20 +196,16 @@ public class SmsHandlerService(
         }
     }
 
-    private async Task HandleRemovedConversation(string deviceId, TextConversation textConversation, ObservableCollection<SmsConversation> conversations)
+    private async Task HandleRemovedConversation(string deviceId, TextConversation textConversation, ObservableCollection<Conversation> conversations)
     {
         try
         {
-            // Remove from database
             await smsRepository.DeleteConversationAsync(deviceId, textConversation.ThreadId);
-            
-            // Remove from UI
             await dispatcher.EnqueueAsync(() =>
             {
                 var existingConversation = conversations.FirstOrDefault(c => c.ThreadId == textConversation.ThreadId);
                 if (existingConversation != null)
                 {
-                    logger.LogInformation("Removing conversation: {ThreadId}", existingConversation.ThreadId);
                     conversations.Remove(existingConversation);
                 }
             });
@@ -245,34 +216,7 @@ public class SmsHandlerService(
         }
     }
 
-    private async Task SaveContactsFromConversation(string deviceId, TextConversation textConversation)
-    {
-        try
-        {
-            var contactsToSave = new List<Contact>();
-            
-            foreach (var message in textConversation.Messages)
-            {
-                contactsToSave.AddRange(message.Contacts);
-            }
-            
-            if (contactsToSave.Count > 0)
-            {
-                var contactEntities = contactsToSave
-                    .DistinctBy(c => c.PhoneNumber)
-                    .Select(c => SmsRepository.ToEntity(c, deviceId))
-                    .ToList();
-                
-                await smsRepository.SaveContactsAsync(contactEntities);
-            }
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error saving contacts for device {DeviceId}", deviceId);
-        }
-    }
-
-    private async Task SaveMessagesFromConversation(string deviceId, TextConversation textConversation)
+    private async Task<List<MessageEntity>?> SaveMessagesFromConversation(string deviceId, TextConversation textConversation)
     {
         try
         {
@@ -281,58 +225,33 @@ public class SmsHandlerService(
                 .ToList();
             
             await smsRepository.SaveMessagesAsync(messageEntities);
-            
-            // Save attachments
-            //var attachmentsToSave = new List<SmsAttachmentEntity>();
-            //foreach (var message in textConversation.Messages)
-            //{
-            //    if (message.Attachments != null && message.Attachments.Count > 0)
-            //    {
-            //        var messageAttachments = message.Attachments
-            //            .Select(a => SmsRepository.ToEntity(a, message.UniqueId, deviceId))
-            //            .ToList();
-            //        attachmentsToSave.AddRange(messageAttachments);
-            //    }
-            //}
-            
-            //if (attachmentsToSave.Count > 0)
-            //{
-            //    await smsRepository.SaveAttachmentsAsync(attachmentsToSave);
-            //}
+
+            // TODO: Handle attachments 
+
+            return messageEntities;
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error saving messages for device {DeviceId}", deviceId);
+            return null;
         }
     }
 
-    public void AddNewConversation(SmsConversation conversation, ObservableCollection<SmsConversation> conversations)
-    {
-        int index = FindInsertionIndex(conversation, conversations);
-        conversations.Insert(index, conversation);
-    }
 
-    private static int FindInsertionIndex(SmsConversation conversation, ObservableCollection<SmsConversation> conversations)
-    {
-        for (int i = 0; i < conversations.Count; i++)
-        {
-            // Compare timestamps - if current conversation is older than the new one, insert here
-            if (conversations[i].LastMessageTimestamp < conversation.LastMessageTimestamp)
-            {
-                return i;
-            }
-        }
-
-        // If we get here, this is the oldest conversation or collection is empty
-        return conversations.Count;
-    }
-
-    public async Task<List<TextMessage>> LoadMessagesForConversation(string deviceId, long threadId)
+    public async Task<List<Message>> LoadMessagesForConversation(string deviceId, long threadId)
     {
         try
         {
             var messageEntities = await smsRepository.GetMessagesWithAttachmentsAsync(deviceId, threadId);
-            return messageEntities.Select(SmsRepository.FromEntity).ToList();
+            var messages = new List<Message>();
+            
+            foreach (var entity in messageEntities)
+            {
+                var message = await entity.ToMessageAsync(smsRepository);
+                messages.Add(message);
+            }
+            
+            return messages;
         }
         catch (Exception ex)
         {
@@ -341,7 +260,7 @@ public class SmsHandlerService(
         }
     }
 
-    public async Task RequestThreadHistory(ServerSession session, long threadId, long rangeStartTimestamp = -1, long numberToRequest = -1)
+    public void RequestThreadHistory(ServerSession session, long threadId, long rangeStartTimestamp = -1, long numberToRequest = -1)
     {
         var threadRequest = new ThreadRequest
         {
@@ -352,17 +271,71 @@ public class SmsHandlerService(
         sessionManager.SendMessage(session, SocketMessageSerializer.Serialize(threadRequest));
     }
 
-    public async Task SendTextMessage(ServerSession session, TextMessage textMessage)
+    public void SendTextMessage(ServerSession session, TextMessage textMessage)
     {
-        logger.LogInformation("Sending text message: {Body} to {Address}", textMessage.Body, textMessage.Addresses.FirstOrDefault());
         sessionManager.SendMessage(session, SocketMessageSerializer.Serialize(textMessage));
+    }
+
+    public async Task HandleContactMessage(string deviceId, ContactMessage contactMessage)
+    {
+        try
+        {
+            var contactEntity = SmsRepository.ToEntity(contactMessage, deviceId);
+            await smsRepository.SaveContactAsync(contactEntity);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error handling contact message {ContactId} for device {DeviceId}", 
+                contactMessage.Id, deviceId);
+        }
     }
 
     public void ClearConversationsForDevice(string deviceId)
     {
-        if (deviceConversations.ContainsKey(deviceId))
+        if (deviceConversations.TryGetValue(deviceId, out ObservableCollection<Conversation>? value))
         {
-            deviceConversations[deviceId].Clear();
+            value.Clear();
         }
+    }
+
+    public void InsertOrMoveConversation(Conversation conversation, ObservableCollection<Conversation> conversations)
+    {
+        var existingIndex = conversations.IndexOf(conversation);
+        var targetIndex = FindInsertionIndex(conversations, conversation.LastMessageTimestamp);
+
+
+        if (existingIndex >= 0)
+        {
+            if (existingIndex == targetIndex || (existingIndex == targetIndex - 1))
+            {
+                return;
+            }
+
+            conversations.RemoveAt(existingIndex);
+            if (existingIndex < targetIndex)
+            {
+                targetIndex--;
+            }
+        }
+        conversations.Insert(targetIndex, conversation);
+    }
+
+    private static int FindInsertionIndex(ObservableCollection<Conversation> conversations, long timestamp)
+    {
+        for (int i = 0; i < conversations.Count; i++)
+        {
+            if (conversations[i].LastMessageTimestamp <= timestamp)
+            {
+                return i;
+            }
+        }
+        return conversations.Count;
+    }
+
+    public async Task<ObservableCollection<Contact>> GetAllContactsAsync()
+    {   
+        var contacts = await smsRepository.GetAllContactsAsync();
+        var senders = await Task.WhenAll(contacts.Select(c => c.ToContact()));
+        return senders.ToObservableCollection();
     }
 }

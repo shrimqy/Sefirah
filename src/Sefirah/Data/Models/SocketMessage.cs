@@ -24,6 +24,7 @@ namespace Sefirah.Data.Models;
 [JsonDerivedType(typeof(PlaybackAction), typeDiscriminator: "18")]
 [JsonDerivedType(typeof(ApplicationList), typeDiscriminator: "19")]
 [JsonDerivedType(typeof(ActionMessage), typeDiscriminator: "20")]
+[JsonDerivedType(typeof(ContactMessage), typeDiscriminator: "21")]
 public class SocketMessage { }
 public class CommandMessage : SocketMessage
 {
@@ -391,6 +392,9 @@ public class TextConversation : SocketMessage
     [JsonPropertyName("threadId")]
     public required long ThreadId { get; set; }
 
+    [JsonPropertyName("recipients")]
+    public List<string> Recipients { get; set; } = [];
+
     [JsonPropertyName("messages")]
     public List<TextMessage> Messages { get; set; } = [];
 }
@@ -399,9 +403,6 @@ public class TextMessage : SocketMessage
 {
     [JsonPropertyName("addresses")]
     public List<string> Addresses { get; set; } = [];
-
-    [JsonPropertyName("contacts")]
-    public List<Contact> Contacts { get; set; } = [];
 
     [JsonPropertyName("threadId")]
     public long? ThreadId { get; set; } = null;
@@ -465,13 +466,19 @@ public class PhoneNumber
     public int SubscriptionId { get; set; } = -1;
 }
 
-public class Contact
+public class ContactMessage : SocketMessage
 {
-    [JsonPropertyName("contactName")]
-    public required string ContactName { get; set; }
+    [JsonPropertyName("id")]
+    public required string Id { get; set; }
 
-    [JsonPropertyName("phoneNumber")]
-    public required string PhoneNumber { get; set; }
+    [JsonPropertyName("lookupKey")]
+    public string? LookupKey { get; set; }
+
+    [JsonPropertyName("displayName")]
+    public required string DisplayName { get; set; }
+
+    [JsonPropertyName("number")]
+    public required string Number { get; set; }
 
     [JsonPropertyName("photoBase64")]
     public string? PhotoBase64 { get; set; }

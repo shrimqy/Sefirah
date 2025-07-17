@@ -1,7 +1,7 @@
 using SQLite;
 
 namespace Sefirah.Data.AppDatabase.Models;
-public class SmsAttachmentEntity
+public class AttachmentEntity
 {
     [PrimaryKey, AutoIncrement]
     public int Id { get; set; }

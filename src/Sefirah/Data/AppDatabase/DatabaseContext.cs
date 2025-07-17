@@ -45,19 +45,19 @@ public class DatabaseContext
             db.CreateTable<ContactEntity>();
         }
 
-        if (db.GetTableInfo(nameof(SmsConversationEntity)).Count == 0)
+        if (db.GetTableInfo(nameof(ConversationEntity)).Count == 0)
         {
-            db.CreateTable<SmsConversationEntity>();
+            db.CreateTable<ConversationEntity>();
         }
 
-        if (db.GetTableInfo(nameof(TextMessageEntity)).Count == 0)
+        if (db.GetTableInfo(nameof(MessageEntity)).Count == 0)
         {
-            db.CreateTable<TextMessageEntity>();
+            db.CreateTable<MessageEntity>();
         }
 
-        if (db.GetTableInfo(nameof(SmsAttachmentEntity)).Count == 0)
+        if (db.GetTableInfo(nameof(AttachmentEntity)).Count == 0)
         {
-            db.CreateTable<SmsAttachmentEntity>();
+            db.CreateTable<AttachmentEntity>();
         }
 
         return db;

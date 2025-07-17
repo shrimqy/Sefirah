@@ -1,6 +1,8 @@
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Sefirah.Data.AppDatabase.Models;
 using Sefirah.Data.Models;
+using Sefirah.Data.Models.Messages;
 using SQLite;
 
 namespace Sefirah.Data.AppDatabase.Repository;
@@ -18,12 +20,12 @@ public class SmsRepository
 
     #region Conversation Operations
 
-    public async Task<SmsConversationEntity?> GetConversationAsync(string deviceId, long threadId)
+    public async Task<ConversationEntity?> GetConversationAsync(string deviceId, long threadId)
     {
         try
         {
             return await Task.Run(() => 
-                databaseContext.Database.Table<SmsConversationEntity>()
+                databaseContext.Database.Table<ConversationEntity>()
                     .FirstOrDefault(c => c.DeviceId == deviceId && c.ThreadId == threadId));
         }
         catch (Exception ex)
@@ -33,12 +35,12 @@ public class SmsRepository
         }
     }
 
-    public async Task<List<SmsConversationEntity>> GetConversationsAsync(string deviceId)
+    public async Task<List<ConversationEntity>> GetConversationsAsync(string deviceId)
     {
         try
         {
             return await Task.Run(() => 
-                databaseContext.Database.Table<SmsConversationEntity>()
+                databaseContext.Database.Table<ConversationEntity>()
                     .Where(c => c.DeviceId == deviceId)
                     .OrderByDescending(c => c.LastMessageTimestamp)
                     .ToList());
@@ -50,7 +52,7 @@ public class SmsRepository
         }
     }
 
-    public async Task<bool> SaveConversationAsync(SmsConversationEntity conversation)
+    public async Task<bool> SaveConversationAsync(ConversationEntity conversation)
     {
         try
         {
@@ -71,7 +73,7 @@ public class SmsRepository
             await Task.Run(() =>
             {
                 // Delete conversation
-                databaseContext.Database.Delete<SmsConversationEntity>(threadId);
+                databaseContext.Database.Delete<ConversationEntity>(threadId);
                 
                 // Delete associated messages
                 databaseContext.Database.Execute("DELETE FROM TextMessageEntity WHERE DeviceId = ? AND ThreadId = ?", deviceId, threadId);
@@ -90,12 +92,12 @@ public class SmsRepository
 
     #region Message Operations
 
-    public async Task<List<TextMessageEntity>> GetMessagesAsync(string deviceId, long threadId)
+    public async Task<List<MessageEntity>> GetMessagesAsync(string deviceId, long threadId)
     {
         try
         {
             return await Task.Run(() => 
-                databaseContext.Database.Table<TextMessageEntity>()
+                databaseContext.Database.Table<MessageEntity>()
                     .Where(m => m.DeviceId == deviceId && m.ThreadId == threadId)
                     .OrderBy(m => m.Timestamp)
                     .ToList());
@@ -107,7 +109,7 @@ public class SmsRepository
         }
     }
 
-    public async Task<List<TextMessageEntity>> GetMessagesWithAttachmentsAsync(string deviceId, long threadId)
+    public async Task<List<MessageEntity>> GetMessagesWithAttachmentsAsync(string deviceId, long threadId)
     {
         try
         {
@@ -136,13 +138,11 @@ public class SmsRepository
         }
     }
 
-    public async Task<TextMessageEntity?> GetMessageAsync(string deviceId, long uniqueId)
+    public List<MessageEntity>? GetMessageAsync(string deviceId, long uniqueId)
     {
         try
         {
-            return await Task.Run(() => 
-                databaseContext.Database.Table<TextMessageEntity>()
-                    .FirstOrDefault(m => m.DeviceId == deviceId && m.UniqueId == uniqueId));
+            return databaseContext.Database.Table<MessageEntity>().Where(m => m.DeviceId == deviceId && m.UniqueId == uniqueId).ToList();
         }
         catch (Exception ex)
         {
@@ -151,7 +151,7 @@ public class SmsRepository
         }
     }
 
-    public async Task<bool> SaveMessageAsync(TextMessageEntity message)
+    public async Task<bool> SaveMessageAsync(MessageEntity message)
     {
         try
         {
@@ -165,7 +165,7 @@ public class SmsRepository
         }
     }
 
-    public async Task<bool> SaveMessagesAsync(List<TextMessageEntity> messages)
+    public async Task<bool> SaveMessagesAsync(List<MessageEntity> messages)
     {
         try
         {
@@ -217,17 +217,48 @@ public class SmsRepository
         }
     }
 
-    public async Task<ContactEntity?> GetContactAsync(string deviceId, string phoneNumber)
+    public async Task<List<ContactEntity>> GetAllContactsAsync()
+    {
+        try
+        {
+            return await Task.Run(() =>
+            {
+                return databaseContext.Database.Table<ContactEntity>().ToList();
+            });
+        }
+        catch
+        {
+            return [];
+        }
+    }
+
+
+    public async Task<ContactEntity?> GetContactAsync(string deviceId, string phoneNumber)  
     {
         try
         {
             return await Task.Run(() => 
                 databaseContext.Database.Table<ContactEntity>()
-                    .FirstOrDefault(c => c.DeviceId == deviceId && c.PhoneNumber == phoneNumber));
+                    .FirstOrDefault(c => c.DeviceId == deviceId && c.Number == phoneNumber));
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error getting contact {PhoneNumber} for device {DeviceId}", phoneNumber, deviceId);
+            return null;
+        }
+    }
+
+    public async Task<ContactEntity?> GetContactByIdAsync(string deviceId, string contactId)
+    {
+        try
+        {
+            return await Task.Run(() => 
+                databaseContext.Database.Table<ContactEntity>()
+                    .FirstOrDefault(c => c.DeviceId == deviceId && c.Id == contactId));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error getting contact by ID {ContactId} for device {DeviceId}", contactId, deviceId);
             return null;
         }
     }
@@ -241,7 +272,7 @@ public class SmsRepository
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error saving contact {PhoneNumber} for device {DeviceId}", contact.PhoneNumber, contact.DeviceId);
+            logger.LogError(ex, "Error saving contact {PhoneNumber} for device {DeviceId}", contact.Number, contact.DeviceId);
             return false;
         }
     }
@@ -264,23 +295,23 @@ public class SmsRepository
 
     #region Attachment Operations
 
-    public async Task<List<SmsAttachmentEntity>> GetAttachmentsAsync(long messageUniqueId)
+    public async Task<List<AttachmentEntity>> GetAttachmentsAsync(long messageUniqueId)
     {
         try
         {
             return await Task.Run(() => 
-                databaseContext.Database.Table<SmsAttachmentEntity>()
+                databaseContext.Database.Table<AttachmentEntity>()
                     .Where(a => a.MessageUniqueId == messageUniqueId)
                     .ToList());
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error getting attachments for message {MessageUniqueId}, device {DeviceId}", messageUniqueId);
+            logger.LogError("Error getting attachments for message {MessageUniqueId}, device {DeviceId}", messageUniqueId, ex);
             return [];
         }
     }
 
-    public async Task<bool> SaveAttachmentAsync(SmsAttachmentEntity attachment)
+    public async Task<bool> SaveAttachmentAsync(AttachmentEntity attachment)
     {
         try
         {
@@ -289,12 +320,12 @@ public class SmsRepository
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error saving attachment for message {MessageUniqueId}, device {DeviceId}", attachment.MessageUniqueId);
+            logger.LogError("Error saving attachment for message {MessageUniqueId}, device {DeviceId}",attachment.MessageUniqueId, ex);
             return false;
         }
     }
 
-    public async Task<bool> SaveAttachmentsAsync(List<SmsAttachmentEntity> attachments)
+    public async Task<bool> SaveAttachmentsAsync(List<AttachmentEntity> attachments)
     {
         try
         {
@@ -312,9 +343,9 @@ public class SmsRepository
 
     #region Helper Methods
 
-    public static TextMessageEntity ToEntity(TextMessage message, string deviceId)
+    public static MessageEntity ToEntity(TextMessage message, string deviceId)
     {
-        return new TextMessageEntity
+        return new MessageEntity
         {
             UniqueId = message.UniqueId,
             ThreadId = message.ThreadId ?? 0,
@@ -324,74 +355,11 @@ public class SmsRepository
             Read = message.Read,
             SubscriptionId = message.SubscriptionId,
             MessageType = message.MessageType,
-            AddressesJson = message.Addresses.Count > 0 ? JsonSerializer.Serialize(message.Addresses) : null,
-            ContactsJson = message.Contacts.Count > 0 ? JsonSerializer.Serialize(message.Contacts) : null,
-            Addresses = message.Addresses,
-            Contacts = message.Contacts
+            Address = message.Addresses[0] // 0 index is for sender
         };
     }
 
-    public static TextMessage FromEntity(TextMessageEntity entity)
-    {
-        var message = new TextMessage
-        {
-            UniqueId = entity.UniqueId,
-            ThreadId = entity.ThreadId,
-            Body = entity.Body,
-            Timestamp = entity.Timestamp,
-            Read = entity.Read,
-            SubscriptionId = entity.SubscriptionId,
-            MessageType = entity.MessageType,
-            Addresses = entity.Addresses,
-            Contacts = entity.Contacts,
-            Attachments = entity.Attachments
-        };
-
-        // Deserialize JSON fields
-        if (!string.IsNullOrEmpty(entity.AddressesJson))
-        {
-            try
-            {
-                message.Addresses = JsonSerializer.Deserialize<List<string>>(entity.AddressesJson) ?? [];
-                entity.Addresses = message.Addresses;
-            }
-            catch (Exception)
-            {
-                message.Addresses = [];
-            }
-        }
-
-        if (!string.IsNullOrEmpty(entity.ContactsJson))
-        {
-            try
-            {
-                message.Contacts = JsonSerializer.Deserialize<List<Contact>>(entity.ContactsJson) ?? [];
-                entity.Contacts = message.Contacts;
-            }
-            catch (Exception)
-            {
-                message.Contacts = [];
-            }
-        }
-
-        return message;
-    }
-
-    public static SmsConversationEntity ToEntity(SmsConversation conversation, string deviceId)
-    {
-        return new SmsConversationEntity
-        {
-            ThreadId = conversation.ThreadId,
-            DeviceId = deviceId,
-            LastMessageTimestamp = conversation.LastMessageTimestamp,
-            LastMessageBody = conversation.LastMessage,
-            HasRead = true, // TODO: Implement proper read status
-            TimeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-            DisplayName = conversation.DisplayName
-        };
-    }
-
-    public static ContactEntity ToEntity(Contact contact, string deviceId)
+    public static ContactEntity ToEntity(ContactMessage contact, string deviceId)
     {
         byte[]? avatar = null;
         if (!string.IsNullOrEmpty(contact.PhotoBase64))
@@ -408,21 +376,39 @@ public class SmsRepository
 
         return new ContactEntity
         {
+            Id = contact.Id,
             DeviceId = deviceId,
-            ContactName = contact.ContactName,
-            PhoneNumber = contact.PhoneNumber,
+            LookupKey = contact.LookupKey,
+            DisplayName = contact.DisplayName,
+            Number = contact.Number,
             Avatar = avatar
         };
     }
 
-    public static SmsAttachmentEntity ToEntity(SmsAttachment attachment, long messageUniqueId)
+    public static AttachmentEntity ToEntity(SmsAttachment attachment, long messageUniqueId)
     {
-        return new SmsAttachmentEntity
+        return new AttachmentEntity
         {
             MessageUniqueId = messageUniqueId,
             Data = Convert.FromBase64String(attachment.Base64Data)
         };
     }
 
+    public static ConversationEntity ToEntity(TextConversation textConversation, string deviceId)
+    {
+        var latestMessage = textConversation.Messages.OrderByDescending(m => m.Timestamp).First();
+
+        Debug.WriteLine($"latestMessage: {latestMessage.Body} AddressesJson: {JsonSerializer.Serialize(textConversation.Recipients)}");
+        return new ConversationEntity
+        {
+            ThreadId = textConversation.ThreadId,
+            DeviceId = deviceId,
+            AddressesJson = JsonSerializer.Serialize(textConversation.Recipients),
+            HasRead = textConversation.Messages.Any(m => m.Read),
+            TimeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+            LastMessageTimestamp = latestMessage.Timestamp,
+            LastMessage = latestMessage.Body
+        };
+    }
     #endregion
 } 

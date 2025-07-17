@@ -1,18 +1,28 @@
+using Sefirah.Data.Models.Messages;
+using Sefirah.Helpers;
 using SQLite;
 
 namespace Sefirah.Data.AppDatabase.Models;
 
 public class ContactEntity
 {
-    [PrimaryKey, AutoIncrement]
-    public int Id { get; set; }
+    [PrimaryKey]
+    public string Id { get; set; } = string.Empty;
 
     [Indexed]
     public string DeviceId { get; set; } = string.Empty;
 
-    public string ContactName { get; set; } = string.Empty;
+    public string? LookupKey { get; set; }
 
-    public string PhoneNumber { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = string.Empty;
+
+    public string Number { get; set; } = string.Empty;
 
     public byte[]? Avatar { get; set; }
+
+    internal async Task<Contact> ToContact()
+    {
+        var displayName = !string.IsNullOrEmpty(DisplayName) ? DisplayName : Number;
+        return new Contact(Number, displayName, Avatar != null ? await Avatar.ToBitmapAsync() : null);
+    }
 } 
