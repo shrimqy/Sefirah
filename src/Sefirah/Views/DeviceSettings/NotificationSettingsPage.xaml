@@ -8,7 +8,7 @@
     xmlns:helpers="using:Sefirah.Helpers"
     xmlns:local="using:Sefirah.Views.DeviceSettings"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:models="using:Sefirah.Data.AppDatabase.Models"
+    xmlns:models="using:Sefirah.Data.Models"
     xmlns:wuc="using:CommunityToolkit.WinUI.Controls"
     mc:Ignorable="d">
 
@@ -57,14 +57,14 @@
                     Header="{helpers:ResourceString Name=AppSpecificSettings}"
                     ItemsSource="{x:Bind ViewModel.RemoteApps}">
                     <wuc:SettingsExpander.ItemTemplate>
-                        <DataTemplate x:DataType="models:ApplicationInfoEntity">
+                        <DataTemplate x:DataType="models:ApplicationInfo">
                             <wuc:SettingsCard>
                                 <wuc:SettingsCard.Header>
                                     <StackPanel Orientation="Horizontal" Spacing="20">
                                         <Image
                                             Width="32"
                                             Height="32"
-                                            Source="{x:Bind AppIcon}" />
+                                            Source="{x:Bind BitmapIcon}" />
                                         <TextBlock FontSize="16" Text="{x:Bind AppName}" />
                                     </StackPanel>
                                 </wuc:SettingsCard.Header>
@@ -73,15 +73,15 @@
                                         <MenuFlyout>
                                             <MenuFlyoutItem
                                                 Click="OnMenuFlyoutItemClick"
-                                                Tag="{x:Bind AppPackage}"
+                                                Tag="{x:Bind PackageName}"
                                                 Text="{helpers:ResourceString Name=NotificationFilterToastFeed/Content}" />
                                             <MenuFlyoutItem
                                                 Click="OnMenuFlyoutItemClick"
-                                                Tag="{x:Bind AppPackage}"
+                                                Tag="{x:Bind PackageName}"
                                                 Text="{helpers:ResourceString Name=NotificationFilterFeed/Content}" />
                                             <MenuFlyoutItem
                                                 Click="OnMenuFlyoutItemClick"
-                                                Tag="{x:Bind AppPackage}"
+                                                Tag="{x:Bind PackageName}"
                                                 Text="{helpers:ResourceString Name=NotificationFilterDisabled/Content}" />
                                         </MenuFlyout>
                                     </Button.Flyout>

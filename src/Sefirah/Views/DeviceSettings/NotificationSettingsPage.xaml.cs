@@ -32,7 +32,6 @@ public sealed partial class NotificationSettingsPage : Page
         if (sender is MenuFlyoutItem menuItem &&
             menuItem.Tag is string appPackage)
         {
-            Debug.WriteLine(" Filter: " + menuItem.Text);
             ViewModel.ChangeNotificationFilter(menuItem.Text, appPackage);
         }
     }

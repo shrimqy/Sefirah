@@ -1,192 +1,86 @@
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.UI.Xaml.Media.Imaging;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Helpers;
+using Sefirah.Utils;
 using SQLite;
-using Sefirah.Extensions;
 
 namespace Sefirah.Data.AppDatabase.Models;
 
-public partial class ApplicationInfoEntity : ObservableObject
+public partial class ApplicationInfoEntity
 {
     [PrimaryKey]
-    public string AppPackage { get; set; } = string.Empty;
+    public string PackageName { get; set; } = string.Empty;
     
     public string AppName { get; set; } = string.Empty;
     
-    private byte[]? _appIconBytes;
-    public byte[]? AppIconBytes 
-    { 
-        get => _appIconBytes;
-        set 
-        {
-            if (SetProperty(ref _appIconBytes, value))
-            {
-                _appIcon = null;
-                OnPropertyChanged(nameof(AppIcon));
-            }
-        }
-    }
+    public string? AppIconPath { get; set; }
 
-    private BitmapImage? _appIcon;
-
-    [NotMapped]
-    [Ignore]
-    public BitmapImage? AppIcon
-    {
-        get 
-        {
-            if (_appIcon == null && _appIconBytes != null)
-            {
-                _appIcon = _appIconBytes.ToBitmap();
-            }
-            return _appIcon;
-        }
-        set => SetProperty(ref _appIcon, value);
-    }
-    [SQLite.Column("AppDeviceInfo")]
+    [Column("AppDeviceInfo")]
     public string? AppDeviceInfoJson { get; set; }
 
-    private List<AppDeviceInfo>? _appDeviceInfo;
-
-    [Ignore]
-    public List<AppDeviceInfo> AppDeviceInfo
+    #region Helpers
+    internal async Task<ApplicationInfo> ToApplicationInfo()
     {
-        get
+        var appIcon = await ImageHelper.LoadFromPathAsync(AppIconPath);
+        
+        var deviceInfo = new List<AppDeviceInfo>();
+        if (!string.IsNullOrEmpty(AppDeviceInfoJson))
         {
-            if (_appDeviceInfo is null)
+            try
             {
-                if (string.IsNullOrEmpty(AppDeviceInfoJson))
-                {
-                    _appDeviceInfo = [];
-                }
-                else
-                {
-                    try
-                    {
-                        _appDeviceInfo = JsonSerializer.Deserialize<List<AppDeviceInfo>>(AppDeviceInfoJson) ?? [];
-                    }
-                    catch (JsonException)
-                    {
-                        // Handle cases where JSON might be invalid
-                        _appDeviceInfo = [];
-                    }
-                }
+                deviceInfo = JsonSerializer.Deserialize<List<AppDeviceInfo>>(AppDeviceInfoJson) ?? [];
             }
-            return _appDeviceInfo;
+            catch (JsonException)
+            {
+                deviceInfo = [];
+            }
         }
-        set
+
+        return new ApplicationInfo
         {
-            _appDeviceInfo = value;
-            AppDeviceInfoJson = JsonSerializer.Serialize(value);
-        }
-    }
-
-    private bool _isLoading;
-    public bool IsLoading
-    {
-        get => _isLoading;
-        set 
-        {
-            SetProperty(ref _isLoading, value);
-        }
-    }
-
-    public void AddDevice(string deviceId)
-    {
-        var devices = new List<AppDeviceInfo>(AppDeviceInfo);
-        if (!devices.Any(d => d.DeviceId == deviceId))
-        {
-            devices.Add(new AppDeviceInfo { DeviceId = deviceId, Filter = NotificationFilter.ToastFeed });
-            AppDeviceInfo = devices;
-        }
-    }
-
-    public void RemoveDevice(string deviceId)
-    {
-        var devices = new List<AppDeviceInfo>(AppDeviceInfo);
-        var deviceToRemove = devices.FirstOrDefault(d => d.DeviceId == deviceId);
-        if (deviceToRemove is not null)
-        {
-            devices.Remove(deviceToRemove);
-            AppDeviceInfo = devices;
-        }
-    }
-
-    public bool HasDevice(string deviceId)
-    {
-        return AppDeviceInfo.Any(d => d.DeviceId == deviceId);
-    }
-
-    public bool IsPinned(string deviceId)
-    {
-        var deviceInfo = AppDeviceInfo.FirstOrDefault(d => d.DeviceId == deviceId);
-        return deviceInfo?.Pinned ?? false;
-    }
-
-    public void SetPinned(string deviceId, bool pinned)
-    {
-        var devices = new List<AppDeviceInfo>(AppDeviceInfo);
-        var deviceInfo = devices.FirstOrDefault(d => d.DeviceId == deviceId);
-        if (deviceInfo != null)
-        {
-            deviceInfo.Pinned = pinned;
-            AppDeviceInfo = devices;
-        }
-    }
-
-    public static ApplicationInfoEntity FromApplicationInfo(ApplicationInfo info, string deviceId)
-    {
-        return new ApplicationInfoEntity
-        {
-            AppPackage = info.PackageName,
-            AppName = info.AppName,
-            AppIconBytes = !string.IsNullOrEmpty(info.AppIcon) 
-                ? Convert.FromBase64String(info.AppIcon) 
-                : null, 
-            AppDeviceInfo = [new AppDeviceInfo { DeviceId = deviceId, Filter = NotificationFilter.ToastFeed }],
+            PackageName = PackageName,
+            AppName = AppName,
+            BitmapIcon = appIcon,
+            IconPath = AppIconPath,
+            DeviceInfo = deviceInfo
         };
     }
 
-    public static Dictionary<NotificationFilter, string> NotificationFilterTypes { get; } = new()
+    internal static ApplicationInfoEntity FromApplicationInfo(ApplicationInfo info, string deviceId)
     {
-        { NotificationFilter.ToastFeed, "NotificationFilterToastFeed.Content".GetLocalizedResource() },
-        { NotificationFilter.Feed, "NotificationFilterFeed.Content".GetLocalizedResource() },
-        { NotificationFilter.Disabled, "NotificationFilterDisabled.Content".GetLocalizedResource() }
-    };
-
-    public string GetNotificationFilter(string deviceId)
-    {
-        var deviceInfo = AppDeviceInfo.FirstOrDefault(d => d.DeviceId == deviceId);
-        if (deviceInfo != null)
+        List<AppDeviceInfo> appDeviceInfo = [new AppDeviceInfo { DeviceId = deviceId, Filter = NotificationFilter.ToastFeed }];
+        return new ApplicationInfoEntity
         {
-            return NotificationFilterTypes[deviceInfo.Filter];
-        }
-        // Return default if device not found
-        return NotificationFilterTypes[NotificationFilter.ToastFeed];
+            PackageName = info.PackageName,
+            AppName = info.AppName,
+            AppIconPath = info.IconPath,
+            AppDeviceInfoJson = JsonSerializer.Serialize(appDeviceInfo)
+        };  
     }
 
-    public string currentNotificationFilter;
-    public string CurrentNotificationFilter
+    internal static async Task<ApplicationInfoEntity> FromApplicationInfoMessage(ApplicationInfoMessage info, string deviceId)
     {
-        get => currentNotificationFilter;
-        set
+        string? appIconPath = null;
+        if (!string.IsNullOrEmpty(info.AppIcon))
         {
-            currentNotificationFilter = value;
-            OnPropertyChanged(nameof(CurrentNotificationFilter));
+            try
+            {
+                var iconBytes = Convert.FromBase64String(info.AppIcon);
+                var fileName = $"{info.PackageName}.png";
+                appIconPath = await ImageUtils.SaveAppIconToPathAsync(iconBytes, fileName);
+            }
+            catch (Exception) { }
         }
-    }
 
-    public void UpdateNotificationFilter(string deviceId)
-    {
-        CurrentNotificationFilter = GetNotificationFilter(deviceId);
-    }
-}
+        List<AppDeviceInfo> appDeviceInfo = [new AppDeviceInfo { DeviceId = deviceId, Filter = NotificationFilter.ToastFeed }];
 
-public class AppDeviceInfo
-{
-    public string DeviceId { get; set; }
-    public NotificationFilter Filter { get; set; }
-    public bool Pinned { get; set; } = false;
+        return new ApplicationInfoEntity
+        {
+            PackageName = info.PackageName,
+            AppName = info.AppName,
+            AppIconPath = appIconPath,
+            AppDeviceInfoJson = JsonSerializer.Serialize(appDeviceInfo)
+        };
+    }
+    #endregion
 }

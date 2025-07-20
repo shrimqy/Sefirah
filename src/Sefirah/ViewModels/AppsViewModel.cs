@@ -1,11 +1,8 @@
 using CommunityToolkit.WinUI;
-using Sefirah.Data.AppDatabase.Models;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
-using Sefirah.Services;
-using Sefirah.Utils;
 using Sefirah.Utils.Serialization;
 
 namespace Sefirah.ViewModels;
@@ -15,8 +12,8 @@ public sealed partial class AppsViewModel : BaseViewModel
     private IScreenMirrorService ScreenMirrorService { get; } = Ioc.Default.GetRequiredService<IScreenMirrorService>();
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
     private ISessionManager SessionManager { get; } = Ioc.Default.GetRequiredService<ISessionManager>();
-    public ObservableCollection<ApplicationInfoEntity> Apps => RemoteAppsRepository.Applications;
-    public ObservableCollection<ApplicationInfoEntity> PinnedApps => RemoteAppsRepository.PinnedApplications;
+    public ObservableCollection<ApplicationInfo> Apps => RemoteAppsRepository.Applications;
+    public ObservableCollection<ApplicationInfo> PinnedApps => RemoteAppsRepository.PinnedApplications;
     private IAdbService AdbService { get; } = Ioc.Default.GetRequiredService<IAdbService>();
 
     [ObservableProperty]
@@ -32,7 +29,6 @@ public sealed partial class AppsViewModel : BaseViewModel
     {
         LoadApps();
         
-        // Subscribe to application list updates to stop loading
         RemoteAppsRepository.ApplicationListUpdated += OnApplicationListUpdated;
         ((INotifyPropertyChanged)DeviceManager).PropertyChanged += (s, e) =>
         {
@@ -42,7 +38,7 @@ public sealed partial class AppsViewModel : BaseViewModel
     }
 
 
-    private void LoadApps()
+    private async void LoadApps()
     {
         try
         {
@@ -55,7 +51,7 @@ public sealed partial class AppsViewModel : BaseViewModel
                 return;
             }
             
-            RemoteAppsRepository.LoadApplicationsFromDevice(activeDevice.Id);
+            await RemoteAppsRepository.LoadApplicationsFromDevice(activeDevice.Id);
         
         }
         catch (Exception ex)
@@ -64,10 +60,8 @@ public sealed partial class AppsViewModel : BaseViewModel
         }
         finally
         {
-            // Add a small delay to make loading indicator visible, then clear it
-            App.MainWindow!.DispatcherQueue.EnqueueAsync(async () =>
+            await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
             {
-                await Task.Delay(200); 
                 IsLoading = false;
             });
         }
@@ -78,59 +72,58 @@ public sealed partial class AppsViewModel : BaseViewModel
         App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
         {
             IsLoading = false;
-            LoadApps();
             OnPropertyChanged(nameof(IsEmpty));
             OnPropertyChanged(nameof(HasPinnedApps));
         });
     }
 
     [RelayCommand]
-    public async Task UninstallApp(ApplicationInfoEntity app)
+    public async Task UninstallApp(ApplicationInfo app)
     {
         try
         {
             if (app == null) return;
 
-            await AdbService.UninstallApp(DeviceManager.ActiveDevice!.Id, app.AppPackage);
+            await AdbService.UninstallApp(DeviceManager.ActiveDevice!.Id, app.PackageName);
             Apps.Remove(app);
-            RemoteAppsRepository.RemoveDeviceFromApplication(app.AppPackage, DeviceManager.ActiveDevice!.Id);
+            await RemoteAppsRepository.RemoveDeviceFromApplication(app.PackageName, DeviceManager.ActiveDevice!.Id);
             OnPropertyChanged(nameof(IsEmpty));
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error uninstalling app: {AppPackage}", app?.AppPackage);
+            Logger.LogError(ex, "Error uninstalling app: {AppPackage}", app?.PackageName);
         }
     }
 
     [RelayCommand]
-    public void PinApp(ApplicationInfoEntity app)
+    public async Task PinApp(ApplicationInfo app)
     {
         try
         {
             if (app == null || DeviceManager.ActiveDevice == null) return;
 
-            RemoteAppsRepository.PinApp(app.AppPackage, DeviceManager.ActiveDevice.Id);
+            await RemoteAppsRepository.PinApp(app.PackageName, DeviceManager.ActiveDevice.Id);
             OnPropertyChanged(nameof(HasPinnedApps));
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error pinning app: {AppPackage}", app?.AppPackage);
+            Logger.LogError(ex, "Error pinning app: {AppPackage}", app?.PackageName);
         }
     }
 
     [RelayCommand]
-    public void UnpinApp(ApplicationInfoEntity app)
+    public async Task UnpinApp(ApplicationInfo app)
     {
         try
         {
             if (app == null || DeviceManager.ActiveDevice == null) return;
 
-            RemoteAppsRepository.UnpinApp(app.AppPackage, DeviceManager.ActiveDevice.Id);
+            await RemoteAppsRepository.UnpinApp(app.PackageName, DeviceManager.ActiveDevice.Id);
             OnPropertyChanged(nameof(HasPinnedApps));
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error unpinning app: {AppPackage}", app?.AppPackage);
+            Logger.LogError(ex, "Error unpinning app: {AppPackage}", app?.PackageName);
         }
     }
 
@@ -147,7 +140,7 @@ public sealed partial class AppsViewModel : BaseViewModel
                     return;
                 }
 
-                var app = Apps.FirstOrDefault(a => a.AppPackage == appPackage);
+                var app = Apps.FirstOrDefault(a => a.PackageName == appPackage);
                 if (app == null)
                 {
                     Logger.LogWarning("App not found: {AppPackage}", appPackage);
@@ -159,8 +152,9 @@ public sealed partial class AppsViewModel : BaseViewModel
                 {
                     Apps[index].IsLoading = true;
                     Logger.LogDebug("Opening app: {AppPackage} on device: {DeviceId}", appPackage, activeDevice.Id);
-                    var filePath = await ImageUtils.SaveToFilePathAsync(app.AppIconBytes, "appIcon.png");
-
+                    
+                    // Use the icon path directly for saving
+                    var filePath = app.IconPath;
                     var started = await ScreenMirrorService.StartScrcpy(device: activeDevice, customArgs: $"--start-app={appPackage} --window-title={appName}", iconPath: filePath);
                     if (started)
                     {

@@ -1,5 +1,5 @@
 using Microsoft.UI.Xaml.Input;
-using Sefirah.Data.AppDatabase.Models;
+using Sefirah.Data.Models;
 using Sefirah.ViewModels;
 
 namespace Sefirah.Views;
@@ -15,9 +15,9 @@ public sealed partial class AppsPage : Page
 
     private async void AppsGridView_ItemClick(object sender, ItemClickEventArgs e)
     {
-        if (e.ClickedItem is ApplicationInfoEntity app)
+        if (e.ClickedItem is ApplicationInfo app)
         {
-            await ViewModel.OpenApp(app.AppPackage, app.AppName);
+            await ViewModel.OpenApp(app.PackageName, app.AppName);
         }
     }
 
@@ -45,7 +45,7 @@ public sealed partial class AppsPage : Page
 
     private void AppSearchBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
     {
-        if (args.SelectedItem is ApplicationInfoEntity selectedApp)
+        if (args.SelectedItem is ApplicationInfo selectedApp)
         {
             sender.Text = selectedApp.AppName;
         }
@@ -53,12 +53,12 @@ public sealed partial class AppsPage : Page
 
     private async void AppSearchBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
     {
-        if (args.ChosenSuggestion is ApplicationInfoEntity selectedApp)
+        if (args.ChosenSuggestion is ApplicationInfo selectedApp)
         {
             sender.Text = string.Empty;
             sender.ItemsSource = null;
 
-            await ViewModel.OpenApp(selectedApp.AppPackage, selectedApp.AppName);
+            await ViewModel.OpenApp(selectedApp.PackageName, selectedApp.AppName);
         }
     }
 }

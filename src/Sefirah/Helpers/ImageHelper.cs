@@ -75,7 +75,7 @@ public static class ImageHelper
         }
     }
 
-    public static async Task<string> ToBase64Async(IRandomAccessStreamReference data)
+    public static async Task<string> ToBase64Async(this IRandomAccessStreamReference data)
     {
         try
         {
@@ -89,6 +89,32 @@ public static class ImageHelper
         catch (Exception)
         {
             return string.Empty;
+        }
+    }
+
+    public static async Task<BitmapImage?> LoadFromPathAsync(string? filePath, int decodeSize = -1)
+    {
+        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
+        {
+            return null;
+        }
+
+        try
+        {
+            using var stream = File.OpenRead(filePath);
+            var image = new BitmapImage();
+            if (decodeSize > 0)
+            {
+                image.DecodePixelWidth = decodeSize;
+                image.DecodePixelHeight = decodeSize;
+            }
+            image.DecodePixelType = DecodePixelType.Logical;
+            await image.SetSourceAsync(stream.AsRandomAccessStream());
+            return image;
+        }
+        catch (Exception)
+        {
+            return null;
         }
     }
 }

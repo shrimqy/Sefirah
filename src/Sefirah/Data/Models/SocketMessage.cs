@@ -1,4 +1,5 @@
 using Sefirah.Data.Enums;
+using SkiaSharp;
 
 namespace Sefirah.Data.Models;
 
@@ -13,7 +14,7 @@ namespace Sefirah.Data.Models;
 [JsonDerivedType(typeof(PlaybackSession), typeDiscriminator: "7")]
 [JsonDerivedType(typeof(FileTransfer), typeDiscriminator: "8")]
 [JsonDerivedType(typeof(BulkFileTransfer), typeDiscriminator: "9")]
-[JsonDerivedType(typeof(ApplicationInfo), typeDiscriminator: "10")]
+[JsonDerivedType(typeof(ApplicationInfoMessage), typeDiscriminator: "10")]
 [JsonDerivedType(typeof(SftpServerInfo), typeDiscriminator: "11")]
 [JsonDerivedType(typeof(UdpBroadcast), typeDiscriminator: "12")]
 [JsonDerivedType(typeof(DeviceRingerMode), typeDiscriminator: "13")]
@@ -83,7 +84,7 @@ public class NotificationMessage : SocketMessage
     public string? Text { get; set; }
 
     [JsonPropertyName("messages")]
-    public List<Message>? Messages { get; set; }
+    public List<NotificationTextMessage>? Messages { get; set; }
 
     [JsonPropertyName("tag")]
     public string? Tag { get; set; }
@@ -134,13 +135,13 @@ public class NotificationAction : SocketMessage
     public bool IsReplyAction { get; set; }
 }
 
-public class GroupedMessage
+public class GroupedNotificationTextMessage
 {
     public string Sender { get; set; }
     public List<string> Messages { get; set; }
 }
 
-public class Message
+public class NotificationTextMessage
 {
     [JsonPropertyName("sender")]
     public string Sender { get; set; }
@@ -326,10 +327,10 @@ public class StorageInfo : SocketMessage
 
 public class ApplicationList : SocketMessage
 {
-    public required List<ApplicationInfo> AppList { get; set; }
+    public required List<ApplicationInfoMessage> AppList { get; set; }
 }
 
-public class ApplicationInfo : SocketMessage
+public class ApplicationInfoMessage : SocketMessage
 {
     [JsonPropertyName("packageName")]
     public required string PackageName { get; set; }

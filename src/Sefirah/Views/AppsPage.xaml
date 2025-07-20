@@ -7,7 +7,7 @@
     xmlns:helpers="using:Sefirah.Helpers"
     xmlns:local="using:Sefirah.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:models="using:Sefirah.Data.AppDatabase.Models"
+    xmlns:models="using:Sefirah.Data.Models"
     xmlns:vm="using:Sefirah.ViewModels"
     x:Name="AppPageRoot"
     Background="Transparent"
@@ -23,7 +23,7 @@
         <converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
     </Page.Resources>
 
-    <Grid Margin="16,12">
+    <Grid Margin="16,12,0,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -80,7 +80,7 @@
                         <Image
                             Width="36"
                             Height="36"
-                            Source="{Binding AppIcon, Mode=OneWay}"
+                            Source="{Binding BitmapIcon, Mode=OneWay}"
                             Stretch="Uniform" />
                         <TextBlock
                             Margin="12,0,0,0"
@@ -95,6 +95,7 @@
             Grid.Row="1"
             Grid.Column="0"
             Grid.ColumnSpan="3"
+            Padding="0,0,20,0"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             HorizontalScrollBarVisibility="Disabled"
@@ -123,7 +124,7 @@
                         </GridView.ItemContainerStyle>
 
                         <GridView.ItemTemplate>
-                            <DataTemplate x:DataType="models:ApplicationInfoEntity">
+                            <DataTemplate x:DataType="models:ApplicationInfo">
                                 <Grid
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
@@ -161,7 +162,7 @@
                                         Height="48"
                                         Margin="0,10,0,10"
                                         HorizontalAlignment="Center"
-                                        Source="{x:Bind AppIcon, Mode=OneWay}"
+                                        Source="{x:Bind BitmapIcon, Mode=OneWay}"
                                         Stretch="Uniform"
                                         Visibility="{x:Bind IsLoading, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
 
@@ -224,7 +225,7 @@
                         </GridView.ItemContainerStyle>
 
                         <GridView.ItemTemplate>
-                            <DataTemplate x:DataType="models:ApplicationInfoEntity">
+                            <DataTemplate x:DataType="models:ApplicationInfo">
                                 <Grid
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
@@ -262,7 +263,7 @@
                                         Height="48"
                                         Margin="0,10,0,10"
                                         HorizontalAlignment="Center"
-                                        Source="{x:Bind AppIcon, Mode=OneWay}"
+                                        Source="{x:Bind BitmapIcon, Mode=OneWay}"
                                         Stretch="Uniform"
                                         Visibility="{x:Bind IsLoading, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
 
