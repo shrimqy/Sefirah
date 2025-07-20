@@ -4,15 +4,15 @@ using Microsoft.Windows.AppLifecycle;
 using Sefirah.Helpers;
 using Sefirah.Views;
 using Sefirah.Views.Onboarding;
-using Uno.Resizetizer;
 using Windows.ApplicationModel.Activation;
 using LaunchActivatedEventArgs = Microsoft.UI.Xaml.LaunchActivatedEventArgs;
 using H.NotifyIcon;
 using Sefirah.Data.Contracts;
 using System.Runtime.InteropServices;
-
-
-
+using Uno.Resizetizer;
+using Sefirah.Extensions;
+using Sefirah.Data.Enums;
+using Microsoft.UI.Windowing;
 #if WINDOWS
 using Sefirah.Platforms.Windows.Helpers;
 #endif
@@ -20,6 +20,11 @@ using Sefirah.Platforms.Windows.Helpers;
 namespace Sefirah;
 public partial class App : Application
 {
+    public static TaskCompletionSource? SplashScreenLoadingTCS { get; private set; }
+    public static bool HandleClosedEvents { get; set; } = true;
+    public static Window? MainWindow { get; private set; }
+    protected IHost? Host { get; private set; }
+
     public App()
     {
         InitializeComponent();
@@ -28,64 +33,98 @@ public partial class App : Application
         AppDomain.CurrentDomain.UnhandledException += (sender, e) => AppLifecycleHelper.HandleAppUnhandledException(e.ExceptionObject as Exception);
         TaskScheduler.UnobservedTaskException += (sender, e) => AppLifecycleHelper.HandleAppUnhandledException(e.Exception);
     }
-    public static bool HandleClosedEvents { get; set; } = true;
-    public static Window? MainWindow { get; private set; }
-    protected IHost? Host { get; private set; }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        var builder = this.ConfigureApp(args);
-            
-        MainWindow = builder.Window;
+        _ = ActivateAsync();
+
+        async Task ActivateAsync()
+        {
+            var builder = this.ConfigureApp(args);
+            MainWindow = builder.Window;
+            MainWindow.AppWindow.Title = "Sefirah";
+            MainWindow.SetWindowIcon();
 #if WINDOWS
-        MainWindow.ExtendsContentIntoTitleBar = true;
-        MainWindow.SystemBackdrop = new MicaBackdrop();
+            MainWindow.ExtendsContentIntoTitleBar = true;
+            MainWindow.SystemBackdrop = new MicaBackdrop();
 #endif
-        MainWindow.AppWindow.Title = "Sefirah";
 #if DEBUG
-        MainWindow.UseStudio();
+            MainWindow.UseStudio();
 #endif
-        MainWindow.SetWindowIcon();
+            Host = builder.Build();
+            Ioc.Default.ConfigureServices(Host.Services);
+            await Host.StartAsync();
 
-        Host = builder.Build();
-        Ioc.Default.ConfigureServices(Host.Services);
-        Host.StartAsync();
-
+            bool isStartupTask = false;
 #if WINDOWS
-        HookEventsForWindow();
+            var appActivationArguments = Microsoft.Windows.AppLifecycle.AppInstance.GetCurrent().GetActivatedEventArgs();
+            isStartupTask = appActivationArguments.Data is IStartupTaskActivatedEventArgs;
+
+            HookEventsForWindow();
+            bool isStartupRegistered = ApplicationData.Current.LocalSettings.Values["isStartupRegistered"] == null;
+            if (isStartupRegistered)
+            {
+                await AppLifecycleHelper.HandleStartupTaskAsync(true);
+                ApplicationData.Current.LocalSettings.Values["isStartupRegistered"] = true;
+            }
 #endif
-        var rootFrame = EnsureWindowIsInitialized();
+            var rootFrame = EnsureWindowIsInitialized();
+            if (rootFrame is null)
+                return;
 
-        if (rootFrame is null)
-            return;
-
-        switch (args)
-        {
-            default:
-                bool isOnboarding = ApplicationData.Current.LocalSettings.Values["HasCompletedOnboarding"] == null;
-                if (isOnboarding)
+            if (isStartupTask)
+            {
+                var userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
+                var startupOption = userSettingsService.GeneralSettingsService.StartupOption;
+                switch (startupOption)
                 {
-                    // Navigate to onboarding page
-                    rootFrame.Navigate(typeof(WelcomePage), null, new SuppressNavigationTransitionInfo());
-                }
-                else
-                {
-                    // Navigate to main page
-                    rootFrame.Navigate(typeof(MainPage), null, new SuppressNavigationTransitionInfo());
-                }
-                break;
-        }
-        bool isStartupRegistered = ApplicationData.Current.LocalSettings.Values["isStartupRegistered"] == null;
-        if (isStartupRegistered)
-        {
-            AppLifecycleHelper.HandleStartupTaskAsync(true);
-            ApplicationData.Current.LocalSettings.Values["isStartupRegistered"] = true;
-        }
+                    case StartupOptions.InTray:
+                        // Don't activate or show the window
+                        break;
+                    case StartupOptions.Minimized:
+                        // Need to show the window first, then minimize it
+                        MainWindow.Activate();
+                        await Task.Delay(200);
+                        OverlappedPresenter overlappedPresenter = (MainWindow.AppWindow.Presenter as OverlappedPresenter) ?? OverlappedPresenter.Create();
+                        if (overlappedPresenter.IsMinimizable)
+                        {
+                            overlappedPresenter.Minimize();
+                        }
+                        break;
+                    default:
+                        MainWindow.Activate();
+                        MainWindow.AppWindow.Show();
+                        break;
+                };
+            }
+            else 
+            {
+                MainWindow!.Activate();
+                // Wait for the Window to initialize
+                await Task.Delay(10);
+                MainWindow.AppWindow.Show();
+            }
 
-        MainWindow!.Activate();
-        MainWindow.AppWindow.Show();
+            rootFrame.Navigate(typeof(Views.SplashScreen));
 
-        _ = AppLifecycleHelper.InitializeAppComponentsAsync();
+            SplashScreenLoadingTCS = new TaskCompletionSource();
+            await SplashScreenLoadingTCS!.Task.WithTimeoutAsync(TimeSpan.FromMilliseconds(500));
+            SplashScreenLoadingTCS = null;
+
+            await AppLifecycleHelper.InitializeAppComponentsAsync();
+
+            bool isOnboarding = ApplicationData.Current.LocalSettings.Values["HasCompletedOnboarding"] == null;
+            if (isOnboarding)
+            {
+                // Navigate to onboarding page
+                rootFrame.Navigate(typeof(WelcomePage), null, new SuppressNavigationTransitionInfo());
+            }
+            else
+            {
+                // Navigate to main page
+                rootFrame.Navigate(typeof(MainPage), null, new SuppressNavigationTransitionInfo());
+            }
+        }
     }
 
     public Frame? EnsureWindowIsInitialized()
@@ -113,7 +152,19 @@ public partial class App : Application
             return null;
         }
     }
+
+
 #if WINDOWS
+
+    /// <summary>
+    /// Gets invoked when the application is activated.
+    /// </summary>
+    public async Task OnActivatedAsync(AppActivationArguments activatedEventArgs)
+    {
+        // InitializeApplication accesses UI, needs to be called on UI thread
+        await MainWindow!.DispatcherQueue.EnqueueAsync(() => InitializeApplicationAsync(activatedEventArgs));
+    }
+
     public async Task InitializeApplicationAsync(AppActivationArguments activatedEventArgs)
     {
         switch (activatedEventArgs.Data)
@@ -127,27 +178,7 @@ public partial class App : Application
                 MainWindow!.AppWindow.Show();
                 MainWindow!.Activate();
                 break;
-    }
-    }
-#endif
-
-    public void ShowSplashScreen()
-    {
-        var rootFrame = EnsureWindowIsInitialized();
-        if (rootFrame is null)
-            return; 
-
-        rootFrame.Navigate(typeof(Views.SplashScreen));
-    }
-
-#if WINDOWS
-    /// <summary>
-    /// Gets invoked when the application is activated.
-    /// </summary>
-    public async Task OnActivatedAsync(AppActivationArguments activatedEventArgs)
-    {
-        // InitializeApplication accesses UI, needs to be called on UI thread
-        await MainWindow!.DispatcherQueue.EnqueueAsync(() => InitializeApplicationAsync(activatedEventArgs));
+        }
     }
 
     private void HookEventsForWindow()
@@ -160,7 +191,6 @@ public partial class App : Application
     {
         if (HandleClosedEvents)
         {
-            // If HandleClosedEvents is true, we hide the window (tray icon exit logic can change this)
             args.Handled = true;
             MainWindow!.Hide();
         }
