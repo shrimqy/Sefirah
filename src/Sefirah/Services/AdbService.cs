@@ -1,36 +1,18 @@
+using System.Net;
 using AdvancedSharpAdbClient;
 using AdvancedSharpAdbClient.DeviceCommands;
 using AdvancedSharpAdbClient.Models;
 using AdvancedSharpAdbClient.Receivers;
 using CommunityToolkit.WinUI;
-using Microsoft.UI.Dispatching;
 using Sefirah.Data.Contracts;
+using Sefirah.Data.Enums;
 using Sefirah.Data.Items;
 using Sefirah.Data.Models;
-using System.Net;
-using System.Diagnostics;
 
 namespace Sefirah.Services;
 
-public interface IAdbService
-{
-    ObservableCollection<AdbDevice> AdbDevices { get; }
-    ObservableCollection<ScrcpyPreferenceItem> DisplayOrientationOptions { get; }
-    ObservableCollection<ScrcpyPreferenceItem> VideoCodecOptions { get; }
-    ObservableCollection<ScrcpyPreferenceItem> AudioCodecOptions { get; }
-    Task StartAsync();
-    Task<bool> ConnectWireless(string? host, int port=5555);
-    Task StopAsync();   
-    Task UninstallApp(string deviceId, string appPackage);
-    void UnlockDevice(DeviceData deviceData, List<string> unlockCommands);
-    bool IsMonitoring { get; }
-    AdbClient AdbClient { get; }
-    void TryConnectTcp(string host);
-}
-
 public class AdbService(
     ILogger<AdbService> logger,
-    IDeviceManager deviceManager,
     IUserSettingsService userSettingsService
 ) : IAdbService
 {
@@ -110,6 +92,8 @@ public class AdbService(
             deviceMonitor.DeviceConnected += DeviceConnected;
             deviceMonitor.DeviceDisconnected += DeviceDisconnected;
             deviceMonitor.DeviceChanged += DeviceChanged;
+
+            await Task.Delay(50);
             
             await deviceMonitor.StartAsync();
             
@@ -272,7 +256,7 @@ public class AdbService(
     private async Task RefreshDevicesAsync()
     {
         var devices = await adbClient.GetDevicesAsync();
-        if (!devices.Any())
+        if (devices.Any())
         {
             logger.LogWarning("No devices found");
             await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
@@ -410,16 +394,12 @@ public class AdbService(
         try
         {
             logger.LogInformation("Unlocking device");
-            // Check if device is locked by checking the lock screen state
-            ConsoleOutputReceiver consoleReceiver = new();
-            await adbClient.ExecuteShellCommandAsync(deviceData, "dumpsys window policy | grep 'showing=' | cut -d '=' -f2", consoleReceiver);
-            var isLocked = consoleReceiver.ToString().Trim() == "true";
-            if (isLocked)
+            if (await IsLocked(deviceData))
             {
                 foreach (var command in commands)
                 {
                     logger.LogInformation("Executing command: {command}", command);
-                    await adbClient.ExecuteShellCommandAsync(deviceData, command, consoleReceiver);
+                    await adbClient.ExecuteShellCommandAsync(deviceData, command);
                     await Task.Delay(250);
                 }
             }
@@ -428,6 +408,13 @@ public class AdbService(
         { 
             logger.LogError("Error unlocking device: {ex}", ex);
         }
+    }
+
+    public async Task<bool> IsLocked(DeviceData deviceData)
+    {
+        ConsoleOutputReceiver consoleReceiver = new();
+        await adbClient.ExecuteShellCommandAsync(deviceData, "dumpsys window policy | grep 'showing=' | cut -d '=' -f2", consoleReceiver);
+        return consoleReceiver.ToString().Trim() == "true";
     }
 
     public async Task UninstallApp(string deviceId, string appPackage)
@@ -479,7 +466,6 @@ public class AdbService(
             var output = await process.StandardOutput.ReadToEndAsync();
             var error = await process.StandardError.ReadToEndAsync();
             
-            logger.LogInformation("ADB tcpip command output: {Output}", output);
             if (!string.IsNullOrEmpty(error))
             {
                 logger.LogWarning("ADB tcpip command error: {Error}", error);

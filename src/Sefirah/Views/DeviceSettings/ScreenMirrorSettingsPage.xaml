@@ -110,7 +110,7 @@
                                                             FontFamily="Consolas"
                                                             FontSize="13"
                                                             IsTextSelectionEnabled="True"
-                                                            Text="input keyevent 26&#x0a;input keyevent 66&#x0a;input text password" />
+                                                            Text="input keyevent 26&#x0a;input keyevent 66&#x0a;input text %pwd%" />
                                                     </StackPanel>
                                                 </Flyout>
                                             </Button.Flyout>
@@ -124,7 +124,7 @@
                                 <TextBox
                                     MinHeight="80"
                                     AcceptsReturn="True"
-                                    PlaceholderText="input keyevent 26&#x0a;input touchscreen swipe 540 1800 540 900"
+                                    PlaceholderText="input keyevent 26&#x0a;input keyevent 66&#x0a;input text %pwd%"
                                     Text="{x:Bind ViewModel.UnlockCommands, Mode=TwoWay}"
                                     TextWrapping="Wrap" />
                             </StackPanel>

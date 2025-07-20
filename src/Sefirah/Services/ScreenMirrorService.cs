@@ -5,6 +5,7 @@ using Renci.SshNet;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
+using Sefirah.Dialogs;
 using Sefirah.Extensions;
 using Uno.Logging;
 using Windows.ApplicationModel.DataTransfer;
@@ -104,9 +105,24 @@ public class ScreenMirrorService(
                     .Select(c => c.Trim())
                     .Where(c => !string.IsNullOrEmpty(c))
                     .ToList();
-                if (commands?.Count > 0)
+                var adbDevice = pairedDevices.FirstOrDefault(d => d.Serial == selectedDeviceSerial);
+                if (adbDevice == null || adbDevice.DeviceData == null) return false;
+
+                if (commands?.Count > 0 && await adbService.IsLocked(adbDevice.DeviceData.Value))
                 {
-                    var adbDevice = pairedDevices.FirstOrDefault(d => d.Serial == selectedDeviceSerial);   
+                    // Check if any command contains password placeholder
+                    var hasPasswordPlaceholder = commands.Any(c => c.Contains("%pwd%"));
+                    string? password = null;
+                    
+                    if (hasPasswordPlaceholder)
+                    {
+                        password = await ShowPasswordInputDialog();
+                        if (password == null) return false;
+                        
+                        // Replace password placeholders with actual password
+                        commands = commands.Select(c => c.Replace("%pwd%", password)).ToList();
+                    }
+                    
                     if (adbDevice != null && adbDevice.DeviceData != null)
                     {
                         adbService.UnlockDevice(adbDevice.DeviceData.Value, commands);
@@ -199,7 +215,6 @@ public class ScreenMirrorService(
                 return false;
             }
 
-            //// Start monitoring process in background
             StartProcessMonitoring(process, processCts, deviceSerial);
             return true;
         }
@@ -503,5 +518,26 @@ public class ScreenMirrorService(
     public async Task SelectScrcpyLocationClick()
     {
 
+    }
+
+    private async Task<string?> ShowPasswordInputDialog()
+    {
+        string? password = null;
+        
+        await dispatcher!.EnqueueAsync(async () =>
+        {
+            var dialog = new PasswordInputDialog
+            {
+                XamlRoot = App.MainWindow!.Content!.XamlRoot
+            };
+
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                password = dialog.Password;
+            }
+        });
+
+        return password;
     }
 }
