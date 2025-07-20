@@ -185,7 +185,6 @@ public sealed partial class MainPage : Page
     private void OnNotificationCloseButtonClick(object sender, RoutedEventArgs e)
     {
         var button = sender as Button;
-        Debug.WriteLine("Close Button Clicked");
         if (button?.Tag is string notification)
         {
             ViewModel.RemoveNotification(notification);

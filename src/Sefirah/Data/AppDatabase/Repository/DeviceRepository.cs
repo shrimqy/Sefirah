@@ -45,7 +45,7 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
         {
             var device = await Task.FromResult(context.Database.Table<RemoteDeviceEntity>().OrderByDescending(d => d.LastConnected).FirstOrDefault());
             if (device is null) return null;
-            return await PairedDevice.FromRemoteDevice(device);
+            return await device.ToPairedDevice();
         }
         catch (Exception ex)
         {
@@ -61,7 +61,7 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
             var devices = context.Database.Table<RemoteDeviceEntity>()
                                 .OrderByDescending(d => d.LastConnected)
                                 .ToList();
-            var pairedDevices = await Task.WhenAll(devices.Select(d => PairedDevice.FromRemoteDevice(d)));
+            var pairedDevices = await Task.WhenAll(devices.Select(d => d.ToPairedDevice()));
             return pairedDevices.ToList();
         }
         catch (Exception ex)

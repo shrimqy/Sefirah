@@ -4,11 +4,15 @@ using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Utils.Serialization;
+using Windows.Data.Xml.Dom;
 using Windows.System;
+using Windows.UI.Notifications;
+using static Vanara.PInvoke.User32;
+using Notification = Sefirah.Data.Models.Notification;
 
 namespace Sefirah.Services;
 public class NotificationService(
-    ILogger<NotificationService> logger,
+    ILogger logger,
     ISessionManager sessionManager,
     IUserSettingsService userSettingsService,
     IDeviceManager deviceManager,
@@ -48,7 +52,6 @@ public class NotificationService(
         {
             notifications = [];
             deviceNotifications[device.Id] = notifications;
-            logger.LogDebug("Created new notification collection for device: {DeviceId}", device.Id);
         }
         return notifications;
     }
@@ -57,8 +60,6 @@ public class NotificationService(
     {
         if (e.IsConnected)
         {
-            // Device connected - clear notification history to prevent duplicates
-            logger.LogInformation("Device {DeviceId} connected, clearing notification history to prevent duplicates", e.Device.Id);
             ClearHistory(e.Device);
         }
         else
@@ -74,37 +75,45 @@ public class NotificationService(
         
         if (activeDevice != null && deviceNotifications.TryGetValue(activeDevice.Id, out var deviceNotifs))
         {
-            foreach (var notification in deviceNotifs)
+            activeNotifications.AddRange(deviceNotifs);
+
+            if (activeDevice.DeviceSettings.ShowBadge)
             {
-                activeNotifications.Add(notification);
+                // Get the blank badge XML payload for a badge number
+                XmlDocument badgeXml =
+                    BadgeUpdateManager.GetTemplateContent(BadgeTemplateType.BadgeNumber);
+
+                // Set the value of the badge in the XML to our number
+                XmlElement badgeElement = badgeXml.SelectSingleNode("/badge") as XmlElement;
+                badgeElement.SetAttribute("value", deviceNotifs.Count.ToString());
+
+                // Create the badge notification
+                BadgeNotification badge = new(badgeXml);
+
+                // Create the badge updater for the application
+                BadgeUpdater badgeUpdater =
+                    BadgeUpdateManager.CreateBadgeUpdaterForApplication();
+
+                // And update the badge
+                badgeUpdater.Update(badge);
             }
-            logger.LogDebug("Updated active notifications for device {DeviceId}: {Count} notifications", 
-                activeDevice.Id, activeNotifications.Count);
-        }
-        else
-        {
-            logger.LogDebug("Cleared active notifications - no active device or no notifications for device");
+
         }
     }
 
     public async Task HandleNotificationMessage(PairedDevice device, NotificationMessage message)
     {
         // Check if device has notification sync enabled
-        if (!device.DeviceSettings.NotificationSyncEnabled)
-        {
-            logger.LogDebug("Notification sync disabled for device {DeviceId}, skipping notification", device.Id);
-            return;
-        }
+        if (!device.DeviceSettings.NotificationSyncEnabled) return;
+        
 
         await semaphore.WaitAsync().ConfigureAwait(false);
         try
         {
-            logger.LogDebug("Processing notification message from {AppName} for device {DeviceId}", message.AppName, device.Id);
-
             if (message.Title != null && message.AppPackage != null)
             {
-                var filter = remoteAppsRepository.GetAppNotificationFilter(message.AppPackage, device.Id)
-                ?? remoteAppsRepository.AddOrUpdateAppNotificationFilter(device.Id, message.AppPackage, message.AppName!, !string.IsNullOrEmpty(message.AppIcon) ? Convert.FromBase64String(message.AppIcon) : null!);
+                var filter = await remoteAppsRepository.GetAppNotificationFilterAsync(message.AppPackage, device.Id)
+                ?? await remoteAppsRepository.AddOrUpdateAppNotificationFilter(device.Id, message.AppPackage, message.AppName!, !string.IsNullOrEmpty(message.AppIcon) ? Convert.FromBase64String(message.AppIcon) : null!);
 
                 if (filter == NotificationFilter.Disabled) return;
 
@@ -133,12 +142,11 @@ public class NotificationService(
                             // Add new notification
                             notifications.Insert(0, notification);
                         }
-
-                        // Show platform-specific notification only if this is the active session
-                        if (deviceManager.ActiveDevice?.Id == device.Id)
-                        {
-                            await platformNotificationHandler.ShowRemoteNotification(message, device.Id);
-                        }
+#if WINDOWS
+                        // Check if the app is active before showing the notification
+                        if (device.DeviceSettings.IgnoreWindowsApps && await IsAppActiveAsync(message.AppName!)) return;
+#endif
+                        await platformNotificationHandler.ShowRemoteNotification(message, device.Id);
                     }
                     else if ((message.NotificationType == NotificationType.Active || message.NotificationType == NotificationType.New)
                         && (filter == NotificationFilter.Feed || filter == NotificationFilter.ToastFeed))
@@ -147,7 +155,7 @@ public class NotificationService(
                     }
                     else
                     {
-                        logger.LogWarning("Notification from {AppName} does not meet criteria for display", message.AppName);
+                        return;
                     }
                     
                     SortNotifications(device.Id);
@@ -254,7 +262,6 @@ public class NotificationService(
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error removing notification");
-                throw;
             }
         });
     }
@@ -320,7 +327,6 @@ public class NotificationService(
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error clearing all notifications");
-                throw;
             }
         });
     }
@@ -340,7 +346,6 @@ public class NotificationService(
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error clearing history");
-                throw;
             }
         });
     }

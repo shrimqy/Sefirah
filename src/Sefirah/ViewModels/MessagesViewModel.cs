@@ -10,7 +10,6 @@ public sealed partial class MessagesViewModel : BaseViewModel
     private readonly SmsHandlerService smsHandlerService;
     private readonly IDeviceManager deviceManager;
     private readonly ILogger<MessagesViewModel> logger;
-    private readonly Microsoft.UI.Dispatching.DispatcherQueue dispatcher;
 
     public ObservableCollection<Conversation>? Conversations { get; private set; }
     public ObservableCollection<Conversation> SearchResults { get; } = [];
@@ -19,17 +18,17 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
     public ObservableCollection<Contact> Contacts { get; set; } = [];
 
-    private ObservableCollection<MessageGroup> _messageGroups = [];
+    private ObservableCollection<MessageGroup> messageGroups = [];
     public ObservableCollection<MessageGroup> MessageGroups
     {
-        get => _messageGroups;
-        set => SetProperty(ref _messageGroups, value);
+        get => messageGroups;
+        set => SetProperty(ref messageGroups, value);
     }
 
-    private Conversation? _selectedConversation;
+    private Conversation? selectedConversation;
     public Conversation? SelectedConversation
     {
-        get => _selectedConversation;
+        get => selectedConversation;
         set
         {
             // If selecting a conversation, exit new conversation mode 
@@ -38,7 +37,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
                 IsNewConversation = false;
             }
 
-            if (SetProperty(ref _selectedConversation, value))
+            if (SetProperty(ref selectedConversation, value))
             {
                 LoadMessagesForSelectedConversation();
                 OnPropertyChanged(nameof(ShouldShowComposeUI));
@@ -70,7 +69,6 @@ public sealed partial class MessagesViewModel : BaseViewModel
         smsHandlerService = Ioc.Default.GetRequiredService<SmsHandlerService>();
         deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
         logger = Ioc.Default.GetRequiredService<ILogger<MessagesViewModel>>();
-        dispatcher = App.MainWindow!.DispatcherQueue;
 
         ((INotifyPropertyChanged)deviceManager).PropertyChanged += OnDeviceManagerPropertyChanged;
 

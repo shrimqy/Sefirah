@@ -24,10 +24,10 @@
         <vm:ActionsViewModel x:Name="ViewModel" />
     </Page.DataContext>
 
-    <ScrollViewer>
-        <StackPanel Spacing="5">
+    <ScrollViewer Padding="0,0,40,0">
+        <StackPanel Spacing="4">
             <!--  Breadcrumb Navigation  -->
-            <BreadcrumbBar x:Name="BreadcrumbBar" Margin="0,0,0,20">
+            <BreadcrumbBar x:Name="BreadcrumbBar" Margin="0,0,0,8">
                 <BreadcrumbBar.ItemTemplate>
                     <DataTemplate x:DataType="local:NavigationItem">
                         <BreadcrumbBarItem AutomationProperties.Name="{Binding Name}" Content="{Binding}">
@@ -105,7 +105,6 @@
                     FontSize="14"
                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                     Text="No actions configured" />
-
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

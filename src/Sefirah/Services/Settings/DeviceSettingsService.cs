@@ -253,7 +253,7 @@ internal sealed class DeviceSettingsService : BaseDeviceAwareJsonSettings, IDevi
 
     public bool MediaSessionSyncEnabled
     {
-        get => Get(false);
+        get => Get(true);
         set => Set(value);
     }
 

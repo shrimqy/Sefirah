@@ -29,7 +29,7 @@ public class DiscoveryService(
     public List<DiscoveredMdnsServiceArgs> DiscoveredMdnsServices { get; } = [];
     private List<IPEndPoint> broadcastEndpoints = [];
     private const int DiscoveryPort = 5149;
-    private readonly Lock collectionLock = new();
+    private readonly System.Threading.Lock collectionLock = new();
 
     public async Task StartDiscoveryAsync(int serverPort)
     {
@@ -60,7 +60,6 @@ public class DiscoveryService(
 
             broadcastEndpoints = [.. networkInterfaces.Select(ipInfo =>
             {
-                // Calculate proper broadcast address
                 var network = new Data.Models.IPNetwork(ipInfo.Address, ipInfo.SubnetMask);
                 var broadcastAddress = network.BroadcastAddress;
 
@@ -137,27 +136,31 @@ public class DiscoveryService(
         }
     }
 
-    private void OnDiscoveredMdnsService(object? sender, DiscoveredMdnsServiceArgs service)
+    private async void OnDiscoveredMdnsService(object? sender, DiscoveredMdnsServiceArgs service)
     {
         lock (collectionLock)
         {
             if (DiscoveredMdnsServices.Any(s => s.DeviceId == service.DeviceId)) return;
 
             DiscoveredMdnsServices.Add(service);
-            logger.LogInformation("Discovered service instance: {0}, {1}", service.DeviceId, service.DeviceName);
+        }
+        
+        logger.LogInformation("Discovered service instance: {0}, {1}", service.DeviceId, service.DeviceName);
 
-            var sharedSecret = EcdhHelper.DeriveKey(service.PublicKey, localDevice!.PrivateKey);
-            var device = new DiscoveredDevice
-            {
-                DeviceId = service.DeviceId,
-                DeviceName = service.DeviceName,
-                PublicKey = service.PublicKey,
-                HashedKey = sharedSecret,
-                LastSeen = DateTimeOffset.UtcNow,
-                Origin = DeviceOrigin.MdnsService
-            };
+        var sharedSecret = EcdhHelper.DeriveKey(service.PublicKey, localDevice!.PrivateKey);
+        var device = new DiscoveredDevice
+        {
+            DeviceId = service.DeviceId,
+            DeviceName = service.DeviceName,
+            PublicKey = service.PublicKey,
+            HashedKey = sharedSecret,
+            LastSeen = DateTimeOffset.UtcNow,
+            Origin = DeviceOrigin.MdnsService
+        };
 
-            dispatcher.EnqueueAsync(() =>
+        await dispatcher.EnqueueAsync(() =>
+        {
+            lock (collectionLock)
             {
                 var existing = DiscoveredDevices.FirstOrDefault(d => d.DeviceId == device.DeviceId);
                 if (existing != null)
@@ -168,25 +171,22 @@ public class DiscoveryService(
                 {
                     DiscoveredDevices.Add(device);
                 }
-            });
-
-        }
+            }
+        });
     }
 
-    private void OnServiceInstanceShutdown(object? sender, ServiceInstanceShutdownEventArgs e)
+    private async void OnServiceInstanceShutdown(object? sender, ServiceInstanceShutdownEventArgs e)
     {
         var deviceId = e.ServiceInstanceName.ToString().Split('.')[0];
 
-        // Remove from MDNS services list first
-        lock (collectionLock)
-        {
-            DiscoveredMdnsServices.RemoveAll(s => s.DeviceId == deviceId);
-        }
-
-        dispatcher.EnqueueAsync(() =>
+        await dispatcher.EnqueueAsync(() =>
         {
             lock (collectionLock)
             {
+                // Remove from MDNS services list
+                DiscoveredMdnsServices.RemoveAll(s => s.DeviceId == deviceId);
+                
+                // Remove from discovered devices
                 try
                 {
                     var deviceToRemove = DiscoveredDevices
@@ -225,7 +225,7 @@ public class DiscoveryService(
 
     }
 
-    public void OnReceived(EndPoint endpoint, byte[] buffer, long offset, long size)
+    public async void OnReceived(EndPoint endpoint, byte[] buffer, long offset, long size)
     {
         try
         {
@@ -255,7 +255,7 @@ public class DiscoveryService(
                 Origin = DeviceOrigin.UdpBroadcast
             };
 
-            dispatcher.EnqueueAsync(() =>
+            await dispatcher.EnqueueAsync(() =>
             {
                 lock (collectionLock)
                 {
@@ -293,37 +293,38 @@ public class DiscoveryService(
 
     private async void CleanupStaleDevices()
     {
-        List<DiscoveredDevice> staleDevices;
-        lock (collectionLock)
+        try
         {
-            var now = DateTimeOffset.UtcNow;
-            var staleThreshold = TimeSpan.FromSeconds(5);
-
-            // Get snapshot while locked
-            staleDevices = DiscoveredDevices
-                .Where(d => d.Origin == DeviceOrigin.UdpBroadcast &&
-                          now - d.LastSeen > staleThreshold)
-                .ToList();
-        }
-
-        // Process removals on UI thread
-        await dispatcher.EnqueueAsync(() =>
-        {
-            lock (collectionLock)
+            await dispatcher.EnqueueAsync(() =>
             {
-                foreach (var device in staleDevices)
+                lock (collectionLock)
                 {
-                    DiscoveredDevices.Remove(device);
-                }
-            }
+                    var now = DateTimeOffset.UtcNow;
+                    var staleThreshold = TimeSpan.FromSeconds(5);
 
-            // Stop timer if no UDP devices left
-            if (!DiscoveredDevices.Any(d => d.Origin == DeviceOrigin.UdpBroadcast))
-            {
-                _cleanupTimer?.Stop();
-                _cleanupTimer = null;
-            }
-        });
+                    var staleDevices = DiscoveredDevices
+                        .Where(d => d.Origin == DeviceOrigin.UdpBroadcast &&
+                                  now - d.LastSeen > staleThreshold)
+                        .ToList();
+
+                    foreach (var device in staleDevices)
+                    {
+                        DiscoveredDevices.Remove(device);
+                    }
+
+                    // Stop timer if no UDP devices left
+                    if (!DiscoveredDevices.Any(d => d.Origin == DeviceOrigin.UdpBroadcast))
+                    {
+                        _cleanupTimer?.Stop();
+                        _cleanupTimer = null;
+                    }
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error during cleanup of stale devices");
+        }
     }
 
     public void Dispose()

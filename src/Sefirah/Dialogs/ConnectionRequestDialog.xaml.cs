@@ -17,7 +17,7 @@ public sealed partial class ConnectionRequestDialog : ContentDialog
 
     private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
-        ViewModel.OnConnectClick(sender, args);
+        ViewModel.OnConnectClick();
     }
 
     private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)

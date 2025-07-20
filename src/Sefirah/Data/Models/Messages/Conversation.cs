@@ -34,7 +34,7 @@ public partial class Conversation : ObservableObject
         set => SetProperty(ref lastMessageTimestamp, value);
     }
 
-
+    #region Helpers
     public async Task UpdateFromTextConversationAsync(TextConversation textConversation, SmsRepository repository, string deviceId)
     {
         if (textConversation.ThreadId != ThreadId)
@@ -192,4 +192,5 @@ public partial class Conversation : ObservableObject
             TimeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
         };
     }
+    #endregion
 }

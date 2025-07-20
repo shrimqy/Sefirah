@@ -52,6 +52,8 @@ public static class AppLifecycleHelper
             actionService.InitializeAsync(),
             adbService.StartAsync()
         );
+
+        App.SplashScreenLoadingTCS?.TrySetResult();
     } 
 
     public static IApplicationBuilder ConfigureApp(this App app, LaunchActivatedEventArgs args)

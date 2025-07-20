@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Logging;
-
 namespace Sefirah.ViewModels;
 public abstract class BaseViewModel : ObservableObject
 {

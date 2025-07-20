@@ -25,7 +25,7 @@ public class ConversationEntity
     [Ignore]
     public List<string> Addresses { get; set; } = [];
 
-    #region Helper Methods
+    #region Helpers
     internal async Task<Conversation> ToConversationAsync(SmsRepository repository)
     {
         if (!string.IsNullOrEmpty(AddressesJson))

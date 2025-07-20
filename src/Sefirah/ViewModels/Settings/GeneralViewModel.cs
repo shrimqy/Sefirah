@@ -4,7 +4,6 @@ using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Extensions;
 using Sefirah.Helpers;
-using Sefirah.Services;
 
 namespace Sefirah.ViewModels.Settings;
 public sealed partial class GeneralViewModel : BaseViewModel

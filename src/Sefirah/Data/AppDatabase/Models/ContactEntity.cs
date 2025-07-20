@@ -20,9 +20,11 @@ public class ContactEntity
 
     public byte[]? Avatar { get; set; }
 
+    #region Helpers
     internal async Task<Contact> ToContact()
     {
         var displayName = !string.IsNullOrEmpty(DisplayName) ? DisplayName : Number;
         return new Contact(Number, displayName, Avatar != null ? await Avatar.ToBitmapAsync() : null);
     }
-} 
+    #endregion
+}

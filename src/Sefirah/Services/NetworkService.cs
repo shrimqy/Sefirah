@@ -115,7 +115,6 @@ public class NetworkService(
         {
             foreach (var device in PairedDevices.Where(d => d.Session != null))
             {
-                logger.LogDebug("Sending message to device {device.Name}: {message}", device.Name, message);
                 SendMessage(device.Session!, message);
             }
         }
@@ -185,7 +184,7 @@ public class NetworkService(
         }
         catch (Exception ex)
         {
-            logger.LogError("Error in OnReceived for session {0}: {1}", session.Id, ex);
+            logger.LogError("Error in OnReceived for session {id}: {ex}", session.Id, ex);
             DisconnectSession(session);
         }
     }
@@ -201,7 +200,7 @@ public class NetworkService(
                 return;
             }
 
-            // Verify authentication data
+
             if (string.IsNullOrEmpty(deviceInfo.Nonce) || string.IsNullOrEmpty(deviceInfo.Proof))
             {
                 logger.Warn("Missing authentication data");
@@ -216,20 +215,17 @@ public class NetworkService(
 
             if (device != null)
             {
-                logger.Warn($"Device {device.Id} connected");
+                logger.Info($"Device {device.Id} connected");
                 
-                // Update or add device to collection with connection properties
                 deviceManager.UpdateOrAddDevice(device, connectedDevice  =>
                 {
 
                     connectedDevice.ConnectionStatus = true;
                     connectedDevice.Session = session;
                     
-                    // Set as active device
                     deviceManager.ActiveDevice = connectedDevice;
                     device = connectedDevice;
 
-                    // Connect to device via TCP/IP if enabled
                     if (device.DeviceSettings.AdbAutoConnect && connectedSessionIpAddress != null)
                     {
                         adbService.TryConnectTcp(connectedSessionIpAddress);
@@ -254,7 +250,6 @@ public class NetworkService(
                     Proof = proof
                 }));
 
-                // Notify that device connected
                 ConnectionStatusChanged?.Invoke(this, (device, true));
             }
             else
@@ -300,6 +295,7 @@ public class NetworkService(
     {
         try
         {
+            bufferedData = string.Empty;
             session.Disconnect();
             session.Dispose();
             var device = PairedDevices.FirstOrDefault(d => d.Session == session);   

@@ -1,50 +1,57 @@
 using AdvancedSharpAdbClient.Models;
-using CommunityToolkit.Mvvm.ComponentModel;
+using Sefirah.Data.Enums;
 
 namespace Sefirah.Data.Models;
 
-public class AdbDevice : ObservableObject
+public partial class AdbDevice : ObservableObject
 {
-    private string _serial = string.Empty;
+    private string serial = string.Empty;
     public string Serial
     {
-        get => _serial;
+        get => serial;
         set
         {
-            if (SetProperty(ref _serial, value))
+            if (SetProperty(ref serial, value))
             {
                 UpdateDisplayName();
             }
         }
     }
 
-    private string _model = string.Empty;
+    private string model = string.Empty;
     public string Model
     {
-        get => _model;
+        get => model;
         set
         {
-            if (SetProperty(ref _model, value))
+            if (SetProperty(ref model, value))
             {
                 UpdateDisplayName();
             }
         }
     }
 
-    private string _androidId = string.Empty;
+    private string androidId = string.Empty;
     public string AndroidId
     {
-        get => _androidId;
-        set => SetProperty(ref _androidId, value);
+        get => androidId;
+        set => SetProperty(ref androidId, value);
     }
 
-    private DeviceState _state = DeviceState.Unknown;
+    private string displayName = string.Empty;
+    public string DisplayName
+    {
+        get => displayName;
+        set => SetProperty(ref displayName, value);
+    }
+
+    private DeviceState state = DeviceState.Unknown;
     public DeviceState State
     {
-        get => _state;
+        get => state;
         set
         {
-            if (SetProperty(ref _state, value))
+            if (SetProperty(ref state, value))
             {
                 OnPropertyChanged(nameof(IsOnline));
                 IsConnected = value == DeviceState.Online;
@@ -52,44 +59,37 @@ public class AdbDevice : ObservableObject
         }
     }
 
-    private DeviceType _type;
+    private DeviceType type;
     public DeviceType Type
     {
-        get => _type;
+        get => type;
         set
         {
-            if (SetProperty(ref _type, value))
+            if (SetProperty(ref type, value))
             {
                 OnPropertyChanged(nameof(TypeDisplay));
             }
         }
     }
 
-    private DeviceData? _deviceData = null;
+    private DeviceData? deviceData = null;
     public DeviceData? DeviceData
     {
-        get => _deviceData;
-        set => SetProperty(ref _deviceData, value);
+        get => deviceData;
+        set => SetProperty(ref deviceData, value);
     }
 
-    private bool _isConnected;
+    private bool isConnected;
     public bool IsConnected
     {
-        get => _isConnected;
+        get => isConnected;
         set
         {
-            if (SetProperty(ref _isConnected, value))
+            if (SetProperty(ref isConnected, value))
             {
                 OnPropertyChanged(nameof(ConnectionStatus));
             }
         }
-    }
-
-    private string _displayName = string.Empty;
-    public string DisplayName
-    {
-        get => _displayName;
-        set => SetProperty(ref _displayName, value);
     }
 
     public string ConnectionStatus => IsConnected ? "Connected" : "Disconnected";
@@ -103,9 +103,3 @@ public class AdbDevice : ObservableObject
         DisplayName = !string.IsNullOrEmpty(Model) ? $"{Model} ({Serial})" : Serial;
     }
 }
-
-public enum DeviceType
-{
-    USB,
-    WIFI
-} 

@@ -31,7 +31,7 @@ public class MessageEntity
     [Ignore]
     public List<SmsAttachment> Attachments { get; set; } = [];
 
-    #region Helper methods
+    #region Helpers
     internal async Task<Message> ToMessageAsync(SmsRepository repository)
     {
         var contact = await repository.GetContactAsync(DeviceId, Address);

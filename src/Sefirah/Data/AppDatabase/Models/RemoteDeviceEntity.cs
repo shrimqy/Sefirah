@@ -1,4 +1,7 @@
+using CommunityToolkit.WinUI;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Sefirah.Data.Models;
+using Sefirah.Helpers;
 using SQLite;
 
 namespace Sefirah.Data.AppDatabase.Models;
@@ -33,4 +36,32 @@ public partial class RemoteDeviceEntity
     public byte[]? WallpaperBytes { get; set; }
 
     public DateTime? LastConnected { get; set; }
+
+    #region Helpers
+    internal async Task<PairedDevice> ToPairedDevice()
+    {
+        var wallPaperBytes = WallpaperBytes;
+        BitmapImage? wallPaper = null;
+
+        if (wallPaperBytes != null)
+        {
+            var dispatcher = App.MainWindow?.DispatcherQueue;
+            if (dispatcher != null)
+            {
+                await dispatcher.EnqueueAsync(async () =>
+                {
+                    wallPaper = await ImageHelper.ToBitmapAsync(wallPaperBytes);
+                });
+            }
+        }
+
+        return new PairedDevice(DeviceId)
+        {
+            Name = Name,
+            IpAddresses = IpAddresses,
+            PhoneNumbers = PhoneNumbers,
+            Wallpaper = wallPaper,
+        };
+    }
+    #endregion
 }

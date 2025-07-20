@@ -6,10 +6,9 @@ namespace Sefirah.ViewModels.Settings;
 public partial class AboutViewModel : ObservableObject
 {
     [ObservableProperty]
-    private string version;
+    public partial string Version { get; set; } = string.Empty;
 
-    public string AppName
-    => Package.Current.DisplayName;
+    public string AppName => Package.Current.DisplayName;
 
     public AboutViewModel()
     {
@@ -91,7 +90,10 @@ public partial class AboutViewModel : ObservableObject
         // WinUI and Windows App SDK
         new("https://github.com/microsoft/microsoft-ui-xaml", "WinUI 3"),
         new("https://github.com/microsoft/WindowsAppSDK", "Windows App SDK"),
-        
+
+        // Uno Platform
+        new("https://github.com/unoplatform/uno", "Uno Platform"),
+
         // Community Toolkit
         new("https://github.com/CommunityToolkit/dotnet", "CommunityToolkit.Mvvm"),
         new("https://github.com/CommunityToolkit/Windows", "CommunityToolkit.WinUI"),
@@ -101,15 +103,13 @@ public partial class AboutViewModel : ObservableObject
         new("https://github.com/sshnet/SSH.NET", "SSH.NET"),
         
         // Data & Storage
-        new("https://github.com/dotnet/efcore", "Microsoft.Data.Sqlite"),
-        
+        new("https://github.com/ericsink/SQLitePCL.raw", "SQLitePCLRaw"),
+
         // Networking & Server
         new("https://github.com/chronoxor/NetCoreServer", "NetCoreServer"),
         new("https://github.com/meamod/MeaMod.DNS", "MeaMod.DNS"),
         new("https://github.com/PrimalZed/CloudSync", "CloudSync"),
         
-        // Logging
-        new("https://github.com/serilog/serilog", "Serilog"),
         
         // Windows Integration
         new("https://github.com/HavenDV/H.NotifyIcon", "H.NotifyIcon"),
@@ -118,6 +118,11 @@ public partial class AboutViewModel : ObservableObject
         
         // Microsoft Extensions
         new("https://github.com/dotnet/runtime", "Microsoft Extensions"),
+
+        // Other
+        new("https://github.com/tmds/Tmds.DBus", "Tmds.DBus"),
+        new("https://github.com/SharpAdb/AdvancedSharpAdbClient", "AdvancedSharpAdbClient"),
+
     ];
 }
 

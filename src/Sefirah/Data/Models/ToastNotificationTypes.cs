@@ -1,4 +1,5 @@
 namespace Sefirah.Data.Models;
+
 public static class ToastNotificationType
 {
     public const string FileTransfer = "FileTransfer";

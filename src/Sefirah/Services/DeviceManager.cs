@@ -131,7 +131,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
 
                 repository.AddOrUpdateRemoteDevice(existingDevice);
                 logger.LogInformation("Device verified: {IpAddresses}", string.Join(", ", existingDevice.IpAddresses!));
-                var pairedDevice = await PairedDevice.FromRemoteDevice(existingDevice);
+                var pairedDevice = await existingDevice.ToPairedDevice();
                 return pairedDevice;
             }
 
@@ -175,7 +175,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
                     };
 
                     repository.AddOrUpdateRemoteDevice(newDevice);
-                    tcs.SetResult(await PairedDevice.FromRemoteDevice(newDevice));
+                    tcs.SetResult(await newDevice.ToPairedDevice());
                 }
                 catch (Exception ex)
                 {

@@ -3,20 +3,15 @@ using Microsoft.Windows.AppNotifications.Builder;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 using Sefirah.Extensions;
-using Sefirah.Services;
 using Sefirah.Utils;
 using Uno.Logging;
-using Windows.System;
 
-namespace Sefirah.Platforms.Windows.Services;
+namespace Sefirah.Platforms.Windows;
 
 /// <summary>
 /// Windows implementation of the platform notification handler
 /// </summary>
-public class WindowsNotificationHandler(
-    ILogger logger,
-    ISessionManager sessionManager,
-    IDeviceManager deviceManager) : IPlatformNotificationHandler
+public class WindowsNotificationHandler(ILogger logger) : IPlatformNotificationHandler
 {
     /// <inheritdoc />
     public async Task ShowRemoteNotification(NotificationMessage message, string deviceId)
@@ -30,14 +25,14 @@ public class WindowsNotificationHandler(
                 .SetTag(message.Tag ?? string.Empty)
                 .SetGroup(message.GroupKey ?? string.Empty);
 
-            // Handle icons
+            // Handle icons - check for local app icon first
             if (!string.IsNullOrEmpty(message.LargeIcon))
             {
                 await SetNotificationIcon(builder, message.LargeIcon, "largeIcon.png");
             }
-            else if (!string.IsNullOrEmpty(message.AppIcon))
+            else if (!string.IsNullOrEmpty(message.AppIcon) || !string.IsNullOrEmpty(message.AppPackage))
             {
-                await SetNotificationIcon(builder, message.AppIcon, "appIcon.png");
+                await SetAppNotificationIcon(builder, message.AppPackage, message.AppIcon);
             }
 
             // Handle actions
@@ -172,18 +167,6 @@ public class WindowsNotificationHandler(
                 .SetTag($"simple_{DateTime.Now.Ticks}")
                 .SetGroup("simple");
 
-            if (!string.IsNullOrEmpty(iconPath))
-            {
-                if (File.Exists(iconPath))
-                {
-                    builder.SetAppLogoOverride(new Uri($"file:///{iconPath}"), AppNotificationImageCrop.Circle);
-                }
-                else if (await ImageUtils.LocalFileExistsAsync(iconPath))
-                {
-                    builder.SetAppLogoOverride(ImageUtils.GetLocalFileUri(iconPath), AppNotificationImageCrop.Circle);
-                }
-            }
-
             var notification = builder.BuildNotification();
             notification.ExpiresOnReboot = true;
             AppNotificationManager.Default.Show(notification);
@@ -262,152 +245,8 @@ public class WindowsNotificationHandler(
     /// <inheritdoc />
     public async Task RegisterForNotifications()
     {
-        AppNotificationManager.Default.NotificationInvoked -= OnNotificationInvoked;
-        AppNotificationManager.Default.NotificationInvoked += OnNotificationInvoked;
-
-        try
-        {
-            await Task.Run(() => AppNotificationManager.Default.Register());
-        }
-        catch (Exception ex)
-        {
-            logger.LogWarning("Could not register for notifications, continuing without notifications {ex}", ex);
-        }
-    }
-
-    private async void OnNotificationInvoked(AppNotificationManager sender, AppNotificationActivatedEventArgs args)
-    {
-        try
-        {
-            logger.LogDebug("Notification invoked - Arguments: {Arguments}", string.Join(", ", args.Arguments.Select(x => $"{x.Key}={x.Value}")));
-
-            // Common cleanup for all notifications
-            try
-            {
-                await sender.RemoveByGroupAsync(Constants.Notification.NotificationGroup);
-                await Task.Delay(100); // Small delay to ensure removal
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning(ex, "Failed to remove notifications");
-            }
-
-            // Determine notification type first
-            if (!args.Arguments.TryGetValue("notificationType", out var notificationType))
-            {
-                logger.LogWarning("Notification missing type identifier");
-                return;
-            }
-
-            // Route to appropriate handler
-            switch (notificationType)
-            {
-                case ToastNotificationType.FileTransfer:
-                    HandleFileTransferNotification(args);
-                    break;
-                
-                case ToastNotificationType.RemoteNotification:
-                    HandleMessageNotification(args);
-                    break;
-
-                case ToastNotificationType.Clipboard:
-                    HandleClipboardNotification(args);
-                    break;
-                
-                default:
-                    logger.LogWarning("Unhandled notification type: {NotificationType}", notificationType);
-                    break;
-            }
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error handling notification action");
-        }
-    }
-
-    private async void HandleClipboardNotification(AppNotificationActivatedEventArgs args)
-    {
-        Uri.TryCreate(args.Arguments["uri"], UriKind.Absolute, out Uri? uri);
-        if (uri != null && ClipboardService.IsValidWebUrl(uri))
-        {
-            await Launcher.LaunchUriAsync(uri);
-        }
-    }
-
-    private void HandleFileTransferNotification(AppNotificationActivatedEventArgs args)
-    {
-        if (args.Arguments.TryGetValue("action", out string? action))
-        {
-            switch (action)
-            {
-                case "openFile":
-                    if (args.Arguments.TryGetValue("filePath", out string? filePath) && File.Exists(filePath))
-                    {
-                        logger.LogDebug("Opening file: {FilePath}", filePath);
-                        Process.Start(new ProcessStartInfo
-                        {
-                            FileName = filePath,
-                            UseShellExecute = true
-                        });
-                    }
-                    else
-                    {
-                        logger.LogWarning("File not found or path not provided - FilePath: {FilePath}", filePath);
-                    }
-                    break;
-
-                case "openFolder":
-                    if (args.Arguments.TryGetValue("folderPath", out string? folderPath) && Directory.Exists(folderPath))
-                    {
-                        logger.LogDebug("Opening folder: {FolderPath}", folderPath);
-                        Process.Start(new ProcessStartInfo
-                        {
-                            FileName = "explorer.exe",
-                            Arguments = $"\"{folderPath}\"",
-                            UseShellExecute = true
-                        });
-                    }
-                    else
-                    {
-                        logger.LogWarning("Folder not found or path not provided - FolderPath: {FolderPath}", folderPath);
-                    }
-                    break;
-            }
-        }
-    }
-
-    private void HandleMessageNotification(AppNotificationActivatedEventArgs args)
-    {
-        if (!args.Arguments.TryGetValue("action", out var actionType))
-            return;
-        
-        var notificationKey = args.Arguments["notificationKey"];
-        
-        // Get deviceId directly from arguments
-        if (!args.Arguments.TryGetValue("deviceId", out var deviceId) || string.IsNullOrEmpty(deviceId))
-        {
-            logger.LogWarning("Notification missing deviceId argument");
-            return;
-        }
-
-        // Find the device by ID
-        var device = deviceManager.FindDeviceById(deviceId);
-        if (device == null)
-        {
-            logger.LogWarning("Could not find device with ID: {DeviceId}", deviceId);
-            return;
-        }
-
-        switch (actionType)
-        {
-            case "Reply" when args.UserInput.TryGetValue("textBox", out var replyText):
-                NotificationActionUtils.ProcessReplyAction(sessionManager, logger, device, notificationKey, args.Arguments["replyResultKey"], replyText);
-                break;
-            case "Click":
-                var actionIndex = int.Parse(args.Arguments["actionIndex"]);
-                NotificationActionUtils.ProcessClickAction(sessionManager, logger, device, notificationKey, actionIndex);
-                break;
-        }
+        // Registration is handled by ToastNotificationService
+        await Task.CompletedTask;
     }
 
     /// <inheritdoc />
@@ -449,6 +288,33 @@ public class WindowsNotificationHandler(
         }
     }
 
+    private async Task SetAppNotificationIcon(AppNotificationBuilder builder, string? appPackage, string? appIconBase64)
+    {
+        try
+        {
+
+            if (!string.IsNullOrEmpty(appPackage))
+            {
+                var iconUri = await ImageUtils.GetAppIconUri($"{appPackage}.png");
+                if (iconUri != null)
+                {
+                    builder.SetAppLogoOverride(iconUri, AppNotificationImageCrop.Circle);
+                    return;
+                }
+            }
+
+            // Fall back to saving the base64 icon if no local icon exists
+            if (!string.IsNullOrEmpty(appIconBase64))
+            {
+                await SetNotificationIcon(builder, appIconBase64, "appIcon.png");
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Failed to set app notification icon");
+        }
+    }
+
     private async Task SetNotificationIcon(AppNotificationBuilder builder, string iconBase64, string fileName)
     {
         try
@@ -461,4 +327,4 @@ public class WindowsNotificationHandler(
             logger.LogWarning(ex, "Failed to set notification icon");
         }
     }
-} 
+}

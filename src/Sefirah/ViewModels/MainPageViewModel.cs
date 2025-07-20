@@ -28,7 +28,11 @@ public sealed partial class MainPageViewModel : BaseViewModel
             var message = new CommandMessage { CommandType = CommandType.Disconnect };
             SessionManager.SendMessage(Device.Session!, SocketMessageSerializer.Serialize(message));
             await Task.Delay(50);
-            SessionManager.DisconnectSession(Device.Session!);
+            if (Device.Session != null)
+            {
+                SessionManager.DisconnectSession(Device.Session);
+            }
+            Device.ConnectionStatus = false;
         }
     }
 
@@ -119,9 +123,9 @@ public sealed partial class MainPageViewModel : BaseViewModel
         NotificationService.TogglePinNotification(notificationKey);
     }
 
-    public void UpdateNotificationFilter(string appPackage)
+    public async void UpdateNotificationFilter(string appPackage)
     {
-        RemoteAppsRepository.AddOrUpdateAppNotificationFilter(deviceId: Device!.Id, appPackage: appPackage, filter: NotificationFilter.Disabled);
+        await RemoteAppsRepository.AddOrUpdateAppNotificationFilter(deviceId: Device!.Id, appPackage: appPackage, filter: NotificationFilter.Disabled);
     }
 
     public MainPageViewModel()

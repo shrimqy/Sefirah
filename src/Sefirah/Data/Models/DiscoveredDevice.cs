@@ -8,8 +8,6 @@ public class DiscoveredDevice
     public byte[]? HashedKey { get; set; }
     public DateTimeOffset LastSeen { get; set; }
     public DeviceOrigin Origin { get; set; }
-
-    // To return the formatted key
     public string? FormattedKey
     {
         get

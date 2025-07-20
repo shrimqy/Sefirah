@@ -11,6 +11,7 @@
 
     <NavigationView
         x:Name="SettingsNav"
+        BorderThickness="0"
         IsBackButtonVisible="Collapsed"
         IsPaneOpen="True"
         IsPaneToggleButtonVisible="False"
@@ -26,6 +27,7 @@
                 Text="{helpers:ResourceString Name=Settings}" />
         </NavigationView.PaneHeader>
         <NavigationView.Resources>
+            <Thickness x:Key="NavigationViewContentGridBorderThickness">1,0,0,0</Thickness>
             <CornerRadius x:Key="NavigationViewContentGridCornerRadius">0</CornerRadius>
             <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent" />
             <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground" Color="Transparent" />
@@ -47,7 +49,7 @@
             </NavigationViewItem>
         </NavigationView.MenuItems>
 
-        <Frame x:Name="SettingsContentFrame" Padding="40,20,40,0" />
+        <Frame x:Name="SettingsContentFrame" Padding="40,20,0,0" />
 
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>

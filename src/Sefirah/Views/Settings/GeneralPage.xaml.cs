@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
+using Sefirah.Extensions;
 using Sefirah.Utils;
 using Windows.System;
 
@@ -10,6 +11,7 @@ public sealed partial class GeneralPage : Page
     public GeneralPage()
     {
         InitializeComponent();
+        SetupBreadcrumb();
     }
 
     private void OnKeyDown(object sender, KeyRoutedEventArgs e)
@@ -18,6 +20,29 @@ public sealed partial class GeneralPage : Page
         {
             Focus(FocusState.Pointer);
             e.Handled = true;
+        }
+    }
+
+    private void SetupBreadcrumb()
+    {
+        BreadcrumbBar.ItemsSource = new ObservableCollection<NavigationItem>
+        {
+            new() { Name = "General".GetLocalizedResource(), PageType = typeof(GeneralPage) }
+        };
+        BreadcrumbBar.ItemClicked += BreadcrumbBar_ItemClicked;
+    }
+    private void BreadcrumbBar_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)
+    {
+        var items = BreadcrumbBar.ItemsSource as ObservableCollection<NavigationItem>;
+        var clickedItem = items?[args.Index];
+
+        if (clickedItem?.PageType != null && clickedItem.PageType != typeof(ActionsPage))
+        {
+            // Navigate back to general page
+            if (Frame.CanGoBack)
+            {
+                Frame.GoBack();
+            }
         }
     }
 

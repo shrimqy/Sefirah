@@ -10,8 +10,8 @@ public sealed partial class ActionsViewModel : BaseViewModel
 {
     private readonly IUserSettingsService _userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
 
-    private bool _isDragging = true;
-    private bool _isBulkOperation;
+    private bool isDragging = true;
+    private bool isBulkOperation;
 
     public ObservableCollection<BaseAction> Actions { get; } = [];
 
@@ -23,15 +23,15 @@ public sealed partial class ActionsViewModel : BaseViewModel
 
     private void Actions_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        if (_isBulkOperation) return;
+        if (isBulkOperation) return;
         // Reordering ListView has no events, but its collection is updated twice,
         // first to remove the selected item, and second to add the item at the selected position.
-        if (_isDragging)
+        if (isDragging)
         {
-            _isDragging = false;
+            isDragging = false;
             return;
         }
-        _isDragging = true;
+        isDragging = true;
         
         SaveActions();
     }
@@ -48,7 +48,7 @@ public sealed partial class ActionsViewModel : BaseViewModel
             }
             SaveActions();
         }
-        _isBulkOperation = true;
+        isBulkOperation = true;
         Actions.Clear();
         
         var customActions = _userSettingsService.GeneralSettingsService.Actions;
@@ -56,7 +56,7 @@ public sealed partial class ActionsViewModel : BaseViewModel
         {
             Actions.Add(action);
         }
-        _isBulkOperation = false;
+        isBulkOperation = false;
     }
 
     private void SaveActions()
@@ -74,9 +74,9 @@ public sealed partial class ActionsViewModel : BaseViewModel
 
         if (await dialog.ShowAsync() == ContentDialogResult.Primary && dialog.Result is not null)
         {
-            _isBulkOperation = true;
+            isBulkOperation = true;
             Actions.Add(dialog.Result);
-            _isBulkOperation = false;
+            isBulkOperation = false;
             SaveActions();
         }
     }
@@ -112,9 +112,9 @@ public sealed partial class ActionsViewModel : BaseViewModel
 
         if (await dialog.ShowAsync() == ContentDialogResult.Primary)
         {
-            _isBulkOperation = true;
+            isBulkOperation = true;
             Actions.Remove(action);
-            _isBulkOperation = false;
+            isBulkOperation = false;
             SaveActions();
         }
     }

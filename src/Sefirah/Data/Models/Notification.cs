@@ -15,7 +15,7 @@ public class Notification
     public string? AppPackage { get; set; }
     public string? Title { get; set; }
     public string? Text { get; set; }
-    public List<GroupedMessage>? GroupedMessages { get; set; }
+    public List<GroupedNotificationTextMessage>? GroupedMessages { get; set; }
     public bool HasGroupedMessages => GroupedMessages?.Count > 0;
     public string? Tag { get; set; }
     public string? GroupKey { get; set; }
@@ -42,9 +42,6 @@ public class Notification
             "NotificationFilterButton".GetLocalizedResource(),
             AppName)
         : null;
-
-    // Display name for the device this notification came from
-    public string? DeviceDisplayName => null; // To be populated when showing in UI if needed
 
     public static async Task<Notification> FromMessage(NotificationMessage message)
     {
@@ -80,10 +77,10 @@ public class Notification
 // Helper extension method for grouping messages
 public static class NotificationExtensions
 {
-    public static List<GroupedMessage> GroupBySender(this List<Message> messages)
+    public static List<GroupedNotificationTextMessage> GroupBySender(this List<NotificationTextMessage> messages)
     {
-        var result = new List<GroupedMessage>();
-        var currentGroup = new GroupedMessage();
+        var result = new List<GroupedNotificationTextMessage>();
+        var currentGroup = new GroupedNotificationTextMessage();
 
         foreach (var message in messages)
         {
@@ -93,7 +90,7 @@ public static class NotificationExtensions
                 {
                     result.Add(currentGroup);
                 }
-                currentGroup = new GroupedMessage
+                currentGroup = new GroupedNotificationTextMessage
                 {
                     Sender = message.Sender,
                     Messages = []

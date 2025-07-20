@@ -27,8 +27,8 @@
         <vm:AboutViewModel x:Name="ViewModel" />
     </Page.DataContext>
 
-    <ScrollViewer>
-        <StackPanel Margin="16,24,16,0" Spacing="5">
+    <ScrollViewer Padding="0,0,40,0">
+        <StackPanel Spacing="4">
 
             <TextBlock
                 Margin="0,0,0,8"

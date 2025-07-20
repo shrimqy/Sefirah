@@ -17,7 +17,8 @@ using Windows.Media.Control;
 namespace Sefirah.Platforms.Windows.Services;
 public class WindowsPlaybackService(
     ILogger<WindowsPlaybackService> logger,
-    ISessionManager sessionManager) : IPlaybackService, IMMNotificationClient
+    ISessionManager sessionManager,
+    IDeviceManager deviceManager) : IPlaybackService, IMMNotificationClient
 {
     private readonly DispatcherQueue dispatcher = DispatcherQueue.GetForCurrentThread();
     private readonly Dictionary<string, GlobalSystemMediaTransportControlsSession> activeSessions = [];
@@ -48,7 +49,7 @@ public class WindowsPlaybackService(
 
             sessionManager.ConnectionStatusChanged += async (sender, args) =>
             {
-                if (args.IsConnected && args.Device.Session != null)
+                if (args.IsConnected && args.Device.Session != null && args.Device.DeviceSettings?.MediaSessionSyncEnabled == true)
                 {
                     foreach (var session in activeSessions.Values)
                     {
@@ -371,7 +372,7 @@ public class WindowsPlaybackService(
 
             if (mediaProperties.Thumbnail != null)
             {
-                playbackSession.Thumbnail = await ImageHelper.ToBase64Async(mediaProperties.Thumbnail);
+                playbackSession.Thumbnail = await mediaProperties.Thumbnail.ToBase64Async();
             }
 
             return playbackSession;
@@ -388,8 +389,14 @@ public class WindowsPlaybackService(
     {
         try
         {
-            string jsonMessage = SocketMessageSerializer.Serialize(playbackSession);
-            sessionManager.BroadcastMessage(jsonMessage);
+            foreach (var device in deviceManager.PairedDevices)
+            {
+                if (device.Session != null && device.DeviceSettings?.MediaSessionSyncEnabled == true)
+                {
+                    string jsonMessage = SocketMessageSerializer.Serialize(playbackSession);
+                    sessionManager.SendMessage(device.Session, jsonMessage);
+                }
+            }
         }
         catch (Exception ex)
         {

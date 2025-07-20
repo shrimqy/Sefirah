@@ -1,18 +1,15 @@
+using System.Collections.Specialized;
 using CommunityToolkit.WinUI;
-using Microsoft.UI.Xaml.Media.Imaging;
-using Sefirah.Data.AppDatabase.Models;
 using Sefirah.Data.Contracts;
 using Sefirah.Extensions;
-using Sefirah.Helpers;
 using Sefirah.Services.Socket;
-using Sefirah.Services;
 
 namespace Sefirah.Data.Models;
 
 public partial class PairedDevice : ObservableObject
 {
-    public string Id { get; set; }
-    public string Name { get; set; }
+    public string Id { get; private set; }
+    public string Name { get; set; } = string.Empty;
     public List<string>? IpAddresses { get; set; } = [];
     public List<PhoneNumber>? PhoneNumbers { get; set; } = [];
     public ImageSource? Wallpaper { get; set; }
@@ -55,20 +52,38 @@ public partial class PairedDevice : ObservableObject
         }
     }
 
-    // ADB Connection Properties
+    private readonly IAdbService adbService;
+    private readonly IUserSettingsService userSettingsService;
+
+    private IDeviceSettingsService deviceSettings;
+    public IDeviceSettingsService DeviceSettings
+    {
+        get => deviceSettings;
+        private set => SetProperty(ref deviceSettings, value);
+    }
+
+
+    public PairedDevice(string Id)
+    {
+        this.Id = Id;
+        userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
+        adbService = Ioc.Default.GetRequiredService<IAdbService>();
+        adbService.AdbDevices.CollectionChanged += OnAdbDevicesChanged;
+        deviceSettings = userSettingsService.GetDeviceSettings(Id);
+    }
+
+    public ObservableCollection<AdbDevice> ConnectedAdbDevices { get; set; } = [];
+
     public bool HasAdbConnection
     {
         get
         {
             try
             {
-                var adbService = Ioc.Default.GetService<IAdbService>();
-                if (adbService == null) return false;
-
-                return adbService.AdbDevices.Any(adbDevice => 
+                return adbService?.AdbDevices.Any(adbDevice => 
                     adbDevice.IsOnline && 
                     !string.IsNullOrEmpty(adbDevice.AndroidId) && 
-                    adbDevice.AndroidId == Id);
+                    adbDevice.AndroidId == Id) ?? false;
             }
             catch
             {
@@ -77,91 +92,25 @@ public partial class PairedDevice : ObservableObject
         }
     }
 
-    public ObservableCollection<AdbDevice> ConnectedAdbDevices
+    private void OnAdbDevicesChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        get
-        {
-            try
-            {
-                var adbService = Ioc.Default.GetService<IAdbService>();
-                if (adbService == null) return new ObservableCollection<AdbDevice>();
-
-                var connectedDevices = adbService.AdbDevices
-                    .Where(adbDevice => adbDevice.IsOnline && 
-                                       !string.IsNullOrEmpty(adbDevice.AndroidId) && 
-                                       adbDevice.AndroidId == Id)
-                    .ToList();
-
-                return new ObservableCollection<AdbDevice>(connectedDevices);
-            }
-            catch
-            {
-                return new ObservableCollection<AdbDevice>();
-            }
-        }
-    }
-
-    private IDeviceSettingsService? _deviceSettings;
-    public IDeviceSettingsService DeviceSettings
-    {
-        get
-        {
-            if (_deviceSettings == null)
-            {
-                var userSettingsService = Ioc.Default.GetService<IUserSettingsService>();
-                _deviceSettings = userSettingsService?.GetDeviceSettings(Id);
-            }
-            return _deviceSettings!;
-        }
-    }
-
-    public static async Task<PairedDevice> FromDeviceInfo(DeviceInfo device, string IpAddress)
-    {
-        var wallPaperBytes = string.IsNullOrEmpty(device.Avatar) ? null : Convert.FromBase64String(device.Avatar);
-        var wallPaper = await ImageHelper.ToBitmapAsync(wallPaperBytes);
-        return new PairedDevice
-        {
-            Id = device.DeviceId,
-            Name = device.DeviceName,
-            IpAddresses = [IpAddress],
-            PhoneNumbers = device.PhoneNumbers,
-            Wallpaper = wallPaper
-        };
-    }
-
-    public static async Task<PairedDevice> FromRemoteDevice(RemoteDeviceEntity device)
-    {
-        var wallPaperBytes = device.WallpaperBytes;
-        BitmapImage? wallPaper = null;
-        
-        if (wallPaperBytes != null)
-        {
-            var dispatcher = App.MainWindow?.DispatcherQueue;
-            if (dispatcher != null)
-            {
-                await dispatcher.EnqueueAsync(async () =>
-                {
-                    wallPaper = await ImageHelper.ToBitmapAsync(wallPaperBytes);
-                });
-            }
-        }
-
-        return new PairedDevice
-        {
-            Id = device.DeviceId,
-            Name = device.Name,
-            IpAddresses = device.IpAddresses,
-            PhoneNumbers = device.PhoneNumbers,
-            Wallpaper = wallPaper,
-        };
-    }
-
-    /// <summary>
-    /// Call this method to refresh ADB connection status when ADB devices change
-    /// </summary>
-    public void RefreshAdbStatus()
-    {
+        RefreshConnectedAdbDevices();
         OnPropertyChanged(nameof(HasAdbConnection));
-        OnPropertyChanged(nameof(ConnectedAdbDevices));
+    }
+
+    private void RefreshConnectedAdbDevices()
+    {
+        App.MainWindow?.DispatcherQueue.EnqueueAsync(() =>
+        {
+            ConnectedAdbDevices.Clear();
+
+            var devices = adbService.AdbDevices
+                .Where(adbDevice => adbDevice.IsOnline && 
+                    !string.IsNullOrEmpty(adbDevice.AndroidId) && 
+                    adbDevice.AndroidId == Id)
+                .ToList();
+
+            ConnectedAdbDevices.AddRange(devices);
+        });
     }
 }

@@ -30,13 +30,10 @@ public partial class ConnectionRequestViewModel : ObservableObject
         _frame = frame;
     }
 
-    public void OnConnectClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    public void OnConnectClick()
     {
-        // If we're on the onboarding page, navigate to main page
-        if (_frame.Content is SyncPage)
-        {
-            ApplicationData.Current.LocalSettings.Values["HasCompletedOnboarding"] = true;
-            _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
-        }
+        // If we're on the onboarding pages, navigate to main page
+        ApplicationData.Current.LocalSettings.Values["HasCompletedOnboarding"] = true;
+        _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
     }
 }

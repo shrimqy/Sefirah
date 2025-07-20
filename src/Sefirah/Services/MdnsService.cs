@@ -55,8 +55,6 @@ public class MdnsService(ILogger<MdnsService> logger) : IMdnsService
                     logger.LogWarning("Service profile has invalid name, skipping unadvertise");
                     return;
                 }
-
-                // Library-specific cleanup sequence
                 serviceDiscovery.Unadvertise(serviceProfile);
                 multicastService.Stop();
             }
@@ -67,11 +65,8 @@ public class MdnsService(ILogger<MdnsService> logger) : IMdnsService
         }
         finally
         {
-            // Dispose resources regardless of success
             serviceDiscovery?.Dispose();
             multicastService?.Dispose();
-            
-            // Reset references after disposal
             serviceDiscovery = null;
             multicastService = null;
             serviceProfile = null;
@@ -119,9 +114,8 @@ public class MdnsService(ILogger<MdnsService> logger) : IMdnsService
 
                     foreach (var txtData in txtRecord.Strings)
                     {
-                        // Trim spaces in case there's any
                         var cleanTxtData = txtData.Trim();
-                        var parts = cleanTxtData.Split(['='], 2); // Split at first '=' only
+                        var parts = cleanTxtData.Split(['='], 2); // Split at first '=' 
                         if (parts.Length == 2)
                         {
                             if (parts[0] == "deviceName")
@@ -140,7 +134,7 @@ public class MdnsService(ILogger<MdnsService> logger) : IMdnsService
                         var deviceId = txtRecord.CanonicalName.Split('.')[0]; // Split on first dot to get device ID
                         DiscoveredMdnsService?.Invoke(this, new DiscoveredMdnsServiceArgs 
                         { 
-                            DeviceId = deviceId,  // Use just the device ID
+                            DeviceId = deviceId, 
                             DeviceName = deviceName, 
                             PublicKey = publicKey 
                         });

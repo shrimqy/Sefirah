@@ -1,5 +1,4 @@
 using System.Runtime.Serialization;
-using System.Text.Json.Serialization;
 
 namespace Sefirah.Data.Enums;
 public enum FileTransferType

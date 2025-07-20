@@ -1,11 +1,9 @@
 using CommunityToolkit.WinUI;
-using Microsoft.Extensions.Logging;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 using Sefirah.Utils.Serialization;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Graphics.Imaging;
-using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.System;
 using DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue;
@@ -80,10 +78,10 @@ public class ClipboardService : IClipboardService
                 // Check if any connected devices have clipboard sync enabled
                 var devicesWithClipboardSync = deviceManager.PairedDevices
                     .Where(device => device.Session != null && 
-                                   device.DeviceSettings.ClipboardSyncEnabled)
+                                   device.DeviceSettings?.ClipboardSyncEnabled == true)
                     .ToList();
                 
-                if (!devicesWithClipboardSync.Any())
+                if (devicesWithClipboardSync.Count == 0)
                 {
                     logger.LogDebug("No connected devices have clipboard sync enabled, skipping clipboard processing");
                     return;
@@ -97,10 +95,10 @@ public class ClipboardService : IClipboardService
                 {
                     // Check if any device has image clipboard enabled
                     var devicesWithImageSync = devicesWithClipboardSync
-                        .Where(device => device.DeviceSettings.ImageToClipboardEnabled)
+                        .Where(device => device.DeviceSettings?.ImageToClipboardEnabled == true)
                         .ToList();
                     
-                    if (devicesWithImageSync.Any())
+                    if (devicesWithImageSync.Count != 0)
                     {
                         await TryHandleBitmapContent(dataPackageView);
                     }
@@ -135,7 +133,7 @@ public class ClipboardService : IClipboardService
         // Send message only to devices that have clipboard sync enabled
         foreach (var device in deviceManager.PairedDevices)
         {
-            if (device.Session != null && device.DeviceSettings.ClipboardSyncEnabled)
+            if (device.Session != null && device.DeviceSettings?.ClipboardSyncEnabled == true)
             {
                 sessionManager.SendMessage(device.Session, serializedMessage);
                 logger.LogDebug("Sent clipboard message to device {DeviceId}", device.Id);
@@ -193,7 +191,7 @@ public class ClipboardService : IClipboardService
         }
     }
 
-    private async Task<Stream> CompressImageStream(IRandomAccessStream stream, string mimeType)
+    private static async Task<Stream> CompressImageStream(IRandomAccessStream stream, string mimeType)
     {
         var compressedStream = new MemoryStream();
         
