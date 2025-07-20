@@ -1,12 +1,10 @@
 using CommunityToolkit.WinUI;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 using Sefirah.Views.DevicePreferences;
+using Uno.Resizetizer;
 using Rect = Windows.Foundation.Rect;
 
 
@@ -22,6 +20,7 @@ public sealed partial class DeviceSettingsWindow : Window
         
         this.InitializeComponent();
         Title = device.Name;
+        this.SetWindowIcon();
         OverlappedPresenter overlappedPresenter = (AppWindow.Presenter as OverlappedPresenter) ?? OverlappedPresenter.Create();
         overlappedPresenter.IsMaximizable = false;
         overlappedPresenter.IsMinimizable = false;
