@@ -46,6 +46,12 @@
     </UnoFeatures>
     <Platforms>x64;ARM64;x86</Platforms>
   </PropertyGroup>
+    
+  <PropertyGroup>
+    <UnoIconForegroundFile>Assets\Icons\icon_foreground.svg</UnoIconForegroundFile>
+    <UnoIconBackgroundColor Condition="'$(IsWinAppSdk)' == 'true'">Transparent</UnoIconBackgroundColor>
+  </PropertyGroup>
+    
     <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100'">
         <StartupObject>Sefirah.Platforms.Windows.Program</StartupObject>
     </PropertyGroup>
