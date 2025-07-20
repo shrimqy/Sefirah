@@ -112,6 +112,12 @@ internal sealed class DeviceSettingsService : BaseDeviceAwareJsonSettings, IDevi
         get => Get(false);
         set => Set(value);
     }
+
+    public int UnlockTimeout
+    {
+        get => Get(0);
+        set => Set(value);
+    }
     
     public string? UnlockCommands
     {

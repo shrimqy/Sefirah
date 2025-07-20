@@ -251,6 +251,19 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         }
     }
 
+    public int UnlockTimeout
+    {
+        get => DeviceSettings?.UnlockTimeout ?? 0;
+        set
+        {
+            if (DeviceSettings != null && DeviceSettings.UnlockTimeout != value)
+            {
+                DeviceSettings.UnlockTimeout = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public string? UnlockCommands
     {
         get => DeviceSettings?.UnlockCommands;
@@ -638,7 +651,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         var remoteAppEntity = RemoteAppsRepository.GetApplicationsFromDevice(id).ToObservableCollection();
         foreach (var entity in remoteAppEntity)
         {
-            var app = await entity.ToApplicationInfo().ConfigureAwait(false);
+            var app = await entity.ToApplicationInfo();
             app.UpdateNotificationFilter(id);
             RemoteApps.Add(app);
         }

@@ -24,6 +24,9 @@ public class ScreenMirrorService(
     private CancellationTokenSource? cts;
     private readonly Microsoft.UI.Dispatching.DispatcherQueue? dispatcher = App.MainWindow?.DispatcherQueue;
     
+    // Password cache: deviceId -> (password, cachedTime, timeoutMinutes)
+    private readonly Dictionary<string, (string Password, DateTime CachedAt, int TimeoutMinutes)> passwordCache = [];
+    
     public async Task<bool> StartScrcpy(PairedDevice device, string? customArgs = null, string? iconPath = null)
     {
         Process? process = null;
@@ -116,8 +119,26 @@ public class ScreenMirrorService(
                     
                     if (hasPasswordPlaceholder)
                     {
-                        password = await ShowPasswordInputDialog();
-                        if (password == null) return false;
+                        // Only use password caching if timeout is greater than 0
+                        var timeoutSeconds = deviceSettings.UnlockTimeout;
+                        if (timeoutSeconds > 0)
+                        {
+                            // Try to get cached password first
+                            password = GetCachedPassword(device.Id, timeoutSeconds);
+                        }
+                        
+                        // If no cached password or caching is disabled, ask user for password
+                        if (password == null)
+                        {
+                            password = await ShowPasswordInputDialog();
+                            if (password == null) return false;
+                            
+                            // Only cache the password if timeout is greater than 0
+                            if (timeoutSeconds > 0)
+                            {
+                                CachePassword(device.Id, password, timeoutSeconds);
+                            }
+                        }
                         
                         // Replace password placeholders with actual password
                         commands = commands.Select(c => c.Replace("%pwd%", password)).ToList();
@@ -539,5 +560,26 @@ public class ScreenMirrorService(
         });
 
         return password;
+    }
+
+    private string? GetCachedPassword(string deviceId, int currentTimeout)
+    {
+        if (passwordCache.TryGetValue(deviceId, out var cacheEntry))
+        {
+            var (password, cachedAt, cachedTimeout) = cacheEntry;
+
+            if (currentTimeout == cachedTimeout && DateTime.Now <= cachedAt.AddMinutes(cachedTimeout))
+            {
+                return password;
+            }
+            passwordCache.Remove(deviceId);
+        }
+        
+        return null;
+    }
+
+    private void CachePassword(string deviceId, string password, int timeoutMinutes)
+    {
+        passwordCache[deviceId] = (password, DateTime.Now, timeoutMinutes);
     }
 }

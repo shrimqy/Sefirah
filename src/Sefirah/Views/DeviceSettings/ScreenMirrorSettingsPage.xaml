@@ -65,70 +65,122 @@
                         </wuc:SettingsCard>
                     </wuc:SettingsExpander.Items>
                     <wuc:SettingsExpander.ItemsFooter>
-                        <Grid
+                        <Border
                             Padding="58,16,44,8"
                             Background="{ThemeResource ExpanderHeaderBackground}"
                             BorderBrush="{ThemeResource ExpanderHeaderBorderBrush}"
                             BorderThickness="0,1,0,0"
                             CornerRadius="0">
-                            <StackPanel Spacing="3">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel
-                                        Grid.Column="0"
-                                        VerticalAlignment="Center"
-                                        Orientation="Horizontal"
-                                        Spacing="8">
-                                        <TextBlock Text="Unlock device before launching scrcpy" />
-                                        <Button
-                                            Padding="4"
-                                            Background="Transparent"
-                                            BorderThickness="0">
-                                            <FontIcon
-                                                FontSize="14"
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                Glyph="&#xE946;" />
-                                            <Button.Flyout>
-                                                <Flyout>
-                                                    <StackPanel MaxWidth="350" Spacing="5">
-                                                        <TextBlock
-                                                            FontWeight="SemiBold"
-                                                            Foreground="{ThemeResource AccentAAFillColorDefaultBrush}"
-                                                            Text="{helpers:ResourceString Name=UnlockDeviceHelpTitle}" />
-                                                        <TextBlock
-                                                            FontSize="13"
-                                                            Text="{helpers:ResourceString Name=UnlockDeviceHelpDescription}"
-                                                            TextWrapping="Wrap" />
-                                                        <TextBlock
-                                                            FontWeight="SemiBold"
-                                                            Foreground="{ThemeResource AccentAAFillColorDefaultBrush}"
-                                                            Text="{helpers:ResourceString Name=UnlockDeviceHelpExample}" />
-                                                        <TextBlock
-                                                            FontFamily="Consolas"
-                                                            FontSize="13"
-                                                            IsTextSelectionEnabled="True"
-                                                            Text="input keyevent 26&#x0a;input keyevent 66&#x0a;input text %pwd%" />
-                                                    </StackPanel>
-                                                </Flyout>
-                                            </Button.Flyout>
-                                        </Button>
-                                    </StackPanel>
-                                    <ToggleSwitch
-                                        Grid.Column="1"
-                                        IsOn="{x:Bind ViewModel.UnlockDeviceBeforeLaunch, Mode=TwoWay}"
-                                        Style="{StaticResource CustomToggleSwitchStyle}" />
-                                </Grid>
+                            <Grid RowSpacing="10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    Orientation="Horizontal"
+                                    Spacing="8">
+                                    <TextBlock Text="Unlock device before launching scrcpy" />
+                                    <Button
+                                        Padding="4"
+                                        Background="Transparent"
+                                        BorderThickness="0">
+                                        <FontIcon
+                                            FontSize="14"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Glyph="&#xE946;" />
+                                        <Button.Flyout>
+                                            <Flyout>
+                                                <StackPanel MaxWidth="350" Spacing="5">
+                                                    <TextBlock
+                                                        FontWeight="SemiBold"
+                                                        Foreground="{ThemeResource AccentAAFillColorDefaultBrush}"
+                                                        Text="{helpers:ResourceString Name=UnlockDeviceHelpTitle}" />
+                                                    <TextBlock
+                                                        FontSize="13"
+                                                        Text="{helpers:ResourceString Name=UnlockDeviceHelpDescription}"
+                                                        TextWrapping="Wrap" />
+                                                    <TextBlock
+                                                        FontWeight="SemiBold"
+                                                        Foreground="{ThemeResource AccentAAFillColorDefaultBrush}"
+                                                        Text="{helpers:ResourceString Name=UnlockDeviceHelpExample}" />
+                                                    <TextBlock
+                                                        FontFamily="Consolas"
+                                                        FontSize="13"
+                                                        IsTextSelectionEnabled="True"
+                                                        Text="input keyevent 26&#x0a;input keyevent 66&#x0a;input text %pwd%" />
+                                                </StackPanel>
+                                            </Flyout>
+                                        </Button.Flyout>
+                                    </Button>
+                                </StackPanel>
+                                <ToggleSwitch
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Margin="-12,0"
+                                    HorizontalAlignment="Right"
+                                    IsOn="{x:Bind ViewModel.UnlockDeviceBeforeLaunch, Mode=TwoWay}"
+                                    Style="{StaticResource CustomToggleSwitchStyle}" />
+
+                                <StackPanel
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    Orientation="Horizontal"
+                                    Spacing="8">
+                                    <TextBlock Text="Password cache timeout" />
+                                    <Button
+                                        Padding="4"
+                                        Background="Transparent"
+                                        BorderThickness="0">
+                                        <FontIcon
+                                            FontSize="14"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Glyph="&#xE946;" />
+                                        <Button.Flyout>
+                                            <Flyout>
+                                                <StackPanel MaxWidth="350" Spacing="5">
+                                                    <TextBlock
+                                                        FontWeight="SemiBold"
+                                                        Foreground="{ThemeResource AccentAAFillColorDefaultBrush}"
+                                                        Text="Password Cache Timeout" />
+                                                    <TextBlock
+                                                        FontSize="13"
+                                                        Text="When set to 0, you'll be prompted for password every time. When set to a value greater than 0, your password will be cached for the specified number of minutes and reused automatically."
+                                                        TextWrapping="Wrap" />
+                                                </StackPanel>
+                                            </Flyout>
+                                        </Button.Flyout>
+                                    </Button>
+                                </StackPanel>
+                                <NumberBox
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    LargeChange="30"
+                                    Minimum="0"
+                                    PlaceholderText="0 (disabled)"
+                                    SmallChange="5"
+                                    Value="{x:Bind ViewModel.UnlockTimeout, Mode=TwoWay}" />
+
                                 <TextBox
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="2"
                                     MinHeight="80"
+                                    Margin="0,6,0,0"
                                     AcceptsReturn="True"
                                     PlaceholderText="input keyevent 26&#x0a;input keyevent 66&#x0a;input text %pwd%"
                                     Text="{x:Bind ViewModel.UnlockCommands, Mode=TwoWay}"
                                     TextWrapping="Wrap" />
-                            </StackPanel>
-                        </Grid>
+                            </Grid>
+                        </Border>
                     </wuc:SettingsExpander.ItemsFooter>
                 </wuc:SettingsExpander>
 

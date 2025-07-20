@@ -95,6 +95,11 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     bool UnlockDeviceBeforeLaunch { get; set; }
 
     /// <summary>
+    /// Gets or sets the unlock timeout.
+    /// </summary>
+    int UnlockTimeout { get; set; }
+
+    /// <summary>
     /// Gets or sets the video bitrate.
     /// </summary>
     string? VideoBitrate { get; set; }  
