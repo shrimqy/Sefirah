@@ -33,6 +33,7 @@ public class NotificationService(
     // Initialize the service - call this after DI container creates the instance
     public void Initialize()
     {
+        ClearBadge();
         // Listen to device connection status changes
         sessionManager.ConnectionStatusChanged += OnConnectionStatusChanged;
         
@@ -392,5 +393,21 @@ public class NotificationService(
                 logger.LogInformation("Removed all notifications for disconnected device {DeviceId}", deviceId);
             }
         });
+    }
+
+    /// <summary>
+    /// Clears the badge number on the app tile
+    /// </summary>
+    private void ClearBadge()
+    {
+        try
+        {
+            BadgeUpdater badgeUpdater = BadgeUpdateManager.CreateBadgeUpdaterForApplication();
+            badgeUpdater.Clear();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error clearing badge number at startup");
+        }
     }
 }
