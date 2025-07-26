@@ -11,6 +11,8 @@ public sealed partial class MainPageViewModel : BaseViewModel
     private INotificationService NotificationService { get; } = Ioc.Default.GetRequiredService<INotificationService>();
     private RemoteAppRepository RemoteAppsRepository { get; } = Ioc.Default.GetRequiredService<RemoteAppRepository>();
     private ISessionManager SessionManager { get; } = Ioc.Default.GetRequiredService<ISessionManager>();
+    private IUpdateService UpdateService { get; } = Ioc.Default.GetRequiredService<IUpdateService>();
+
     private ObservableCollection<PairedDevice> PairedDevices => DeviceManager.PairedDevices;
 
     public ReadOnlyObservableCollection<Notification> Notifications => NotificationService.NotificationHistory;
@@ -19,6 +21,8 @@ public sealed partial class MainPageViewModel : BaseViewModel
 
     [ObservableProperty]
     public partial bool LoadingScrcpy { get; set; } = false;
+
+    public bool IsUpdateAvailable => UpdateService.IsUpdateAvailable;
 
     [RelayCommand]
     public async Task ToggleConnection(PairedDevice? device)
@@ -36,7 +40,6 @@ public sealed partial class MainPageViewModel : BaseViewModel
         }
     }
 
-    [RelayCommand]
     public async Task StartScrcpy()
     {
         try
@@ -126,6 +129,11 @@ public sealed partial class MainPageViewModel : BaseViewModel
     public async void UpdateNotificationFilter(string appPackage)
     {
         await RemoteAppsRepository.AddOrUpdateAppNotificationFilter(deviceId: Device!.Id, appPackage: appPackage, filter: NotificationFilter.Disabled);
+    }
+
+    public void UpdateApp()
+    {
+        UpdateService.DownloadUpdatesAsync();
     }
 
     public MainPageViewModel()

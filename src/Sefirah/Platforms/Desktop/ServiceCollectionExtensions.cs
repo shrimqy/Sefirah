@@ -14,6 +14,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IPlatformNotificationHandler, DesktopNotificationHandler>();
         services.AddSingleton<IPlaybackService, DesktopPlaybackService>();
         services.AddSingleton<IActionService, DesktopActionService>();
+        services.AddSingleton<IUpdateService, DesktopUpdateService>();
         services.AddSingleton<ISftpService, DesktopSftpService>();
         return services;
     }

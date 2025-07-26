@@ -613,9 +613,9 @@
                             SelectsOnInvoked="False"
                             Tapped="UpdateButtonClick"
                             ToolTipService.ToolTip="Update Available"
-                            Visibility="Collapsed">
+                            Visibility="{x:Bind ViewModel.IsUpdateAvailable, Mode=OneWay}">
                             <NavigationViewItem.Icon>
-                                <FontIcon Glyph="&#xECC5;" />
+                                <FontIcon Foreground="{StaticResource AccentFillColorDefaultBrush}" Glyph="&#xEDAB;" />
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
                     </NavigationView.FooterMenuItems>

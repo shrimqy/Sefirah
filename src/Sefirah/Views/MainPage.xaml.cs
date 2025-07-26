@@ -291,13 +291,13 @@ public sealed partial class MainPage : Page
         storyboard.Begin();
     }
 
-    private void ToggleScreenMirror(object sender, TappedRoutedEventArgs e)
+    private async void ToggleScreenMirror(object sender, TappedRoutedEventArgs e)
     {
-        ViewModel.StartScrcpy();
+        await ViewModel.StartScrcpy();
     }
 
     private void UpdateButtonClick(object sender, TappedRoutedEventArgs e)
     {
-        Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.ReleasesUrl)).AsTask();
+        ViewModel.UpdateApp();
     }
 }

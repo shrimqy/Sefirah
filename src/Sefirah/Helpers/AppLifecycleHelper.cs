@@ -38,6 +38,8 @@ public static class AppLifecycleHelper
         var playbackService = Ioc.Default.GetRequiredService<IPlaybackService>();
         var actionService = Ioc.Default.GetRequiredService<IActionService>();
 
+        var updateService = Ioc.Default.GetRequiredService<IUpdateService>();
+
 #if WINDOWS
         var windowsNotificationHandler = Ioc.Default.GetRequiredService<IPlatformNotificationHandler>();
         await windowsNotificationHandler.RegisterForNotifications();
@@ -45,13 +47,14 @@ public static class AppLifecycleHelper
 
         notificationService.Initialize();
         await deviceManager.Initialize();
-        
+
         await Task.WhenAll(
             networkService.StartServerAsync(),
             playbackService.InitializeAsync(),
             actionService.InitializeAsync(),
-            adbService.StartAsync()
-        );
+            adbService.StartAsync(),
+            updateService.CheckForUpdatesAsync()
+        ); 
 
         App.SplashScreenLoadingTCS?.TrySetResult();
     } 

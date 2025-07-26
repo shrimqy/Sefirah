@@ -13,6 +13,8 @@ using Uno.Resizetizer;
 using Sefirah.Extensions;
 using Sefirah.Data.Enums;
 using Microsoft.UI.Windowing;
+using WinRT.Interop;
+
 #if WINDOWS
 using Sefirah.Platforms.Windows.Helpers;
 #endif
@@ -22,6 +24,7 @@ public partial class App : Application
 {
     public static TaskCompletionSource? SplashScreenLoadingTCS { get; private set; }
     public static bool HandleClosedEvents { get; set; } = true;
+    public static nint WindowHandle { get; private set; }
     public static Window? MainWindow { get; private set; }
     protected IHost? Host { get; private set; }
 
@@ -45,6 +48,7 @@ public partial class App : Application
             MainWindow.AppWindow.Title = "Sefirah";
             MainWindow.SetWindowIcon();
 #if WINDOWS
+            WindowHandle = WindowNative.GetWindowHandle(MainWindow);
             MainWindow.ExtendsContentIntoTitleBar = true;
             MainWindow.SystemBackdrop = new MicaBackdrop();
 #endif
