@@ -132,6 +132,9 @@ public class WindowsPlaybackService(
                             SetVolume(mediaAction.Source, Convert.ToSingle(mediaAction.Value.Value));
                         }
                         break;
+                    case PlaybackActionType.ToggleMute:
+                        ToggleMute(mediaAction.Source);
+                        break;
                     default:
                         logger.LogWarning("Unhandled media action: {PlaybackActionType}", mediaAction.PlaybackActionType);
                         break;
@@ -426,6 +429,7 @@ public class WindowsPlaybackService(
                         DeviceId = device.ID,
                         DeviceName = device.FriendlyName,
                         Volume = device.AudioEndpointVolume.MasterVolumeLevelScalar,
+                        IsMuted = device.AudioEndpointVolume.Mute,
                         IsSelected = device.ID == defaultDevice
                     }
                 );
@@ -434,6 +438,38 @@ public class WindowsPlaybackService(
         catch (Exception ex)
         {
             logger.LogWarning(ex, "Failed to enumerate audio devices");
+        }
+    }
+
+    public void ToggleMute(string deviceId)
+    {
+        try
+        {
+            var endpoint = enumerator.GetDevice(deviceId);
+            if (endpoint == null)
+            {
+                logger.LogWarning("Endpoint not found: {DeviceId}", deviceId);
+                return;
+            }
+            // Check if device is active
+            if (endpoint.State != DeviceState.Active)
+            {
+                logger.LogWarning("Device {DeviceId} is not in active state: {State}", deviceId, endpoint.State);
+                return;
+            }
+            try
+            {
+                endpoint.AudioEndpointVolume.Mute = !endpoint.AudioEndpointVolume.Mute;
+                logger.LogInformation("Device {DeviceId} muted: {Mute}", deviceId, endpoint.AudioEndpointVolume.Mute);
+            }
+            catch (COMException comEx) when (comEx.HResult == unchecked((int)0x8007001F))
+            {
+                logger.LogWarning("Device {DeviceId} not functioning when muting", deviceId);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error muting device {DeviceId}", deviceId);
         }
     }
 
@@ -546,6 +582,7 @@ public class WindowsPlaybackService(
                 DeviceId = pwstrDeviceId,
                 DeviceName = enumerator.GetDevice(pwstrDeviceId).FriendlyName,
                 Volume = enumerator.GetDevice(pwstrDeviceId).AudioEndpointVolume.MasterVolumeLevelScalar,
+                IsMuted = enumerator.GetDevice(pwstrDeviceId).AudioEndpointVolume.Mute,
                 IsSelected = false
             }
         );
@@ -573,9 +610,6 @@ public class WindowsPlaybackService(
     public void OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key)
     {
         AudioDevice? device = AudioDevices.FirstOrDefault(d => d.DeviceId == pwstrDeviceId);
-        if (device != null)
-        {
-            device.Volume = enumerator.GetDevice(pwstrDeviceId).AudioEndpointVolume.MasterVolumeLevelScalar;
-        }
+        device?.Volume = enumerator.GetDevice(pwstrDeviceId).AudioEndpointVolume.MasterVolumeLevelScalar;
     }
 }

@@ -1,5 +1,4 @@
 using Sefirah.Data.Enums;
-using SkiaSharp;
 
 namespace Sefirah.Data.Models;
 
@@ -262,6 +261,9 @@ public class AudioDevice : SocketMessage
 
     [JsonPropertyName("volume")]
     public float Volume { get; set; }
+
+    [JsonPropertyName("isMuted")]   
+    public bool IsMuted { get; set; }
 
     [JsonPropertyName("isSelected")]
     public bool IsSelected { get; set; }

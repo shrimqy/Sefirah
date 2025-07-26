@@ -32,6 +32,7 @@ public enum PlaybackActionType
     PlaybackRate,
     DefaultDevice,
     VolumeUpdate,
+    ToggleMute
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
