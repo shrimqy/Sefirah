@@ -118,10 +118,13 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
                 {
                     existingDevice.WallpaperBytes = Convert.FromBase64String(device.Avatar);
                 }
-
                 if (ipAddress != null && existingDevice.IpAddresses?.Contains(ipAddress) == false)
                 {
-                    existingDevice.IpAddresses?.Add(ipAddress);
+                    var updatedIpAddresses = new List<string>(existingDevice.IpAddresses ?? [])
+                    {
+                        ipAddress
+                    };
+                    existingDevice.IpAddresses = updatedIpAddresses;
                 }
 
                 if (device.PhoneNumbers != null && existingDevice.PhoneNumbers?.Count != device.PhoneNumbers.Count)
@@ -130,7 +133,6 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
                 }
 
                 repository.AddOrUpdateRemoteDevice(existingDevice);
-                logger.LogInformation("Device verified: {IpAddresses}", string.Join(", ", existingDevice.IpAddresses!));
                 var pairedDevice = await existingDevice.ToPairedDevice();
                 return pairedDevice;
             }

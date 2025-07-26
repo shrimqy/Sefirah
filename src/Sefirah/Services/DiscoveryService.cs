@@ -75,11 +75,10 @@ public class DiscoveryService(
 
             if (remoteDevice != null && remoteDevice.IpAddresses != null)
             {
-                logger.LogInformation($"Remote device IP addresses: {string.Join(", ", remoteDevice.IpAddresses)}");
                 broadcastEndpoints.AddRange(remoteDevice.IpAddresses.Select(ip => new IPEndPoint(IPAddress.Parse(ip), DiscoveryPort)));
             }
 
-            logger.LogInformation($"Active broadcast endpoints: {string.Join(", ", broadcastEndpoints)}");
+            logger.LogInformation("Active broadcast endpoints: {endpoints}", string.Join(", ", broadcastEndpoints));
 
 
             udpClient = new MulticastClient("0.0.0.0", port, this)
@@ -93,7 +92,7 @@ public class DiscoveryService(
             if (udpClient.Connect())
             {
                 udpClient.Socket.EnableBroadcast = true;
-                logger.LogInformation("UDP Client connected successfully {0}", port);
+                logger.LogInformation("UDP Client connected successfully {port}", port);
 
                 BroadcastDeviceInfoAsync(udpBroadcast);
             }
@@ -109,7 +108,6 @@ public class DiscoveryService(
         catch (Exception ex)
         {
             logger.LogError("Discovery initialization failed: {message}", ex.Message);
-            throw;
         }
     }
 
@@ -145,7 +143,7 @@ public class DiscoveryService(
             DiscoveredMdnsServices.Add(service);
         }
         
-        logger.LogInformation("Discovered service instance: {0}, {1}", service.DeviceId, service.DeviceName);
+        logger.LogInformation("Discovered service instance: {deviceId}, {deviceName}", service.DeviceId, service.DeviceName);
 
         var sharedSecret = EcdhHelper.DeriveKey(service.PublicKey, localDevice!.PrivateKey);
         var device = new DiscoveredDevice
