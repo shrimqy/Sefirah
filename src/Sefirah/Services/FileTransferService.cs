@@ -23,7 +23,7 @@ public class FileTransferService(
     IPlatformNotificationHandler notificationHandler
     ) : IFileTransferService, ITcpClientProvider, ITcpServerProvider
 {
-    private readonly string storageLocation = userSettingsService.GeneralSettingsService.ReceivedFilesPath;
+    private readonly string? storageLocation;
     private FileStream? currentFileStream;
     private FileMetadata? currentFileMetadata;
     private long bytesReceived;
@@ -58,6 +58,7 @@ public class FileTransferService(
 
             ArgumentNullException.ThrowIfNull(data);
 
+            var storageLocation = userSettingsService.GeneralSettingsService.ReceivedFilesPath;
             string fullPath = Path.Combine(storageLocation, data.FileMetadata.FileName);
 
             Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
