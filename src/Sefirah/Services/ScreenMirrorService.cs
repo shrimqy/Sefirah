@@ -109,7 +109,7 @@ public class ScreenMirrorService(
                     .Where(c => !string.IsNullOrEmpty(c))
                     .ToList();
                 var adbDevice = pairedDevices.FirstOrDefault(d => d.Serial == selectedDeviceSerial);
-                if (adbDevice == null || adbDevice.DeviceData == null) return false;
+                if (adbDevice == null || !adbDevice.DeviceData.HasValue) return false;
 
                 if (commands?.Count > 0 && await adbService.IsLocked(adbDevice.DeviceData.Value))
                 {
@@ -144,7 +144,7 @@ public class ScreenMirrorService(
                         commands = commands.Select(c => c.Replace("%pwd%", password)).ToList();
                     }
                     
-                    if (adbDevice != null && adbDevice.DeviceData != null)
+                    if (adbDevice != null && adbDevice.DeviceData.HasValue)
                     {
                         adbService.UnlockDevice(adbDevice.DeviceData.Value, commands);
                     }

@@ -47,13 +47,9 @@ public class ClipboardService : IClipboardService
                 Clipboard.ContentChanged += OnClipboardContentChanged;
                 logger.LogInformation("Clipboard monitoring started");
             }
-            catch (NotImplementedException ex)
-            {
-                logger.LogWarning("Clipboard monitoring not implemented on this platform (known issue): {Message}", ex.Message);
-            }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to start clipboard monitoring");
+                logger.LogError("Failed to start clipboard monitoring {ex}", ex);
             }
         });
 
