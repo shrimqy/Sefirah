@@ -13,13 +13,12 @@
         x:Name="TrayIcon"
         x:FieldModifier="public"
         ContextMenuMode="SecondWindow"
-        IconSource="/Assets/Icons/SefirahDark.ico"
         LeftClickCommand="{x:Bind ShowHideWindowCommand}"
         NoLeftClickDelay="True"
         ToolTipText="Sefirah">
         <tb:TaskbarIcon.ContextFlyout>
             <MenuFlyout AreOpenCloseAnimationsEnabled="True">
-                <MenuFlyoutItem Command="{x:Bind ShowHideWindowCommand}" Text="{helpers:ResourceString Name=ShowHide}" />
+                <MenuFlyoutItem Command="{x:Bind ShowHideWindowCommand}" Text="{helpers:ResourceString Name=ShowHideWindow}" />
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem Command="{x:Bind ExitApplicationCommand}" Text="{helpers:ResourceString Name=Exit}" />
             </MenuFlyout>

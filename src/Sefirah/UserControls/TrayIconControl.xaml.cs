@@ -1,9 +1,20 @@
+using Microsoft.UI;
+using Microsoft.UI.Xaml.Media.Imaging;
+using Windows.UI.ViewManagement;
+
 namespace Sefirah.UserControls;
 public sealed partial class TrayIconControl : UserControl
 {
+    private readonly UISettings uiSettings = new();
     public TrayIconControl()
     {
         InitializeComponent();
+
+        // Set initial icon
+        UpdateTrayIcon(uiSettings, null);
+
+        // Monitor system theme changes
+        uiSettings.ColorValuesChanged += UpdateTrayIcon;
     }
 
     [RelayCommand]
@@ -24,6 +35,37 @@ public sealed partial class TrayIconControl : UserControl
         {
             window.Activate();
             window.AppWindow.Show();
+        }
+    }
+
+
+    private void UpdateTrayIcon(UISettings sender, object args)
+    {
+        try
+        {
+            var iconPath = sender.GetColorValue(UIColorType.Background) == Colors.Black
+                ? "ms-appx:///Assets/Icons/SefirahDark.ico"
+                : "ms-appx:///Assets/Icons/SefirahLight.ico";
+
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                try
+                {
+                    var imageSource = new BitmapImage
+                    {
+                        UriSource = new Uri(iconPath)
+                    };
+                    TrayIcon.IconSource = imageSource;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Failed to load tray icon: {ex.Message}");
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to detect theme: {ex.Message}");
         }
     }
 

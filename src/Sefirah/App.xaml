@@ -23,6 +23,16 @@
             <!--  Desktop/Skia: Solid backgrounds with theme support  -->
             <skia:SolidColorBrush x:Key="App.PageBackgroundBrush" Color="{ThemeResource ApplicationPageBackgroundThemeBrush}" />
 
+            <!--  Theme-aware icon resources  -->
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <x:String x:Key="IconPath">ms-appx:///Assets/AppTiles/Square44x44Logo.altform-lightunplated_targetsize-256.png</x:String>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <x:String x:Key="IconPath">ms-appx:///Assets/AppTiles/Square44x44Logo.altform-unplated_targetsize-256.png</x:String>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+
         </ResourceDictionary>
     </Application.Resources>
 

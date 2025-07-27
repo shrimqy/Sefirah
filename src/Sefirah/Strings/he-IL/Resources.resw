@@ -676,9 +676,6 @@ input touchscreen swipe 540 1800 540 900</value>
   <data name="Back" xml:space="preserve">
     <value>Back</value>
   </data>
-  <data name="ShowHide" xml:space="preserve">
-    <value>Show/Hide</value>
-  </data>
   <data name="Browse" xml:space="preserve">
     <value>Browse</value>
   </data>

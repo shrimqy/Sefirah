@@ -12,16 +12,36 @@
     <Grid x:Name="AppTitleBar" Height="32">
         <Grid.ColumnDefinitions>
             <ColumnDefinition x:Name="LeftPaddingColumn" Width="0" />
-            <ColumnDefinition />
+            <ColumnDefinition Width="Auto" />
             <ColumnDefinition x:Name="RightPaddingColumn" Width="0" />
         </Grid.ColumnDefinitions>
-        <TextBlock
-            x:Name="TitleBarTextBlock"
+
+        <Grid
             Grid.Column="1"
-            Margin="15,0,0,0"
-            VerticalAlignment="Center"
-            FontSize="14"
-            Style="{StaticResource CaptionTextBlockStyle}"
-            Text="Sefirah" />
+            Margin="16,0,0,0"
+            ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Image
+                x:Name="TitleBarIcon"
+                Grid.Column="0"
+                Width="25"
+                Height="25"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center">
+                <Image.Source>
+                    <BitmapImage UriSource="{ThemeResource IconPath}" />
+                </Image.Source>
+            </Image>
+            <TextBlock
+                x:Name="TitleBarTextBlock"
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                FontSize="14"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                Text="Sefirah" />
+        </Grid>
     </Grid>
 </UserControl>
