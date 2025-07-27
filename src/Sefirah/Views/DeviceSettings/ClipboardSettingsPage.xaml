@@ -21,37 +21,30 @@
             <TextBlock
                 FontSize="16"
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                Text="Clipboard Settings" />
+                Text="{helpers:ResourceString Name=ClipboardSettings}" />
             <StackPanel Spacing="5">
-                <wuc:SettingsCard Header="Clipboard Sync" Description="Sync clipboard changes with this device">
-                    <wuc:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xF0E3;" />
-                    </wuc:SettingsCard.HeaderIcon>
-                    <ToggleSwitch IsOn="{x:Bind ViewModel.ClipboardSyncEnabled, Mode=TwoWay}" />
-                </wuc:SettingsCard>
-
-                <wuc:SettingsCard Header="Open Links in Browser" Description="Automatically open links from clipboard in default browser">
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=OpenLinksInBrowserDescription}" Header="{helpers:ResourceString Name=OpenLinksInBrowser}">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE774;" />
                     </wuc:SettingsCard.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind ViewModel.OpenLinksInBrowser, Mode=TwoWay}" />
                 </wuc:SettingsCard>
 
-                <wuc:SettingsCard Header="Show Clipboard Toast" Description="Show toast notifications for clipboard changes">
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=ShowClipboardToastDescription}" Header="{helpers:ResourceString Name=ShowClipboardToast}">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE7E7;" />
                     </wuc:SettingsCard.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind ViewModel.ShowClipboardToast, Mode=TwoWay}" />
                 </wuc:SettingsCard>
 
-                <wuc:SettingsCard Header="Clipboard Files" Description="Enable file synchronization through clipboard">
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=ClipboardFilesDescription}" Header="{helpers:ResourceString Name=ClipboardFiles}">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE8B7;" />
                     </wuc:SettingsCard.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind ViewModel.ClipboardFilesEnabled, Mode=TwoWay}" />
                 </wuc:SettingsCard>
 
-                <wuc:SettingsCard Header="Image to Clipboard" Description="Enable image synchronization through clipboard">
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=ImageToClipboardDescription}" Header="{helpers:ResourceString Name=ImageToClipboard}">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEB9F;" />
                     </wuc:SettingsCard.HeaderIcon>

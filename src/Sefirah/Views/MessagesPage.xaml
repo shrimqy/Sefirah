@@ -270,11 +270,11 @@
                     HorizontalAlignment="Center"
                     FontSize="18"
                     FontWeight="SemiBold"
-                    Text="New Message" />
+                    Text="{helpers:ResourceString Name=NewMessage}" />
                 <TextBlock
                     Margin="20,0"
                     Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                    Text="Enter addresses above and compose your message below"
+                    Text="{helpers:ResourceString Name=EnterAddressesAndCompose}"
                     TextAlignment="Center"
                     TextWrapping="Wrap" />
             </StackPanel>

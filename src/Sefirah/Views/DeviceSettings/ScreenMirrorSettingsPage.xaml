@@ -28,7 +28,7 @@
 
     <ScrollViewer>
         <StackPanel Margin="20" Spacing="16">
-            <TextBlock FontSize="16" Text="Screen Mirror Settings" />
+            <TextBlock FontSize="16" Text="{helpers:ResourceString Name=ScreenMirrorSettings}" />
             <StackPanel Spacing="5">
                 <!--  General Settings  -->
                 <wuc:SettingsExpander Header="{helpers:ResourceString Name=GeneralSettings}" IsExpanded="{x:Bind ViewModel.IsGeneralScreenMirrorSettingsExpanded, Mode=TwoWay}">
@@ -36,7 +36,7 @@
                         <FontIcon Glyph="&#xE713;" />
                     </wuc:SettingsExpander.HeaderIcon>
                     <wuc:SettingsExpander.Items>
-                        <wuc:SettingsCard Header="Connection preference">
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=ConnectionPreference}">
                             <ComboBox
                                 Width="150"
                                 ItemsSource="{x:Bind ViewModel.ScrcpyDevicePreferenceOptions.Values}"
@@ -87,7 +87,7 @@
                                     VerticalAlignment="Center"
                                     Orientation="Horizontal"
                                     Spacing="8">
-                                    <TextBlock Text="Unlock device before launching scrcpy" />
+                                    <TextBlock Text="{helpers:ResourceString Name=UnlockDeviceBeforeLaunch}" />
                                     <Button
                                         Padding="4"
                                         Background="Transparent"

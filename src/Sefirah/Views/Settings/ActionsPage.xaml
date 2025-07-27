@@ -5,6 +5,7 @@
     xmlns:contracts="using:Sefirah.Data.Contracts"
     xmlns:converters="using:Sefirah.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:Sefirah.Helpers"
     xmlns:local="using:Sefirah.Views.Settings"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models_actions="using:Sefirah.Data.Models.Actions"
@@ -48,7 +49,7 @@
             <Button
                 Margin="12,0,0,16"
                 Command="{x:Bind ViewModel.AddActionCommand}"
-                Content="Add Action"
+                Content="{helpers:ResourceString Name=AddAction}"
                 Style="{ThemeResource AccentButtonStyle}" />
 
             <!--  Actions List  -->
@@ -79,11 +80,11 @@
                                 <Button
                                     Command="{Binding DataContext.EditActionCommand, ElementName=PageRoot}"
                                     CommandParameter="{x:Bind}"
-                                    Content="Edit" />
+                                    Content="{helpers:ResourceString Name=Edit}" />
                                 <Button
                                     Command="{Binding DataContext.RemoveActionCommand, ElementName=PageRoot}"
                                     CommandParameter="{x:Bind}"
-                                    Content="Remove" />
+                                    Content="{helpers:ResourceString Name=Remove}" />
                             </StackPanel>
                         </wuc:SettingsCard>
                     </DataTemplate>
@@ -104,7 +105,7 @@
                     HorizontalAlignment="Center"
                     FontSize="14"
                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                    Text="No actions configured" />
+                    Text="{helpers:ResourceString Name=NoActionsConfigured}" />
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

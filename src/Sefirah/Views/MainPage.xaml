@@ -520,7 +520,7 @@
                                                         HorizontalAlignment="Stretch"
                                                         VerticalAlignment="Center"
                                                         KeyDown="ReplyTextBox_KeyDown"
-                                                        PlaceholderText="Reply"
+                                                        PlaceholderText="{helpers:ResourceString Name=Reply}"
                                                         Tag="{x:Bind}" />
 
                                                     <Button

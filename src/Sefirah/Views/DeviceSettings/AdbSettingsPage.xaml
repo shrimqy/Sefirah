@@ -25,18 +25,18 @@
             <TextBlock
                 FontSize="16"
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                Text="ADB Settings" />
+                Text="{helpers:ResourceString Name=AdbSettings}" />
 
             <StackPanel Spacing="5">
                 <!--  General ADB Settings  -->
-                <wuc:SettingsCard Description="Automatically connect to ADB when device connects" Header="Auto Connect">
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=AutoConnectDescription}" Header="{helpers:ResourceString Name=AutoConnect}">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE895;" />
                     </wuc:SettingsCard.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind ViewModel.AdbAutoConnect, Mode=TwoWay}" />
                 </wuc:SettingsCard>
 
-                <wuc:SettingsCard Description="Enable wireless ADB connections" Header="Use TCP/IP Mode">
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=UseTcpIpModeDescription}" Header="{helpers:ResourceString Name=UseTcpIpMode}">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE968;" />
                     </wuc:SettingsCard.HeaderIcon>

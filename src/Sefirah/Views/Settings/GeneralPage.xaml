@@ -105,8 +105,8 @@
             <!--  Actions  -->
             <wuc:SettingsCard
                 Click="OpenActionsSettings"
-                Description="Configure custom actions and executable commands"
-                Header="Actions"
+                Description="{helpers:ResourceString Name=ActionsDescription}"
+                Header="{helpers:ResourceString Name=Actions}"
                 IsClickEnabled="True">
                 <wuc:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE8F7;" />

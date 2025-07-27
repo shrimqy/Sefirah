@@ -127,13 +127,13 @@
     <value>Settings</value>
   </data>
   <data name="PrivacyPolicy" xml:space="preserve">
-    <value>Privacy Policy</value>
+    <value>Privacy policy</value>
   </data>
   <data name="SupportDevelopment" xml:space="preserve">
     <value>Support Development</value>
   </data>
   <data name="OpenLogs" xml:space="preserve">
-    <value>Open Logs</value>
+    <value>Open logs</value>
   </data>
   <data name="GitHubRepository" xml:space="preserve">
     <value>GitHub Repository</value>
@@ -154,7 +154,7 @@
     <value>Third party libraries</value>
   </data>
   <data name="SaveLocation" xml:space="preserve">
-    <value>Save Location</value>
+    <value>Save location</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
     <value>Remote Storage Location</value>
@@ -190,7 +190,7 @@
     <value>Notification Feed + Toast</value>
   </data>
   <data name="PairedDevices.Title" xml:space="preserve">
-    <value>Paired Devices</value>
+    <value>Paired devices</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>Available Devices</value>
@@ -232,7 +232,7 @@
     <value>Dark</value>
   </data>
   <data name="RemoveDeviceDialogTitle" xml:space="preserve">
-    <value>Remove Device</value>
+    <value>Remove device</value>
   </data>
   <data name="Remove" xml:space="preserve">
     <value>Remove</value>
@@ -248,7 +248,7 @@
 page.</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
-    <value>Get Started</value>
+    <value>Get started</value>
   </data>
   <data name="OnboardingSkip" xml:space="preserve">
     <value>Skip for now</value>
@@ -281,9 +281,6 @@ mobile (Make sure the pin matches)</value>
   <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
     <value>PASSKEY</value>
   </data>
-  <data name="GitHub" xml:space="preserve">
-    <value>GitHub</value>
-  </data>
   <data name="ClipboardDescription" xml:space="preserve">
     <value>Sync your clipboard across devices</value>
   </data>
@@ -300,7 +297,7 @@ mobile (Make sure the pin matches)</value>
     <value>Disconnected</value>
   </data>
   <data name="ShowHideWindow" xml:space="preserve">
-    <value>Show/Hide Window</value>
+    <value>Show/Hide window</value>
   </data>
   <data name="Exit" xml:space="preserve">
     <value>Exit</value>
@@ -330,7 +327,7 @@ mobile (Make sure the pin matches)</value>
     <value>Received File</value>
   </data>
   <data name="TransferNotification.Title" xml:space="preserve">
-    <value>File Transfer</value>
+    <value>File transfer</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>Send</value>
@@ -375,7 +372,7 @@ mobile (Make sure the pin matches)</value>
     <value>Unpin</value>
   </data>
   <data name="ScreenMirror" xml:space="preserve">
-    <value>Screen Mirror</value>
+    <value>Screen mirror</value>
   </data>
   <data name="VideoSettings" xml:space="preserve">
     <value>Video Settings</value>
@@ -405,7 +402,7 @@ mobile (Make sure the pin matches)</value>
     <value>Messages</value>
   </data>
   <data name="EmptyMessages" xml:space="preserve">
-    <value>Select a conversation to view messages</value>
+    <value>Start a new conversation or select one to reply</value>
   </data>
   <data name="MessagePlaceholder" xml:space="preserve">
     <value>Type a message</value>
@@ -420,7 +417,7 @@ mobile (Make sure the pin matches)</value>
     <value>Search messages</value>
   </data>
   <data name="AddressInputPlaceholder" xml:space="preserve">
-    <value>Enter phone number and press Enter</value>
+    <value>To</value>
   </data>
   <data name="RemoveAddress" xml:space="preserve">
     <value>Remove address</value>
@@ -521,12 +518,6 @@ mobile (Make sure the pin matches)</value>
   <data name="AskEverytime" xml:space="preserve">
     <value>Ask every time</value>
   </data>
-  <data name="Usb" xml:space="preserve">
-    <value>USB</value>
-  </data>
-  <data name="WIFI" xml:space="preserve">
-    <value>WIFI</value>
-  </data>
   <data name="Auto" xml:space="preserve">
     <value>Auto</value>
   </data>
@@ -543,16 +534,16 @@ mobile (Make sure the pin matches)</value>
     <value>Enable virtual display</value>
   </data>
   <data name="TransferNotificationSending.Title" xml:space="preserve">
-    <value>Sending File</value>
+    <value>Sending file</value>
   </data>
   <data name="TransferNotificationSent.Title" xml:space="preserve">
-    <value>Sent File</value>
+    <value>Sent file</value>
   </data>
   <data name="Uninstall" xml:space="preserve">
     <value>Uninstall</value>
   </data>
   <data name="UnlockDeviceHelpTitle" xml:space="preserve">
-    <value>Shell Commands Help</value>
+    <value>Shell commands help</value>
   </data>
   <data name="UnlockDeviceHelpDescription" xml:space="preserve">
     <value>The shell commands in the text box will be executed before launching scrcpy. Enter commands that work on your device, separated by line.</value>
@@ -569,5 +560,148 @@ mobile (Make sure the pin matches)</value>
 82 or MENU: Brings up the unlock interface, or prompts for fingerprint authentication.
 Some devices may also require a swipe gesture to bring up the unlock UI:
 input touchscreen swipe 540 1800 540 900</value>
+  </data>
+  <data name="PinnedApps" xml:space="preserve">
+    <value>Pinned apps</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="ActionsDescription" xml:space="preserve">
+    <value>Configure custom actions and executable commands</value>
+  </data>
+  <data name="AdbNoDevice" xml:space="preserve">
+    <value>No ADB devices connected</value>
+  </data>
+  <data name="AdbNoDeviceSubtitle" xml:space="preserve">
+    <value>Turn on ADB and connect your device via USB or Wi-Fi to see it here</value>
+  </data>
+  <data name="ClipboardSettings" xml:space="preserve">
+    <value>Clipboard settings</value>
+  </data>
+  <data name="DeviceSettings" xml:space="preserve">
+    <value>Device settings</value>
+  </data>
+  <data name="NotificationSettings" xml:space="preserve">
+    <value>Notification settings</value>
+  </data>
+  <data name="ScreenMirrorSettings" xml:space="preserve">
+    <value>Screen mirror settings</value>
+  </data>
+  <data name="OpenLinksInBrowserDescription" xml:space="preserve">
+    <value>Automatically open links from clipboard in default browser</value>
+  </data>
+  <data name="ShowClipboardToastDescription" xml:space="preserve">
+    <value>Show toast notifications for clipboard changes</value>
+  </data>
+  <data name="ClipboardFilesDescription" xml:space="preserve">
+    <value>Enable file synchronization through clipboard</value>
+  </data>
+  <data name="ImageToClipboardDescription" xml:space="preserve">
+    <value>Enable image synchronization through clipboard</value>
+  </data>
+  <data name="AutoConnectDescription" xml:space="preserve">
+    <value>Automatically connect to ADB when device connects</value>
+  </data>
+  <data name="SyncClipboardChanges" xml:space="preserve">
+    <value>Sync clipboard changes with this device</value>
+  </data>
+  <data name="ConfigureNotificationSettings" xml:space="preserve">
+    <value>Configure notification settings</value>
+  </data>
+  <data name="ConfigureScreenMirroring" xml:space="preserve">
+    <value>Configure screen mirroring</value>
+  </data>
+  <data name="ConfigureAdbConnection" xml:space="preserve">
+    <value>Configure ADB connection and manage addresses</value>
+  </data>
+  <data name="SyncMediaSessions" xml:space="preserve">
+    <value>Sync media and audio sessions</value>
+  </data>
+  <data name="MediaSessions" xml:space="preserve">
+    <value>Media sessions</value>
+  </data>
+  <data name="DisplayToastNotifications" xml:space="preserve">
+    <value>Display toast notifications on this PC</value>
+  </data>
+  <data name="ShowBadge" xml:space="preserve">
+    <value>Show badge</value>
+  </data>
+  <data name="ShowBadgeDescription" xml:space="preserve">
+    <value>Show notification badge on taskbar</value>
+  </data>
+  <data name="IgnoreDuringDoNotDisturb" xml:space="preserve">
+    <value>Ignore during Do Not Disturb</value>
+  </data>
+  <data name="IgnoreDuringDoNotDisturbDescription" xml:space="preserve">
+    <value>Don't show notifications when Do Not Disturb is enabled</value>
+  </data>
+  <data name="ConnectionPreference" xml:space="preserve">
+    <value>Connection preference</value>
+  </data>
+  <data name="AddAction" xml:space="preserve">
+    <value>Add action</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="NoActionsConfigured" xml:space="preserve">
+    <value>No actions configured</value>
+  </data>
+  <data name="ActionName" xml:space="preserve">
+    <value>Action name</value>
+  </data>
+  <data name="ExecutablePath" xml:space="preserve">
+    <value>Executable path</value>
+  </data>
+  <data name="Arguments" xml:space="preserve">
+    <value>Arguments</value>
+  </data>
+  <data name="StartInDirectory" xml:space="preserve">
+    <value>Start In directory</value>
+  </data>
+  <data name="EnterActionName" xml:space="preserve">
+    <value>Enter action name</value>
+  </data>
+  <data name="PathToExecutable" xml:space="preserve">
+    <value>Path to executable</value>
+  </data>
+  <data name="CommandLineArguments" xml:space="preserve">
+    <value>Command line arguments (optional)</value>
+  </data>
+  <data name="EnterPassword" xml:space="preserve">
+    <value>Enter password</value>
+  </data>
+  <data name="Reply" xml:space="preserve">
+    <value>Reply</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="ShowHide" xml:space="preserve">
+    <value>Show/Hide</value>
+  </data>
+  <data name="Browse" xml:space="preserve">
+    <value>Browse</value>
+  </data>
+  <data name="EnterAddressesAndCompose" xml:space="preserve">
+    <value>Enter addresses above and compose your message below</value>
+  </data>
+  <data name="UseTcpIpMode" xml:space="preserve">
+    <value>Use TCP/IP mode</value>
+  </data>
+  <data name="UseTcpIpModeDescription" xml:space="preserve">
+    <value>Enable wireless ADB connections</value>
+  </data>
+  <data name="WorkingDirectory" xml:space="preserve">
+    <value>Working directory (optional)</value>
+  </data>
+  <data name="UnlockDeviceBeforeLaunch" xml:space="preserve">
+    <value>Unlock device before launching scrcpy</value>
+  </data>
+  <data name="UnlockCommandsPlaceholder" xml:space="preserve">
+    <value>input keyevent 26
+input keyevent 66
+input text %pwd%</value>
   </data>
 </root>

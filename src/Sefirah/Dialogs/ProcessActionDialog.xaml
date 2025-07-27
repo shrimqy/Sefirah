@@ -2,12 +2,13 @@
     x:Class="Sefirah.Dialogs.ProcessActionDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:helpers="using:Sefirah.Helpers"
     xmlns:local="using:Sefirah.Dialogs"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     DefaultButton="Primary"
     IsPrimaryButtonEnabled="{x:Bind IsFormValid, Mode=OneWay}"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
-    PrimaryButtonText="Save"
+    PrimaryButtonText="{helpers:ResourceString Name=Save}"
     SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
     SecondaryButtonText="Cancel"
     Style="{ThemeResource DefaultContentDialogStyle}">
@@ -17,8 +18,8 @@
             <!--  Action Name  -->
             <TextBox
                 x:Name="ActionNameTextBox"
-                Header="Action Name"
-                PlaceholderText="Enter action name"
+                Header="{helpers:ResourceString Name=ActionName}"
+                PlaceholderText="{helpers:ResourceString Name=EnterActionName}"
                 TextChanged="OnFormFieldChanged" />
 
             <!--  Action Path  -->
@@ -30,21 +31,21 @@
                 <TextBox
                     x:Name="ActionPathTextBox"
                     Grid.Column="0"
-                    Header="Executable Path"
-                    PlaceholderText="Path to executable"
+                    Header="{helpers:ResourceString Name=ExecutablePath}"
+                    PlaceholderText="{helpers:ResourceString Name=PathToExecutable}"
                     TextChanged="OnFormFieldChanged" />
                 <Button
                     Grid.Column="1"
                     Margin="8,24,0,0"
                     Click="BrowseForExecutable_Click"
-                    Content="Browse" />
+                    Content="{helpers:ResourceString Name=Browse}" />
             </Grid>
 
             <!--  Arguments  -->
             <TextBox
                 x:Name="ArgumentsTextBox"
-                Header="Arguments"
-                PlaceholderText="Command line arguments (optional)" />
+                Header="{helpers:ResourceString Name=Arguments}"
+                PlaceholderText="{helpers:ResourceString Name=CommandLineArguments}" />
 
             <!--  Start Directory  -->
             <Grid>
@@ -55,13 +56,13 @@
                 <TextBox
                     x:Name="StartDirectoryTextBox"
                     Grid.Column="0"
-                    Header="Start In Directory"
-                    PlaceholderText="Working directory (optional)" />
+                    Header="{helpers:ResourceString Name=StartInDirectory}"
+                    PlaceholderText="{helpers:ResourceString Name=WorkingDirectory}" />
                 <Button
                     Grid.Column="1"
                     Margin="8,24,0,0"
                     Click="BrowseForDirectory_Click"
-                    Content="Browse" />
+                    Content="{helpers:ResourceString Name=Browse}" />
             </Grid>
         </StackPanel>
     </ScrollViewer>

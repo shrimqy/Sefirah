@@ -181,8 +181,8 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
     public Dictionary<ScrcpyDevicePreferenceType, string> ScrcpyDevicePreferenceOptions { get; } = new()
     {
         { ScrcpyDevicePreferenceType.Auto, "Auto".GetLocalizedResource() },
-        { ScrcpyDevicePreferenceType.Usb, "USB".GetLocalizedResource() },
-        { ScrcpyDevicePreferenceType.Tcpip, "WIFI".GetLocalizedResource() },
+        { ScrcpyDevicePreferenceType.Usb, "USB" },
+        { ScrcpyDevicePreferenceType.Tcpip, "WIFI" },
         { ScrcpyDevicePreferenceType.AskEverytime, "AskEverytime".GetLocalizedResource() }
     };
 

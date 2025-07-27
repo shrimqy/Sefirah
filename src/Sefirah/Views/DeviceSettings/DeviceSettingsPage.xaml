@@ -98,14 +98,14 @@
             <TextBlock
                 FontSize="20"
                 FontWeight="SemiBold"
-                Text="Device Settings" />
+                Text="{helpers:ResourceString Name=DeviceSettings}" />
 
             <StackPanel Spacing="5">
                 <!--  Clipboard Settings  -->
                 <wuc:SettingsCard
                     Click="OpenClipboardSettings"
-                    Description="Sync clipboard changes with this device"
-                    Header="Clipboard"
+                    Description="{helpers:ResourceString Name=SyncClipboardChanges}"
+                    Header="{helpers:ResourceString Name=Clipboard}"
                     IsClickEnabled="True">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xF0E3;" />
@@ -119,8 +119,8 @@
                 <!--  Notification Settings  -->
                 <wuc:SettingsCard
                     Click="OpenNotificationsSettings"
-                    Description="Configure notification settings"
-                    Header="Notifications"
+                    Description="{helpers:ResourceString Name=ConfigureNotificationSettings}"
+                    Header="{helpers:ResourceString Name=Notifications}"
                     IsClickEnabled="True">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xF0E3;" />
@@ -134,8 +134,8 @@
                 <!--  Screen Mirror Settings  -->
                 <wuc:SettingsCard
                     Click="OpenScreenMirrorSettings"
-                    Description="Configure screen mirroring"
-                    Header="Screen Mirror"
+                    Description="{helpers:ResourceString Name=ConfigureScreenMirroring}"
+                    Header="{helpers:ResourceString Name=ScreenMirror}"
                     IsClickEnabled="True">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEC15;" />
@@ -148,8 +148,8 @@
                 <!--  ADB Settings  -->
                 <wuc:SettingsCard
                     Click="OpenAdbSettings"
-                    Description="Configure ADB connection and manage addresses"
-                    Header="ADB Settings"
+                    Description="{helpers:ResourceString Name=ConfigureAdbConnection}"
+                    Header="{helpers:ResourceString Name=AdbSettings}"
                     IsClickEnabled="True">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEC7A;" />
@@ -161,7 +161,7 @@
 
 
                 <!--  Media Session Settings  -->
-                <wuc:SettingsCard Description="Sync media and audio sessions" Header="Media Sessions">
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=SyncMediaSessions}" Header="{helpers:ResourceString Name=MediaSessions}">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEA69;" />
                     </wuc:SettingsCard.HeaderIcon>

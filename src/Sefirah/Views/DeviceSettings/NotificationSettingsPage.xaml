@@ -22,30 +22,30 @@
             <TextBlock
                 FontSize="16"
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                Text="Notification Settings" />
+                Text="{helpers:ResourceString Name=NotificationSettings}" />
             <StackPanel Spacing="5">
-                <wuc:SettingsCard Description="Display toast notifications on this PC" Header="Show Notification Toast">
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=DisplayToastNotifications}" Header="{helpers:ResourceString Name=ShowNotificationToast}">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE7E7;" />
                     </wuc:SettingsCard.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind ViewModel.ShowNotificationToast, Mode=TwoWay}" />
                 </wuc:SettingsCard>
 
-                <wuc:SettingsCard Description="Show notification badge on taskbar" Header="Show Badge">
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=ShowBadgeDescription}" Header="{helpers:ResourceString Name=ShowBadge}">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xF136;" />
                     </wuc:SettingsCard.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind ViewModel.ShowBadge, Mode=TwoWay}" />
                 </wuc:SettingsCard>
 
-                <wuc:SettingsCard Description="Don't show notifications from apps already installed on Windows" Header="Ignore Windows Apps">
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=IgnoreWindowsApps}" Header="{helpers:ResourceString Name=IgnoreWindowsApps}">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE894;" />
                     </wuc:SettingsCard.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind ViewModel.IgnoreWindowsApps, Mode=TwoWay}" />
                 </wuc:SettingsCard>
 
-                <wuc:SettingsCard Description="Don't show notifications when Do Not Disturb is enabled" Header="Ignore During Do Not Disturb">
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=IgnoreDuringDoNotDisturbDescription}" Header="{helpers:ResourceString Name=IgnoreDuringDoNotDisturb}">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE7ED;" />
                     </wuc:SettingsCard.HeaderIcon>
@@ -53,7 +53,7 @@
                 </wuc:SettingsCard>
 
                 <wuc:SettingsExpander
-                    Description="Display toast notifications on this PC"
+                    Description="{helpers:ResourceString Name=DisplayToastNotifications}"
                     Header="{helpers:ResourceString Name=AppSpecificSettings}"
                     ItemsSource="{x:Bind ViewModel.RemoteApps}">
                     <wuc:SettingsExpander.ItemTemplate>

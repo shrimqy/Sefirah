@@ -132,11 +132,11 @@
                                         Glyph="&#xE783;" />
 
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                        <TextBlock FontWeight="SemiBold" Text="No ADB devices connected" />
+                                        <TextBlock FontWeight="SemiBold" Text="{helpers:ResourceString Name=AdbNoDevice}" />
                                         <TextBlock
                                             FontSize="12"
                                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                            Text="Connect your device via USB or WiFi to see it here"
+                                            Text="{helpers:ResourceString Name=AdbNoDeviceSubtitle}"
                                             TextWrapping="Wrap" />
                                     </StackPanel>
                                 </Grid>
@@ -146,7 +146,7 @@
                                 <Button Command="{Binding DataContext.OpenDeviceSettingsCommand, ElementName=DevicePage}" CommandParameter="{x:Bind}">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <FontIcon FontSize="14" Glyph="&#xE713;" />
-                                        <TextBlock Text="Settings" />
+                                        <TextBlock Text="{helpers:ResourceString Name=Settings}" />
                                     </StackPanel>
                                 </Button>
                                 <Button

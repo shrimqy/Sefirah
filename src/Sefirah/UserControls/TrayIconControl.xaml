@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:Sefirah.Helpers"
     xmlns:local="using:Sefirah.UserControls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:tb="using:H.NotifyIcon"
@@ -18,9 +19,9 @@
         ToolTipText="Sefirah">
         <tb:TaskbarIcon.ContextFlyout>
             <MenuFlyout AreOpenCloseAnimationsEnabled="True">
-                <MenuFlyoutItem Command="{x:Bind ShowHideWindowCommand}" Text="Show/Hide" />
+                <MenuFlyoutItem Command="{x:Bind ShowHideWindowCommand}" Text="{helpers:ResourceString Name=ShowHide}" />
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Command="{x:Bind ExitApplicationCommand}" Text="Exit" />
+                <MenuFlyoutItem Command="{x:Bind ExitApplicationCommand}" Text="{helpers:ResourceString Name=Exit}" />
             </MenuFlyout>
         </tb:TaskbarIcon.ContextFlyout>
     </tb:TaskbarIcon>
