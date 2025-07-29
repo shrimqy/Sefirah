@@ -31,7 +31,11 @@
         <converters:NullToOpacityConverter x:Key="NullToOpacityConverter" />
     </Page.Resources>
 
-    <Grid>
+    <Grid
+        AllowDrop="True"
+        DragOver="Grid_DragOver"
+        Drop="Page_Drop"
+        DropCompleted="Page_DropCompleted">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />

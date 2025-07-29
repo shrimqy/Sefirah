@@ -701,4 +701,7 @@ input touchscreen swipe 540 1800 540 900</value>
 input keyevent 66
 input text %pwd%</value>
   </data>
+  <data name="FileDropCaption" xml:space="preserve">
+    <value>Drop files to send</value>
+  </data>
 </root>

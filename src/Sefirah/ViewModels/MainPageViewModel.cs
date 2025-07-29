@@ -2,7 +2,10 @@ using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
+using Sefirah.Dialogs;
+using Sefirah.Services;
 using Sefirah.Utils.Serialization;
+
 namespace Sefirah.ViewModels;
 public sealed partial class MainPageViewModel : BaseViewModel
 {
@@ -12,6 +15,7 @@ public sealed partial class MainPageViewModel : BaseViewModel
     private RemoteAppRepository RemoteAppsRepository { get; } = Ioc.Default.GetRequiredService<RemoteAppRepository>();
     private ISessionManager SessionManager { get; } = Ioc.Default.GetRequiredService<ISessionManager>();
     private IUpdateService UpdateService { get; } = Ioc.Default.GetRequiredService<IUpdateService>();
+    private IFileTransferService FileTransferService { get; } = Ioc.Default.GetRequiredService<IFileTransferService>();
 
     private ObservableCollection<PairedDevice> PairedDevices => DeviceManager.PairedDevices;
 
@@ -134,6 +138,27 @@ public sealed partial class MainPageViewModel : BaseViewModel
     public void UpdateApp()
     {
         UpdateService.DownloadUpdatesAsync();
+    }
+
+    public async void SendFiles(StorageFile[] storageFiles)
+    {
+        PairedDevice? selectedDevice = null;
+        if (PairedDevices.Count == 0)
+        {
+            return;
+        }
+        else if (PairedDevices.Count == 1)
+        {
+            selectedDevice = PairedDevices[0];
+        }
+        else if (PairedDevices.Count > 1)
+            selectedDevice = await DeviceSelector.ShowDeviceSelectionDialog(PairedDevices.ToList());
+        {
+        }
+        if (selectedDevice == null)
+            return;
+
+        await FileTransferService.SendBulkFiles(storageFiles, selectedDevice);
     }
 
     public MainPageViewModel()

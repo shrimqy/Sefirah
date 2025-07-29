@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Sefirah.Data.Models;
 using Sefirah.ViewModels;
 using Sefirah.ViewModels.Settings;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
 
 namespace Sefirah.Views;
@@ -299,5 +300,28 @@ public sealed partial class MainPage : Page
     private void UpdateButtonClick(object sender, TappedRoutedEventArgs e)
     {
         ViewModel.UpdateApp();
+    }
+
+    private async void Page_Drop(object sender, DragEventArgs e)
+    {
+        // Check if the dropped data contains files
+        if (e.DataView.Contains(StandardDataFormats.StorageItems))
+        {
+            // Get the file(s) from the DataPackage
+            var items = await e.DataView.GetStorageItemsAsync();
+            var files = items.OfType<StorageFile>().ToArray();
+            ViewModel.SendFiles(files);
+        }
+    }
+
+    private void Page_DropCompleted(UIElement sender, DropCompletedEventArgs args)
+    {
+        Debug.WriteLine("Drag Enter");
+    }
+
+    private void Grid_DragOver(object sender, DragEventArgs e)
+    {
+        e.AcceptedOperation = DataPackageOperation.Copy;
+        e.DragUIOverride.Caption = "Drop files to send";
     }
 }
