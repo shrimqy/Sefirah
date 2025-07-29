@@ -12,7 +12,7 @@ public interface IFileTransferService
     /// <summary>
     /// Receives a bulk of files.
     /// </summary>
-    Task ReceiveBulkFiles(BulkFileTransfer data);
+    Task ReceiveBulkFiles(BulkFileTransfer data, PairedDevice device);
 
 #if WINDOWS
     /// <summary>
@@ -21,10 +21,12 @@ public interface IFileTransferService
     Task ProcessShareAsync(ShareOperation data);
 #endif
 
+    Task SendFileWithStream(Stream stream, FileMetadata metadata, PairedDevice device);
+
     /// <summary>
     /// Sends a file to the remote device (Used for clipboard image transfer)
     /// </summary>
-    Task SendFile(Stream stream, FileMetadata metadata, PairedDevice device);
+    Task SendBulkFiles(StorageFile[] files, PairedDevice device);
 
     event EventHandler<(PairedDevice device, StorageFile data)> FileReceived;
 }

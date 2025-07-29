@@ -65,7 +65,9 @@ public class MessageHandler(
                 case FileTransfer fileTransfer:
                     await fileTransferService.ReceiveFile(fileTransfer, device);
                     break;
-
+                case BulkFileTransfer fileTransfer:
+                    await fileTransferService.ReceiveBulkFiles(fileTransfer, device);
+                    break;
                 default:
                     logger.LogWarning("Unknown message type received: {type}", message.GetType().Name);
                     break;

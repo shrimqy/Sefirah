@@ -220,7 +220,7 @@ public class ClipboardService : IClipboardService
                 device.DeviceSettings.ClipboardSyncEnabled &&
                 device.DeviceSettings.ImageToClipboardEnabled)
             {
-                await fileTransferService.SendFile(stream, metadata, device);
+                await fileTransferService.SendFileWithStream(stream, metadata, device);
             }
         }
     }
