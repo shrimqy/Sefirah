@@ -4,10 +4,7 @@ using Microsoft.UI.Windowing;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 using Sefirah.Views.DevicePreferences;
-using Uno.Resizetizer;
 using Rect = Windows.Foundation.Rect;
-
-
 
 namespace Sefirah.Views;
 public sealed partial class DeviceSettingsWindow : Window

@@ -16,7 +16,6 @@ public sealed partial class SyncPage : Page
     {
         // Mark onboarding as completed
         ApplicationData.Current.LocalSettings.Values["HasCompletedOnboarding"] = true;
-        // Navigate to main page
         Frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
     }
 }

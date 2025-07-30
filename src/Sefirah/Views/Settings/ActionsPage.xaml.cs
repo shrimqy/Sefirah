@@ -1,3 +1,5 @@
+using Sefirah.Extensions;
+
 namespace Sefirah.Views.Settings;
 
 public class NavigationItem
@@ -18,8 +20,8 @@ public sealed partial class ActionsPage : Page
     {
         BreadcrumbBar.ItemsSource = new ObservableCollection<NavigationItem>
         {
-            new NavigationItem { Name = "General", PageType = typeof(GeneralPage) },
-            new NavigationItem { Name = "Actions", PageType = typeof(ActionsPage) }
+            new() { Name = "General".GetLocalizedResource(), PageType = typeof(GeneralPage) },
+            new() { Name = "Actions".GetLocalizedResource(), PageType = typeof(ActionsPage) }
         };
         BreadcrumbBar.ItemClicked += BreadcrumbBar_ItemClicked;
     }

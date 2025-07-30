@@ -1,4 +1,3 @@
-using Microsoft.UI.Xaml.Input;
 using Sefirah.Data.Models;
 using Sefirah.ViewModels;
 

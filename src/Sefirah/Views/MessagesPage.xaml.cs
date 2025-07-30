@@ -172,7 +172,7 @@ public sealed partial class MessagesPage : Page
                 // Set initials for text content if it's a TextBlock
                 if (border.Child is TextBlock textBlock && contact.DisplayName != null)
                 {
-                    textBlock.Text = MessagesPage.GetInitials(contact.DisplayName);
+                    textBlock.Text = GetInitials(contact.DisplayName);
                 }
             }
         }
@@ -188,7 +188,7 @@ public sealed partial class MessagesPage : Page
             border.Background = new SolidColorBrush(backgroundColor);
             
             // Set initials for text content if it's a TextBlock
-            if (border.Child is TextBlock textBlock)
+            if (border.Child is TextBlock textBlock && messageGroup.Sender.DisplayName != null)
             {
                 textBlock.Text = GetInitials(messageGroup.Sender.DisplayName);
             }
