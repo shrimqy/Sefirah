@@ -1,0 +1,174 @@
+﻿<Page
+    x:Class="Sefirah.Views.DevicePreferences.DeviceSettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Sefirah.UserControls"
+    xmlns:converters="using:Sefirah.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:Sefirah.Helpers"
+    xmlns:local="using:Sefirah.Views.DevicePreferences"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:wuc="using:CommunityToolkit.WinUI.Controls"
+    x:Name="LayoutRoot"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <converters:NullToOpacityConverter x:Key="NullToOpacityConverter" />
+        <converters:NullBooleanConverter x:Key="NullBooleanConverter" />
+        <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
+    </Page.Resources>
+
+    <ScrollViewer>
+        <StackPanel Margin="15,35" Spacing="16">
+            <!--  Device Overview Card  -->
+            <Border
+                Padding="20"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <StackPanel Spacing="16">
+                    <!--  Device Header with Icon  -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!--  Device Icon (same as DevicesPage)  -->
+                        <Grid
+                            Grid.Column="0"
+                            Width="50"
+                            Height="88"
+                            Margin="0,0,20,0">
+                            <Rectangle
+                                Opacity="0.5"
+                                RadiusX="6"
+                                RadiusY="6"
+                                Stroke="Black"
+                                StrokeThickness="2">
+                                <Rectangle.Fill>
+                                    <SolidColorBrush Opacity="0.1" Color="{ThemeResource SystemBaseLowColor}" />
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <Rectangle
+                                Margin="2"
+                                RadiusX="6"
+                                RadiusY="6"
+                                Stroke="Black"
+                                StrokeThickness="1" />
+                            <Border Margin="3" CornerRadius="6">
+                                <Border.Background>
+                                    <LinearGradientBrush Opacity="{x:Bind ViewModel.Device.Wallpaper, Converter={StaticResource NullToOpacityConverter}, Mode=OneWay}" StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Offset="0" Color="#FF0070FF" />
+                                        <GradientStop Offset="1" Color="#FF2E90FF" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Image
+                                    x:Name="WallpaperImage"
+                                    Source="{x:Bind ViewModel.Device.Wallpaper, Mode=OneWay}"
+                                    Stretch="UniformToFill"
+                                    Visibility="{x:Bind ViewModel.Device.Wallpaper, Converter={StaticResource NullToVisibilityConverter}, Mode=OneWay}" />
+                            </Border>
+                        </Grid>
+
+                        <!--  Device Info  -->
+                        <StackPanel Grid.Column="1" Spacing="8">
+                            <TextBlock
+                                FontSize="24"
+                                FontWeight="SemiBold"
+                                Text="{x:Bind ViewModel.Device.Name, Mode=OneWay}" />
+                            <TextBlock
+                                FontSize="14"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Text="{x:Bind ViewModel.DisplayPhoneNumbers, Mode=OneWay}" />
+                            <TextBlock
+                                FontSize="12"
+                                Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                Text="{x:Bind ViewModel.DisplayIpAddresses, Mode=OneWay}" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!--  Device Settings Title  -->
+            <TextBlock
+                FontSize="20"
+                FontWeight="SemiBold"
+                Text="{helpers:ResourceString Name=DeviceSettings}" />
+
+            <StackPanel Spacing="5">
+                <!--  Clipboard Settings  -->
+                <wuc:SettingsCard
+                    Click="OpenClipboardSettings"
+                    Description="{helpers:ResourceString Name=SyncClipboardChanges}"
+                    Header="{helpers:ResourceString Name=Clipboard}"
+                    IsClickEnabled="True">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xF0E3;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <wuc:SettingsCard.ActionIcon>
+                        <FontIcon FontSize="11" Glyph="&#xE76C;" />
+                    </wuc:SettingsCard.ActionIcon>
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.ClipboardSyncEnabled, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+
+                <!--  Notification Settings  -->
+                <wuc:SettingsCard
+                    Click="OpenNotificationsSettings"
+                    Description="{helpers:ResourceString Name=ConfigureNotificationSettings}"
+                    Header="{helpers:ResourceString Name=Notifications}"
+                    IsClickEnabled="True">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xF0E3;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <wuc:SettingsCard.ActionIcon>
+                        <FontIcon FontSize="11" Glyph="&#xE76C;" />
+                    </wuc:SettingsCard.ActionIcon>
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.NotificationSyncEnabled, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+
+                <!--  Screen Mirror Settings  -->
+                <wuc:SettingsCard
+                    Click="OpenScreenMirrorSettings"
+                    Description="{helpers:ResourceString Name=ConfigureScreenMirroring}"
+                    Header="{helpers:ResourceString Name=ScreenMirror}"
+                    IsClickEnabled="True">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xEC15;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <wuc:SettingsCard.ActionIcon>
+                        <FontIcon FontSize="11" Glyph="&#xE76C;" />
+                    </wuc:SettingsCard.ActionIcon>
+                </wuc:SettingsCard>
+
+                <!--  ADB Settings  -->
+                <wuc:SettingsCard
+                    Click="OpenAdbSettings"
+                    Description="{helpers:ResourceString Name=ConfigureAdbConnection}"
+                    Header="{helpers:ResourceString Name=AdbSettings}"
+                    IsClickEnabled="True">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xEC7A;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <wuc:SettingsCard.ActionIcon>
+                        <FontIcon FontSize="11" Glyph="&#xE76C;" />
+                    </wuc:SettingsCard.ActionIcon>
+                </wuc:SettingsCard>
+
+
+                <!--  Media Session Settings  -->
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=SyncMediaSessions}" Header="{helpers:ResourceString Name=MediaSessions}">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xEA69;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.MediaSessionSyncEnabled, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

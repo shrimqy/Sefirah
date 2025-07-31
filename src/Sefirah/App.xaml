@@ -1,0 +1,39 @@
+﻿<Application
+    x:Class="Sefirah.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:skia="http://uno.ui/skia"
+    xmlns:win="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    mc:Ignorable="skia">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!--  Load WinUI resources  -->
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+                <!--  Load Uno.UI.Toolkit resources  -->
+                <ToolkitResources xmlns="using:Uno.Toolkit.UI" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!--  Platform-specific page backgrounds  -->
+            <!--  Windows: Transparent (for Mica backdrop)  -->
+            <win:SolidColorBrush x:Key="App.PageBackgroundBrush" Color="Transparent" />
+
+            <!--  Desktop/Skia: Solid backgrounds with theme support  -->
+            <skia:SolidColorBrush x:Key="App.PageBackgroundBrush" Color="{ThemeResource ApplicationPageBackgroundThemeBrush}" />
+
+            <!--  Theme-aware icon resources  -->
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <x:String x:Key="IconPath">ms-appx:///Assets/AppTiles/Square44x44Logo.altform-lightunplated_targetsize-256.png</x:String>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <x:String x:Key="IconPath">ms-appx:///Assets/AppTiles/Square44x44Logo.altform-unplated_targetsize-256.png</x:String>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+
+        </ResourceDictionary>
+    </Application.Resources>
+
+</Application>

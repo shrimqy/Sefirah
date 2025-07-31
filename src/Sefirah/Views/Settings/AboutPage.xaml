@@ -1,0 +1,178 @@
+﻿<Page
+    x:Class="Sefirah.Views.Settings.AboutPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dataItems="using:Sefirah.Data.Items"
+    xmlns:helpers="using:Sefirah.Helpers"
+    xmlns:local="using:Sefirah.Views.Settings"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:Sefirah.ViewModels.Settings"
+    xmlns:wuc="using:CommunityToolkit.WinUI.Controls"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <Style x:Key="CardButtonStyle" TargetType="HyperlinkButton">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Padding" Value="0" />
+            </Style>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Page.DataContext>
+        <vm:AboutViewModel x:Name="ViewModel" />
+    </Page.DataContext>
+
+    <ScrollViewer Padding="0,0,40,0">
+        <StackPanel Spacing="4">
+
+            <TextBlock
+                Margin="0,0,0,8"
+                FontSize="28"
+                FontWeight="Medium"
+                Text="{helpers:ResourceString Name=About}" />
+
+            <!--  App Version  -->
+            <wuc:SettingsCard Description="{x:Bind ViewModel.Version}" Header="{x:Bind ViewModel.AppName}">
+                <wuc:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE946;" />
+                </wuc:SettingsCard.HeaderIcon>
+                <Button
+                    x:Name="CopyVersionInfo"
+                    Command="{x:Bind ViewModel.CopyVersionCommand}"
+                    ToolTipService.ToolTip="Copy version">
+                    <FontIcon Glyph="&#xE8C8;" />
+                </Button>
+            </wuc:SettingsCard>
+
+            <!--  Feedback  -->
+            <wuc:SettingsExpander Header="{helpers:ResourceString Name=Feedback}">
+                <wuc:SettingsExpander.HeaderIcon>
+                    <FontIcon Glyph="&#xE939;" />
+                </wuc:SettingsExpander.HeaderIcon>
+                <wuc:SettingsExpander.Items>
+                    <!--  Submit feature request  -->
+                    <wuc:SettingsCard
+                        Command="{x:Bind ViewModel.OpenFeatureRequestCommand}"
+                        CornerRadius="0"
+                        Header="{helpers:ResourceString Name=SubmitFeatureRequest}"
+                        IsClickEnabled="True">
+                        <FontIcon
+                            FontSize="14"
+                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                            Glyph="&#xE8A7;" />
+                    </wuc:SettingsCard>
+
+                    <!--  Submit bug report  -->
+                    <wuc:SettingsCard
+                        Command="{x:Bind ViewModel.OpenBugReportCommand}"
+                        CornerRadius="0"
+                        Header="{helpers:ResourceString Name=SubmitBugReport}"
+                        IsClickEnabled="True">
+                        <FontIcon
+                            FontSize="14"
+                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                            Glyph="&#xE8A7;" />
+                    </wuc:SettingsCard>
+                </wuc:SettingsExpander.Items>
+            </wuc:SettingsExpander>
+
+            <!--  Third Party Libraries  -->
+            <wuc:SettingsExpander Header="{helpers:ResourceString Name=ThirdPartyLibraries}">
+                <wuc:SettingsExpander.HeaderIcon>
+                    <FontIcon Glyph="&#xE72D;" />
+                </wuc:SettingsExpander.HeaderIcon>
+                <wuc:SettingsExpander.ItemsHeader>
+                    <ItemsRepeater Margin="10" ItemsSource="{x:Bind ViewModel.ThirdPartyLibraries}">
+                        <ItemsRepeater.Layout>
+                            <UniformGridLayout
+                                ItemsStretch="Fill"
+                                MaximumRowsOrColumns="6"
+                                MinColumnSpacing="8"
+                                MinItemWidth="200"
+                                MinRowSpacing="8"
+                                Orientation="Horizontal" />
+                        </ItemsRepeater.Layout>
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate x:DataType="dataItems:OpenSourceLibraryItem">
+                                <HyperlinkButton
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Stretch"
+                                    NavigateUri="{x:Bind Url}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Text="{x:Bind Name}"
+                                            TextWrapping="Wrap" />
+                                    </Grid>
+                                </HyperlinkButton>
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+                </wuc:SettingsExpander.ItemsHeader>
+            </wuc:SettingsExpander>
+
+            <!--  Support  -->
+            <wuc:SettingsCard
+                Command="{x:Bind ViewModel.OpenDonateCommand}"
+                Header="{helpers:ResourceString Name=SupportDevelopment}"
+                IsClickEnabled="True">
+                <wuc:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE719;" />
+                </wuc:SettingsCard.HeaderIcon>
+                <FontIcon Glyph="&#xE8A7;" />
+            </wuc:SettingsCard>
+
+            <!--  Open Logs  -->
+            <wuc:SettingsCard
+                Command="{x:Bind ViewModel.OpenLogsCommand}"
+                Header="{helpers:ResourceString Name=OpenLogs}"
+                IsClickEnabled="True">
+                <wuc:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE9F9;" />
+                </wuc:SettingsCard.HeaderIcon>
+                <FontIcon Glyph="&#xE8A7;" />
+            </wuc:SettingsCard>
+
+            <!--  GitHub Repository  -->
+            <wuc:SettingsCard
+                Command="{x:Bind ViewModel.OpenGitHubRepoCommand}"
+                Header="{helpers:ResourceString Name=GitHubRepository}"
+                IsClickEnabled="True">
+                <wuc:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE774;" />
+                </wuc:SettingsCard.HeaderIcon>
+                <FontIcon Glyph="&#xE8A7;" />
+            </wuc:SettingsCard>
+
+            <!--  Android GitHub Repository  -->
+            <wuc:SettingsCard
+                Command="{x:Bind ViewModel.OpenAndroidGitHubRepoCommand}"
+                Header="{helpers:ResourceString Name=AndroidGitHubRepository}"
+                IsClickEnabled="True">
+                <wuc:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE774;" />
+                </wuc:SettingsCard.HeaderIcon>
+                <FontIcon Glyph="&#xE8A7;" />
+            </wuc:SettingsCard>
+
+            <!--  Privacy Policy  -->
+            <wuc:SettingsCard
+                Command="{x:Bind ViewModel.OpenPrivacyPolicyCommand}"
+                Header="{helpers:ResourceString Name=PrivacyPolicy}"
+                IsClickEnabled="True">
+                <wuc:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE72E;" />
+                </wuc:SettingsCard.HeaderIcon>
+            </wuc:SettingsCard>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

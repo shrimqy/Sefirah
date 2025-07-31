@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Sefirah
+Comment=Seamless Device Linking
+Exec=Sefirah
+Icon=com.castle.sefirah
+Terminal=false
+Type=Application
+Categories=Utility;

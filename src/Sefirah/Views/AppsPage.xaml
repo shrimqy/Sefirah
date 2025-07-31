@@ -1,0 +1,316 @@
+﻿<Page
+    x:Class="Sefirah.Views.AppsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:Sefirah.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:Sefirah.Helpers"
+    xmlns:local="using:Sefirah.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:Sefirah.Data.Models"
+    xmlns:vm="using:Sefirah.ViewModels"
+    x:Name="AppPageRoot"
+    Background="Transparent"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <converters:StringNullOrEmptyToBooleanConverter x:Key="StringNullOrEmptyToBooleanConverter" />
+        <converters:NullBooleanConverter x:Key="NullBooleanConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+        <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
+    </Page.Resources>
+
+    <Grid Margin="16,12,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock
+            Grid.Row="0"
+            Grid.Column="0"
+            Margin="16,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            FontSize="24"
+            FontWeight="SemiBold"
+            Text="Apps" />
+
+        <Button
+            Grid.Row="0"
+            Grid.Column="1"
+            Margin="0,12"
+            Padding="12,8"
+            HorizontalAlignment="Right"
+            Background="Transparent"
+            BorderThickness="0"
+            Command="{x:Bind ViewModel.RefreshAppsCommand}"
+            ToolTipService.ToolTip="Refresh Apps">
+            <FontIcon FontSize="16" Glyph="&#xE72C;" />
+        </Button>
+
+        <AutoSuggestBox
+            x:Name="AppSearchBox"
+            Grid.Row="0"
+            Grid.Column="2"
+            MinWidth="250"
+            Margin="6,12,16,12"
+            HorizontalAlignment="Right"
+            AutomationProperties.Name="App AutoSuggestBox"
+            PlaceholderText="{helpers:ResourceString Name=SearchApps}"
+            QueryIcon="Find"
+            QuerySubmitted="AppSearchBox_QuerySubmitted"
+            SuggestionChosen="AppSearchBox_SuggestionChosen"
+            TextChanged="AppSearchBox_TextChanged"
+            UpdateTextOnSelect="False">
+            <AutoSuggestBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel
+                        Margin="0,8,0,8"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal">
+                        <Image
+                            Width="36"
+                            Height="36"
+                            Source="{Binding BitmapIcon, Mode=OneWay}"
+                            Stretch="Uniform" />
+                        <TextBlock
+                            Margin="12,0,0,0"
+                            VerticalAlignment="Center"
+                            Text="{Binding AppName, Mode=OneWay}" />
+                    </StackPanel>
+                </DataTemplate>
+            </AutoSuggestBox.ItemTemplate>
+        </AutoSuggestBox>
+
+        <ScrollViewer
+            Grid.Row="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Padding="0,0,20,0"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            HorizontalScrollBarVisibility="Disabled"
+            VerticalScrollBarVisibility="Auto">
+
+            <StackPanel>
+                <!--  Pinned Apps Section  -->
+                <Grid Visibility="{x:Bind ViewModel.HasPinnedApps, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <GridView
+                        x:Name="PinnedAppsGridView"
+                        HorizontalAlignment="Stretch"
+                        IsItemClickEnabled="True"
+                        IsRightTapEnabled="True"
+                        ItemClick="AppsGridView_ItemClick"
+                        ItemsSource="{x:Bind ViewModel.PinnedApps, Mode=OneWay}"
+                        SelectionMode="None">
+
+                        <GridView.ItemContainerStyle>
+                            <Style BasedOn="{StaticResource DefaultGridViewItemStyle}" TargetType="GridViewItem">
+                                <Setter Property="Margin" Value="12,12,12,0" />
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                                <Setter Property="Width" Value="100" />
+                                <Setter Property="Height" Value="110" />
+                            </Style>
+                        </GridView.ItemContainerStyle>
+
+                        <GridView.ItemTemplate>
+                            <DataTemplate x:DataType="models:ApplicationInfo">
+                                <Grid
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Background="Transparent"
+                                    IsRightTapEnabled="True">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <Grid.ContextFlyout>
+                                        <MenuFlyout>
+                                            <MenuFlyoutItem
+                                                Command="{Binding ElementName=AppPageRoot, Path=ViewModel.UnpinAppCommand}"
+                                                CommandParameter="{x:Bind}"
+                                                Text="{helpers:ResourceString Name=Unpin}">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xE77A;" />
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                            <MenuFlyoutItem
+                                                Command="{Binding ElementName=AppPageRoot, Path=ViewModel.UninstallAppCommand}"
+                                                CommandParameter="{x:Bind}"
+                                                Text="{helpers:ResourceString Name=Uninstall}">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xE74D;" />
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                        </MenuFlyout>
+                                    </Grid.ContextFlyout>
+
+                                    <Image
+                                        Grid.Row="0"
+                                        Width="48"
+                                        Height="48"
+                                        Margin="0,10,0,10"
+                                        HorizontalAlignment="Center"
+                                        Source="{x:Bind BitmapIcon, Mode=OneWay}"
+                                        Stretch="Uniform"
+                                        Visibility="{x:Bind IsLoading, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+
+                                    <ProgressRing
+                                        Grid.Row="0"
+                                        Width="48"
+                                        Height="48"
+                                        Margin="0,10,0,10"
+                                        HorizontalAlignment="Center"
+                                        IsActive="{x:Bind IsLoading, Mode=OneWay}" />
+
+                                    <TextBlock
+                                        Grid.Row="1"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Bottom"
+                                        MaxLines="2"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Text="{x:Bind AppName}"
+                                        TextAlignment="Center"
+                                        TextWrapping="Wrap" />
+                                </Grid>
+                            </DataTemplate>
+                        </GridView.ItemTemplate>
+                    </GridView>
+                </Grid>
+
+                <!--  All Apps Section  -->
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Rectangle
+                        Grid.Row="0"
+                        Height="1"
+                        Fill="{ThemeResource ControlStrokeColorSecondaryBrush}"
+                        Visibility="{x:Bind ViewModel.HasPinnedApps, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                    <GridView
+                        x:Name="AppsGridView"
+                        Grid.Row="1"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        IsItemClickEnabled="True"
+                        IsRightTapEnabled="True"
+                        ItemClick="AppsGridView_ItemClick"
+                        ItemsSource="{x:Bind ViewModel.Apps, Mode=OneWay}"
+                        SelectionMode="None">
+
+                        <GridView.ItemContainerStyle>
+                            <Style BasedOn="{StaticResource DefaultGridViewItemStyle}" TargetType="GridViewItem">
+                                <Setter Property="Margin" Value="12,12,12,0" />
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                                <Setter Property="Width" Value="100" />
+                                <Setter Property="Height" Value="110" />
+                            </Style>
+                        </GridView.ItemContainerStyle>
+
+                        <GridView.ItemTemplate>
+                            <DataTemplate x:DataType="models:ApplicationInfo">
+                                <Grid
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Background="Transparent"
+                                    IsRightTapEnabled="True">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <Grid.ContextFlyout>
+                                        <MenuFlyout>
+                                            <MenuFlyoutItem
+                                                Command="{Binding ElementName=AppPageRoot, Path=ViewModel.PinAppCommand}"
+                                                CommandParameter="{x:Bind}"
+                                                Text="{helpers:ResourceString Name=Pin}">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xE141;" />
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                            <MenuFlyoutItem
+                                                Command="{Binding ElementName=AppPageRoot, Path=ViewModel.UninstallAppCommand}"
+                                                CommandParameter="{x:Bind}"
+                                                Text="{helpers:ResourceString Name=Uninstall}">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xE74D;" />
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                        </MenuFlyout>
+                                    </Grid.ContextFlyout>
+
+                                    <Image
+                                        Grid.Row="0"
+                                        Width="48"
+                                        Height="48"
+                                        Margin="0,10,0,10"
+                                        HorizontalAlignment="Center"
+                                        Source="{x:Bind BitmapIcon, Mode=OneWay}"
+                                        Stretch="Uniform"
+                                        Visibility="{x:Bind IsLoading, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+
+                                    <ProgressRing
+                                        Grid.Row="0"
+                                        Width="48"
+                                        Height="48"
+                                        Margin="0,10,0,10"
+                                        HorizontalAlignment="Center"
+                                        IsActive="{x:Bind IsLoading, Mode=OneWay}" />
+
+                                    <TextBlock
+                                        Grid.Row="1"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Bottom"
+                                        MaxLines="2"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Text="{x:Bind AppName}"
+                                        TextAlignment="Center"
+                                        TextWrapping="Wrap" />
+                                </Grid>
+                            </DataTemplate>
+                        </GridView.ItemTemplate>
+                    </GridView>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+
+        <ProgressRing
+            Grid.Row="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Width="50"
+            Height="50"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
+
+        <TextBlock
+            Grid.Row="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Style="{StaticResource BodyTextBlockStyle}"
+            Text="{helpers:ResourceString Name=NoApps}"
+            Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay}" />
+    </Grid>
+
+</Page>

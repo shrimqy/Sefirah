@@ -1,0 +1,45 @@
+﻿<Page
+    x:Class="Sefirah.Views.SplashScreen"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:Sefirah.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    mc:Ignorable="d">
+
+    <Grid>
+        <!--  Splash Screen Image  -->
+        <Viewbox
+            x:Name="SplashScreenImageViewbox"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Stretch="None">
+            <Image
+                x:Name="SplashScreenImage"
+                Width="140"
+                Source="{ThemeResource IconPath}" />
+        </Viewbox>
+
+        <!--  Loading Indicator  -->
+        <ProgressRing
+            x:Name="SplashScreenLoadingProgressRing"
+            Margin="0,0,0,48"
+            VerticalAlignment="Bottom"
+            Foreground="{ThemeResource ApplicationForegroundThemeBrush}"
+            IsIndeterminate="True" />
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="SizeChangesState">
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowHeight="500" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="SplashScreenLoadingProgressRing.Margin" Value="0,0,0,88" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+    </Grid>
+</Page>

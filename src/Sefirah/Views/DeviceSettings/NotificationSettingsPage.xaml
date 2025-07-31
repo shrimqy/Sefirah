@@ -1,0 +1,101 @@
+﻿<Page
+    x:Class="Sefirah.Views.DeviceSettings.NotificationSettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Sefirah.UserControls"
+    xmlns:converters="using:Sefirah.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:Sefirah.Helpers"
+    xmlns:local="using:Sefirah.Views.DeviceSettings"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:Sefirah.Data.Models"
+    xmlns:wuc="using:CommunityToolkit.WinUI.Controls"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <converters:NullToOpacityConverter x:Key="NullToOpacityConverter" />
+        <converters:NullBooleanConverter x:Key="NullBooleanConverter" />
+    </Page.Resources>
+
+    <ScrollViewer>
+        <StackPanel Margin="20" Spacing="16">
+            <TextBlock
+                FontSize="16"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Text="{helpers:ResourceString Name=NotificationSettings}" />
+            <StackPanel Spacing="5">
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=DisplayToastNotifications}" Header="{helpers:ResourceString Name=ShowNotificationToast}">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE7E7;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.ShowNotificationToast, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=ShowBadgeDescription}" Header="{helpers:ResourceString Name=ShowBadge}">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xF136;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.ShowBadge, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=IgnoreWindowsApps}" Header="{helpers:ResourceString Name=IgnoreWindowsApps}">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE894;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.IgnoreWindowsApps, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=IgnoreDuringDoNotDisturbDescription}" Header="{helpers:ResourceString Name=IgnoreDuringDoNotDisturb}">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE7ED;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.IgnoreNotificationDuringDnd, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+
+                <wuc:SettingsExpander
+                    Description="{helpers:ResourceString Name=DisplayToastNotifications}"
+                    Header="{helpers:ResourceString Name=AppSpecificSettings}"
+                    ItemsSource="{x:Bind ViewModel.RemoteApps}">
+                    <wuc:SettingsExpander.ItemTemplate>
+                        <DataTemplate x:DataType="models:ApplicationInfo">
+                            <wuc:SettingsCard>
+                                <wuc:SettingsCard.Header>
+                                    <StackPanel Orientation="Horizontal" Spacing="20">
+                                        <Image
+                                            Width="32"
+                                            Height="32"
+                                            Source="{x:Bind BitmapIcon}" />
+                                        <TextBlock FontSize="16" Text="{x:Bind AppName}" />
+                                    </StackPanel>
+                                </wuc:SettingsCard.Header>
+                                <Button Content="{x:Bind CurrentNotificationFilter, Mode=OneWay}">
+                                    <Button.Flyout>
+                                        <MenuFlyout>
+                                            <MenuFlyoutItem
+                                                Click="OnMenuFlyoutItemClick"
+                                                Tag="{x:Bind PackageName}"
+                                                Text="{helpers:ResourceString Name=NotificationFilterToastFeed/Content}" />
+                                            <MenuFlyoutItem
+                                                Click="OnMenuFlyoutItemClick"
+                                                Tag="{x:Bind PackageName}"
+                                                Text="{helpers:ResourceString Name=NotificationFilterFeed/Content}" />
+                                            <MenuFlyoutItem
+                                                Click="OnMenuFlyoutItemClick"
+                                                Tag="{x:Bind PackageName}"
+                                                Text="{helpers:ResourceString Name=NotificationFilterDisabled/Content}" />
+                                        </MenuFlyout>
+                                    </Button.Flyout>
+                                </Button>
+                            </wuc:SettingsCard>
+                        </DataTemplate>
+                    </wuc:SettingsExpander.ItemTemplate>
+                    <wuc:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE7F4;" />
+                    </wuc:SettingsExpander.HeaderIcon>
+                    <wuc:SettingsExpander.Items />
+                </wuc:SettingsExpander>
+
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

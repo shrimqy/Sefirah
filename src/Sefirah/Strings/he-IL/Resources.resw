@@ -1,0 +1,705 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About" xml:space="preserve">
+    <value>אודות</value>
+  </data>
+  <data name="General" xml:space="preserve">
+    <value>כללי</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>הגדרות</value>
+  </data>
+  <data name="PrivacyPolicy" xml:space="preserve">
+    <value>מדיניות פרטיות</value>
+  </data>
+  <data name="SupportDevelopment" xml:space="preserve">
+    <value>תמיכה בפיתוח</value>
+  </data>
+  <data name="OpenLogs" xml:space="preserve">
+    <value>פתח יומנים</value>
+  </data>
+  <data name="GitHubRepository" xml:space="preserve">
+    <value>מאגר GitHub לאפליקציית Windows</value>
+  </data>
+  <data name="AndroidGitHubRepository" xml:space="preserve">
+    <value>מאגר GitHub לאפליקציית Android</value>
+  </data>
+  <data name="Clipboard" xml:space="preserve">
+    <value>לוח העתקה</value>
+  </data>
+  <data name="Feedback" xml:space="preserve">
+    <value>משוב</value>
+  </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>התראות</value>
+  </data>
+  <data name="ThirdPartyLibraries" xml:space="preserve">
+    <value>ספריות צד שלישי</value>
+  </data>
+  <data name="SaveLocation" xml:space="preserve">
+    <value>נתיב שמירת קבצים במחשב</value>
+  </data>
+  <data name="RemoteStorageLocation" xml:space="preserve">
+    <value>נתיב שמירת קבצים בהתקן מרוחק</value>
+  </data>
+  <data name="ShowClipboardToast" xml:space="preserve">
+    <value>הצג התראות Windows על סנכרון לוח העתקה</value>
+  </data>
+  <data name="ImageToClipboard" xml:space="preserve">
+    <value>כלול תמונות בסנכרון לוח העתקה</value>
+  </data>
+  <data name="ClipboardFiles" xml:space="preserve">
+    <value>שמירת קבצים שנשלחים מהטלפון בלוח העתקה באופן אוטומטי</value>
+  </data>
+  <data name="NotificationsDescription" xml:space="preserve">
+    <value>קבלת התראות מהתקן מרוחק</value>
+  </data>
+  <data name="GeneralSettings" xml:space="preserve">
+    <value>הגדרות כלליות</value>
+  </data>
+  <data name="ShowNotificationToast" xml:space="preserve">
+    <value>הצג התראות Windows על התראות מהתקן מרוחק</value>
+  </data>
+  <data name="IgnoreWindowsApps" xml:space="preserve">
+    <value>התעלם מהתראות מאפליקציות במחשב שחופפות לאפליקציות בהתקן המרוחק</value>
+  </data>
+  <data name="NotificationFilterDisabled.Content" xml:space="preserve">
+    <value>מושבת</value>
+  </data>
+  <data name="NotificationFilterFeed.Content" xml:space="preserve">
+    <value>הצג בפיד ההתראות</value>
+  </data>
+  <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
+    <value>הצג בפיד ההתראות וכהתראת Windows</value>
+  </data>
+  <data name="PairedDevices.Title" xml:space="preserve">
+    <value>התקנים מוצמדים</value>
+  </data>
+  <data name="AvailableDevices.Title" xml:space="preserve">
+    <value>התקנים זמינים</value>
+  </data>
+  <data name="AvailableDevices.Subtitle" xml:space="preserve">
+    <value>התקני אנדרואיד המריצים את האפליקציה ונמצאים באותה רשת יופיעו כאן למטה</value>
+  </data>
+  <data name="StartupOption" xml:space="preserve">
+    <value>סוג הפעלה</value>
+  </data>
+  <data name="StartupOptionDescription" xml:space="preserve">
+    <value>בחר כיצד האפליקציה תופעל כאשר הWindows עולה</value>
+  </data>
+  <data name="StartupOptionMinimized.Content" xml:space="preserve">
+    <value>הפעל במצב ממוזער</value>
+  </data>
+  <data name="StartupOptionMaximized.Content" xml:space="preserve">
+    <value>הפעל במצב חלון מרבי</value>
+  </data>
+  <data name="StartupOptionSystemTray.Content" xml:space="preserve">
+    <value>הפעל במגש המערכת</value>
+  </data>
+  <data name="StartupOptionDisabled.Content" xml:space="preserve">
+    <value>מושבת</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>ערכת נושא</value>
+  </data>
+  <data name="ThemeDescription" xml:space="preserve">
+    <value>בחר את עיצוב ברירת המחדל לאפליקציה</value>
+  </data>
+  <data name="Default" xml:space="preserve">
+    <value>ברירת מחדל</value>
+  </data>
+  <data name="ThemeLight.Content" xml:space="preserve">
+    <value>בהיר</value>
+  </data>
+  <data name="ThemeDark.Content" xml:space="preserve">
+    <value>חשוך</value>
+  </data>
+  <data name="RemoveDeviceDialogTitle" xml:space="preserve">
+    <value>הסר התקן</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>הסרה</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>בטל</value>
+  </data>
+  <data name="OnboardingWelcome.Title" xml:space="preserve">
+    <value>ברוכ/ה הבא/ה ל-Serifah</value>
+  </data>
+  <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
+    <value>כדי להתחיל, יש להוריד ולהתקין את האפליקצית ליווי של התוכנה דרך עמוד ה-GitHub או בחנויות האפליקציות השונות.</value>
+  </data>
+  <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
+    <value>התחל</value>
+  </data>
+  <data name="OnboardingSkip" xml:space="preserve">
+    <value>לדלג בינתיים</value>
+  </data>
+  <data name="OnboardingDevice.Title" xml:space="preserve">
+    <value>חבר/י את ההתקן שלך</value>
+  </data>
+  <data name="OnboardingDevice.Subtitle" xml:space="preserve">
+    <value>התקנים שהתגלו ברשת שלך יופיעו למטה, ויפעילו את החיבור מהמכשיר (יש לוודא שהקוד תואם)</value>
+  </data>
+  <data name="ConnectionRequest.Title" xml:space="preserve">
+    <value>בקשת חיבור התקן</value>
+  </data>
+  <data name="ConnectionRequest.Subtitle" xml:space="preserve">
+    <value>נא לוודא שהקוד תואם בשני ההתקנים:</value>
+  </data>
+  <data name="ConnectionRequestRejectButton" xml:space="preserve">
+    <value>דחה</value>
+  </data>
+  <data name="NotificationsClearButton" xml:space="preserve">
+    <value>נקה הכל</value>
+  </data>
+  <data name="ConnectionRequestAcceptButton" xml:space="preserve">
+    <value>אשר</value>
+  </data>
+  <data name="NoDevicesFound" xml:space="preserve">
+    <value>לא נמצאו התקנים</value>
+  </data>
+  <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
+    <value>קוד</value>
+  </data>
+  <data name="ClipboardDescription" xml:space="preserve">
+    <value>סנכרן את לוח העתקה בין התקנים</value>
+  </data>
+  <data name="StartupOptionsDescription" xml:space="preserve">
+    <value>בחר כיצד התוכנה תפעל כאשר הWindows עולה</value>
+  </data>
+  <data name="OpenLinksInBrowser" xml:space="preserve">
+    <value>פתח קישורים בדפדפן באופן אוטומטי</value>
+  </data>
+  <data name="Connected.Text" xml:space="preserve">
+    <value>מחובר</value>
+  </data>
+  <data name="Disconnected.Text" xml:space="preserve">
+    <value>מנותק</value>
+  </data>
+  <data name="ShowHideWindow" xml:space="preserve">
+    <value>הצג/הסתר חלון</value>
+  </data>
+  <data name="Exit" xml:space="preserve">
+    <value>יציאה</value>
+  </data>
+  <data name="Features" xml:space="preserve">
+    <value>תכונות</value>
+  </data>
+  <data name="SelectLocation" xml:space="preserve">
+    <value>בחר נתיב</value>
+  </data>
+  <data name="RemoveDeviceDialogSubtitle" xml:space="preserve">
+    <value>האם את/ה בטוח/ה שאת/ה רוצה להסיר את {0}? לא יהיה ניתן לבטל פעולה זו.</value>
+  </data>
+  <data name="AppSpecificSettings" xml:space="preserve">
+    <value>הגדרות יישום ספציפיות</value>
+  </data>
+  <data name="TransferNotificationReceiving.Content" xml:space="preserve">
+    <value>מקבל {0}</value>
+  </data>
+  <data name="TransferNotificationReceivingError" xml:space="preserve">
+    <value>שגיאה בקבלת {0}</value>
+  </data>
+  <data name="TransferNotificationReceiving.Title" xml:space="preserve">
+    <value>מקבל קובץ</value>
+  </data>
+  <data name="TransferNotificationReceived.Title" xml:space="preserve">
+    <value>הקובץ התקבל</value>
+  </data>
+  <data name="TransferNotification.Title" xml:space="preserve">
+    <value>העברת קובץ</value>
+  </data>
+  <data name="SendButton" xml:space="preserve">
+    <value>שלח</value>
+  </data>
+  <data name="ReplyPlaceholder" xml:space="preserve">
+    <value>הקלד תגובה</value>
+  </data>
+  <data name="TransferNotificationActionOpenFile" xml:space="preserve">
+    <value>פתיחת קובץ</value>
+  </data>
+  <data name="TransferNotificationActionOpenFolder" xml:space="preserve">
+    <value>פתיחת תיקייה</value>
+  </data>
+  <data name="NotificationFilterButton" xml:space="preserve">
+    <value>כבה התראות מ{0}</value>
+  </data>
+  <data name="SubmitBugReport" xml:space="preserve">
+    <value>דווח על באג</value>
+  </data>
+  <data name="SubmitFeatureRequest" xml:space="preserve">
+    <value>בקשת תכונה</value>
+  </data>
+  <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
+    <value>אל תציג התראות Windows כאשר הטלפון במצב 'נא לא להפריע'</value>
+  </data>
+  <data name="Devices" xml:space="preserve">
+    <value>התקנים</value>
+  </data>
+  <data name="RingerModeNormal.Content" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="RingerModeSilent.Content" xml:space="preserve">
+    <value>Silent</value>
+  </data>
+  <data name="RingerModeVibrate.Content" xml:space="preserve">
+    <value>Vibrate</value>
+  </data>
+  <data name="Pin" xml:space="preserve">
+    <value>נעץ</value>
+  </data>
+  <data name="Unpin" xml:space="preserve">
+    <value>בטל נעיצה</value>
+  </data>
+  <data name="ScreenMirror" xml:space="preserve">
+    <value>שקף מסך</value>
+  </data>
+  <data name="VideoSettings" xml:space="preserve">
+    <value>הגדרות וידיאו</value>
+  </data>
+  <data name="AudioSettings" xml:space="preserve">
+    <value>הגדרות קול</value>
+  </data>
+  <data name="OpenApp" xml:space="preserve">
+    <value>פתיחה באפליקציה</value>
+  </data>
+  <data name="ScreenOff" xml:space="preserve">
+    <value>השאר את מסך ההתקן כבוי בזמן שיקוף מסך</value>
+  </data>
+  <data name="PhysicalKeyboard" xml:space="preserve">
+    <value>הסתר את המקלדת במסך</value>
+  </data>
+  <data name="Bitrate" xml:space="preserve">
+    <value>קצב סיביות</value>
+  </data>
+  <data name="Resolution" xml:space="preserve">
+    <value>רזולוציה</value>
+  </data>
+  <data name="Buffer" xml:space="preserve">
+    <value>אוגר</value>
+  </data>
+  <data name="Messages" xml:space="preserve">
+    <value>הודעות</value>
+  </data>
+  <data name="EmptyMessages" xml:space="preserve">
+    <value>Start a new conversation or select one to reply</value>
+  </data>
+  <data name="MessagePlaceholder" xml:space="preserve">
+    <value>הקלד הודעה</value>
+  </data>
+  <data name="Apps" xml:space="preserve">
+    <value>יישומים</value>
+  </data>
+  <data name="NewMessage" xml:space="preserve">
+    <value>הודעה חדשה</value>
+  </data>
+  <data name="SearchMessages" xml:space="preserve">
+    <value>חיפוש הודעות</value>
+  </data>
+  <data name="AddressInputPlaceholder" xml:space="preserve">
+    <value>To</value>
+  </data>
+  <data name="RemoveAddress" xml:space="preserve">
+    <value>הסר כתובת</value>
+  </data>
+  <data name="CopyMessage" xml:space="preserve">
+    <value>העתק הודעה</value>
+  </data>
+  <data name="NoApps" xml:space="preserve">
+    <value>לא נמצאו יישומים</value>
+  </data>
+  <data name="AllApps" xml:space="preserve">
+    <value>כל היישומים</value>
+  </data>
+  <data name="AdditionalArguments" xml:space="preserve">
+    <value>פרמטרים נוספים</value>
+  </data>
+  <data name="AdbDeviceOffline" xml:space="preserve">
+    <value>התקן Adb לא מקוון</value>
+  </data>
+  <data name="AdbDeviceOfflineDescription" xml:space="preserve">
+    <value>חבר את ההתקן שלך דרך USB עם הגדרת 'USB Debugging' מופעלת ונסה שנית</value>
+  </data>
+  <data name="Dismiss" xml:space="preserve">
+    <value>התעלם</value>
+  </data>
+  <data name="ScrcpyNotFound" xml:space="preserve">
+    <value>Scrcpy לא נמצא</value>
+  </data>
+  <data name="ScrcpyNotFoundDescription" xml:space="preserve">
+    <value>בחר את הנתיב שבו scrcpy מותקן</value>
+  </data>
+  <data name="PreferTcpIp" xml:space="preserve">
+    <value>העדף חיבוריות אלחוטית</value>
+  </data>
+  <data name="SearchApps" xml:space="preserve">
+    <value>חיפוש יישומים</value>
+  </data>
+  <data name="DisableVideoForwarding" xml:space="preserve">
+    <value>בטל העברת וידאו</value>
+  </data>
+  <data name="VideoCodec" xml:space="preserve">
+    <value>קידוד וידאו</value>
+  </data>
+  <data name="FrameRate" xml:space="preserve">
+    <value>קצב פריימים</value>
+  </data>
+  <data name="Crop" xml:space="preserve">
+    <value>חיתוך</value>
+  </data>
+  <data name="Display" xml:space="preserve">
+    <value>תצוגה</value>
+  </data>
+  <data name="VirtualDisplaySize" xml:space="preserve">
+    <value>גודל מסך וירטואלי</value>
+  </data>
+  <data name="DisplayOrientation" xml:space="preserve">
+    <value>כוון תצוגה</value>
+  </data>
+  <data name="RotationAngle" xml:space="preserve">
+    <value>זווית סיבוב</value>
+  </data>
+  <data name="AudioOutputMode" xml:space="preserve">
+    <value>יציאת שמע</value>
+  </data>
+  <data name="ForwardMicrophone" xml:space="preserve">
+    <value>העבר מיקרופון</value>
+  </data>
+  <data name="AudioOutputBuffer" xml:space="preserve">
+    <value>אוגר יציאת שמע</value>
+  </data>
+  <data name="AudioCodec" xml:space="preserve">
+    <value>קידוד שמע</value>
+  </data>
+  <data name="AdbSettings" xml:space="preserve">
+    <value>הגדרות Adb</value>
+  </data>
+  <data name="AutoConnect" xml:space="preserve">
+    <value>חיבור אוטומטי</value>
+  </data>
+  <data name="Both" xml:space="preserve">
+    <value>שניהם</value>
+  </data>
+  <data name="DesktopDevice" xml:space="preserve">
+    <value>התקן שולחני</value>
+  </data>
+  <data name="RemoteDevice" xml:space="preserve">
+    <value>התקן מרוחק</value>
+  </data>
+  <data name="SelectDevice" xml:space="preserve">
+    <value>בחר התקן</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>התחל</value>
+  </data>
+  <data name="ScrcpyDevicePreference" xml:space="preserve">
+    <value>הגדרות התקן</value>
+  </data>
+  <data name="AskEverytime" xml:space="preserve">
+    <value>שאל בכל פעם</value>
+  </data>
+  <data name="Auto" xml:space="preserve">
+    <value>אוטומטי</value>
+  </data>
+  <data name="ScrcpyErrorTitle" xml:space="preserve">
+    <value>Scrcpy failed to start</value>
+  </data>
+  <data name="CopyError" xml:space="preserve">
+    <value>Copy error</value>
+  </data>
+  <data name="DeviceName" xml:space="preserve">
+    <value>Device name</value>
+  </data>
+  <data name="EnableVirtualDisplay" xml:space="preserve">
+    <value>Enable virtual display</value>
+  </data>
+  <data name="TransferNotificationSending.Title" xml:space="preserve">
+    <value>Sending file</value>
+  </data>
+  <data name="TransferNotificationSent.Title" xml:space="preserve">
+    <value>Sent file</value>
+  </data>
+  <data name="Uninstall" xml:space="preserve">
+    <value>Uninstall</value>
+  </data>
+  <data name="UnlockDeviceHelpTitle" xml:space="preserve">
+    <value>Shell commands help</value>
+  </data>
+  <data name="UnlockDeviceHelpDescription" xml:space="preserve">
+    <value>The shell commands in the text box will be executed before launching scrcpy. Enter commands that work on your device, separated by line.</value>
+  </data>
+  <data name="UnlockDeviceHelpExample" xml:space="preserve">
+    <value>Example:</value>
+  </data>
+  <data name="UnlockDeviceHelpUsefulInfo" xml:space="preserve">
+    <value>Useful information:</value>
+  </data>
+  <data name="UnlockDeviceHelpNote" xml:space="preserve">
+    <value>26 or POWER: Wakes or sleeps the device screen.
+66 or ENTER: Simulates the Enter key press.
+82 or MENU: Brings up the unlock interface, or prompts for fingerprint authentication.
+Some devices may also require a swipe gesture to bring up the unlock UI:
+input touchscreen swipe 540 1800 540 900</value>
+  </data>
+  <data name="PinnedApps" xml:space="preserve">
+    <value>Pinned apps</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="ActionsDescription" xml:space="preserve">
+    <value>Configure custom actions and executable commands</value>
+  </data>
+  <data name="AdbNoDevice" xml:space="preserve">
+    <value>No ADB devices connected</value>
+  </data>
+  <data name="AdbNoDeviceSubtitle" xml:space="preserve">
+    <value>Turn on ADB and connect your device via USB or Wi-Fi to see it here</value>
+  </data>
+  <data name="ClipboardSettings" xml:space="preserve">
+    <value>Clipboard settings</value>
+  </data>
+  <data name="DeviceSettings" xml:space="preserve">
+    <value>Device settings</value>
+  </data>
+  <data name="NotificationSettings" xml:space="preserve">
+    <value>Notification settings</value>
+  </data>
+  <data name="ScreenMirrorSettings" xml:space="preserve">
+    <value>Screen mirror settings</value>
+  </data>
+  <data name="OpenLinksInBrowserDescription" xml:space="preserve">
+    <value>Automatically open links from clipboard in default browser</value>
+  </data>
+  <data name="ShowClipboardToastDescription" xml:space="preserve">
+    <value>Show toast notifications for clipboard changes</value>
+  </data>
+  <data name="ClipboardFilesDescription" xml:space="preserve">
+    <value>Enable file synchronization through clipboard</value>
+  </data>
+  <data name="ImageToClipboardDescription" xml:space="preserve">
+    <value>Enable image synchronization through clipboard</value>
+  </data>
+  <data name="AutoConnectDescription" xml:space="preserve">
+    <value>Automatically connect to ADB when device connects</value>
+  </data>
+  <data name="SyncClipboardChanges" xml:space="preserve">
+    <value>Sync clipboard changes with this device</value>
+  </data>
+  <data name="ConfigureNotificationSettings" xml:space="preserve">
+    <value>Configure notification settings</value>
+  </data>
+  <data name="ConfigureScreenMirroring" xml:space="preserve">
+    <value>Configure screen mirroring</value>
+  </data>
+  <data name="ConfigureAdbConnection" xml:space="preserve">
+    <value>Configure ADB connection and manage addresses</value>
+  </data>
+  <data name="SyncMediaSessions" xml:space="preserve">
+    <value>Sync media and audio sessions</value>
+  </data>
+  <data name="MediaSessions" xml:space="preserve">
+    <value>Media sessions</value>
+  </data>
+  <data name="DisplayToastNotifications" xml:space="preserve">
+    <value>Display toast notifications on this PC</value>
+  </data>
+  <data name="ShowBadge" xml:space="preserve">
+    <value>Show badge</value>
+  </data>
+  <data name="ShowBadgeDescription" xml:space="preserve">
+    <value>Show notification badge on taskbar</value>
+  </data>
+  <data name="IgnoreDuringDoNotDisturb" xml:space="preserve">
+    <value>Ignore during Do Not Disturb</value>
+  </data>
+  <data name="IgnoreDuringDoNotDisturbDescription" xml:space="preserve">
+    <value>Don't show notifications when Do Not Disturb is enabled</value>
+  </data>
+  <data name="ConnectionPreference" xml:space="preserve">
+    <value>Connection preference</value>
+  </data>
+  <data name="AddAction" xml:space="preserve">
+    <value>Add action</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="NoActionsConfigured" xml:space="preserve">
+    <value>No actions configured</value>
+  </data>
+  <data name="ActionName" xml:space="preserve">
+    <value>Action name</value>
+  </data>
+  <data name="ExecutablePath" xml:space="preserve">
+    <value>Executable path</value>
+  </data>
+  <data name="Arguments" xml:space="preserve">
+    <value>Arguments</value>
+  </data>
+  <data name="StartInDirectory" xml:space="preserve">
+    <value>Start In directory</value>
+  </data>
+  <data name="EnterActionName" xml:space="preserve">
+    <value>Enter action name</value>
+  </data>
+  <data name="PathToExecutable" xml:space="preserve">
+    <value>Path to executable</value>
+  </data>
+  <data name="CommandLineArguments" xml:space="preserve">
+    <value>Command line arguments (optional)</value>
+  </data>
+  <data name="EnterPassword" xml:space="preserve">
+    <value>Enter password</value>
+  </data>
+  <data name="Reply" xml:space="preserve">
+    <value>Reply</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="Browse" xml:space="preserve">
+    <value>Browse</value>
+  </data>
+  <data name="EnterAddressesAndCompose" xml:space="preserve">
+    <value>Enter addresses above and compose your message below</value>
+  </data>
+  <data name="UseTcpIpMode" xml:space="preserve">
+    <value>Use TCP/IP mode</value>
+  </data>
+  <data name="UseTcpIpModeDescription" xml:space="preserve">
+    <value>Enable wireless ADB connections</value>
+  </data>
+  <data name="WorkingDirectory" xml:space="preserve">
+    <value>Working directory (optional)</value>
+  </data>
+  <data name="UnlockDeviceBeforeLaunch" xml:space="preserve">
+    <value>Unlock device before launching scrcpy</value>
+  </data>
+  <data name="UnlockCommandsPlaceholder" xml:space="preserve">
+    <value>input keyevent 26
+input keyevent 66
+input text %pwd%</value>
+  </data>
+  <data name="FileDropCaption" xml:space="preserve">
+    <value>Drop files to send</value>
+  </data>
+</root>

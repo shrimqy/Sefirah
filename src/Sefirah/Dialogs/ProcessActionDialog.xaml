@@ -1,0 +1,69 @@
+﻿<ContentDialog
+    x:Class="Sefirah.Dialogs.ProcessActionDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:helpers="using:Sefirah.Helpers"
+    xmlns:local="using:Sefirah.Dialogs"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    DefaultButton="Primary"
+    IsPrimaryButtonEnabled="{x:Bind IsFormValid, Mode=OneWay}"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
+    PrimaryButtonText="{helpers:ResourceString Name=Save}"
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
+    SecondaryButtonText="Cancel"
+    Style="{ThemeResource DefaultContentDialogStyle}">
+
+    <ScrollViewer MaxHeight="500">
+        <StackPanel MinWidth="400" Spacing="12">
+            <!--  Action Name  -->
+            <TextBox
+                x:Name="ActionNameTextBox"
+                Header="{helpers:ResourceString Name=ActionName}"
+                PlaceholderText="{helpers:ResourceString Name=EnterActionName}"
+                TextChanged="OnFormFieldChanged" />
+
+            <!--  Action Path  -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox
+                    x:Name="ActionPathTextBox"
+                    Grid.Column="0"
+                    Header="{helpers:ResourceString Name=ExecutablePath}"
+                    PlaceholderText="{helpers:ResourceString Name=PathToExecutable}"
+                    TextChanged="OnFormFieldChanged" />
+                <Button
+                    Grid.Column="1"
+                    Margin="8,24,0,0"
+                    Click="BrowseForExecutable_Click"
+                    Content="{helpers:ResourceString Name=Browse}" />
+            </Grid>
+
+            <!--  Arguments  -->
+            <TextBox
+                x:Name="ArgumentsTextBox"
+                Header="{helpers:ResourceString Name=Arguments}"
+                PlaceholderText="{helpers:ResourceString Name=CommandLineArguments}" />
+
+            <!--  Start Directory  -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox
+                    x:Name="StartDirectoryTextBox"
+                    Grid.Column="0"
+                    Header="{helpers:ResourceString Name=StartInDirectory}"
+                    PlaceholderText="{helpers:ResourceString Name=WorkingDirectory}" />
+                <Button
+                    Grid.Column="1"
+                    Margin="8,24,0,0"
+                    Click="BrowseForDirectory_Click"
+                    Content="{helpers:ResourceString Name=Browse}" />
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</ContentDialog>

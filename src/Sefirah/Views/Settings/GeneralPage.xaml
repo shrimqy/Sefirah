@@ -1,0 +1,120 @@
+﻿<Page
+    x:Class="Sefirah.Views.Settings.GeneralPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Sefirah.UserControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:Sefirah.Helpers"
+    xmlns:local="using:Sefirah.Views.Settings"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:Sefirah.ViewModels.Settings"
+    xmlns:wuc="using:CommunityToolkit.WinUI.Controls"
+    mc:Ignorable="d">
+
+    <Page.DataContext>
+        <vm:GeneralViewModel x:Name="ViewModel" />
+    </Page.DataContext>
+
+    <ScrollViewer Padding="0,0,40,0">
+        <StackPanel Spacing="4">
+            <!--  Breadcrumb Navigation  -->
+            <BreadcrumbBar x:Name="BreadcrumbBar" Margin="0,0,0,8">
+                <BreadcrumbBar.ItemTemplate>
+                    <DataTemplate x:DataType="local:NavigationItem">
+                        <BreadcrumbBarItem AutomationProperties.Name="{Binding Name}" Content="{Binding}">
+                            <BreadcrumbBarItem.ContentTemplate>
+                                <DataTemplate>
+                                    <TextBlock
+                                        FontSize="28"
+                                        FontWeight="SemiBold"
+                                        Text="{Binding Name}" />
+                                </DataTemplate>
+                            </BreadcrumbBarItem.ContentTemplate>
+                        </BreadcrumbBarItem>
+                    </DataTemplate>
+                </BreadcrumbBar.ItemTemplate>
+            </BreadcrumbBar>
+
+            <!--  Startup Options  -->
+            <wuc:SettingsCard Description="{helpers:ResourceString Name=StartupOptionDescription}" Header="{helpers:ResourceString Name=StartupOption}">
+                <wuc:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE7E8;" />
+                </wuc:SettingsCard.HeaderIcon>
+                <ComboBox
+                    MinWidth="140"
+                    ItemsSource="{x:Bind ViewModel.StartupTypes.Values}"
+                    SelectedItem="{x:Bind ViewModel.SelectedStartupType, Mode=TwoWay}" />
+            </wuc:SettingsCard>
+
+            <!--  Theme  -->
+            <wuc:SettingsCard Description="{helpers:ResourceString Name=ThemeDescription}" Header="{helpers:ResourceString Name=Theme}">
+                <wuc:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE790;" />
+                </wuc:SettingsCard.HeaderIcon>
+                <ComboBox
+                    MinWidth="140"
+                    ItemsSource="{x:Bind ViewModel.ThemeTypes.Values}"
+                    SelectedItem="{x:Bind ViewModel.SelectedThemeType, Mode=TwoWay}" />
+            </wuc:SettingsCard>
+
+            <!--  Scrcpy location  -->
+            <wuc:SettingsCard Description="{x:Bind ViewModel.ScrcpyPath, Mode=OneWay}" Header="{helpers:ResourceString Name=ScreenMirror}">
+                <wuc:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xEC15;" />
+                </wuc:SettingsCard.HeaderIcon>
+                <Button Click="SelectScrcpyLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
+            </wuc:SettingsCard>
+
+            <!--  Adb Settings  -->
+            <wuc:SettingsCard Description="{x:Bind ViewModel.AdbPath, Mode=OneWay}" Header="{helpers:ResourceString Name=AdbSettings}">
+                <wuc:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xEC7A;" />
+                </wuc:SettingsCard.HeaderIcon>
+                <Button Click="SelectAdbLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
+            </wuc:SettingsCard>
+
+            <!--  Save Location  -->
+            <wuc:SettingsCard Description="{x:Bind ViewModel.ReceivedFilesPath, Mode=OneWay}" Header="{helpers:ResourceString Name=SaveLocation}">
+                <wuc:SettingsCard.HeaderIcon>
+                    <SymbolIcon Symbol="Folder" />
+                </wuc:SettingsCard.HeaderIcon>
+                <Button Click="SelectSaveLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
+            </wuc:SettingsCard>
+
+            <!--  Remote Storage Location  -->
+            <wuc:SettingsCard Description="{x:Bind ViewModel.RemoteStoragePath, Mode=OneWay}" Header="{helpers:ResourceString Name=RemoteStorageLocation}">
+                <wuc:SettingsCard.HeaderIcon>
+                    <SymbolIcon Symbol="SyncFolder" />
+                </wuc:SettingsCard.HeaderIcon>
+                <Button Click="SelectRemoteLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
+            </wuc:SettingsCard>
+
+            <!--  Local Device Name  -->
+            <wuc:SettingsCard Header="{helpers:ResourceString Name=DeviceName}">
+                <wuc:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE70F;" />
+                </wuc:SettingsCard.HeaderIcon>
+                <TextBox
+                    x:Name="DeviceNameTextBox"
+                    MinWidth="200"
+                    KeyDown="OnKeyDown"
+                    Text="{x:Bind ViewModel.LocalDeviceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            </wuc:SettingsCard>
+
+            <!--  Actions  -->
+            <wuc:SettingsCard
+                Click="OpenActionsSettings"
+                Description="{helpers:ResourceString Name=ActionsDescription}"
+                Header="{helpers:ResourceString Name=Actions}"
+                IsClickEnabled="True">
+                <wuc:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE8F7;" />
+                </wuc:SettingsCard.HeaderIcon>
+                <wuc:SettingsCard.ActionIcon>
+                    <FontIcon FontSize="11" Glyph="&#xE76C;" />
+                </wuc:SettingsCard.ActionIcon>
+            </wuc:SettingsCard>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

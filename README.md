@@ -46,6 +46,7 @@
 ### Android App
 
 [<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" alt="Get it on IzzyOnDroid" width="220">](https://apt.izzysoft.de/fdroid/index/apk/com.castle.sefirah)
+[<img src="https://www.openapk.net/images/openapk-badge.png" alt="Get it on OpenApk" width="220">](https://www.openapk.net/sefirah/com.castle.sefirah/)
 
 
 ## How to Use
@@ -71,11 +72,11 @@
     - **Note:** This feature is still a bit experimental and may not work on all Windows versions especially older versions of Windows 10 and other unofficial debloated Windows 11 versions. 
     - **WARNING**: DO NOT set the remote storage location to a pre-existing folder as it will delete the contents of that folder.
 6. **SMS Texting**:
-    - Grant all the permissions required from the permissions page in Android. After that, reconnect and the messages should appear in the Messages tab in the Desktop app. You can now view and send texts as sms. You can also switch sims if your device has dual sims. Attachments have not been implemented and the messages are not cached to local storage  (yet).
+    - Grant all the permissions required from the permissions page in Android. After that, reconnect and the messages should appear in the Messages tab in the Desktop app. You can now view and send texts as sms. You can also switch sims if your device has dual sims. Attachments have not been implemented yet.
 7. **Screen Mirroring using [Scrcpy](https://github.com/Genymobile/scrcpy)**:
     - You would need to [download](https://github.com/Genymobile/scrcpy/releases), extract and set the scrcpy location in App settings. 
     - You can specify your preferences for the scrcpy to launch with in the screen mirroring section. 
-    - For initiating screen mirroring, the easiest way would be to plug your device through usb and start it by clicking on Phone frame.
+    - For initiating screen mirroring, the easiest way would be to plug your device through usb and start using the button next to the ringer mode (In the arugments text box add "--tcpip" if you want to make the connection wireless and you don't need to specify anymore arugments if you don't know what you're doing).
     - Sefirah will try to connect to your device if the default tcpip port is open for subsequent connections.
     - If you have any doubts or problems in connecting scrcpy, refer [scrcpy docs](https://github.com/Genymobile/scrcpy/blob/master/doc/connection.md) and [Scrcpy FAQ](https://github.com/Genymobile/scrcpy/blob/master/FAQ.md).
     - If you like their project, please consider supporting the author [rom1v](https://blog.rom1v.com/about/#support-my-open-source-work)
