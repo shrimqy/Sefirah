@@ -1,3 +1,3 @@
 files:
-  - source: src/Sefirah.App/Strings/en-US/*.resw
-    translation: /src/Sefirah.App/Strings/%locale%/%original_file_name%
+  - source: src/Sefirah/Strings/en/*.resw
+    translation: /src/Sefirah/Strings/%locale%/%original_file_name%
