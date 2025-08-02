@@ -118,424 +118,426 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="About" xml:space="preserve">
-    <value>אודות</value>
+    <value>About</value>
   </data>
   <data name="General" xml:space="preserve">
-    <value>כללי</value>
+    <value>General</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>הגדרות</value>
+    <value>Settings</value>
   </data>
   <data name="PrivacyPolicy" xml:space="preserve">
-    <value>מדיניות פרטיות</value>
+    <value>Privacy policy</value>
   </data>
   <data name="SupportDevelopment" xml:space="preserve">
-    <value>תמיכה בפיתוח</value>
+    <value>Support development</value>
   </data>
   <data name="OpenLogs" xml:space="preserve">
-    <value>פתח יומנים</value>
+    <value>Open logs</value>
   </data>
   <data name="GitHubRepository" xml:space="preserve">
-    <value>מאגר GitHub לאפליקציית Windows</value>
+    <value>GitHub Repository</value>
   </data>
   <data name="AndroidGitHubRepository" xml:space="preserve">
-    <value>מאגר GitHub לאפליקציית Android</value>
+    <value>Android GitHub Repository</value>
   </data>
   <data name="Clipboard" xml:space="preserve">
-    <value>לוח העתקה</value>
+    <value>Clipboard</value>
   </data>
   <data name="Feedback" xml:space="preserve">
-    <value>משוב</value>
+    <value>Feedback</value>
   </data>
   <data name="Notifications" xml:space="preserve">
-    <value>התראות</value>
+    <value>Notifications</value>
   </data>
   <data name="ThirdPartyLibraries" xml:space="preserve">
-    <value>ספריות צד שלישי</value>
+    <value>Third party libraries</value>
   </data>
   <data name="SaveLocation" xml:space="preserve">
-    <value>נתיב שמירת קבצים במחשב</value>
+    <value>Save location</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>נתיב שמירת קבצים בהתקן מרוחק</value>
+    <value>Remote Storage Location</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
-    <value>הצג התראות Windows על סנכרון לוח העתקה</value>
+    <value>Show clipboard toast</value>
   </data>
   <data name="ImageToClipboard" xml:space="preserve">
-    <value>כלול תמונות בסנכרון לוח העתקה</value>
+    <value>Include images in clipboard monitor</value>
   </data>
   <data name="ClipboardFiles" xml:space="preserve">
-    <value>שמירת קבצים שנשלחים מהטלפון בלוח העתקה באופן אוטומטי</value>
+    <value>Add received files to clipboard</value>
   </data>
   <data name="NotificationsDescription" xml:space="preserve">
-    <value>קבלת התראות מהתקן מרוחק</value>
+    <value>Receive notifications from remote device</value>
   </data>
   <data name="GeneralSettings" xml:space="preserve">
-    <value>הגדרות כלליות</value>
+    <value>General Settings</value>
   </data>
   <data name="ShowNotificationToast" xml:space="preserve">
-    <value>הצג התראות Windows על התראות מהתקן מרוחק</value>
+    <value>Show notification toast</value>
   </data>
   <data name="IgnoreWindowsApps" xml:space="preserve">
-    <value>התעלם מהתראות מאפליקציות במחשב שחופפות לאפליקציות בהתקן המרוחק</value>
+    <value>Ignore remote notifications from active Windows apps</value>
   </data>
   <data name="NotificationFilterDisabled.Content" xml:space="preserve">
-    <value>מושבת</value>
+    <value>Disabled</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>הצג בפיד ההתראות</value>
+    <value>Notification Feed</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>הצג בפיד ההתראות וכהתראת Windows</value>
+    <value>Notification Feed + Toast</value>
   </data>
   <data name="PairedDevices.Title" xml:space="preserve">
-    <value>התקנים מוצמדים</value>
+    <value>Paired devices</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
-    <value>התקנים זמינים</value>
+    <value>Available Devices</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
-    <value>התקני אנדרואיד המריצים את האפליקציה ונמצאים באותה רשת יופיעו כאן למטה</value>
+    <value>Android devices that are running the app in the same network will show up below</value>
   </data>
   <data name="StartupOption" xml:space="preserve">
-    <value>סוג הפעלה</value>
+    <value>Startup option</value>
   </data>
   <data name="StartupOptionDescription" xml:space="preserve">
-    <value>בחר כיצד האפליקציה תופעל כאשר הWindows עולה</value>
+    <value>Choose how the app starts when Windows boots</value>
   </data>
   <data name="StartupOptionMinimized.Content" xml:space="preserve">
-    <value>הפעל במצב ממוזער</value>
+    <value>Start minimized</value>
   </data>
   <data name="StartupOptionMaximized.Content" xml:space="preserve">
-    <value>הפעל במצב חלון מרבי</value>
+    <value>Start maximized</value>
   </data>
   <data name="StartupOptionSystemTray.Content" xml:space="preserve">
-    <value>הפעל במגש המערכת</value>
+    <value>Start in system tray</value>
   </data>
   <data name="StartupOptionDisabled.Content" xml:space="preserve">
-    <value>מושבת</value>
+    <value>Disabled</value>
   </data>
   <data name="Theme" xml:space="preserve">
-    <value>ערכת נושא</value>
+    <value>Theme</value>
   </data>
   <data name="ThemeDescription" xml:space="preserve">
-    <value>בחר את עיצוב ברירת המחדל לאפליקציה</value>
+    <value>Choose your default app theme</value>
   </data>
   <data name="Default" xml:space="preserve">
-    <value>ברירת מחדל</value>
+    <value>Default</value>
   </data>
   <data name="ThemeLight.Content" xml:space="preserve">
-    <value>בהיר</value>
+    <value>Light</value>
   </data>
   <data name="ThemeDark.Content" xml:space="preserve">
-    <value>חשוך</value>
+    <value>Dark</value>
   </data>
   <data name="RemoveDeviceDialogTitle" xml:space="preserve">
-    <value>הסר התקן</value>
+    <value>Remove device</value>
   </data>
   <data name="Remove" xml:space="preserve">
-    <value>הסרה</value>
+    <value>Remove</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>בטל</value>
+    <value>Cancel</value>
   </data>
   <data name="OnboardingWelcome.Title" xml:space="preserve">
-    <value>ברוכ/ה הבא/ה ל-Serifah</value>
+    <value>Welcome to Sefirah</value>
   </data>
   <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
-    <value>כדי להתחיל, יש להוריד ולהתקין את האפליקצית ליווי של התוכנה דרך עמוד ה-GitHub או בחנויות האפליקציות השונות.</value>
+    <value>To get started, download and install the companion app through the corresponding GitHub
+page.</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
-    <value>התחל</value>
+    <value>Get started</value>
   </data>
   <data name="OnboardingSkip" xml:space="preserve">
-    <value>לדלג בינתיים</value>
+    <value>Skip for now</value>
   </data>
   <data name="OnboardingDevice.Title" xml:space="preserve">
-    <value>חבר/י את ההתקן שלך</value>
+    <value>Connect your device</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>התקנים שהתגלו ברשת שלך יופיעו למטה, ויפעילו את החיבור מהמכשיר (יש לוודא שהקוד תואם)</value>
+    <value>Discovered devices in your network will appear below, and initiate the connection from your
+mobile (Make sure the pin matches)</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>בקשת חיבור התקן</value>
+    <value>Device Connection Request</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
-    <value>נא לוודא שהקוד תואם בשני ההתקנים:</value>
+    <value>Verify the passkey matches on both devices:</value>
   </data>
   <data name="ConnectionRequestRejectButton" xml:space="preserve">
-    <value>דחה</value>
+    <value>Reject</value>
   </data>
   <data name="NotificationsClearButton" xml:space="preserve">
-    <value>נקה הכל</value>
+    <value>Clear all</value>
   </data>
   <data name="ConnectionRequestAcceptButton" xml:space="preserve">
-    <value>אשר</value>
+    <value>Accept</value>
   </data>
   <data name="NoDevicesFound" xml:space="preserve">
-    <value>לא נמצאו התקנים</value>
+    <value>No devices found</value>
   </data>
   <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
-    <value>קוד</value>
+    <value>PASSKEY</value>
   </data>
   <data name="ClipboardDescription" xml:space="preserve">
-    <value>סנכרן את לוח העתקה בין התקנים</value>
+    <value>Sync your clipboard across devices</value>
   </data>
   <data name="StartupOptionsDescription" xml:space="preserve">
-    <value>בחר כיצד התוכנה תפעל כאשר הWindows עולה</value>
+    <value>Choose how the app starts when Windows boots</value>
   </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
-    <value>פתח קישורים בדפדפן באופן אוטומטי</value>
+    <value>Open links in browser</value>
   </data>
   <data name="Connected.Text" xml:space="preserve">
-    <value>מחובר</value>
+    <value>Connected</value>
   </data>
   <data name="Disconnected.Text" xml:space="preserve">
-    <value>מנותק</value>
+    <value>Disconnected</value>
   </data>
   <data name="ShowHideWindow" xml:space="preserve">
-    <value>הצג/הסתר חלון</value>
+    <value>Show/Hide window</value>
   </data>
   <data name="Exit" xml:space="preserve">
-    <value>יציאה</value>
+    <value>Exit</value>
   </data>
   <data name="Features" xml:space="preserve">
-    <value>תכונות</value>
+    <value>Features</value>
   </data>
   <data name="SelectLocation" xml:space="preserve">
-    <value>בחר נתיב</value>
+    <value>Select location</value>
   </data>
   <data name="RemoveDeviceDialogSubtitle" xml:space="preserve">
-    <value>האם את/ה בטוח/ה שאת/ה רוצה להסיר את {0}? לא יהיה ניתן לבטל פעולה זו.</value>
+    <value>Are you sure you want to remove '{0}'? This action cannot be undone.</value>
   </data>
   <data name="AppSpecificSettings" xml:space="preserve">
-    <value>הגדרות יישום ספציפיות</value>
+    <value>App-specific Settings</value>
   </data>
   <data name="TransferNotificationReceiving.Content" xml:space="preserve">
-    <value>מקבל {0}</value>
+    <value>Receiving {0}</value>
   </data>
   <data name="TransferNotificationReceivingError" xml:space="preserve">
-    <value>שגיאה בקבלת {0}</value>
+    <value>Error while receiving {0}</value>
   </data>
   <data name="TransferNotificationReceiving.Title" xml:space="preserve">
-    <value>מקבל קובץ</value>
+    <value>Receiving File</value>
   </data>
   <data name="TransferNotificationReceived.Title" xml:space="preserve">
-    <value>הקובץ התקבל</value>
+    <value>Received File</value>
   </data>
   <data name="TransferNotification.Title" xml:space="preserve">
-    <value>העברת קובץ</value>
+    <value>File transfer</value>
   </data>
   <data name="SendButton" xml:space="preserve">
-    <value>שלח</value>
+    <value>Send</value>
   </data>
   <data name="ReplyPlaceholder" xml:space="preserve">
-    <value>הקלד תגובה</value>
+    <value>Type a reply</value>
   </data>
   <data name="TransferNotificationActionOpenFile" xml:space="preserve">
-    <value>פתיחת קובץ</value>
+    <value>Open file</value>
   </data>
   <data name="TransferNotificationActionOpenFolder" xml:space="preserve">
-    <value>פתיחת תיקייה</value>
+    <value>Open folder</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
-    <value>כבה התראות מ{0}</value>
+    <value>Turn off notifications from {0}</value>
   </data>
   <data name="SubmitBugReport" xml:space="preserve">
-    <value>דווח על באג</value>
+    <value>Report a bug</value>
   </data>
   <data name="SubmitFeatureRequest" xml:space="preserve">
-    <value>בקשת תכונה</value>
+    <value>Feature request</value>
   </data>
   <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
-    <value>אל תציג התראות Windows כאשר הטלפון במצב 'נא לא להפריע'</value>
+    <value>Do not show notification toast when phone is in DND</value>
   </data>
   <data name="Devices" xml:space="preserve">
-    <value>התקנים</value>
+    <value>Devices</value>
   </data>
   <data name="RingerModeNormal.Content" xml:space="preserve">
-    <value>רגיל</value>
+    <value>Normal</value>
   </data>
   <data name="RingerModeSilent.Content" xml:space="preserve">
-    <value>שקט</value>
+    <value>Silent</value>
   </data>
   <data name="RingerModeVibrate.Content" xml:space="preserve">
-    <value>רטט</value>
+    <value>Vibrate</value>
   </data>
   <data name="Pin" xml:space="preserve">
-    <value>נעץ</value>
+    <value>Pin</value>
   </data>
   <data name="Unpin" xml:space="preserve">
-    <value>בטל נעיצה</value>
+    <value>Unpin</value>
   </data>
   <data name="ScreenMirror" xml:space="preserve">
-    <value>שקף מסך</value>
+    <value>Screen mirror</value>
   </data>
   <data name="VideoSettings" xml:space="preserve">
-    <value>הגדרות וידיאו</value>
+    <value>Video settings</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>הגדרות קול</value>
+    <value>Audio Settings</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
-    <value>פתיחה באפליקציה</value>
+    <value>Open in app</value>
   </data>
   <data name="ScreenOff" xml:space="preserve">
-    <value>השאר את מסך ההתקן כבוי בזמן שיקוף מסך</value>
+    <value>Keep device screen off while mirroring</value>
   </data>
   <data name="PhysicalKeyboard" xml:space="preserve">
-    <value>הסתר את המקלדת במסך</value>
+    <value>Disable on-screen keyboard</value>
   </data>
   <data name="Bitrate" xml:space="preserve">
-    <value>קצב סיביות</value>
+    <value>Bitrate</value>
   </data>
   <data name="Resolution" xml:space="preserve">
-    <value>רזולוציה</value>
+    <value>Resolution</value>
   </data>
   <data name="Buffer" xml:space="preserve">
-    <value>אוגר</value>
+    <value>Buffer</value>
   </data>
   <data name="Messages" xml:space="preserve">
-    <value>הודעות</value>
+    <value>Messages</value>
   </data>
   <data name="EmptyMessages" xml:space="preserve">
     <value>Start a new conversation or select one to reply</value>
   </data>
   <data name="MessagePlaceholder" xml:space="preserve">
-    <value>הקלד הודעה</value>
+    <value>Type a message</value>
   </data>
   <data name="Apps" xml:space="preserve">
-    <value>יישומים</value>
+    <value>Apps</value>
   </data>
   <data name="NewMessage" xml:space="preserve">
-    <value>הודעה חדשה</value>
+    <value>New message</value>
   </data>
   <data name="SearchMessages" xml:space="preserve">
-    <value>חיפוש הודעות</value>
+    <value>Search messages</value>
   </data>
   <data name="AddressInputPlaceholder" xml:space="preserve">
     <value>To</value>
   </data>
   <data name="RemoveAddress" xml:space="preserve">
-    <value>הסר כתובת</value>
+    <value>Remove address</value>
   </data>
   <data name="CopyMessage" xml:space="preserve">
-    <value>העתק הודעה</value>
+    <value>Copy message</value>
   </data>
   <data name="NoApps" xml:space="preserve">
-    <value>לא נמצאו יישומים</value>
+    <value>No apps found</value>
   </data>
   <data name="AllApps" xml:space="preserve">
-    <value>כל היישומים</value>
+    <value>All Apps</value>
   </data>
   <data name="AdditionalArguments" xml:space="preserve">
-    <value>פרמטרים נוספים</value>
+    <value>Additional arguments</value>
   </data>
   <data name="AdbDeviceOffline" xml:space="preserve">
-    <value>התקן Adb לא מקוון</value>
+    <value>Adb device is offline</value>
   </data>
   <data name="AdbDeviceOfflineDescription" xml:space="preserve">
-    <value>חבר את ההתקן שלך דרך USB עם הגדרת 'USB Debugging' מופעלת ונסה שנית</value>
+    <value>Connect your device through USB with USB Debugging enabled, then try again.</value>
   </data>
   <data name="Dismiss" xml:space="preserve">
-    <value>התעלם</value>
+    <value>Dismiss</value>
   </data>
   <data name="ScrcpyNotFound" xml:space="preserve">
-    <value>Scrcpy לא נמצא</value>
+    <value>Scrcpy not found</value>
   </data>
   <data name="ScrcpyNotFoundDescription" xml:space="preserve">
-    <value>בחר את הנתיב שבו scrcpy מותקן</value>
+    <value>Select the folder where scrcpy is located</value>
   </data>
   <data name="PreferTcpIp" xml:space="preserve">
-    <value>העדף חיבוריות אלחוטית</value>
+    <value>Prefer wireless connection</value>
   </data>
   <data name="SearchApps" xml:space="preserve">
-    <value>חיפוש יישומים</value>
+    <value>Search apps</value>
   </data>
   <data name="DisableVideoForwarding" xml:space="preserve">
-    <value>בטל העברת וידאו</value>
+    <value>Disable video forwarding</value>
   </data>
   <data name="VideoCodec" xml:space="preserve">
-    <value>קידוד וידאו</value>
+    <value>Video codec</value>
   </data>
   <data name="FrameRate" xml:space="preserve">
-    <value>קצב פריימים</value>
+    <value>Frame rate</value>
   </data>
   <data name="Crop" xml:space="preserve">
-    <value>חיתוך</value>
+    <value>Crop</value>
   </data>
   <data name="Display" xml:space="preserve">
-    <value>תצוגה</value>
+    <value>Display</value>
   </data>
   <data name="VirtualDisplaySize" xml:space="preserve">
-    <value>גודל מסך וירטואלי</value>
+    <value>Virtual display size</value>
   </data>
   <data name="DisplayOrientation" xml:space="preserve">
-    <value>כוון תצוגה</value>
+    <value>Display orientation</value>
   </data>
   <data name="RotationAngle" xml:space="preserve">
-    <value>זווית סיבוב</value>
+    <value>Rotation angle</value>
   </data>
   <data name="AudioOutputMode" xml:space="preserve">
-    <value>יציאת שמע</value>
+    <value>Audio output</value>
   </data>
   <data name="ForwardMicrophone" xml:space="preserve">
-    <value>העבר מיקרופון</value>
+    <value>Forward microphone</value>
   </data>
   <data name="AudioOutputBuffer" xml:space="preserve">
-    <value>אוגר יציאת שמע</value>
+    <value>Audio output buffer</value>
   </data>
   <data name="AudioCodec" xml:space="preserve">
-    <value>קידוד שמע</value>
+    <value>Audio codec</value>
   </data>
   <data name="AdbSettings" xml:space="preserve">
-    <value>הגדרות Adb</value>
+    <value>Adb Settings</value>
   </data>
   <data name="AutoConnect" xml:space="preserve">
-    <value>חיבור אוטומטי</value>
+    <value>Auto connect</value>
   </data>
   <data name="Both" xml:space="preserve">
-    <value>שניהם</value>
+    <value>Both</value>
   </data>
   <data name="DesktopDevice" xml:space="preserve">
-    <value>התקן שולחני</value>
+    <value>Desktop device</value>
   </data>
   <data name="RemoteDevice" xml:space="preserve">
-    <value>התקן מרוחק</value>
+    <value>Remote device</value>
   </data>
   <data name="SelectDevice" xml:space="preserve">
-    <value>בחר התקן</value>
+    <value>Select a device</value>
   </data>
   <data name="Start" xml:space="preserve">
-    <value>התחל</value>
+    <value>Start</value>
   </data>
   <data name="ScrcpyDevicePreference" xml:space="preserve">
-    <value>הגדרות התקן</value>
+    <value>Device preference</value>
   </data>
   <data name="AskEverytime" xml:space="preserve">
-    <value>שאל בכל פעם</value>
+    <value>Ask every time</value>
   </data>
   <data name="Auto" xml:space="preserve">
-    <value>אוטומטי</value>
+    <value>Auto</value>
   </data>
   <data name="ScrcpyErrorTitle" xml:space="preserve">
-    <value>התוכנה Scrcpy נכשלה בעת הרצתה</value>
+    <value>Scrcpy failed to start</value>
   </data>
   <data name="CopyError" xml:space="preserve">
-    <value>העתק שגיאה</value>
+    <value>Copy error</value>
   </data>
   <data name="DeviceName" xml:space="preserve">
-    <value>שם ההתקן</value>
+    <value>Device name</value>
   </data>
   <data name="EnableVirtualDisplay" xml:space="preserve">
-    <value>הפעל מסך ווירטואלי</value>
+    <value>Enable virtual display</value>
   </data>
   <data name="TransferNotificationSending.Title" xml:space="preserve">
-    <value>Sending file</value>
+    <value>Sending File</value>
   </data>
   <data name="TransferNotificationSent.Title" xml:space="preserve">
-    <value>Sent file</value>
+    <value>Sent File</value>
   </data>
   <data name="Uninstall" xml:space="preserve">
     <value>Uninstall</value>
@@ -544,7 +546,7 @@
     <value>Shell commands help</value>
   </data>
   <data name="UnlockDeviceHelpDescription" xml:space="preserve">
-    <value>The shell commands in the text box will be executed before launching scrcpy. Enter commands that work on your device, separated by line.</value>
+    <value>The shell commands in the text box will be executed before launching scrcpy. Enter commands that work on your device, separated by line. Use %pwd% as a placeholder for your password if you need to be prompted for it.</value>
   </data>
   <data name="UnlockDeviceHelpExample" xml:space="preserve">
     <value>Example:</value>
@@ -555,7 +557,8 @@
   <data name="UnlockDeviceHelpNote" xml:space="preserve">
     <value>26 or POWER: Wakes or sleeps the device screen.
 66 or ENTER: Simulates the Enter key press.
-82 or MENU: Brings up the unlock interface, or prompts for fingerprint authentication.
+82 or MENU: Brings up the unlock interface or prompts for fingerprint authentication.
+%pwd%: Placeholder for password - you'll be prompted to enter it.
 Some devices may also require a swipe gesture to bring up the unlock UI:
 input touchscreen swipe 540 1800 540 900</value>
   </data>
@@ -572,7 +575,7 @@ input touchscreen swipe 540 1800 540 900</value>
     <value>No ADB devices connected</value>
   </data>
   <data name="AdbNoDeviceSubtitle" xml:space="preserve">
-    <value>Turn on ADB and connect your device via USB or Wi-Fi to see it here</value>
+    <value>Turn on ADB and connect your device via USB or Wi-Fi to see it here.</value>
   </data>
   <data name="ClipboardSettings" xml:space="preserve">
     <value>Clipboard settings</value>
