@@ -1,56 +1,70 @@
 ﻿<Project Sdk="Uno.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>net9.0-windows10.0.26100;net9.0-desktop</TargetFrameworks>
+    <PropertyGroup>
+        <TargetFrameworks>net9.0-windows10.0.26100;net9.0-desktop</TargetFrameworks>
 
-    <OutputType>Exe</OutputType>
-    <UnoSingleProject>true</UnoSingleProject>
+        <OutputType>Exe</OutputType>
+        <UnoSingleProject>true</UnoSingleProject>
 
-    <!-- Display name -->
-    <ApplicationTitle>Sefirah</ApplicationTitle>
-    <!-- App Identifier -->
-    <ApplicationId>com.sefirah.castle</ApplicationId>
-    <!-- Versions -->
-    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-    <ApplicationVersion>1</ApplicationVersion>
-    <!-- Package Publisher -->
-    <ApplicationPublisher>shrimqy</ApplicationPublisher>
-    <!-- Package Description -->
-    <Description>Sefirah powered by Uno Platform.</Description>
-    <!--
-      If you encounter this error message:
+        <!-- Display name -->
+        <ApplicationTitle>Sefirah</ApplicationTitle>
+        <!-- App Identifier -->
+        <ApplicationId>com.sefirah.castle</ApplicationId>
+        <!-- Versions -->
+        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+        <ApplicationVersion>1</ApplicationVersion>
+        <!-- Package Publisher -->
+        <ApplicationPublisher>shrimqy</ApplicationPublisher>
+        <!-- Package Description -->
+        <Description>Sefirah powered by Uno Platform.</Description>
+        <!--
+            If you encounter this error message:
 
-        error NETSDK1148: A referenced assembly was compiled using a newer version of Microsoft.Windows.SDK.NET.dll.
-        Please update to a newer .NET SDK in order to reference this assembly.
+            error NETSDK1148: A referenced assembly was compiled using a newer version of Microsoft.Windows.SDK.NET.dll.
+            Please update to a newer .NET SDK in order to reference this assembly.
 
-      This means that the two packages below must be aligned with the "build" version number of
-      the "Microsoft.Windows.SDK.BuildTools" package above, and the "revision" version number
-      must be the highest found in https://www.nuget.org/packages/Microsoft.Windows.SDK.NET.Ref.
-    -->
-    <!-- <WindowsSdkPackageVersion>10.0.22621.28</WindowsSdkPackageVersion> -->
+            This means that the two packages below must be aligned with the "build" version number of
+            the "Microsoft.Windows.SDK.BuildTools" package above, and the "revision" version number
+            must be the highest found in https://www.nuget.org/packages/Microsoft.Windows.SDK.NET.Ref.
+        -->
+        <!-- <WindowsSdkPackageVersion>10.0.22621.28</WindowsSdkPackageVersion> -->
 
-    <!--
-      UnoFeatures let's you quickly add and manage implicit package references based on the features you want to use.
-      https://aka.platform.uno/singleproject-features
-    -->
-    <UnoFeatures>
-      Lottie;
-      Hosting;
-      Toolkit;
-      Logging;
-      LoggingSerilog;
-      Mvvm;
-      Configuration;
-      Localization;
-      ThemeService;
-      SkiaRenderer;
-    </UnoFeatures>
-    <Platforms>x64;ARM64;x86</Platforms>
-  </PropertyGroup>
+        <!--
+            UnoFeatures let's you quickly add and manage implicit package references based on the features you want to use.
+            https://aka.platform.uno/singleproject-features
+        -->
+        <UnoFeatures>
+            Lottie;
+            Hosting;
+            Toolkit;
+            Logging;
+            LoggingSerilog;
+            Mvvm;
+            Configuration;
+            Localization;
+            ThemeService;
+            SkiaRenderer;
+        </UnoFeatures>
+        <Platforms>x64;ARM64;x86</Platforms>
+        <LangVersion>Preview</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
     
-  <PropertyGroup>
-    <UnoIconForegroundFile>Assets\Icons\icon_foreground.svg</UnoIconForegroundFile>
-    <UnoIconBackgroundColor Condition="'$(IsWinAppSdk)' == 'true'">Transparent</UnoIconBackgroundColor>
-  </PropertyGroup>
+
+    <PropertyGroup Condition="'$(UapAppxPackageBuildMode)' == 'StoreUpload'">
+        <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(UapAppxPackageBuildMode)' == 'Sideloading'">
+        <GenerateTemporaryStoreCertificate>False</GenerateTemporaryStoreCertificate>
+        <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
+        <PackageCertificateKeyFile>Sefirah_TemporaryKey.pfx</PackageCertificateKeyFile>
+        <PackageCertificateThumbprint>276047138A50F9695B57C0E0763E5A414C03B049</PackageCertificateThumbprint>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <UnoIconForegroundFile>Assets\Icons\icon_foreground.svg</UnoIconForegroundFile>
+        <UnoIconBackgroundColor Condition="'$(IsWinAppSdk)' == 'true'">Transparent</UnoIconBackgroundColor>
+    </PropertyGroup>
     
     <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100'">
         <StartupObject>Sefirah.Platforms.Windows.Program</StartupObject>
@@ -70,10 +84,8 @@
     <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100'">
         <PublishTrimmed>false</PublishTrimmed>
         <TrimMode>partial</TrimMode>
-
         <!-- Disable ILLink  -->
         <RunILLink>false</RunILLink>
-
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
     </PropertyGroup>
@@ -85,7 +97,7 @@
 
     <ItemGroup>
         <Content Include="Assets\Icons\IconResource.dll">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory> 
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory> 
         </Content>
     </ItemGroup>
     <ItemGroup>
@@ -107,8 +119,8 @@
         <PackageReference Include="Vanara.PInvoke.Shell32" />
     </ItemGroup>
     <ItemGroup>
-      <UnoSplashScreen Update="Assets\Splash\splash_screen.svg">
+        <UnoSplashScreen Update="Assets\Splash\splash_screen.svg">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </UnoSplashScreen>
+        </UnoSplashScreen>
     </ItemGroup>
 </Project>
