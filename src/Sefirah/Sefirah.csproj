@@ -48,7 +48,7 @@
         <LangVersion>Preview</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
-    
+
 
     <PropertyGroup Condition="'$(UapAppxPackageBuildMode)' == 'StoreUpload'">
         <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
@@ -60,27 +60,19 @@
         <PackageCertificateKeyFile>Sefirah_TemporaryKey.pfx</PackageCertificateKeyFile>
         <PackageCertificateThumbprint>276047138A50F9695B57C0E0763E5A414C03B049</PackageCertificateThumbprint>
     </PropertyGroup>
-    
+
     <PropertyGroup>
         <UnoIconForegroundFile>Assets\Icons\icon_foreground.svg</UnoIconForegroundFile>
         <UnoIconBackgroundColor Condition="'$(IsWinAppSdk)' == 'true'">Transparent</UnoIconBackgroundColor>
     </PropertyGroup>
-    
+
     <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100'">
         <StartupObject>Sefirah.Platforms.Windows.Program</StartupObject>
     </PropertyGroup>
     <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-desktop'">
         <StartupObject>Program</StartupObject>
     </PropertyGroup>
-    <PropertyGroup>
-        <LangVersion>Preview</LangVersion>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
-        <PackageCertificateThumbprint>276047138A50F9695B57C0E0763E5A414C03B049</PackageCertificateThumbprint>
-        <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-        <PackageCertificateKeyFile>Sefirah_TemporaryKey.pfx</PackageCertificateKeyFile>
-    </PropertyGroup>
-  
+
     <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100'">
         <PublishTrimmed>false</PublishTrimmed>
         <TrimMode>partial</TrimMode>
@@ -89,7 +81,7 @@
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
     </PropertyGroup>
-    
+
     <ItemGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100'">
         <RuntimeHostConfigurationOption Include="System.Runtime.InteropServices.BuiltInComInterop.IsSupported" Value="true" />
         <RuntimeHostConfigurationOption Include="System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization" Value="false" />
@@ -97,7 +89,7 @@
 
     <ItemGroup>
         <Content Include="Assets\Icons\IconResource.dll">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory> 
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
     <ItemGroup>
@@ -120,7 +112,7 @@
     </ItemGroup>
     <ItemGroup>
         <UnoSplashScreen Update="Assets\Splash\splash_screen.svg">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </UnoSplashScreen>
     </ItemGroup>
 </Project>
