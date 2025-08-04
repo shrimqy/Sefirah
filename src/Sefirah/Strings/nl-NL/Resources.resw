@@ -704,4 +704,7 @@ input text %pwd%</value>
   <data name="FileDropCaption" xml:space="preserve">
     <value>Drop files to send</value>
   </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
 </root>
