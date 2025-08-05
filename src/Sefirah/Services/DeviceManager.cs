@@ -42,6 +42,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
             if (existingDevice != null)
             {
                 existingDevice.Name = device.Name;
+                existingDevice.Model = device.Model;
                 existingDevice.IpAddresses = device.IpAddresses;
                 existingDevice.PhoneNumbers = device.PhoneNumbers;
                 existingDevice.Wallpaper = device.Wallpaper;
@@ -114,6 +115,8 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
                 // Update device info
                 existingDevice.LastConnected = DateTime.Now;
                 existingDevice.Name = device.DeviceName;
+                existingDevice.Model = device.Model;
+
                 if (!string.IsNullOrEmpty(device.Avatar))
                 {
                     existingDevice.WallpaperBytes = Convert.FromBase64String(device.Avatar);
@@ -168,6 +171,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
                         DeviceId = device.DeviceId,
                         Name = device.DeviceName,
                         LastConnected = DateTime.Now,
+                        Model = device.Model,
                         SharedSecret = sharedSecret,
                         WallpaperBytes = !string.IsNullOrEmpty(device.Avatar)
                             ? Convert.FromBase64String(device.Avatar)

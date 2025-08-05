@@ -157,6 +157,9 @@ public class DeviceInfo : SocketMessage
     [JsonPropertyName("deviceName")]
     public string DeviceName { get; set; }
 
+    [JsonPropertyName("model")]
+    public string? Model { get; set; }
+
     [JsonPropertyName("avatar")]
     public string? Avatar { get; set; }
 

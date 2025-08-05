@@ -10,6 +10,7 @@ public partial class PairedDevice : ObservableObject
 {
     public string Id { get; private set; }
     public string Name { get; set; } = string.Empty;
+    public string Model { get; set; } = string.Empty;
     public List<string>? IpAddresses { get; set; } = [];
     public List<PhoneNumber>? PhoneNumbers { get; set; } = [];
     public ImageSource? Wallpaper { get; set; }
@@ -82,8 +83,15 @@ public partial class PairedDevice : ObservableObject
             {
                 return adbService?.AdbDevices.Any(adbDevice => 
                     adbDevice.IsOnline && 
-                    !string.IsNullOrEmpty(adbDevice.AndroidId) && 
-                    adbDevice.AndroidId == Id) ?? false;
+                    (
+                        (!string.IsNullOrEmpty(adbDevice.AndroidId) && adbDevice.AndroidId == Id) ||
+                        (string.IsNullOrEmpty(adbDevice.AndroidId) && 
+                         !string.IsNullOrEmpty(adbDevice.Model) && 
+                         !string.IsNullOrEmpty(Model) &&
+                         (Model.Equals(adbDevice.Model, StringComparison.OrdinalIgnoreCase) ||
+                          Model.Contains(adbDevice.Model, StringComparison.OrdinalIgnoreCase) ||
+                          adbDevice.Model.Contains(Model, StringComparison.OrdinalIgnoreCase)))
+                    )) ?? false;
             }
             catch
             {
@@ -98,19 +106,34 @@ public partial class PairedDevice : ObservableObject
         OnPropertyChanged(nameof(HasAdbConnection));
     }
 
-    private void RefreshConnectedAdbDevices()
+    private async void RefreshConnectedAdbDevices()
     {
-        App.MainWindow?.DispatcherQueue.EnqueueAsync(() =>
+        try
         {
-            ConnectedAdbDevices.Clear();
+            // Use UI thread if available
+            await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+            {
+                ConnectedAdbDevices.Clear();
 
-            var devices = adbService.AdbDevices
-                .Where(adbDevice => adbDevice.IsOnline && 
-                    !string.IsNullOrEmpty(adbDevice.AndroidId) && 
-                    adbDevice.AndroidId == Id)
-                .ToList();
+                var devices = adbService.AdbDevices
+                    .Where(adbDevice => adbDevice.IsOnline && 
+                        (
+                            (!string.IsNullOrEmpty(adbDevice.AndroidId) && adbDevice.AndroidId == Id) ||
+                            (string.IsNullOrEmpty(adbDevice.AndroidId) && 
+                                !string.IsNullOrEmpty(adbDevice.Model) && 
+                                !string.IsNullOrEmpty(Model) &&
+                                (Model.Equals(adbDevice.Model, StringComparison.OrdinalIgnoreCase) ||
+                                Model.Contains(adbDevice.Model, StringComparison.OrdinalIgnoreCase) ||
+                                adbDevice.Model.Contains(Model, StringComparison.OrdinalIgnoreCase)))
+                        ))
+                    .ToList();
 
-            ConnectedAdbDevices.AddRange(devices);
-        });
+                ConnectedAdbDevices.AddRange(devices);
+            });
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error in RefreshConnectedAdbDevices: {ex.Message}");
+        }
     }
 }

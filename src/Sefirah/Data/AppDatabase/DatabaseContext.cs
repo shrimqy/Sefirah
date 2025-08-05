@@ -34,6 +34,24 @@ public class DatabaseContext
         {
             db.CreateTable<RemoteDeviceEntity>();
         }
+        else
+        {
+            // Check if Model column exists, if not add it (migration for existing databases)
+            var remoteDeviceColumns = db.GetTableInfo(nameof(RemoteDeviceEntity));
+            var hasModelColumn = remoteDeviceColumns.Any(col => col.Name.Equals("Model", StringComparison.OrdinalIgnoreCase));
+            
+            if (!hasModelColumn)
+            {
+                try
+                {
+                    db.Execute("ALTER TABLE RemoteDeviceEntity ADD COLUMN Model TEXT DEFAULT ''");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Migration warning: Could not add Model column: {ex.Message}");
+                }
+            }
+        }
 
         if (db.GetTableInfo(nameof(ApplicationInfoEntity)).Count == 0)
         {

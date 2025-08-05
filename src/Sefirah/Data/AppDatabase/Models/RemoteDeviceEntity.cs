@@ -12,6 +12,8 @@ public partial class RemoteDeviceEntity
     public string DeviceId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
 
+    public string? Model { get; set; } = string.Empty;
+
     [ColumnAttribute("IpAddresses")]
     public string? IpAddressesJson { get; set; }
     
@@ -58,6 +60,7 @@ public partial class RemoteDeviceEntity
         return new PairedDevice(DeviceId)
         {
             Name = Name,
+            Model = Model,
             IpAddresses = IpAddresses,
             PhoneNumbers = PhoneNumbers,
             Wallpaper = wallPaper,

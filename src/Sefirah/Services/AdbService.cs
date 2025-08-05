@@ -4,6 +4,7 @@ using AdvancedSharpAdbClient.DeviceCommands;
 using AdvancedSharpAdbClient.Models;
 using AdvancedSharpAdbClient.Receivers;
 using CommunityToolkit.WinUI;
+using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Items;
@@ -13,6 +14,7 @@ namespace Sefirah.Services;
 
 public class AdbService(
     ILogger<AdbService> logger,
+    IDeviceManager deviceManager,
     IUserSettingsService userSettingsService
 ) : IAdbService
 {
@@ -309,15 +311,42 @@ public class AdbService(
 
                 // adb shell cat /storage/emulated/0/Android/data/com.castle.sefirah/files/device_info.txt
                 // Get the Android ID from the device_info.txt file since we can't directly access the android id of the App 
-                // TODO: Use this for associating the adb devices with paired devices
                 await adbClient.ExecuteShellCommandAsync(deviceData, "cat /storage/emulated/0/Android/data/com.castle.sefirah/files/device_info.txt", androidIdReceiver);
-                androidId = androidIdReceiver.ToString().Trim();
+                var id = androidIdReceiver.ToString().Trim();
+                if (!string.IsNullOrEmpty(id))
+                {
+                    // Extract the Android ID from the output
+                    androidId = id;
+                }
             }
             catch (Exception ex)
             {
                 logger.LogError($"Error getting Android ID for {deviceData.Serial}", ex);
             }
-            logger.LogInformation($"Android ID: {androidId}");
+
+            // Look for paired devices with matching model
+            if (string.IsNullOrEmpty(androidId) && fullDeviceData.Model != null)
+            {
+                var deviceModel = fullDeviceData.Model;
+
+                var pairedDevices = deviceManager.PairedDevices;
+                var matchingDevice = pairedDevices.FirstOrDefault(pd =>
+                    !string.IsNullOrEmpty(pd.Model) &&
+                    (pd.Model.Equals(deviceModel, StringComparison.OrdinalIgnoreCase) ||
+                     pd.Model.Contains(deviceModel, StringComparison.OrdinalIgnoreCase) ||
+                     deviceModel.Contains(pd.Model, StringComparison.OrdinalIgnoreCase)));
+
+                if (matchingDevice != null)
+                {
+                    androidId = matchingDevice.Id;
+                }
+                else
+                {
+                    logger.LogWarning($"No matching paired device found for model: {deviceModel}");
+                    androidId = string.Empty;
+                }
+            }
+
             var device = new AdbDevice
             {
                 Serial = fullDeviceData.Serial,
