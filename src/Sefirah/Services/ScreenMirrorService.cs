@@ -158,6 +158,11 @@ public class ScreenMirrorService(
                     selectedDeviceSerial = $"{connectedSessionIpAddress}:5555";
                 }
             }
+            else if (devices.Any(d => d.IsOnline && !string.IsNullOrEmpty(d.Serial)))
+            {
+                // If no paired devices found, show dialog to select from online devices
+                selectedDeviceSerial = await ShowDeviceSelectionDialog(devices.Where(d => d.IsOnline).ToList());
+            }
             else
             {
                 logger.LogWarning("No online devices found from adb");
