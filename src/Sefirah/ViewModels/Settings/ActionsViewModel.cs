@@ -8,7 +8,7 @@ namespace Sefirah.ViewModels.Settings;
 
 public sealed partial class ActionsViewModel : BaseViewModel
 {
-    private readonly IUserSettingsService _userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
+    private readonly IUserSettingsService userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
 
     private bool isDragging = true;
     private bool isBulkOperation;
@@ -38,20 +38,10 @@ public sealed partial class ActionsViewModel : BaseViewModel
 
     private void LoadActions()
     {
-        if (ApplicationData.Current.LocalSettings.Values["DefaultActionsLoaded"] == null) 
-        {
-            ApplicationData.Current.LocalSettings.Values["DefaultActionsLoaded"] = true;
-            var defaultActions = DefaultActionsProvider.GetDefaultActions();
-            foreach (var action in defaultActions)
-            {
-                Actions.Add(action);
-            }
-            SaveActions();
-        }
         isBulkOperation = true;
         Actions.Clear();
         
-        var customActions = _userSettingsService.GeneralSettingsService.Actions;
+        var customActions = userSettingsService.GeneralSettingsService.Actions;
         foreach (var action in customActions)
         {
             Actions.Add(action);
@@ -61,7 +51,7 @@ public sealed partial class ActionsViewModel : BaseViewModel
 
     private void SaveActions()
     {
-        _userSettingsService.GeneralSettingsService.Actions = Actions.ToList();
+        userSettingsService.GeneralSettingsService.Actions = Actions.ToList();
     }
 
     [RelayCommand]
@@ -88,7 +78,7 @@ public sealed partial class ActionsViewModel : BaseViewModel
 
         if (await actionDialog.ShowDialogAsync(App.MainWindow!.Content!.XamlRoot!) is { } result)
         {
-            _userSettingsService.GeneralSettingsService.UpdateAction(result);
+            userSettingsService.GeneralSettingsService.UpdateAction(result);
             var existingAction = Actions.First(a => a.Id == result.Id);
             var index = Actions.IndexOf(existingAction!);
             Actions[index] = result;

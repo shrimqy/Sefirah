@@ -6,13 +6,21 @@ using Sefirah.Utils.Serialization;
 namespace Sefirah.Services;
 
 public abstract class BaseActionService(
-    IGeneralSettingsService generalSettingsService, 
+    IGeneralSettingsService generalSettingsService,
+    IUserSettingsService userSettingsService,
     ISessionManager sessionManager,
     ILogger logger) : IActionService
 {
     public virtual Task InitializeAsync()
     {
         sessionManager.ConnectionStatusChanged += OnConnectionStatusChanged;
+        if (ApplicationData.Current.LocalSettings.Values["DefaultActionsLoaded"] == null)
+        {
+            ApplicationData.Current.LocalSettings.Values["DefaultActionsLoaded"] = true;
+            var defaultActions = DefaultActionsProvider.GetDefaultActions();
+            userSettingsService.GeneralSettingsService.Actions = [.. defaultActions];
+        }
+
         return Task.CompletedTask;
     }
 
