@@ -48,7 +48,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
             .ToList();
     }
 
-    public async void AddOrUpdateApplication(ApplicationInfoEntity application)
+    public async Task AddOrUpdateApplication(ApplicationInfoEntity application)
     {
         var existingApp = context.Database.Table<ApplicationInfoEntity>()
             .FirstOrDefault(a => a.PackageName == application.PackageName);

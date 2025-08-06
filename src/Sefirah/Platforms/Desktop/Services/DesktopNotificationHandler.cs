@@ -2,9 +2,8 @@ using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 using Sefirah.Utils;
 using Tmds.DBus.Protocol;
-using System.Diagnostics;
 
-namespace Sefirah.Platforms.Desktop;
+namespace Sefirah.Platforms.Desktop.Services;
 
 /// <summary>
 /// Desktop implementation of the platform notification handler using D-Bus
