@@ -1,12 +1,12 @@
 using System.Text;
-using AdvancedSharpAdbClient.Models;
 using CommunityToolkit.WinUI;
-using Renci.SshNet;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Dialogs;
 using Sefirah.Extensions;
+using Sefirah.Utils;
+using Sefirah.Views.Settings;
 using Uno.Logging;
 using Windows.ApplicationModel.DataTransfer;
 
@@ -14,8 +14,7 @@ namespace Sefirah.Services;
 public class ScreenMirrorService(
     ILogger<ScreenMirrorService> logger,
     IUserSettingsService userSettingsService,
-    IAdbService adbService,
-    ISessionManager sessionManager
+    IAdbService adbService
 ) : IScreenMirrorService
 {
     private readonly ObservableCollection<AdbDevice> devices = adbService.AdbDevices;
@@ -543,7 +542,12 @@ public class ScreenMirrorService(
 
     public async Task SelectScrcpyLocationClick()
     {
-
+        var file = await PickerHelper.PickFileAsync();
+        if (file?.Path is string path)
+        {
+            userSettingsService.GeneralSettingsService.ScrcpyPath = path;
+            GeneralPage.TrySetCompanionTool(path, "adb.exe", p => userSettingsService.GeneralSettingsService.AdbPath = p);
+        }
     }
 
     private async Task<string?> ShowPasswordInputDialog()
