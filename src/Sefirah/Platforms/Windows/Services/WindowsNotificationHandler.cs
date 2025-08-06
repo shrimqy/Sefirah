@@ -3,15 +3,17 @@ using Microsoft.Windows.AppNotifications.Builder;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 using Sefirah.Extensions;
+using Sefirah.Services;
 using Sefirah.Utils;
 using Uno.Logging;
+using Windows.System;
 
-namespace Sefirah.Platforms.Windows;
+namespace Sefirah.Platforms.Windows.Services;
 
 /// <summary>
 /// Windows implementation of the platform notification handler
 /// </summary>
-public class WindowsNotificationHandler(ILogger logger) : IPlatformNotificationHandler
+public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionManager, IDeviceManager deviceManager) : IPlatformNotificationHandler
 {
     /// <inheritdoc />
     public async Task ShowRemoteNotification(NotificationMessage message, string deviceId)
@@ -208,6 +210,7 @@ public class WindowsNotificationHandler(ILogger logger) : IPlatformNotificationH
     /// <inheritdoc />
     public async Task ShowFileTransferNotification(string title, string text, string? filePath = null, string? folderPath = null)
     {
+        // TODO: show hero image if available
         try
         {
             var builder = new AppNotificationBuilder()
@@ -245,8 +248,147 @@ public class WindowsNotificationHandler(ILogger logger) : IPlatformNotificationH
     /// <inheritdoc />
     public async Task RegisterForNotifications()
     {
-        // Registration is handled by ToastNotificationService
-        await Task.CompletedTask;
+        AppNotificationManager.Default.NotificationInvoked -= OnNotificationInvoked;
+        AppNotificationManager.Default.NotificationInvoked += OnNotificationInvoked;
+
+        try
+        {
+            await Task.Run(() => AppNotificationManager.Default.Register());
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Could not register for notifications, continuing without notifications");
+        }
+    }
+
+    private async void OnNotificationInvoked(AppNotificationManager sender, AppNotificationActivatedEventArgs args)
+    {
+        try
+        {
+            logger.LogDebug("Notification invoked - Arguments: {Arguments}", string.Join(", ", args.Arguments.Select(x => $"{x.Key}={x.Value}")));
+
+            // Common cleanup for all notifications
+            try
+            {
+                await sender.RemoveByGroupAsync(Constants.Notification.NotificationGroup);
+                await Task.Delay(100); // Small delay to ensure removal
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Failed to remove notifications");
+            }
+
+            // Determine notification type first
+            if (!args.Arguments.TryGetValue("notificationType", out var notificationType))
+            {
+                logger.LogWarning("Notification missing type identifier");
+                return;
+            }
+
+            // Route to appropriate handler
+            switch (notificationType)
+            {
+                case ToastNotificationType.FileTransfer:
+                    HandleFileTransferNotification(args);
+                    break;
+                
+                case ToastNotificationType.RemoteNotification:
+                    HandleMessageNotification(args);
+                    break;
+
+                case ToastNotificationType.Clipboard:
+                    HandleClipboardNotification(args);
+                    break;
+                
+                default:
+                    logger.LogWarning("Unhandled notification type: {NotificationType}", notificationType);
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error handling notification action");
+        }
+    }
+
+    private async void HandleClipboardNotification(AppNotificationActivatedEventArgs args)
+    {
+        if (args.Arguments.TryGetValue("uri", out var uriString) && Uri.TryCreate(uriString, UriKind.Absolute, out Uri? uri))
+        {
+            if (ClipboardService.IsValidWebUrl(uri))
+            {
+                await Launcher.LaunchUriAsync(uri);
+            }
+        }
+    }
+
+    private void HandleFileTransferNotification(AppNotificationActivatedEventArgs args)
+    {
+        if (args.Arguments.TryGetValue("action", out string? action))
+        {
+            switch (action)
+            {
+                case "openFile":
+                    if (args.Arguments.TryGetValue("filePath", out string? filePath) && File.Exists(filePath))
+                    {
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = filePath,
+                            UseShellExecute = true
+                        });
+                    }
+                    else
+                    {
+                        logger.LogWarning("File not found or path not provided - FilePath: {FilePath}", filePath);
+                    }
+                    break;
+
+                case "openFolder":
+                    if (args.Arguments.TryGetValue("folderPath", out string? folderPath) && Directory.Exists(folderPath))
+                    {
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = "explorer.exe",
+                            Arguments = $"\"{folderPath}\"",
+                            UseShellExecute = true
+                        });
+                    }
+                    else
+                    {
+                        logger.LogWarning("Folder not found or path not provided - FolderPath: {FolderPath}", folderPath);
+                    }
+                    break;
+            }
+        }
+    }
+
+    private void HandleMessageNotification(AppNotificationActivatedEventArgs args)
+    {
+        if (!args.Arguments.TryGetValue("action", out var actionType))
+            return;
+        
+        if (!args.Arguments.TryGetValue("deviceId", out var deviceId))
+            return;
+
+        var device = deviceManager.FindDeviceById(deviceId);
+        if (device == null) return;
+
+        var notificationKey = args.Arguments["notificationKey"];
+        switch (actionType)
+        {
+            case "Reply" when args.UserInput.TryGetValue("textBox", out var replyText):
+                if (args.Arguments.TryGetValue("replyResultKey", out var replyResultKey))
+                {
+                    NotificationActionUtils.ProcessReplyAction(sessionManager, logger, device, notificationKey, replyResultKey, replyText);
+                }
+                break;
+            case "Click":
+                if (args.Arguments.TryGetValue("actionIndex", out var actionIndexStr) && int.TryParse(actionIndexStr, out var actionIndex))
+                {
+                    NotificationActionUtils.ProcessClickAction(sessionManager, logger, device, notificationKey, actionIndex);
+                }
+                break;
+        }
     }
 
     /// <inheritdoc />
