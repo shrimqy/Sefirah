@@ -155,7 +155,7 @@ public sealed partial class AppsViewModel : BaseViewModel
                     
                     // Use the icon path directly for saving
                     var filePath = app.IconPath;
-                    var started = await ScreenMirrorService.StartScrcpy(device: activeDevice, customArgs: $"--start-app={appPackage} --window-title={appName}", iconPath: filePath);
+                    var started = await ScreenMirrorService.StartScrcpy(device: activeDevice, customArgs: $"--start-app={appPackage} --window-title=\"{appName}\"", iconPath: filePath);
                     if (started)
                     {
                         await Task.Delay(2000);
