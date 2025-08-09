@@ -211,7 +211,7 @@
     <value>Maximiert starten</value>
   </data>
   <data name="StartupOptionSystemTray.Content" xml:space="preserve">
-    <value>In die Symbolleiste starten</value>
+    <value>Ins System-tray starten</value>
   </data>
   <data name="StartupOptionDisabled.Content" xml:space="preserve">
     <value>Deaktiviert</value>
