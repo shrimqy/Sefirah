@@ -1,0 +1,709 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About" xml:space="preserve">
+    <value>Hakkında</value>
+  </data>
+  <data name="General" xml:space="preserve">
+    <value>Genel</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Ayarlar</value>
+  </data>
+  <data name="PrivacyPolicy" xml:space="preserve">
+    <value>Gizlilik ilkesi</value>
+  </data>
+  <data name="SupportDevelopment" xml:space="preserve">
+    <value>Geliştirmeyi destekle</value>
+  </data>
+  <data name="OpenLogs" xml:space="preserve">
+    <value>Kayıtları aç</value>
+  </data>
+  <data name="GitHubRepository" xml:space="preserve">
+    <value>GitHub Deposu</value>
+  </data>
+  <data name="AndroidGitHubRepository" xml:space="preserve">
+    <value>Android GitHub Deposu</value>
+  </data>
+  <data name="Clipboard" xml:space="preserve">
+    <value>Pano</value>
+  </data>
+  <data name="Feedback" xml:space="preserve">
+    <value>Geri bildirim</value>
+  </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>Bildirimler</value>
+  </data>
+  <data name="ThirdPartyLibraries" xml:space="preserve">
+    <value>Üçüncü parti kütüphaneler</value>
+  </data>
+  <data name="SaveLocation" xml:space="preserve">
+    <value>Kayıt konumu</value>
+  </data>
+  <data name="RemoteStorageLocation" xml:space="preserve">
+    <value>Uzak Depolama Konumu</value>
+  </data>
+  <data name="ShowClipboardToast" xml:space="preserve">
+    <value>Pano bildirimlerini göster</value>
+  </data>
+  <data name="ImageToClipboard" xml:space="preserve">
+    <value>Görüntüleri pano izleyicisine dahil et</value>
+  </data>
+  <data name="ClipboardFiles" xml:space="preserve">
+    <value>Alınan dosyaları panoya ekle</value>
+  </data>
+  <data name="NotificationsDescription" xml:space="preserve">
+    <value>Uzak cihazdan bildirimler al</value>
+  </data>
+  <data name="GeneralSettings" xml:space="preserve">
+    <value>Genel Ayarlar</value>
+  </data>
+  <data name="ShowNotificationToast" xml:space="preserve">
+    <value>Bildirim pencerelerini göster</value>
+  </data>
+  <data name="IgnoreWindowsApps" xml:space="preserve">
+    <value>Etkin Windows uygulamalarından gelen uzak bildirimleri yoksay</value>
+  </data>
+  <data name="NotificationFilterDisabled.Content" xml:space="preserve">
+    <value>Devre dışı</value>
+  </data>
+  <data name="NotificationFilterFeed.Content" xml:space="preserve">
+    <value>Bildirim Akışı</value>
+  </data>
+  <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
+    <value>Bildirim Akışı + Bildirim Penceresi</value>
+  </data>
+  <data name="PairedDevices.Title" xml:space="preserve">
+    <value>Eşleştirilmiş cihazlar</value>
+  </data>
+  <data name="AvailableDevices.Title" xml:space="preserve">
+    <value>Mevcut Cihazlar</value>
+  </data>
+  <data name="AvailableDevices.Subtitle" xml:space="preserve">
+    <value>Aynı ağda uygulamayı çalıştıran Android cihazlar aşağıda görünecektir</value>
+  </data>
+  <data name="StartupOption" xml:space="preserve">
+    <value>Başlangıç seçeneği</value>
+  </data>
+  <data name="StartupOptionDescription" xml:space="preserve">
+    <value>Windows başladığında uygulamanın nasıl başlayacağını seçin</value>
+  </data>
+  <data name="StartupOptionMinimized.Content" xml:space="preserve">
+    <value>Simge durumunda başlat</value>
+  </data>
+  <data name="StartupOptionMaximized.Content" xml:space="preserve">
+    <value>Ekranı kaplayarak başlat</value>
+  </data>
+  <data name="StartupOptionSystemTray.Content" xml:space="preserve">
+    <value>Sistem tepsisinde başlat</value>
+  </data>
+  <data name="StartupOptionDisabled.Content" xml:space="preserve">
+    <value>Devre dışı</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Tema</value>
+  </data>
+  <data name="ThemeDescription" xml:space="preserve">
+    <value>Varsayılan uygulama temanızı seçin</value>
+  </data>
+  <data name="Default" xml:space="preserve">
+    <value>Varsayılan</value>
+  </data>
+  <data name="ThemeLight.Content" xml:space="preserve">
+    <value>Açık</value>
+  </data>
+  <data name="ThemeDark.Content" xml:space="preserve">
+    <value>Koyu</value>
+  </data>
+  <data name="RemoveDeviceDialogTitle" xml:space="preserve">
+    <value>Cihazı kaldır</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Kaldır</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>İptal</value>
+  </data>
+  <data name="OnboardingWelcome.Title" xml:space="preserve">
+    <value>Sefirah'a hoş geldiniz</value>
+  </data>
+  <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
+    <value>Başlamak için ilgili GitHub sayfasından yardımcı uygulamayı indirin ve kurun.</value>
+  </data>
+  <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
+    <value>Başlayın</value>
+  </data>
+  <data name="OnboardingSkip" xml:space="preserve">
+    <value>Şimdilik atla</value>
+  </data>
+  <data name="OnboardingDevice.Title" xml:space="preserve">
+    <value>Cihazınızı bağlayın</value>
+  </data>
+  <data name="OnboardingDevice.Subtitle" xml:space="preserve">
+    <value>Ağınızda keşfedilen cihazlar aşağıda görünecektir, bağlantıyı mobil cihazınızdan başlatın (PIN'in eşleştiğinden emin olun)</value>
+  </data>
+  <data name="ConnectionRequest.Title" xml:space="preserve">
+    <value>Cihaz Bağlantı İsteği</value>
+  </data>
+  <data name="ConnectionRequest.Subtitle" xml:space="preserve">
+    <value>Parolanın her iki cihazda da eşleştiğini doğrulayın:</value>
+  </data>
+  <data name="ConnectionRequestRejectButton" xml:space="preserve">
+    <value>Reddet</value>
+  </data>
+  <data name="NotificationsClearButton" xml:space="preserve">
+    <value>Tümünü temizle</value>
+  </data>
+  <data name="ConnectionRequestAcceptButton" xml:space="preserve">
+    <value>Kabul et</value>
+  </data>
+  <data name="NoDevicesFound" xml:space="preserve">
+    <value>Cihaz bulunamadı</value>
+  </data>
+  <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
+    <value>PAROLA</value>
+  </data>
+  <data name="ClipboardDescription" xml:space="preserve">
+    <value>Panonuzu cihazlar arasında senkronize edin</value>
+  </data>
+  <data name="StartupOptionsDescription" xml:space="preserve">
+    <value>Windows başladığında uygulamanın nasıl başlayacağını seçin</value>
+  </data>
+  <data name="OpenLinksInBrowser" xml:space="preserve">
+    <value>Bağlantıları tarayıcıda aç</value>
+  </data>
+  <data name="Connected.Text" xml:space="preserve">
+    <value>Bağlandı</value>
+  </data>
+  <data name="Disconnected.Text" xml:space="preserve">
+    <value>Bağlantı kesildi</value>
+  </data>
+  <data name="ShowHideWindow" xml:space="preserve">
+    <value>Pencereyi göster/gizle</value>
+  </data>
+  <data name="Exit" xml:space="preserve">
+    <value>Çıkış</value>
+  </data>
+  <data name="Features" xml:space="preserve">
+    <value>Özellikler</value>
+  </data>
+  <data name="SelectLocation" xml:space="preserve">
+    <value>Konum seç</value>
+  </data>
+  <data name="RemoveDeviceDialogSubtitle" xml:space="preserve">
+    <value>'{0}' adlı cihazı kaldırmak istediğinizden emin misiniz? Bu işlem geri alınamaz.</value>
+  </data>
+  <data name="AppSpecificSettings" xml:space="preserve">
+    <value>Uygulamaya Özel Ayarlar</value>
+  </data>
+  <data name="TransferNotificationReceiving.Content" xml:space="preserve">
+    <value>{0} alınıyor</value>
+  </data>
+  <data name="TransferNotificationReceivingError" xml:space="preserve">
+    <value>{0} alınırken hata oluştu</value>
+  </data>
+  <data name="TransferNotificationReceiving.Title" xml:space="preserve">
+    <value>Dosya Alınıyor</value>
+  </data>
+  <data name="TransferNotificationReceived.Title" xml:space="preserve">
+    <value>Dosya Alındı</value>
+  </data>
+  <data name="TransferNotification.Title" xml:space="preserve">
+    <value>Dosya aktarımı</value>
+  </data>
+  <data name="SendButton" xml:space="preserve">
+    <value>Gönder</value>
+  </data>
+  <data name="ReplyPlaceholder" xml:space="preserve">
+    <value>Bir yanıt yazın</value>
+  </data>
+  <data name="TransferNotificationActionOpenFile" xml:space="preserve">
+    <value>Dosyayı aç</value>
+  </data>
+  <data name="TransferNotificationActionOpenFolder" xml:space="preserve">
+    <value>Klasörü aç</value>
+  </data>
+  <data name="NotificationFilterButton" xml:space="preserve">
+    <value>{0} uygulamasından gelen bildirimleri kapat</value>
+  </data>
+  <data name="SubmitBugReport" xml:space="preserve">
+    <value>Hata bildir</value>
+  </data>
+  <data name="SubmitFeatureRequest" xml:space="preserve">
+    <value>Özellik isteğinde bulun</value>
+  </data>
+  <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
+    <value>Telefon Rahatsız Etme modundayken bildirim penceresi gösterme</value>
+  </data>
+  <data name="Devices" xml:space="preserve">
+    <value>Cihazlar</value>
+  </data>
+  <data name="RingerModeNormal.Content" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="RingerModeSilent.Content" xml:space="preserve">
+    <value>Sessiz</value>
+  </data>
+  <data name="RingerModeVibrate.Content" xml:space="preserve">
+    <value>Titreşim</value>
+  </data>
+  <data name="Pin" xml:space="preserve">
+    <value>Sabitle</value>
+  </data>
+  <data name="Unpin" xml:space="preserve">
+    <value>Sabitlemeyi kaldır</value>
+  </data>
+  <data name="ScreenMirror" xml:space="preserve">
+    <value>Ekran yansıtma</value>
+  </data>
+  <data name="VideoSettings" xml:space="preserve">
+    <value>Video ayarları</value>
+  </data>
+  <data name="AudioSettings" xml:space="preserve">
+    <value>Ses Ayarları</value>
+  </data>
+  <data name="OpenApp" xml:space="preserve">
+    <value>Uygulamada aç</value>
+  </data>
+  <data name="ScreenOff" xml:space="preserve">
+    <value>Yansıtma sırasında cihaz ekranını kapalı tut</value>
+  </data>
+  <data name="PhysicalKeyboard" xml:space="preserve">
+    <value>Ekran klavyesini devre dışı bırak</value>
+  </data>
+  <data name="Bitrate" xml:space="preserve">
+    <value>Bit hızı</value>
+  </data>
+  <data name="Resolution" xml:space="preserve">
+    <value>Çözünürlük</value>
+  </data>
+  <data name="Buffer" xml:space="preserve">
+    <value>Arabellek</value>
+  </data>
+  <data name="Messages" xml:space="preserve">
+    <value>Mesajlar</value>
+  </data>
+  <data name="EmptyMessages" xml:space="preserve">
+    <value>Yeni bir konuşma başlatın veya yanıtlamak için birini seçin</value>
+  </data>
+  <data name="MessagePlaceholder" xml:space="preserve">
+    <value>Bir mesaj yazın</value>
+  </data>
+  <data name="Apps" xml:space="preserve">
+    <value>Uygulamalar</value>
+  </data>
+  <data name="NewMessage" xml:space="preserve">
+    <value>Yeni mesaj</value>
+  </data>
+  <data name="SearchMessages" xml:space="preserve">
+    <value>Mesajlarda ara</value>
+  </data>
+  <data name="AddressInputPlaceholder" xml:space="preserve">
+    <value>Kime</value>
+  </data>
+  <data name="RemoveAddress" xml:space="preserve">
+    <value>Adresi kaldır</value>
+  </data>
+  <data name="CopyMessage" xml:space="preserve">
+    <value>Mesajı kopyala</value>
+  </data>
+  <data name="NoApps" xml:space="preserve">
+    <value>Uygulama bulunamadı</value>
+  </data>
+  <data name="AllApps" xml:space="preserve">
+    <value>Tüm Uygulamalar</value>
+  </data>
+  <data name="AdditionalArguments" xml:space="preserve">
+    <value>Ek argümanlar</value>
+  </data>
+  <data name="AdbDeviceOffline" xml:space="preserve">
+    <value>Adb cihazı çevrimdışı</value>
+  </data>
+  <data name="AdbDeviceOfflineDescription" xml:space="preserve">
+    <value>Cihazınızı USB Hata Ayıklama etkin olarak USB üzerinden bağlayın, ardından tekrar deneyin.</value>
+  </data>
+  <data name="Dismiss" xml:space="preserve">
+    <value>Kapat</value>
+  </data>
+  <data name="ScrcpyNotFound" xml:space="preserve">
+    <value>Scrcpy bulunamadı</value>
+  </data>
+  <data name="ScrcpyNotFoundDescription" xml:space="preserve">
+    <value>scrcpy'nin bulunduğu klasörü seçin</value>
+  </data>
+  <data name="PreferTcpIp" xml:space="preserve">
+    <value>Kablosuz bağlantıyı tercih et</value>
+  </data>
+  <data name="SearchApps" xml:space="preserve">
+    <value>Uygulamalarda ara</value>
+  </data>
+  <data name="DisableVideoForwarding" xml:space="preserve">
+    <value>Video iletimini devre dışı bırak</value>
+  </data>
+  <data name="VideoCodec" xml:space="preserve">
+    <value>Video codec</value>
+  </data>
+  <data name="FrameRate" xml:space="preserve">
+    <value>Kare hızı</value>
+  </data>
+  <data name="Crop" xml:space="preserve">
+    <value>Kırp</value>
+  </data>
+  <data name="Display" xml:space="preserve">
+    <value>Ekran</value>
+  </data>
+  <data name="VirtualDisplaySize" xml:space="preserve">
+    <value>Sanal ekran boyutu</value>
+  </data>
+  <data name="DisplayOrientation" xml:space="preserve">
+    <value>Ekran yönü</value>
+  </data>
+  <data name="RotationAngle" xml:space="preserve">
+    <value>Döndürme açısı</value>
+  </data>
+  <data name="AudioOutputMode" xml:space="preserve">
+    <value>Ses çıkışı</value>
+  </data>
+  <data name="ForwardMicrophone" xml:space="preserve">
+    <value>Mikrofonu yönlendir</value>
+  </data>
+  <data name="AudioOutputBuffer" xml:space="preserve">
+    <value>Ses çıkış arabelleği</value>
+  </data>
+  <data name="AudioCodec" xml:space="preserve">
+    <value>Ses codec</value>
+  </data>
+  <data name="AdbSettings" xml:space="preserve">
+    <value>Adb Ayarları</value>
+  </data>
+  <data name="AutoConnect" xml:space="preserve">
+    <value>Otomatik bağlan</value>
+  </data>
+  <data name="Both" xml:space="preserve">
+    <value>Her ikisi de</value>
+  </data>
+  <data name="DesktopDevice" xml:space="preserve">
+    <value>Masaüstü cihazı</value>
+  </data>
+  <data name="RemoteDevice" xml:space="preserve">
+    <value>Uzak cihaz</value>
+  </data>
+  <data name="SelectDevice" xml:space="preserve">
+    <value>Bir cihaz seçin</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Başlat</value>
+  </data>
+  <data name="ScrcpyDevicePreference" xml:space="preserve">
+    <value>Cihaz tercihi</value>
+  </data>
+  <data name="AskEverytime" xml:space="preserve">
+    <value>Her defasında sor</value>
+  </data>
+  <data name="Auto" xml:space="preserve">
+    <value>Otomatik</value>
+  </data>
+  <data name="ScrcpyErrorTitle" xml:space="preserve">
+    <value>Scrcpy başlatılamadı</value>
+  </data>
+  <data name="CopyError" xml:space="preserve">
+    <value>Kopyalama hatası</value>
+  </data>
+  <data name="DeviceName" xml:space="preserve">
+    <value>Cihaz adı</value>
+  </data>
+  <data name="EnableVirtualDisplay" xml:space="preserve">
+    <value>Sanal ekranı etkinleştir</value>
+  </data>
+  <data name="TransferNotificationSending.Title" xml:space="preserve">
+    <value>Dosya Gönderiliyor</value>
+  </data>
+  <data name="TransferNotificationSent.Title" xml:space="preserve">
+    <value>Dosya Gönderildi</value>
+  </data>
+  <data name="Uninstall" xml:space="preserve">
+    <value>Kaldır</value>
+  </data>
+  <data name="UnlockDeviceHelpTitle" xml:space="preserve">
+    <value>Kabuk komutları yardımı</value>
+  </data>
+  <data name="UnlockDeviceHelpDescription" xml:space="preserve">
+    <value>Metin kutusundaki kabuk komutları scrcpy başlatılmadan önce yürütülecektir. Cihazınızda çalışan komutları satırlarla ayırarak girin. Parolanızın istenmesi gerekiyorsa, parola yer tutucusu olarak %pwd% kullanın.</value>
+  </data>
+  <data name="UnlockDeviceHelpExample" xml:space="preserve">
+    <value>Örnek:</value>
+  </data>
+  <data name="UnlockDeviceHelpUsefulInfo" xml:space="preserve">
+    <value>Faydalı bilgiler:</value>
+  </data>
+  <data name="UnlockDeviceHelpNote" xml:space="preserve">
+    <value>26 veya POWER: Cihaz ekranını uyandırır veya uyutur.
+66 veya ENTER: Enter tuşuna basmayı simüle eder.
+82 veya MENU: Kilit açma arayüzünü getirir veya parmak izi kimlik doğrulaması ister.
+%pwd%: Parola için yer tutucu - girmeniz istenecektir.
+Bazı cihazlar kilit açma arayüzünü getirmek için bir kaydırma hareketi de gerektirebilir:
+input touchscreen swipe 540 1800 540 900</value>
+  </data>
+  <data name="PinnedApps" xml:space="preserve">
+    <value>Sabitlenmiş uygulamalar</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Eylemler</value>
+  </data>
+  <data name="ActionsDescription" xml:space="preserve">
+    <value>Özel eylemleri ve çalıştırılabilir komutları yapılandırın</value>
+  </data>
+  <data name="AdbNoDevice" xml:space="preserve">
+    <value>Bağlı ADB cihazı yok</value>
+  </data>
+  <data name="AdbNoDeviceSubtitle" xml:space="preserve">
+    <value>Burada görmek için ADB'yi açın ve cihazınızı USB veya Wi-Fi ile bağlayın.</value>
+  </data>
+  <data name="ClipboardSettings" xml:space="preserve">
+    <value>Pano ayarları</value>
+  </data>
+  <data name="DeviceSettings" xml:space="preserve">
+    <value>Cihaz ayarları</value>
+  </data>
+  <data name="NotificationSettings" xml:space="preserve">
+    <value>Bildirim ayarları</value>
+  </data>
+  <data name="ScreenMirrorSettings" xml:space="preserve">
+    <value>Ekran yansıtma ayarları</value>
+  </data>
+  <data name="OpenLinksInBrowserDescription" xml:space="preserve">
+    <value>Panodaki bağlantıları varsayılan tarayıcıda otomatik olarak aç</value>
+  </data>
+  <data name="ShowClipboardToastDescription" xml:space="preserve">
+    <value>Pano değişiklikleri için bildirim pencereleri göster</value>
+  </data>
+  <data name="ClipboardFilesDescription" xml:space="preserve">
+    <value>Pano aracılığıyla dosya senkronizasyonunu etkinleştir</value>
+  </data>
+  <data name="ImageToClipboardDescription" xml:space="preserve">
+    <value>Pano aracılığıyla görüntü senkronizasyonunu etkinleştir</value>
+  </data>
+  <data name="AutoConnectDescription" xml:space="preserve">
+    <value>Cihaz bağlandığında ADB'ye otomatik olarak bağlan</value>
+  </data>
+  <data name="SyncClipboardChanges" xml:space="preserve">
+    <value>Pano değişikliklerini bu cihazla senkronize et</value>
+  </data>
+  <data name="ConfigureNotificationSettings" xml:space="preserve">
+    <value>Bildirim ayarlarını yapılandır</value>
+  </data>
+  <data name="ConfigureScreenMirroring" xml:space="preserve">
+    <value>Ekran yansıtmayı yapılandır</value>
+  </data>
+  <data name="ConfigureAdbConnection" xml:space="preserve">
+    <value>ADB bağlantısını yapılandır ve adresleri yönet</value>
+  </data>
+  <data name="SyncMediaSessions" xml:space="preserve">
+    <value>Medya ve ses oturumlarını senkronize et</value>
+  </data>
+  <data name="MediaSessions" xml:space="preserve">
+    <value>Medya oturumları</value>
+  </data>
+  <data name="DisplayToastNotifications" xml:space="preserve">
+    <value>Bu bilgisayarda bildirim pencerelerini göster</value>
+  </data>
+  <data name="ShowBadge" xml:space="preserve">
+    <value>Rozeti göster</value>
+  </data>
+  <data name="ShowBadgeDescription" xml:space="preserve">
+    <value>Görev çubuğunda bildirim rozetini göster</value>
+  </data>
+  <data name="IgnoreDuringDoNotDisturb" xml:space="preserve">
+    <value>Rahatsız Etme modundayken yoksay</value>
+  </data>
+  <data name="IgnoreDuringDoNotDisturbDescription" xml:space="preserve">
+    <value>Rahatsız Etme modu etkinken bildirim gösterme</value>
+  </data>
+  <data name="ConnectionPreference" xml:space="preserve">
+    <value>Bağlantı tercihi</value>
+  </data>
+  <data name="AddAction" xml:space="preserve">
+    <value>Eylem ekle</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Düzenle</value>
+  </data>
+  <data name="NoActionsConfigured" xml:space="preserve">
+    <value>Yapılandırılmış eylem yok</value>
+  </data>
+  <data name="ActionName" xml:space="preserve">
+    <value>Eylem adı</value>
+  </data>
+  <data name="ExecutablePath" xml:space="preserve">
+    <value>Çalıştırılabilir dosya yolu</value>
+  </data>
+  <data name="Arguments" xml:space="preserve">
+    <value>Argümanlar</value>
+  </data>
+  <data name="StartInDirectory" xml:space="preserve">
+    <value>Başlangıç dizini</value>
+  </data>
+  <data name="EnterActionName" xml:space="preserve">
+    <value>Eylem adını girin</value>
+  </data>
+  <data name="PathToExecutable" xml:space="preserve">
+    <value>Çalıştırılabilir dosyanın yolu</value>
+  </data>
+  <data name="CommandLineArguments" xml:space="preserve">
+    <value>Komut satırı argümanları (isteğe bağlı)</value>
+  </data>
+  <data name="EnterPassword" xml:space="preserve">
+    <value>Parolayı girin</value>
+  </data>
+  <data name="Reply" xml:space="preserve">
+    <value>Yanıtla</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Geri</value>
+  </data>
+  <data name="Browse" xml:space="preserve">
+    <value>Gözat</value>
+  </data>
+  <data name="EnterAddressesAndCompose" xml:space="preserve">
+    <value>Yukarıya adresleri girin ve mesajınızı aşağıda oluşturun</value>
+  </data>
+  <data name="UseTcpIpMode" xml:space="preserve">
+    <value>TCP/IP modunu kullan</value>
+  </data>
+  <data name="UseTcpIpModeDescription" xml:space="preserve">
+    <value>Kablosuz ADB bağlantılarını etkinleştir</value>
+  </data>
+  <data name="WorkingDirectory" xml:space="preserve">
+    <value>Çalışma dizini (isteğe bağlı)</value>
+  </data>
+  <data name="UnlockDeviceBeforeLaunch" xml:space="preserve">
+    <value>scrcpy'yi başlatmadan önce cihazın kilidini aç</value>
+  </data>
+  <data name="UnlockCommandsPlaceholder" xml:space="preserve">
+    <value>input keyevent 26
+input keyevent 66
+input text %pwd%</value>
+  </data>
+  <data name="FileDropCaption" xml:space="preserve">
+    <value>Göndermek için dosyaları buraya sürükleyin</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Kaydet</value>
+  </data>
+</root>
