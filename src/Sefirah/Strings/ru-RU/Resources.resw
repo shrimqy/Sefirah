@@ -602,13 +602,13 @@ input touchscreen swipe 540 1800 540 900</value>
     <value>Automatically connect to ADB when device connects</value>
   </data>
   <data name="SyncClipboardChanges" xml:space="preserve">
-    <value>Sync clipboard changes with this device</value>
+    <value>Синхронизировать изменения буфера обмена с этим устройством</value>
   </data>
   <data name="ConfigureNotificationSettings" xml:space="preserve">
-    <value>Configure notification settings</value>
+    <value>Настройка параметров уведомлений</value>
   </data>
   <data name="ConfigureScreenMirroring" xml:space="preserve">
-    <value>Configure screen mirroring</value>
+    <value>Настройка трансляции экрана</value>
   </data>
   <data name="ConfigureAdbConnection" xml:space="preserve">
     <value>Configure ADB connection and manage addresses</value>
