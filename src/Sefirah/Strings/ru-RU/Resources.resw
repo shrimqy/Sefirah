@@ -572,7 +572,7 @@ input touchscreen swipe 540 1800 540 900</value>
     <value>No ADB devices connected</value>
   </data>
   <data name="AdbNoDeviceSubtitle" xml:space="preserve">
-    <value>Turn on ADB and connect your device via USB or Wi-Fi to see it here</value>
+    <value>Включите ADB и подключите устройство через USB или Wi-Fi, чтобы увидеть его здесь.</value>
   </data>
   <data name="ClipboardSettings" xml:space="preserve">
     <value>Clipboard settings</value>
