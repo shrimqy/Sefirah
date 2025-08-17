@@ -1,5 +1,8 @@
 using Microsoft.UI;
 using Microsoft.UI.Xaml.Media.Imaging;
+#if WINDOWS
+using Sefirah.Platforms.Windows.Interop;
+#endif
 using Windows.UI.ViewManagement;
 
 namespace Sefirah.UserControls;
@@ -33,8 +36,10 @@ public sealed partial class TrayIconControl : UserControl
         }
         else
         {
-            window.Activate();
             window.AppWindow.Show();
+#if WINDOWS
+            InteropHelpers.SetForegroundWindow(App.WindowHandle);
+#endif
         }
     }
 

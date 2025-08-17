@@ -64,4 +64,7 @@ public static class InteropHelpers
         Type type = typeof(UIElement);
         type.InvokeMember("ProtectedCursor", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.SetProperty | BindingFlags.Instance, null, uiElement, new object[] { cursor });
     }
+
+    [DllImport("user32.dll")]
+    public static extern void SetForegroundWindow(nint hWnd);
 }
