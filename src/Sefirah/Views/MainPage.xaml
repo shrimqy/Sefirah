@@ -617,7 +617,7 @@
                             SelectsOnInvoked="False"
                             Tapped="UpdateButtonClick"
                             ToolTipService.ToolTip="Update Available"
-                            Visibility="{x:Bind ViewModel.IsUpdateAvailable, Mode=OneWay}">
+                            Visibility="{x:Bind ViewModel.IsUpdateAvailable, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <NavigationViewItem.Icon>
                                 <FontIcon Foreground="{StaticResource AccentFillColorDefaultBrush}" Glyph="&#xEDAB;" />
                             </NavigationViewItem.Icon>
