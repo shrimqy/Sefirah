@@ -64,7 +64,7 @@
                                         <Image
                                             Width="32"
                                             Height="32"
-                                            Source="{x:Bind BitmapIcon}" />
+                                            Source="{x:Bind IconPath}" />
                                         <TextBlock FontSize="16" Text="{x:Bind AppName}" />
                                     </StackPanel>
                                 </wuc:SettingsCard.Header>

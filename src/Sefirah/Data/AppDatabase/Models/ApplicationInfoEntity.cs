@@ -1,6 +1,5 @@
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
-using Sefirah.Helpers;
 using Sefirah.Utils;
 using SQLite;
 
@@ -19,28 +18,18 @@ public partial class ApplicationInfoEntity
     public string? AppDeviceInfoJson { get; set; }
 
     #region Helpers
-    internal async Task<ApplicationInfo> ToApplicationInfo()
+    internal ApplicationInfo ToApplicationInfo()
     {
-        var appIcon = await ImageHelper.LoadFromPathAsync(AppIconPath);
-        
-        var deviceInfo = new List<AppDeviceInfo>();
+        List<AppDeviceInfo> deviceInfo = [];
         if (!string.IsNullOrEmpty(AppDeviceInfoJson))
         {
-            try
-            {
-                deviceInfo = JsonSerializer.Deserialize<List<AppDeviceInfo>>(AppDeviceInfoJson) ?? [];
-            }
-            catch (JsonException)
-            {
-                deviceInfo = [];
-            }
+            deviceInfo = JsonSerializer.Deserialize<List<AppDeviceInfo>>(AppDeviceInfoJson) ?? [];
         }
 
         return new ApplicationInfo
         {
             PackageName = PackageName,
             AppName = AppName,
-            BitmapIcon = appIcon,
             IconPath = AppIconPath,
             DeviceInfo = deviceInfo
         };

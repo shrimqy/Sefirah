@@ -28,7 +28,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
 
             foreach (var entity in appEntities)
             {
-                var appInfo = await entity.ToApplicationInfo();
+                var appInfo = entity.ToApplicationInfo();
                 Applications.Add(appInfo);
                 
                 if (appInfo.IsPinned(deviceId))
@@ -60,7 +60,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
             existingApp.AppIconPath = application.AppIconPath ?? existingApp.AppIconPath;
             
             // Add device to existing app
-            var appInfo = await existingApp.ToApplicationInfo();
+            var appInfo = existingApp.ToApplicationInfo();
             var deviceId = GetFirstDeviceId(application);
             appInfo.AddDevice(deviceId);
             existingApp.AppDeviceInfoJson = JsonSerializer.Serialize(appInfo.DeviceInfo);
@@ -72,10 +72,9 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
                 var appToUpdate = Applications.FirstOrDefault(a => a.PackageName == existingApp.PackageName);
                 if (appToUpdate != null)
                 {
-                    var updatedAppInfo = await existingApp.ToApplicationInfo();
+                    var updatedAppInfo = existingApp.ToApplicationInfo();
                     appToUpdate.PackageName = updatedAppInfo.PackageName;
                     appToUpdate.AppName = updatedAppInfo.AppName;
-                    appToUpdate.BitmapIcon = updatedAppInfo.BitmapIcon;
                     appToUpdate.IconPath = updatedAppInfo.IconPath;
                     appToUpdate.DeviceInfo = updatedAppInfo.DeviceInfo;
                 }
@@ -86,7 +85,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
             context.Database.Insert(application);
             await App.MainWindow!.DispatcherQueue.EnqueueAsync(async () =>
             {
-                var appInfo = await application.ToApplicationInfo();
+                var appInfo = application.ToApplicationInfo();
                 Applications.Add(appInfo);
             });
         }
@@ -99,7 +98,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
         
         if (app != null && HasDevice(app, deviceId))
         {
-            var appInfo = await app.ToApplicationInfo().ConfigureAwait(false);
+            var appInfo = app.ToApplicationInfo();
             var deviceInfo = appInfo.DeviceInfo.FirstOrDefault(d => d.DeviceId == deviceId);
             return deviceInfo?.Filter;
         }
@@ -113,7 +112,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
 
         if (app != null)
         {
-            var appInfo = await app.ToApplicationInfo().ConfigureAwait(false);
+            var appInfo = app.ToApplicationInfo();
             appInfo.AddDevice(deviceId);
             var deviceInfo = appInfo.DeviceInfo.FirstOrDefault(d => d.DeviceId == deviceId);
             deviceInfo?.Filter = filter;
@@ -125,10 +124,9 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
                 var appToUpdate = Applications.FirstOrDefault(a => a.PackageName == appPackage);
                 if (appToUpdate != null)
                 {
-                    var updatedAppInfo = await app.ToApplicationInfo().ConfigureAwait(false);
+                    var updatedAppInfo = app.ToApplicationInfo();
                     appToUpdate.PackageName = updatedAppInfo.PackageName;
                     appToUpdate.AppName = updatedAppInfo.AppName;
-                    appToUpdate.BitmapIcon = updatedAppInfo.BitmapIcon;
                     appToUpdate.IconPath = updatedAppInfo.IconPath;
                     appToUpdate.DeviceInfo = updatedAppInfo.DeviceInfo;
                 }
@@ -162,7 +160,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
             
             await App.MainWindow!.DispatcherQueue.EnqueueAsync(async() =>
             {
-                Applications.Add(await newEntity.ToApplicationInfo());
+                Applications.Add(newEntity.ToApplicationInfo());
             });
         }
         return filter;
@@ -175,7 +173,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
         
         if (app != null)
         {
-            var appInfo = await app.ToApplicationInfo().ConfigureAwait(false);
+            var appInfo = app.ToApplicationInfo();
             var deviceInfo = appInfo.DeviceInfo.FirstOrDefault(d => d.DeviceId == deviceId);
             if (deviceInfo != null)
             {
@@ -193,7 +191,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
 
         if (app != null)
         {
-            var appInfo = await app.ToApplicationInfo().ConfigureAwait(false);
+            var appInfo = app.ToApplicationInfo();
             appInfo.RemoveDevice(deviceId);
             app.AppDeviceInfoJson = JsonSerializer.Serialize(appInfo.DeviceInfo);
             
@@ -224,10 +222,9 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
                     var appToUpdate = Applications.FirstOrDefault(a => a.PackageName == appPackage);
                     if (appToUpdate != null)
                     {
-                        var updatedAppInfo = await app.ToApplicationInfo();
+                        var updatedAppInfo = app.ToApplicationInfo();
                         appToUpdate.PackageName = updatedAppInfo.PackageName;
                         appToUpdate.AppName = updatedAppInfo.AppName;
-                        appToUpdate.BitmapIcon = updatedAppInfo.BitmapIcon;
                         appToUpdate.IconPath = updatedAppInfo.IconPath;
                         appToUpdate.DeviceInfo = updatedAppInfo.DeviceInfo;
                     }
@@ -270,7 +267,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
         {
             if (HasDevice(app, deviceId))
             {
-                var appInfo = await app.ToApplicationInfo().ConfigureAwait(false);
+                var appInfo = app.ToApplicationInfo();
                 appInfo.RemoveDevice(deviceId);
                 app.AppDeviceInfoJson = JsonSerializer.Serialize(appInfo.DeviceInfo);
                 
@@ -312,7 +309,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
 
         if (app != null && HasDevice(app, deviceId))
         {
-            var appInfo = await app.ToApplicationInfo().ConfigureAwait(false);
+            var appInfo = app.ToApplicationInfo();
             appInfo.SetPinned(deviceId, true);
             app.AppDeviceInfoJson = JsonSerializer.Serialize(appInfo.DeviceInfo);
             context.Database.Update(app);
@@ -322,10 +319,9 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
                 var appToUpdate = Applications.FirstOrDefault(a => a.PackageName == appPackage);
                 if (appToUpdate != null)
                 {
-                    var updatedAppInfo = await app.ToApplicationInfo();
+                    var updatedAppInfo = app.ToApplicationInfo();
                     appToUpdate.PackageName = updatedAppInfo.PackageName;
                     appToUpdate.AppName = updatedAppInfo.AppName;
-                    appToUpdate.BitmapIcon = updatedAppInfo.BitmapIcon;
                     appToUpdate.IconPath = updatedAppInfo.IconPath;
                     appToUpdate.DeviceInfo = updatedAppInfo.DeviceInfo;
                     
@@ -345,7 +341,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
 
         if (app != null && HasDevice(app, deviceId))
         {
-            var appInfo = await app.ToApplicationInfo().ConfigureAwait(false);
+            var appInfo = app.ToApplicationInfo();
             appInfo.SetPinned(deviceId, false);
             app.AppDeviceInfoJson = JsonSerializer.Serialize(appInfo.DeviceInfo);
             context.Database.Update(app);
@@ -355,10 +351,9 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
                 var appToUpdate = Applications.FirstOrDefault(a => a.PackageName == appPackage);
                 if (appToUpdate != null)
                 {
-                    var updatedAppInfo = await app.ToApplicationInfo();
+                    var updatedAppInfo = app.ToApplicationInfo();
                     appToUpdate.PackageName = updatedAppInfo.PackageName;
                     appToUpdate.AppName = updatedAppInfo.AppName;
-                    appToUpdate.BitmapIcon = updatedAppInfo.BitmapIcon;
                     appToUpdate.IconPath = updatedAppInfo.IconPath;
                     appToUpdate.DeviceInfo = updatedAppInfo.DeviceInfo;
                     

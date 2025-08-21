@@ -651,7 +651,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         var remoteAppEntity = RemoteAppsRepository.GetApplicationsFromDevice(id).ToObservableCollection();
         foreach (var entity in remoteAppEntity)
         {
-            var app = await entity.ToApplicationInfo();
+            var app = entity.ToApplicationInfo();
             app.UpdateNotificationFilter(id);
             RemoteApps.Add(app);
         }

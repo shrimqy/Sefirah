@@ -72,7 +72,7 @@
             TextChanged="AppSearchBox_TextChanged"
             UpdateTextOnSelect="False">
             <AutoSuggestBox.ItemTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="models:ApplicationInfo">
                     <StackPanel
                         Margin="0,8,0,8"
                         VerticalAlignment="Center"
@@ -80,12 +80,12 @@
                         <Image
                             Width="36"
                             Height="36"
-                            Source="{Binding BitmapIcon, Mode=OneWay}"
+                            Source="{x:Bind IconPath, Mode=OneWay}"
                             Stretch="Uniform" />
                         <TextBlock
                             Margin="12,0,0,0"
                             VerticalAlignment="Center"
-                            Text="{Binding AppName, Mode=OneWay}" />
+                            Text="{x:Bind AppName, Mode=OneWay}" />
                     </StackPanel>
                 </DataTemplate>
             </AutoSuggestBox.ItemTemplate>
@@ -162,7 +162,7 @@
                                         Height="48"
                                         Margin="0,10,0,10"
                                         HorizontalAlignment="Center"
-                                        Source="{x:Bind BitmapIcon, Mode=OneWay}"
+                                        Source="{x:Bind IconPath, Mode=OneWay}"
                                         Stretch="Uniform"
                                         Visibility="{x:Bind IsLoading, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
 
@@ -263,7 +263,7 @@
                                         Height="48"
                                         Margin="0,10,0,10"
                                         HorizontalAlignment="Center"
-                                        Source="{x:Bind BitmapIcon, Mode=OneWay}"
+                                        Source="{x:Bind IconPath, Mode=OneWay}"
                                         Stretch="Uniform"
                                         Visibility="{x:Bind IsLoading, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
 

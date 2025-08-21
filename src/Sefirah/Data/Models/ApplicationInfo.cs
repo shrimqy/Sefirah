@@ -20,13 +20,6 @@ public partial class ApplicationInfo : ObservableObject
         set => SetProperty(ref appName, value);
     }
     
-    private BitmapImage? bitmapIcon;
-    public BitmapImage? BitmapIcon
-    {
-        get => bitmapIcon;
-        set => SetProperty(ref bitmapIcon, value);
-    }
-    
     private string? iconPath;
     public string? IconPath
     {
