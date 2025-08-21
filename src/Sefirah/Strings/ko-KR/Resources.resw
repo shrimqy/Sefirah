@@ -118,165 +118,164 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="About" xml:space="preserve">
-    <value>About</value>
+    <value>정보</value>
   </data>
   <data name="General" xml:space="preserve">
-    <value>General</value>
+    <value>일반</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Settings</value>
+    <value>설정</value>
   </data>
   <data name="PrivacyPolicy" xml:space="preserve">
-    <value>Privacy policy</value>
+    <value>개인정보 정책</value>
   </data>
   <data name="SupportDevelopment" xml:space="preserve">
     <value>Support Development</value>
   </data>
   <data name="OpenLogs" xml:space="preserve">
-    <value>Open logs</value>
+    <value>로그 열기</value>
   </data>
   <data name="GitHubRepository" xml:space="preserve">
-    <value>GitHub Repository</value>
+    <value>GitHub 저장소</value>
   </data>
   <data name="AndroidGitHubRepository" xml:space="preserve">
-    <value>Android GitHub Repository</value>
+    <value>안드로이드 앱 GitHub 저장소</value>
   </data>
   <data name="Clipboard" xml:space="preserve">
-    <value>Clipboard</value>
+    <value>클립보드</value>
   </data>
   <data name="Feedback" xml:space="preserve">
-    <value>Feedback</value>
+    <value>피드백</value>
   </data>
   <data name="Notifications" xml:space="preserve">
-    <value>Notifications</value>
+    <value>알림</value>
   </data>
   <data name="ThirdPartyLibraries" xml:space="preserve">
-    <value>Third party libraries</value>
+    <value>서드파티 라이브러리</value>
   </data>
   <data name="SaveLocation" xml:space="preserve">
-    <value>Save location</value>
+    <value>저장 위치</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Remote Storage Location</value>
+    <value>원격 기기 저장소 위치</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
-    <value>Show clipboard toast</value>
+    <value>클립보드 토스트 알림 표시</value>
   </data>
   <data name="ImageToClipboard" xml:space="preserve">
-    <value>Include images in clipboard monitor</value>
+    <value>클립보드 모니터에 이미지 포함</value>
   </data>
   <data name="ClipboardFiles" xml:space="preserve">
-    <value>Add received files to clipboard</value>
+    <value>수신한 파일을 클립보드에 추가</value>
   </data>
   <data name="NotificationsDescription" xml:space="preserve">
-    <value>Receive notifications from remote device</value>
+    <value>원격 기기에서 알림 수신</value>
   </data>
   <data name="GeneralSettings" xml:space="preserve">
-    <value>General Settings</value>
+    <value>일반 설정</value>
   </data>
   <data name="ShowNotificationToast" xml:space="preserve">
-    <value>Show notification toast</value>
+    <value>알림 토스트 보이기</value>
   </data>
   <data name="IgnoreWindowsApps" xml:space="preserve">
-    <value>Ignore remote notifications from active Windows apps</value>
+    <value>활성 윈도우 앱의 알림을 원격 기기에서 무시하기</value>
   </data>
   <data name="NotificationFilterDisabled.Content" xml:space="preserve">
-    <value>Disabled</value>
+    <value>비활성화</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Notification Feed</value>
+    <value>알림 피드</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>Notification Feed + Toast</value>
+    <value>알림 피드 + 토스트</value>
   </data>
   <data name="PairedDevices.Title" xml:space="preserve">
-    <value>Paired devices</value>
+    <value>페어링된 기기</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
-    <value>Available Devices</value>
+    <value>사용 가능한 기기</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
-    <value>Android devices that are running the app in the same network will show up below</value>
+    <value>동일한 네트워크에서 Sefirah를 실행 중인 안드로이드 기기가 아래에 표시됩니다</value>
   </data>
   <data name="StartupOption" xml:space="preserve">
-    <value>Startup option</value>
+    <value>시작 옵션</value>
   </data>
   <data name="StartupOptionDescription" xml:space="preserve">
-    <value>Choose how the app starts when Windows boots</value>
+    <value>윈도우 부팅 시 앱의 활동 선택</value>
   </data>
   <data name="StartupOptionMinimized.Content" xml:space="preserve">
-    <value>Start minimized</value>
+    <value>최소화 상태로 시작</value>
   </data>
   <data name="StartupOptionMaximized.Content" xml:space="preserve">
-    <value>Start maximized</value>
+    <value>최대화 상태로 시작</value>
   </data>
   <data name="StartupOptionSystemTray.Content" xml:space="preserve">
-    <value>Start in system tray</value>
+    <value>작업 표시줄에서 시작</value>
   </data>
   <data name="StartupOptionDisabled.Content" xml:space="preserve">
-    <value>Disabled</value>
+    <value>비활성화</value>
   </data>
   <data name="Theme" xml:space="preserve">
-    <value>Theme</value>
+    <value>테마</value>
   </data>
   <data name="ThemeDescription" xml:space="preserve">
-    <value>Choose your default app theme</value>
+    <value>기본 앱 테마 선택</value>
   </data>
   <data name="Default" xml:space="preserve">
-    <value>Default</value>
+    <value>기본값</value>
   </data>
   <data name="ThemeLight.Content" xml:space="preserve">
-    <value>Light</value>
+    <value>밝은 테마</value>
   </data>
   <data name="ThemeDark.Content" xml:space="preserve">
-    <value>Dark</value>
+    <value>어두운 테마</value>
   </data>
   <data name="RemoveDeviceDialogTitle" xml:space="preserve">
-    <value>Remove device</value>
+    <value>기기 제거</value>
   </data>
   <data name="Remove" xml:space="preserve">
-    <value>Remove</value>
+    <value>제거</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>취소</value>
   </data>
   <data name="OnboardingWelcome.Title" xml:space="preserve">
-    <value>Welcome to Sefirah</value>
+    <value>Sefirah에 오신 것을 환영합니다</value>
   </data>
   <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
     <value>To get started download and install the comapanion app through the corresponding github
 page.</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
-    <value>Get started</value>
+    <value>지금 시작</value>
   </data>
   <data name="OnboardingSkip" xml:space="preserve">
-    <value>Skip for now</value>
+    <value>일단 건너뛰기</value>
   </data>
   <data name="OnboardingDevice.Title" xml:space="preserve">
     <value>Connect Your Device</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>Discovered devices in your network will appear below, and initiate the connection from your
-mobile (Make sure the pin matches)</value>
+    <value>네트워크에서 발견된 기기가 아래에 표시됩니다. 이후 모바일 장치에서 연결이 시작됩니다. (PIN이 일치하는지 확인하세요)</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>Device Connection Request</value>
+    <value>기기 연결 요청</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
-    <value>Verify the passkey matches on both devices:</value>
+    <value>두 기기에서 패스키 일치 확인:</value>
   </data>
   <data name="ConnectionRequestRejectButton" xml:space="preserve">
-    <value>Reject</value>
+    <value>거부</value>
   </data>
   <data name="NotificationsClearButton" xml:space="preserve">
-    <value>Clear all</value>
+    <value>모두 삭제</value>
   </data>
   <data name="ConnectionRequestAcceptButton" xml:space="preserve">
-    <value>Accept</value>
+    <value>수락</value>
   </data>
   <data name="NoDevicesFound" xml:space="preserve">
-    <value>No devices found</value>
+    <value>기기를 찾을 수 없음</value>
   </data>
   <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
     <value>PASSKEY</value>
@@ -432,106 +431,106 @@ mobile (Make sure the pin matches)</value>
     <value>All Apps</value>
   </data>
   <data name="AdditionalArguments" xml:space="preserve">
-    <value>Additional arguments</value>
+    <value>추가 인수</value>
   </data>
   <data name="AdbDeviceOffline" xml:space="preserve">
-    <value>Adb device is offline</value>
+    <value>ADB 기기 오프라인</value>
   </data>
   <data name="AdbDeviceOfflineDescription" xml:space="preserve">
     <value>Connect your device through USB with USB Debugging enabled and then try again</value>
   </data>
   <data name="Dismiss" xml:space="preserve">
-    <value>Dismiss</value>
+    <value>무시</value>
   </data>
   <data name="ScrcpyNotFound" xml:space="preserve">
-    <value>Scrcpy not found</value>
+    <value>Scrcpy를 찾을 수 없습니다</value>
   </data>
   <data name="ScrcpyNotFoundDescription" xml:space="preserve">
-    <value>Select the folder where scrcpy is located</value>
+    <value>scrcpy가 위치한 폴더를 선택하세요</value>
   </data>
   <data name="PreferTcpIp" xml:space="preserve">
-    <value>Prefer wireless connection</value>
+    <value>무선 연결 선호</value>
   </data>
   <data name="SearchApps" xml:space="preserve">
-    <value>Search apps</value>
+    <value>앱 검색</value>
   </data>
   <data name="DisableVideoForwarding" xml:space="preserve">
-    <value>Disable video forwarding</value>
+    <value>비디오 포워딩 비활성화</value>
   </data>
   <data name="VideoCodec" xml:space="preserve">
-    <value>Video codec</value>
+    <value>비디오 코덱</value>
   </data>
   <data name="FrameRate" xml:space="preserve">
-    <value>Frame rate</value>
+    <value>초당 프레임 수</value>
   </data>
   <data name="Crop" xml:space="preserve">
-    <value>Crop</value>
+    <value>자르기</value>
   </data>
   <data name="Display" xml:space="preserve">
-    <value>Display</value>
+    <value>디스플레이</value>
   </data>
   <data name="VirtualDisplaySize" xml:space="preserve">
-    <value>Virtual display size</value>
+    <value>가상 디스플레이 크기</value>
   </data>
   <data name="DisplayOrientation" xml:space="preserve">
-    <value>Display orientation</value>
+    <value>디스플레이 방향</value>
   </data>
   <data name="RotationAngle" xml:space="preserve">
-    <value>Rotation angle</value>
+    <value>회전 각도</value>
   </data>
   <data name="AudioOutputMode" xml:space="preserve">
-    <value>Audio output</value>
+    <value>오디오 출력</value>
   </data>
   <data name="ForwardMicrophone" xml:space="preserve">
-    <value>Forward microphone</value>
+    <value>마이크 포워딩하기</value>
   </data>
   <data name="AudioOutputBuffer" xml:space="preserve">
-    <value>Audio output buffer</value>
+    <value>오디오 출력 버퍼</value>
   </data>
   <data name="AudioCodec" xml:space="preserve">
-    <value>Audio codec</value>
+    <value>오디오 코덱</value>
   </data>
   <data name="AdbSettings" xml:space="preserve">
-    <value>Adb Settings</value>
+    <value>ADB 설정</value>
   </data>
   <data name="AutoConnect" xml:space="preserve">
-    <value>Auto connect</value>
+    <value>자동 연결</value>
   </data>
   <data name="Both" xml:space="preserve">
-    <value>Both</value>
+    <value>모두</value>
   </data>
   <data name="DesktopDevice" xml:space="preserve">
-    <value>Desktop device</value>
+    <value>데스크톱 기기</value>
   </data>
   <data name="RemoteDevice" xml:space="preserve">
-    <value>Remote device</value>
+    <value>원격 기기</value>
   </data>
   <data name="SelectDevice" xml:space="preserve">
-    <value>Select a device</value>
+    <value>기기 선택</value>
   </data>
   <data name="Start" xml:space="preserve">
-    <value>Start</value>
+    <value>시작</value>
   </data>
   <data name="ScrcpyDevicePreference" xml:space="preserve">
-    <value>Device preference</value>
+    <value>선호하는 기기</value>
   </data>
   <data name="AskEverytime" xml:space="preserve">
-    <value>Ask every time</value>
+    <value>항상 확인</value>
   </data>
   <data name="Auto" xml:space="preserve">
-    <value>Auto</value>
+    <value>자동</value>
   </data>
   <data name="ScrcpyErrorTitle" xml:space="preserve">
-    <value>Scrcpy failed to start</value>
+    <value>scrcpy를 실행하지 못했습니다</value>
   </data>
   <data name="CopyError" xml:space="preserve">
-    <value>Copy error</value>
+    <value>복사 오류</value>
   </data>
   <data name="DeviceName" xml:space="preserve">
-    <value>Device name</value>
+    <value>기기 이름</value>
   </data>
   <data name="EnableVirtualDisplay" xml:space="preserve">
-    <value>Enable virtual display</value>
+    <value>가상 디스플레이 활성화</value>
   </data>
   <data name="TransferNotificationSending.Title" xml:space="preserve">
     <value>Sending file</value>
@@ -540,19 +539,19 @@ mobile (Make sure the pin matches)</value>
     <value>Sent file</value>
   </data>
   <data name="Uninstall" xml:space="preserve">
-    <value>Uninstall</value>
+    <value>삭제</value>
   </data>
   <data name="UnlockDeviceHelpTitle" xml:space="preserve">
-    <value>Shell commands help</value>
+    <value>쉘 명령어 도움말</value>
   </data>
   <data name="UnlockDeviceHelpDescription" xml:space="preserve">
     <value>The shell commands in the text box will be executed before launching scrcpy. Enter commands that work on your device, separated by line.</value>
   </data>
   <data name="UnlockDeviceHelpExample" xml:space="preserve">
-    <value>Example:</value>
+    <value>예:</value>
   </data>
   <data name="UnlockDeviceHelpUsefulInfo" xml:space="preserve">
-    <value>Useful information:</value>
+    <value>유용한 정보:</value>
   </data>
   <data name="UnlockDeviceHelpNote" xml:space="preserve">
     <value>26 or POWER: Wakes or sleeps the device screen.
@@ -562,13 +561,13 @@ Some devices may also require a swipe gesture to bring up the unlock UI:
 input touchscreen swipe 540 1800 540 900</value>
   </data>
   <data name="PinnedApps" xml:space="preserve">
-    <value>Pinned apps</value>
+    <value>고정된 앱</value>
   </data>
   <data name="Actions" xml:space="preserve">
-    <value>Actions</value>
+    <value>동작</value>
   </data>
   <data name="ActionsDescription" xml:space="preserve">
-    <value>Configure custom actions and executable commands</value>
+    <value>커스텀 동작과 명령을 편집</value>
   </data>
   <data name="AdbNoDevice" xml:space="preserve">
     <value>No ADB devices connected</value>
