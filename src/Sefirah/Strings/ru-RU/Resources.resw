@@ -469,10 +469,10 @@
     <value>Display</value>
   </data>
   <data name="VirtualDisplaySize" xml:space="preserve">
-    <value>Virtual display size</value>
+    <value>Размер виртуального экрана</value>
   </data>
   <data name="DisplayOrientation" xml:space="preserve">
-    <value>Display orientation</value>
+    <value>Ориентация экрана</value>
   </data>
   <data name="RotationAngle" xml:space="preserve">
     <value>Rotation angle</value>
