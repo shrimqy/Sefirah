@@ -29,6 +29,25 @@
         <converters:PinIconConverter x:Key="PinIconConverter" />
         <converters:InverseNullToBooleanConverter x:Key="InverseNullToBooleanConverter" />
         <converters:NullToOpacityConverter x:Key="NullToOpacityConverter" />
+        
+        <!-- Phone Frame Overlay Animations -->
+        <Storyboard x:Key="FadeInAnimation" x:Name="FadeInStoryboard">
+            <DoubleAnimation 
+                Storyboard.TargetName="PhoneFrameOverlay" 
+                Storyboard.TargetProperty="Opacity" 
+                From="0" 
+                To="1" 
+                Duration="0:0:0.200" />
+        </Storyboard>
+        
+        <Storyboard x:Key="FadeOutAnimation" x:Name="FadeOutStoryboard">
+            <DoubleAnimation 
+                Storyboard.TargetName="PhoneFrameOverlay" 
+                Storyboard.TargetProperty="Opacity" 
+                From="1" 
+                To="0" 
+                Duration="0:0:0.200" />
+        </Storyboard>
     </Page.Resources>
 
     <Grid
@@ -74,9 +93,6 @@
                         Height="100"
                         VerticalAlignment="Center"
                         CornerRadius="7"
-                        IsRightTapEnabled="True"
-                        IsTabStop="True"
-                        IsTapEnabled="True"
                         PointerEntered="PhoneFrame_PointerEntered"
                         PointerExited="PhoneFrame_PointerExited"
                         PointerWheelChanged="PhoneFrame_PointerWheelChanged">

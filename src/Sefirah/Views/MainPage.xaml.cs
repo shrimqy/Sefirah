@@ -26,6 +26,9 @@ public sealed partial class MainPage : Page
         { "Apps", typeof(AppsPage) }
     };
 
+    // Track the current animation to prevent conflicts
+    private Storyboard? currentOverlayAnimation;
+
     // Handle mouse wheel events on the phone frame
     private void PhoneFrame_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
     {
@@ -267,29 +270,31 @@ public sealed partial class MainPage : Page
 
     private void AnimateOverlay(UIElement overlay, bool show)
     {
+        // Cancel any existing animation to prevent conflicts
+        if (currentOverlayAnimation != null)
+        {
+            currentOverlayAnimation.Stop();
+            currentOverlayAnimation = null;
+        }
+
         if (show)
         {
             overlay.Visibility = Visibility.Visible;
+            currentOverlayAnimation = FadeInStoryboard;
+            FadeInStoryboard.Begin();
         }
-
-        var storyboard = new Storyboard();
-        var animation = new DoubleAnimation
+        else
         {
-            From = show ? 0 : 1,
-            To = show ? 1 : 0,
-            Duration = new Duration(TimeSpan.FromMilliseconds(200))
-        };
-
-        Storyboard.SetTarget(animation, overlay);
-        Storyboard.SetTargetProperty(animation, "Opacity");
-
-        if (!show)
-        {
-            animation.Completed += (s, args) => overlay.Visibility = Visibility.Collapsed;
+            currentOverlayAnimation = FadeOutStoryboard;
+            FadeOutStoryboard.Begin();
+            
+            // Hide overlay after animation completes
+            FadeOutStoryboard.Completed += (s, args) => 
+            {
+                overlay.Visibility = Visibility.Collapsed;
+                currentOverlayAnimation = null;
+            };
         }
-
-        storyboard.Children.Add(animation);
-        storyboard.Begin();
     }
 
     private async void ToggleScreenMirror(object sender, TappedRoutedEventArgs e)
