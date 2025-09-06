@@ -35,18 +35,6 @@ public partial class ApplicationInfoEntity
         };
     }
 
-    internal static ApplicationInfoEntity FromApplicationInfo(ApplicationInfo info, string deviceId)
-    {
-        List<AppDeviceInfo> appDeviceInfo = [new AppDeviceInfo { DeviceId = deviceId, Filter = NotificationFilter.ToastFeed }];
-        return new ApplicationInfoEntity
-        {
-            PackageName = info.PackageName,
-            AppName = info.AppName,
-            AppIconPath = info.IconPath,
-            AppDeviceInfoJson = JsonSerializer.Serialize(appDeviceInfo)
-        };  
-    }
-
     internal static async Task<ApplicationInfoEntity> FromApplicationInfoMessage(ApplicationInfoMessage info, string deviceId)
     {
         string? appIconPath = null;

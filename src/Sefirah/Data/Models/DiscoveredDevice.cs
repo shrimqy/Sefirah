@@ -1,13 +1,20 @@
 namespace Sefirah.Data.Models;
 
-public class DiscoveredDevice
+public class DiscoveredDevice(
+    string deviceId, 
+    string publicKey, 
+    string deviceName, 
+    byte[]? hashedKey, 
+    DateTimeOffset lastSeen, 
+    DeviceOrigin origin)
 {
-    public string DeviceId { get; set; }
-    public string PublicKey { get; set; }
-    public string DeviceName { get; set; }
-    public byte[]? HashedKey { get; set; }
-    public DateTimeOffset LastSeen { get; set; }
-    public DeviceOrigin Origin { get; set; }
+    public string DeviceId { get; } = deviceId;
+    public string PublicKey { get; } = publicKey;
+    public string DeviceName { get; } = deviceName;
+    public byte[]? HashedKey { get; } = hashedKey;
+    public DateTimeOffset LastSeen { get; } = lastSeen;
+    public DeviceOrigin Origin { get; } = origin;
+
     public string? FormattedKey
     {
         get

@@ -6,33 +6,6 @@ namespace Sefirah.Helpers;
 
 public static class NetworkHelper
 {
-
-    public static async Task<int> FindAvailablePortAsync(int startPort)
-    {
-        int port = startPort;
-        const int maxPortNumber = 65535;
-
-        while (port <= maxPortNumber)
-        {
-            try
-            {
-                using var testListener = new TcpListener(IPAddress.Any, port);
-                await Task.Run(() =>
-                {
-                    testListener.Start();
-                    testListener.Stop();
-                });
-
-                return port;
-            }
-            catch (SocketException)
-            {
-                port++;
-            }
-        }
-        return port;
-    }
-
     public static List<IPAddressInfo> GetAllValidAddresses()
     {
         var addresses = new List<IPAddressInfo>();

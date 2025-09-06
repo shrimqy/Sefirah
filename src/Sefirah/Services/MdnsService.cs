@@ -132,12 +132,7 @@ public class MdnsService(ILogger<MdnsService> logger) : IMdnsService
                     if (!string.IsNullOrEmpty(deviceName) && !string.IsNullOrEmpty(publicKey) && txtRecord.CanonicalName != serviceProfile!.FullyQualifiedName)
                     {
                         var deviceId = txtRecord.CanonicalName.Split('.')[0]; // Split on first dot to get device ID
-                        DiscoveredMdnsService?.Invoke(this, new DiscoveredMdnsServiceArgs 
-                        { 
-                            DeviceId = deviceId, 
-                            DeviceName = deviceName, 
-                            PublicKey = publicKey 
-                        });
+                        DiscoveredMdnsService?.Invoke(this, new(deviceId, deviceName, publicKey));
                     }
 
                 }

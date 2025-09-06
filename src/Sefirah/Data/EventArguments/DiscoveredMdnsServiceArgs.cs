@@ -1,8 +1,8 @@
 namespace Sefirah.Data.EventArguments;
 
-public class DiscoveredMdnsServiceArgs : EventArgs
+public class DiscoveredMdnsServiceArgs(string deviceId, string deviceName, string publicKey) : EventArgs
 {
-    public required string DeviceId { get; set; }
-    public string DeviceName { get; set; } = string.Empty;
-    public string PublicKey { get; set; } = string.Empty;
+    public string DeviceId { get; } = deviceId;
+    public string DeviceName { get; } = deviceName;
+    public string PublicKey { get; } = publicKey;
 }

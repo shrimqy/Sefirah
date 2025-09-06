@@ -256,7 +256,6 @@ public class WindowsPlaybackService(
                 {
                     SessionType = SessionType.TimelineUpdate,
                     Source = sender.SourceAppUserModelId,
-                    IsCurrentSession = isCurrentSession,
                     Position = currentPosition
                 };
                 SendPlaybackData(message);
@@ -357,8 +356,6 @@ public class WindowsPlaybackService(
 
             lastTimelinePosition[session.SourceAppUserModelId] = timelineProperties.Position.TotalMilliseconds;
 
-            var currentSession = manager?.GetCurrentSession();
-
             var playbackSession = new PlaybackSession
             {
                 Source = session.SourceAppUserModelId,
@@ -366,7 +363,6 @@ public class WindowsPlaybackService(
                 Artist = mediaProperties.Artist ?? "Unknown Artist",
                 IsPlaying = playbackInfo.PlaybackStatus == GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing,
                 IsShuffleActive = playbackInfo.IsShuffleActive,
-                IsCurrentSession = currentSession?.SourceAppUserModelId == session.SourceAppUserModelId,
                 PlaybackRate = playbackInfo.PlaybackRate,
                 Position = timelineProperties?.Position.TotalMilliseconds,
                 MinSeekTime = timelineProperties?.MinSeekTime.TotalMilliseconds,

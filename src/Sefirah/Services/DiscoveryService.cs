@@ -146,15 +146,13 @@ public class DiscoveryService(
         logger.LogInformation("Discovered service instance: {deviceId}, {deviceName}", service.DeviceId, service.DeviceName);
 
         var sharedSecret = EcdhHelper.DeriveKey(service.PublicKey, localDevice!.PrivateKey);
-        var device = new DiscoveredDevice
-        {
-            DeviceId = service.DeviceId,
-            DeviceName = service.DeviceName,
-            PublicKey = service.PublicKey,
-            HashedKey = sharedSecret,
-            LastSeen = DateTimeOffset.UtcNow,
-            Origin = DeviceOrigin.MdnsService
-        };
+        DiscoveredDevice device = new(
+            service.DeviceId,
+            service.PublicKey,
+            service.DeviceName,
+            sharedSecret,
+            DateTimeOffset.UtcNow,
+            DeviceOrigin.MdnsService);
 
         await dispatcher.EnqueueAsync(() =>
         {
@@ -208,21 +206,6 @@ public class DiscoveryService(
         });
     }
 
-    public void OnConnected()
-    {
-
-    }
-
-    public void OnDisconnected()
-    {
-
-    }
-
-    public void OnError(SocketError error)
-    {
-
-    }
-
     public async void OnReceived(EndPoint endpoint, byte[] buffer, long offset, long size)
     {
         try
@@ -243,15 +226,13 @@ public class DiscoveryService(
             if (DiscoveredMdnsServices.Any(s => s.PublicKey == broadcast.PublicKey)) return;
 
             var sharedSecret = EcdhHelper.DeriveKey(broadcast.PublicKey, localDevice!.PrivateKey);
-            var device = new DiscoveredDevice
-            {
-                DeviceId = broadcast.DeviceId,
-                DeviceName = broadcast.DeviceName,
-                PublicKey = broadcast.PublicKey,
-                HashedKey = sharedSecret,
-                LastSeen = DateTimeOffset.FromUnixTimeMilliseconds(broadcast.TimeStamp),
-                Origin = DeviceOrigin.UdpBroadcast
-            };
+            DiscoveredDevice device = new(
+                broadcast.DeviceId,
+                broadcast.PublicKey,
+                broadcast.DeviceName,
+                sharedSecret,
+                DateTimeOffset.FromUnixTimeMilliseconds(broadcast.TimeStamp),
+                DeviceOrigin.UdpBroadcast);
 
             await dispatcher.EnqueueAsync(() =>
             {

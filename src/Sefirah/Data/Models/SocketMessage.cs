@@ -202,9 +202,6 @@ public class PlaybackSession : SocketMessage
     [JsonPropertyName("sessionType")]
     public SessionType SessionType { get; set; }
 
-    [JsonPropertyName("isCurrentSession")]
-    public bool IsCurrentSession { get; set; }
-
     [JsonPropertyName("source")]
     public string? Source { get; set; }
 

@@ -1,8 +1,8 @@
 namespace Sefirah.Data.Items;
 
-public class ScrcpyPreferenceItem
+public class ScrcpyPreferenceItem(int id, string command, string display)
 {
-    public int Id { get; set; }
-    public string Command { get; set; }
-    public string Display { get; set; }
+    public int Id { get; set; } = id;
+    public string Command { get; set; } = command;
+    public string Display { get; set; } = display;
 }

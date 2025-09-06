@@ -9,7 +9,6 @@ public sealed partial class MessagesViewModel : BaseViewModel
 {
     private readonly SmsHandlerService smsHandlerService;
     private readonly IDeviceManager deviceManager;
-    private readonly ILogger<MessagesViewModel> logger;
 
     public ObservableCollection<Conversation>? Conversations { get; private set; }
     public ObservableCollection<Conversation> SearchResults { get; } = [];
@@ -68,7 +67,6 @@ public sealed partial class MessagesViewModel : BaseViewModel
     {
         smsHandlerService = Ioc.Default.GetRequiredService<SmsHandlerService>();
         deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
-        logger = Ioc.Default.GetRequiredService<ILogger<MessagesViewModel>>();
 
         ((INotifyPropertyChanged)deviceManager).PropertyChanged += OnDeviceManagerPropertyChanged;
 
@@ -138,7 +136,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error loading conversations for device: {DeviceId}", ActiveDevice?.Id);
+            Logger.LogError(ex, "Error loading conversations for device: {DeviceId}", ActiveDevice?.Id);
         }
     }
 
@@ -169,7 +167,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error loading messages for conversation: {ThreadId}", SelectedConversation.ThreadId);
+            Logger.LogError(ex, "Error loading messages for conversation: {ThreadId}", SelectedConversation.ThreadId);
         }
     }
 
@@ -222,7 +220,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error sending message");
+            Logger.LogError(ex, "Error sending message");
         }
     }
     public void StartNewConversation()

@@ -53,8 +53,8 @@ public class Notification
             AppName = message.AppName,
             AppPackage = message.AppPackage,
             Title = message.Title,
-            Text = message.Text,
-            GroupedMessages = message.Messages?.GroupBySender(),
+            Text = message.Text,    
+            GroupedMessages = GroupBySender(message.Messages),
             Tag = message.Tag,
             GroupKey = message.GroupKey,
             Actions = message.Actions.Where(a => a != null).ToList()!,
@@ -72,15 +72,14 @@ public class Notification
         }
         return notification;
     }
-}
 
-// Helper extension method for grouping messages
-public static class NotificationExtensions
-{
-    public static List<GroupedNotificationTextMessage> GroupBySender(this List<NotificationTextMessage> messages)
+    #region Helpers
+    internal static List<GroupedNotificationTextMessage> GroupBySender(List<NotificationTextMessage>? messages)
     {
-        var result = new List<GroupedNotificationTextMessage>();
-        var currentGroup = new GroupedNotificationTextMessage();
+        if (messages == null || messages.Count == 0) return [];
+
+        List<GroupedNotificationTextMessage> result = [];
+        GroupedNotificationTextMessage currentGroup = new();
 
         foreach (var message in messages)
         {
@@ -106,4 +105,5 @@ public static class NotificationExtensions
 
         return result;
     }
+    #endregion
 }

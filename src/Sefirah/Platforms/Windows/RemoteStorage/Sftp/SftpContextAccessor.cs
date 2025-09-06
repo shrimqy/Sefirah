@@ -20,11 +20,8 @@ public class SftpContextAccessor : IRemoteContextSetter, ISftpContextAccessor
         set
         {
             var holder = _sftpContextCurrent.Value;
-            if (holder != null)
-            {
-                // Clear current SftpContext trapped in the AsyncLocals, as its done.
-                holder.Context = null;
-            }
+            // Clear current SftpContext trapped in the AsyncLocals, as its done.
+            holder?.Context = null;
 
             // Use an object indirection to hold the SftpContext in the AsyncLocal,
             // so it can be cleared in all ExecutionContexts when its cleared.

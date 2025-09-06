@@ -50,11 +50,6 @@ public partial class Client(SslContext context, string address, int port, ITcpCl
         socketProvider.OnConnected();
     }
 
-    protected override void OnHandshaking()
-    {
-        base.OnHandshaking();
-    }
-
     protected override void OnDisconnected()
     {
         socketProvider.OnDisconnected();
@@ -72,18 +67,16 @@ public partial class Client(SslContext context, string address, int port, ITcpCl
 }
 
 
-class MulticastClient(string address, int port, IUdpClientProvider socketProvider) : UdpClient(address, port)
+public partial class MulticastClient(string address, int port, IUdpClientProvider socketProvider, ILogger logger) : UdpClient(address, port)
 {
 
     protected override void OnConnected()
     {
         ReceiveAsync();
-        socketProvider.OnConnected();
     }
 
     protected override void OnDisconnected()
     {
-        socketProvider.OnDisconnected();
     }
 
     protected override void OnReceived(EndPoint endpoint, byte[] buffer, long offset, long size)
@@ -93,6 +86,6 @@ class MulticastClient(string address, int port, IUdpClientProvider socketProvide
     }
     protected override void OnError(SocketError error)
     {
-        //Debug.WriteLine($"Multicast UDP client caught an error with code {error}");
+        logger.LogError("Session {Id} encountered error: {error}", Id, error);
     }
 }
