@@ -33,7 +33,10 @@ public partial class ConnectionRequestViewModel : ObservableObject
     public void OnConnectClick()
     {
         // If we're on the onboarding pages, navigate to main page
-        ApplicationData.Current.LocalSettings.Values["HasCompletedOnboarding"] = true;
-        _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+        if (_frame.Content is not MainPage)
+        {
+            ApplicationData.Current.LocalSettings.Values["HasCompletedOnboarding"] = true;
+            _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+        }
     }
 }
