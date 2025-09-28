@@ -209,16 +209,14 @@ public partial class App : Application
             ApplicationData.Current.LocalSettings.Values["INSTANCE_ACTIVE"] = -Environment.ProcessId;
     }
 
-    public async Task HandleShareTargetActivation(ShareTargetActivatedEventArgs? args)
+    public static async Task HandleShareTargetActivation(ShareTargetActivatedEventArgs args)
     {
-        var shareOperation = args?.ShareOperation;
-        if (shareOperation == null) return;
+        var shareOperation = args.ShareOperation;
         var fileTransferService = Ioc.Default.GetRequiredService<IFileTransferService>();
-
-        await MainWindow!.DispatcherQueue.EnqueueAsync(async () =>
-        {
-            await fileTransferService.ProcessShareAsync(shareOperation);
-        });
+        var items = await shareOperation.Data.GetStorageItemsAsync();
+        shareOperation.ReportDataRetrieved();
+        shareOperation.ReportCompleted();
+        fileTransferService.SendFiles(items);
     }
 #endif
 

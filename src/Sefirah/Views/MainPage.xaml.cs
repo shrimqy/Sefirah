@@ -312,16 +312,8 @@ public sealed partial class MainPage : Page
         // Check if the dropped data contains files
         if (e.DataView.Contains(StandardDataFormats.StorageItems))
         {
-            // Get the file(s) from the DataPackage
-            var items = await e.DataView.GetStorageItemsAsync();
-            var files = items.OfType<StorageFile>().ToArray();
-            ViewModel.SendFiles(files);
-        }
+            ViewModel.SendFiles(await e.DataView.GetStorageItemsAsync());
     }
-
-    private void Page_DropCompleted(UIElement sender, DropCompletedEventArgs args)
-    {
-        Debug.WriteLine("Drag Enter");
     }
 
     private void Grid_DragOver(object sender, DragEventArgs e)

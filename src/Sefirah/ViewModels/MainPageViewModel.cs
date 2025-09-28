@@ -27,6 +27,8 @@ public sealed partial class MainPageViewModel : BaseViewModel
 
     public bool IsUpdateAvailable => UpdateService.IsUpdateAvailable;
 
+    #region Commands
+
     [RelayCommand]
     public async Task ToggleConnection(PairedDevice? device)
     {
@@ -139,26 +141,12 @@ public sealed partial class MainPageViewModel : BaseViewModel
         UpdateService.DownloadUpdatesAsync();
     }
 
-    public async void SendFiles(StorageFile[] storageFiles)
-    {
-        PairedDevice? selectedDevice = null;
-        if (PairedDevices.Count == 0)
+    public void SendFiles(IReadOnlyList<IStorageItem> storageItems)
         {
-            return;
+        FileTransferService.SendFiles(storageItems);
         }
-        else if (PairedDevices.Count == 1)
-        {
-            selectedDevice = PairedDevices[0];
-        }
-        else if (PairedDevices.Count > 1)
-            selectedDevice = await DeviceSelector.ShowDeviceSelectionDialog(PairedDevices.ToList());
-        {
-        }
-        if (selectedDevice == null)
-            return;
 
-        await FileTransferService.SendBulkFiles(storageFiles, selectedDevice);
-    }
+    #endregion
 
     public MainPageViewModel()
     {

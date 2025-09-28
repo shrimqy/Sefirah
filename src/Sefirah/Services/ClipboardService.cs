@@ -4,7 +4,6 @@ using Sefirah.Data.Models;
 using Sefirah.Utils.Serialization;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Graphics.Imaging;
-using Windows.Storage.Streams;
 using Windows.System;
 using DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue;
 
@@ -14,31 +13,43 @@ public class ClipboardService : IClipboardService
 {
     private readonly ILogger<ClipboardService> logger;
     private readonly ISessionManager sessionManager;
-    private readonly IUserSettingsService userSettingsService;
     private readonly IPlatformNotificationHandler platformNotificationHandler;
     private readonly IDeviceManager deviceManager;
     private readonly DispatcherQueue dispatcher;
     private readonly IFileTransferService fileTransferService;
-    private const int DirectTransferThreshold = 512 * 512; // 1MB threshold
+
+    private const int DirectTransferThreshold = 2 * 1024 * 1024; // 2MB threshold
+
+    private static readonly Dictionary<string, string> SupportedImageFileTypes = new()
+    {
+        ["jpeg"] = "image/jpeg",
+        ["jpg"] = "image/jpeg",
+        ["png"] = "image/png",
+        ["gif"] = "image/gif",
+        ["bmp"] = "image/bmp",
+        ["webp"] = "image/webp",
+        ["tiff"] = "image/tiff",
+        ["tif"] = "image/tiff",
+        ["heic"] = "image/heic",
+        ["heif"] = "image/heic",
+        [".apng"] = "image/apng"
+    };
     
     private bool isInternalUpdate; // To track if the clipboard change came from the remote device
 
     public ClipboardService(
         ILogger<ClipboardService> logger,
         ISessionManager sessionManager,
-        IUserSettingsService userSettingsService,
         IPlatformNotificationHandler platformNotificationHandler,
         IDeviceManager deviceManager,
         IFileTransferService fileTransferService)
     {
         this.logger = logger;
         this.sessionManager = sessionManager;
-        this.userSettingsService = userSettingsService;
         this.platformNotificationHandler = platformNotificationHandler;
         this.deviceManager = deviceManager;
         this.fileTransferService = fileTransferService;
-        dispatcher = App.MainWindow?.DispatcherQueue 
-            ?? throw new InvalidOperationException("MainWindow.Instance.DispatcherQueue is null");
+        dispatcher = App.MainWindow.DispatcherQueue;
 
         dispatcher.EnqueueAsync(() =>
         {
@@ -68,52 +79,95 @@ public class ClipboardService : IClipboardService
         {
             try
             {
-                var dataPackageView = Clipboard.GetContent();
-                if (dataPackageView == null) return;
-                
                 // Check if any connected devices have clipboard sync enabled
                 var devicesWithClipboardSync = deviceManager.PairedDevices
-                    .Where(device => device.Session != null && 
-                                   device.DeviceSettings?.ClipboardSyncEnabled == true)
+                    .Where(device => device.Session != null &&
+                                    device.DeviceSettings?.ClipboardSyncEnabled == true)
                     .ToList();
-                
-                if (devicesWithClipboardSync.Count == 0)
-                {
-                    logger.LogDebug("No connected devices have clipboard sync enabled, skipping clipboard processing");
-                    return;
-                }
-                
+
+                if (devicesWithClipboardSync.Count == 0) return;
+
+                logger.LogDebug("Sending clipboard content");
+
+                var dataPackageView = Clipboard.GetContent();
+
                 if (dataPackageView.Contains(StandardDataFormats.Text))
                 {
-                    await TryHandleTextContent(dataPackageView);
+                    await TryHandleTextContent(dataPackageView, devicesWithClipboardSync);
+                    return;
                 }
-                else if (dataPackageView.Contains(StandardDataFormats.Bitmap))
+
+                // Check if any device has image clipboard enabled
+                var devicesWithImageSync = devicesWithClipboardSync
+                    .Where(d => d.DeviceSettings?.ImageToClipboardEnabled == true)
+                    .ToList();
+
+                if (devicesWithImageSync.Count !=0)
                 {
-                    // Check if any device has image clipboard enabled
-                    var devicesWithImageSync = devicesWithClipboardSync
-                        .Where(device => device.DeviceSettings?.ImageToClipboardEnabled == true)
-                        .ToList();
-                    
-                    if (devicesWithImageSync.Count != 0)
+                    if (dataPackageView.Contains(StandardDataFormats.StorageItems))
                     {
-                        await TryHandleBitmapContent(dataPackageView);
+                        var storageItems = await dataPackageView.GetStorageItemsAsync();
+                        var file = storageItems.OfType<StorageFile>().FirstOrDefault();
+                        if (file is IStorageFile)
+                        {
+                            var mimeType = file.ContentType;
+                            var fileExtension = file.FileType[1..];
+
+                            // Validate that this is a supported image type and get MIME type
+                            if (!SupportedImageFileTypes.TryGetValue(fileExtension, out var detectedMimeType)) 
+                                return;
+
+                            // Content type from StorageFile can be unreliable
+                            if (string.IsNullOrEmpty(mimeType))
+                            {
+                                mimeType = detectedMimeType;
+                            }
+
+                            logger.LogInformation("fileName: {fileName}, fileExtension: {fileExtension}, Mime type: {mimeType}", file.Name, fileExtension, mimeType);
+
+                            using var dataStream = await file.OpenReadAsync();
+                            using var stream = dataStream.AsStream();
+                            if (stream.Length > DirectTransferThreshold)
+                                await HandleLargeImageTransfer(stream, fileExtension, mimeType, devicesWithImageSync);
+                            else
+                                await HandleSmallImageTransfer(stream, mimeType, devicesWithImageSync);
+                        }
+                        return;
+                    }
+
+                    if (dataPackageView.Contains(StandardDataFormats.Bitmap))
+                    {
+                        var bitmapRef = await dataPackageView.GetBitmapAsync();  
+                        var bitmap = await bitmapRef.OpenReadAsync();
+#if WINDOWS
+                        var stream = new MemoryStream();
+                        var decoder = await BitmapDecoder.CreateAsync(bitmap);
+                        var softwareBitmap = await decoder.GetSoftwareBitmapAsync();
+                        var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream.AsRandomAccessStream());
+                        encoder.SetSoftwareBitmap(softwareBitmap);
+                        await encoder.FlushAsync();
+                        stream.Position = 0;
+#else
+                        var stream = bitmap.AsStream();
+#endif
+                        await HandleSmallImageTransfer(stream, "image/png", devicesWithImageSync);
                     }
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error handling clipboard content");
+                logger.LogError("Error handling clipboard content: {ex}", ex);
             }
         });
     }
+    
 
-    private async Task<bool> TryHandleTextContent(DataPackageView dataPackageView)
+    private async Task TryHandleTextContent(DataPackageView dataPackageView, List<PairedDevice> devices)
     {
-        if (!dataPackageView.Contains(StandardDataFormats.Text)) return false;
+        if (!dataPackageView.Contains(StandardDataFormats.Text)) return;
 
         string? text = await dataPackageView.GetTextAsync();
-        logger.LogInformation("Clipboard content changed");
-        if (string.IsNullOrEmpty(text)) return false;
+        if (string.IsNullOrEmpty(text)) return;
 
         // Convert Windows CRLF to Unix LF 
         text = text.Replace("\r\n", "\n");
@@ -125,108 +179,34 @@ public class ClipboardService : IClipboardService
         };
 
         var serializedMessage = SocketMessageSerializer.Serialize(message);
-        
-        // Send message only to devices that have clipboard sync enabled
-        foreach (var device in deviceManager.PairedDevices)
+        foreach (var device in devices)
         {
-            if (device.Session != null && device.DeviceSettings?.ClipboardSyncEnabled == true)
-            {
-                sessionManager.SendMessage(device.Session, serializedMessage);
-                logger.LogDebug("Sent clipboard message to device {DeviceId}", device.Id);
-            }
+            sessionManager.SendMessage(device.Session!, serializedMessage);
         }
-        
-        return true;
+        return;
     }
 
-    private async Task<bool> TryHandleBitmapContent(DataPackageView dataPackageView)
+    private async Task HandleLargeImageTransfer(Stream stream, string fileType, string mimeType, List<PairedDevice> devices)
     {
-        if (!dataPackageView.Contains(StandardDataFormats.Bitmap)) return false;
-
-        var imageStream = await dataPackageView.GetBitmapAsync();
-        if (imageStream == null) return false;
-
-        string mimeType = await DetermineImageMimeType(dataPackageView) ?? "image/png";
-        await HandleImageTransfer(imageStream, mimeType);
-        return true;
-    }
-
-    private async Task<string?> DetermineImageMimeType(DataPackageView dataPackageView)
-    {
-        if (!dataPackageView.AvailableFormats.Contains("UniformResourceLocatorW")) 
-            return null;
-
-        try
-        {
-            var urlData = await dataPackageView.GetDataAsync("UniformResourceLocatorW");
-            var urlString = urlData?.ToString();
-            if (string.IsNullOrEmpty(urlString)) return null;
-
-            var extension = Path.GetExtension(urlString.Split('?')[0]).TrimStart('.');
-            return !string.IsNullOrEmpty(extension) ? $"image/{extension.ToLowerInvariant()}" : null;
-        }
-        catch (Exception ex)
-        {
-            logger.LogWarning(ex, "Failed to get URL data");
-            return null;
-        }
-    }
-
-    private async Task HandleImageTransfer(RandomAccessStreamReference imageStream, string mimeType)
-    {
-        using var dataStream = await imageStream.OpenReadAsync();
-        using var compressed = await CompressImageStream(dataStream, mimeType);
-        
-        if (dataStream.Size > DirectTransferThreshold)
-        {
-            await HandleLargeImageTransfer(compressed, mimeType);
-        }
-        else
-        {
-            await HandleSmallImageTransfer(compressed, mimeType);
-        }
-    }
-
-    private static async Task<Stream> CompressImageStream(IRandomAccessStream stream, string mimeType)
-    {
-        var compressedStream = new MemoryStream();
-        
-        var decoder = await BitmapDecoder.CreateAsync(stream);
-        var softwareBitmap = await decoder.GetSoftwareBitmapAsync();
-        
-        var encoder = await BitmapEncoder.CreateAsync(
-            mimeType.Contains("png") ? BitmapEncoder.PngEncoderId : BitmapEncoder.JpegEncoderId, 
-            compressedStream.AsRandomAccessStream());
-            
-        encoder.SetSoftwareBitmap(softwareBitmap);
-        await encoder.FlushAsync();
-        
-        compressedStream.Position = 0;
-        return compressedStream;
-    }
-
-    private async Task HandleLargeImageTransfer(Stream stream, string mimeType)
-    {
-        var fileName = $"clipboard_image_{DateTime.Now:yyyyMMddHHmmss}.{mimeType.Split('/').Last()}";
         var metadata = new FileMetadata
         {
-            FileName = fileName,
+            FileName = $"sefirah_clipboard_image.{fileType}",
             MimeType = mimeType,
             FileSize = stream.Length
         };
-        foreach (var device in deviceManager.PairedDevices)
+
+        await Task.Run(async() =>
         {
-            if (device.Session != null && 
-                device.DeviceSettings.ClipboardSyncEnabled &&
-                device.DeviceSettings.ImageToClipboardEnabled)
+            foreach (var device in devices)
             {
-                await fileTransferService.SendFileWithStream(stream, metadata, device);
+                await fileTransferService.SendFileWithStream(stream, metadata, device, true);
             }
-        }
+        });
     }
 
-    private async Task HandleSmallImageTransfer(Stream stream, string mimeType)
+    private async Task HandleSmallImageTransfer(Stream stream, string mimeType, List<PairedDevice> devices)
     {
+        stream.Position = 0;
         byte[] buffer = new byte[stream.Length];
         await stream.ReadExactlyAsync(buffer);
 
@@ -235,29 +215,16 @@ public class ClipboardService : IClipboardService
             Content = Convert.ToBase64String(buffer),
             ClipboardType = mimeType
         };
-
         var serializedMessage = SocketMessageSerializer.Serialize(message);
-        
-        // Send message only to devices that have clipboard sync enabled
-        foreach (var device in deviceManager.PairedDevices)
+
+        foreach (var device in devices)
         {
-            if (device.Session != null && 
-                device.DeviceSettings.ClipboardSyncEnabled &&
-                device.DeviceSettings.ImageToClipboardEnabled)
-            {
-                sessionManager.SendMessage(device.Session, serializedMessage);
-                logger.LogDebug("Sent clipboard message to device {DeviceId}", device.Id);
-            }
+            sessionManager.SendMessage(device.Session!, serializedMessage);
         }
     }
 
     public async Task SetContentAsync(object content, PairedDevice sourceDevice)
     {
-        if (dispatcher == null)
-        {
-            throw new InvalidOperationException("DispatcherQueue is not available");
-        }
-
         if (!sourceDevice.DeviceSettings.ClipboardSyncEnabled) return;
 
         await dispatcher.EnqueueAsync(async () =>
@@ -326,10 +293,5 @@ public class ClipboardService : IClipboardService
                (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps) && 
                !string.IsNullOrWhiteSpace(uri.Host) &&
                uri.Host.Contains('.');
-    }
-
-    public void Dispose()
-    {
-        dispatcher?.TryEnqueue(() => Clipboard.ContentChanged -= OnClipboardContentChanged);
     }
 }

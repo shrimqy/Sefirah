@@ -280,7 +280,7 @@ public class DesktopNotificationHandler(
         }
     }
 
-    public async Task ShowTransferNotification(string title, string message, string fileName, uint notificationSequence, double? progress = null, bool isReceiving = true, bool silent = false)
+    public async Task ShowTransferNotification(string title, string message, string fileName, uint notificationSequence, double? progress = null, bool silent = false)
     {
         // Progress notification to be implemented 
         await Task.CompletedTask;

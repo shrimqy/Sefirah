@@ -7,6 +7,7 @@ using Sefirah.Services;
 using Sefirah.Utils;
 using Uno.Logging;
 using Windows.System;
+using static Sefirah.Constants;
 
 namespace Sefirah.Platforms.Windows.Services;
 
@@ -75,11 +76,11 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
         }
     }
 
-    public async Task ShowTransferNotification(string title, string message, string fileName, uint notificationSequence, double? progress = null, bool isReceiving = true, bool silent = false)
+    public async Task ShowTransferNotification(string title, string message, string fileName, uint notificationSequence, double? progress = null, bool silent = false)
     {
-        string tag = isReceiving ? "file-receive" : "file-send";
         try
         {
+            var tag = $"filetransfer_{notificationSequence}";
             if (progress.HasValue && progress > 0 && progress < 100)
             {
                 // Update existing notification with progress
@@ -91,7 +92,7 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
                     Status = message
                 };
 
-                await AppNotificationManager.Default.UpdateAsync(progressData, tag, Constants.Notification.NotificationGroup);
+                await AppNotificationManager.Default.UpdateAsync(progressData, tag, Constants.Notification.FileTransferGroup);
             }
             else
             {
@@ -99,7 +100,7 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
                     .AddText(title)
                     .AddText(message)
                     .SetTag(tag)
-                    .SetGroup(Constants.Notification.NotificationGroup);
+                    .SetGroup(Constants.Notification.FileTransferGroup);
 
                 // Only add progress bar for initial notification
                 if (progress == 0)
@@ -154,7 +155,7 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
         }
         catch (Exception ex)
         {
-            logger.Error($"Notification failed - Tag: {tag}, Progress: {progress}, Sequence: {notificationSequence}", ex);
+            logger.Error($"Notification failed, Progress: {progress}, Sequence: {notificationSequence}", ex);
         }
     }
 
@@ -270,7 +271,7 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
             // Common cleanup for all notifications
             try
             {
-                await sender.RemoveByGroupAsync(Constants.Notification.NotificationGroup);
+                await sender.RemoveByGroupAsync(Constants.Notification.FileTransferGroup);
                 await Task.Delay(100); // Small delay to ensure removal
             }
             catch (Exception ex)

@@ -271,6 +271,9 @@ public class AudioDevice : SocketMessage
 
 public class FileTransfer : SocketMessage
 {
+    [JsonPropertyName("transferType")]
+    public required FileTransferType TransferType { get; set; }
+
     [JsonPropertyName("fileMetadata")]
     public required FileMetadata FileMetadata { get; set; }
 
@@ -309,22 +312,6 @@ public class FileMetadata
 
     [JsonPropertyName("fileSize")]
     public required long FileSize { get; set; }
-
-    [JsonIgnore]
-    public string? Uri { get; set; } = string.Empty;
-}
-
-public class StorageInfo : SocketMessage
-{
-    [JsonPropertyName("totalSpace")]
-    public long TotalSpace { get; set; }
-
-    [JsonPropertyName("freeSpace")]
-    public long FreeSpace { get; set; }
-
-    [JsonPropertyName("usedSpace")]
-    public long UsedSpace { get; set; }
-
 }
 
 public class ApplicationList : SocketMessage

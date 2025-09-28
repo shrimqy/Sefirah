@@ -14,14 +14,7 @@ public interface IFileTransferService
     /// </summary>
     Task ReceiveBulkFiles(BulkFileTransfer data, PairedDevice device);
 
-#if WINDOWS
-    /// <summary>
-    /// Processes the share operation to send a file to the remote device.
-    /// </summary>
-    Task ProcessShareAsync(ShareOperation data);
-#endif
-
-    Task SendFileWithStream(Stream stream, FileMetadata metadata, PairedDevice device);
+    Task SendFileWithStream(Stream stream, FileMetadata metadata, PairedDevice device, bool isClipboard);
 
     /// <summary>
     /// Sends a file to the remote device (Used for clipboard image transfer)
@@ -29,4 +22,6 @@ public interface IFileTransferService
     Task SendBulkFiles(StorageFile[] files, PairedDevice device);
 
     event EventHandler<(PairedDevice device, StorageFile data)> FileReceived;
+
+    void SendFiles(IReadOnlyList<IStorageItem> storageItems);
 }

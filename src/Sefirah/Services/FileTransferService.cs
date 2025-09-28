@@ -2,9 +2,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Text;
-using CommunityToolkit.WinUI;
 using NetCoreServer;
 using Sefirah.Data.Contracts;
+using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Dialogs;
 using Sefirah.Extensions;
@@ -12,8 +12,6 @@ using Sefirah.Helpers;
 using Sefirah.Services.Socket;
 using Sefirah.Utils.Serialization;
 using Uno.Logging;
-using Windows.ApplicationModel.DataTransfer;
-using Windows.ApplicationModel.DataTransfer.ShareTarget;
 
 namespace Sefirah.Services;
 public class FileTransferService(
@@ -40,10 +38,11 @@ public class FileTransferService(
     private TaskCompletionSource<bool>? sendTransferCompletionSource;
     private TaskCompletionSource<bool>? receiveTransferCompletionSource;
 
-    public event EventHandler<(PairedDevice device, StorageFile data)> FileReceived;
+    public event EventHandler<(PairedDevice device, StorageFile data)>? FileReceived;
 
     private readonly IEnumerable<int> PORT_RANGE = Enumerable.Range(5152, 18);
 
+    #region Receive
     public async Task ReceiveBulkFiles(BulkFileTransfer bulkFile, PairedDevice device)
     {
         try
@@ -53,10 +52,6 @@ public class FileTransferService(
             {
                 await receiveTransferCompletionSource.Task;
             }
-
-            ArgumentNullException.ThrowIfNull(bulkFile);
-            ArgumentNullException.ThrowIfNull(bulkFile.Files);
-            ArgumentNullException.ThrowIfNull(bulkFile.ServerInfo);
 
             storageLocation = userSettingsService.GeneralSettingsService.ReceivedFilesPath;
             var serverInfo = bulkFile.ServerInfo;
@@ -70,12 +65,11 @@ public class FileTransferService(
                 $"Receiving {totalFiles} files",
                 $"{totalFiles} files",
                 notificationSequence++,
-                0,
-                isReceiving: true);
+                0);
 
             var certificate = await CertificateHelper.GetOrCreateCertificateAsync();
             var context = new SslContext(
-                SslProtocols.Tls12,
+                SslProtocols.Tls12 | SslProtocols.Tls13,
                 certificate,
                 (sender, cert, chain, errors) => true
             );
@@ -131,8 +125,7 @@ public class FileTransferService(
                         $"Receiving {totalFiles} files ({receivedFiles}/{totalFiles})",
                         $"{totalFiles} files",
                         notificationSequence,
-                        overallProgress,
-                        isReceiving: true);
+                        overallProgress);
                 }
                 catch (Exception ex)
                 {
@@ -163,8 +156,7 @@ public class FileTransferService(
                     $"Successfully received all {totalFiles} files",
                     $"{totalFiles} files",
                     notificationSequence++,
-                    null,
-                    isReceiving: true);
+                    null);
                 logger.Info($"Bulk file transfer completed successfully: {receivedFiles}/{totalFiles} files received");
             }
             else
@@ -174,8 +166,7 @@ public class FileTransferService(
                     $"Received {receivedFiles}/{totalFiles} files. {failedFiles.Count} files failed.",
                     $"{totalFiles} files",
                     notificationSequence++,
-                    null,
-                    isReceiving: true);
+                    null);
                 logger.Warn($"Bulk file transfer completed with errors: {receivedFiles}/{totalFiles} files received, {failedFiles.Count} failed");
             }
         }
@@ -187,9 +178,7 @@ public class FileTransferService(
                 "Bulk file transfer failed",
                 "Bulk transfer",
                 notificationSequence++,
-                null,
-                isReceiving: true);
-            throw;
+                null);
         }
         finally
         {
@@ -229,10 +218,13 @@ public class FileTransferService(
             var certificate = await CertificateHelper.GetOrCreateCertificateAsync();
 
             var context = new SslContext(
-                SslProtocols.Tls12,
+                SslProtocols.Tls12 | SslProtocols.Tls13,
                 certificate,
                 (sender, cert, chain, errors) => true
-            );
+            )
+            {
+                ClientCertificateRequired = false,
+            };
 
             client = new Client(context, serverInfo.IpAddress, serverInfo.Port, this, logger);
             if (!client.ConnectAsync())
@@ -246,8 +238,7 @@ public class FileTransferService(
                 $"Receiving {currentFileMetadata.FileName}", 
                 currentFileMetadata.FileName, 
                 notificationSequence++, 
-                0, 
-                isReceiving: true);
+                0);
 
             // Adding a small delay for the android to open a read channel
             await Task.Delay(500);
@@ -267,13 +258,11 @@ public class FileTransferService(
                 $"{currentFileMetadata.FileName} has been saved successfully", 
                 fullPath, 
                 notificationSequence++, 
-                null, 
-                isReceiving: true);
+                null);
         }
         catch (Exception ex)
         {
             logger.Error("Error during file transfer setup", ex);
-            throw;
         }
         finally
         {
@@ -281,6 +270,7 @@ public class FileTransferService(
         }
     }
 
+    #region Server Events
     public void OnConnected()
     {
         logger.Info("Connected to file transfer server");
@@ -345,8 +335,7 @@ public class FileTransferService(
                     $"Receiving {currentFileMetadata.FileName}",
                     currentFileMetadata.FileName,
                     notificationSequence,
-                    progress,
-                    isReceiving: true);
+                    progress);
             }
         }
         catch (Exception ex)
@@ -357,8 +346,7 @@ public class FileTransferService(
                 string.Format("TransferNotificationReceivingError".GetLocalizedResource(), currentFileMetadata?.FileName),
                 currentFileMetadata?.FileName ?? "",
                 notificationSequence++,
-                null,
-                isReceiving: true);
+                null);
             CleanupTransfer();
             if (receiveTransferCompletionSource?.Task.IsCompleted == false)
             {
@@ -366,6 +354,8 @@ public class FileTransferService(
             }
         }
     }
+    #endregion
+    #endregion
 
     private void CleanupTransfer()
     {
@@ -399,35 +389,34 @@ public class FileTransferService(
         }
     }
 
-#if WINDOWS
-    // Share Target handler
-    public async Task ProcessShareAsync(ShareOperation shareOperation)
+    #region Send
+
+    public async void SendFiles(IReadOnlyList<IStorageItem> storageItems)
     {
         try
         {
-            if (shareOperation.Data.Contains(StandardDataFormats.StorageItems))
+            var files = storageItems.OfType<StorageFile>().ToArray();
+            var devices = deviceManager.PairedDevices.Where(d => d.ConnectionStatus).ToList();
+            PairedDevice? selectedDevice = null;
+            if (devices.Count == 0)
             {
-                var items = await shareOperation.Data.GetStorageItemsAsync();
+                return;
+            }
+            else if (devices.Count == 1)
+            {
+                selectedDevice = devices[0];
+            }
+            else if (devices.Count > 1)
+            {
+                App.MainWindow.AppWindow.Show();
+                App.MainWindow.Activate();
+                selectedDevice = await DeviceSelector.ShowDeviceSelectionDialog(devices);
+            }
 
-                var files = items.OfType<StorageFile>().ToArray();
+            if (selectedDevice == null || selectedDevice.Session == null) return;
 
-                var devices = deviceManager.PairedDevices.Where(d => d.ConnectionStatus).ToList();
-                PairedDevice? selectedDevice = null;
-                if (devices.Count == 0)
-                {
-                    return;
-                }
-                else if (devices.Count == 1)
-                {
-                    selectedDevice = devices[0];
-                }
-                else if (devices.Count > 1)
-                {
-                    selectedDevice = await DeviceSelector.ShowDeviceSelectionDialog(devices);
-                }
-
-                if (selectedDevice == null || selectedDevice.Session == null) return;
-
+            await Task.Run(async () =>
+            {
                 if (files.Length > 1)
                 {
                     await SendBulkFiles(files, selectedDevice);
@@ -436,27 +425,19 @@ public class FileTransferService(
                 {
                     var file = files[0];
                     var metadata = await file.ToFileMetadata();
-                    if (metadata == null)
-                    {
-                        return;
-                    }
+                    if (metadata == null) return;
 
                     await SendFileWithStream(await file.OpenStreamForReadAsync(), metadata, selectedDevice);
                 }
-            }
+            });
         }
         catch (Exception ex)
         {
-            logger.Error($"Error in ProcessShareAsync: {ex.Message}", ex);
-        }
-        finally
-        {
-            shareOperation.ReportCompleted();
+            logger.Error($"Error in sending files: {ex.Message}", ex);
         }
     }
-#endif
 
-    public async Task SendFileWithStream(Stream stream, FileMetadata metadata, PairedDevice device)
+    public async Task SendFileWithStream(Stream stream, FileMetadata metadata, PairedDevice device, bool isClipboard = false)
     {
         try
         {
@@ -466,18 +447,9 @@ public class FileTransferService(
                 await sendTransferCompletionSource.Task;
             }
 
-            if (server != null)
-            {
-                server.Stop();
-                server.Dispose();
-                server = null;
-            }
-
-            if (session != null)
-            {
-                session.Disconnect();
-                session = null;
-            }
+            server?.Stop();
+            session?.Disconnect();
+            session = null;
 
             sendTransferCompletionSource = null;
             connectionSource = null;
@@ -485,6 +457,7 @@ public class FileTransferService(
             var serverInfo = await InitializeServer();
             var transfer = new FileTransfer
             {
+                TransferType = isClipboard ? FileTransferType.Clipboard : FileTransferType.File,
                 ServerInfo = serverInfo,
                 FileMetadata = metadata
             };
@@ -493,25 +466,9 @@ public class FileTransferService(
             logger.Debug($"Sending metadata: {json}");
             sessionManager.SendMessage(device.Session!, json);
 
-            await notificationHandler.ShowTransferNotification(
-                "TransferNotificationSending/Title".GetLocalizedResource(),
-                $"Sending {metadata.FileName}",
-                metadata.FileName,
-                notificationSequence++,
-                0,
-                isReceiving: false);
-
             sendTransferCompletionSource = new TaskCompletionSource<bool>();
             await SendFileData(metadata, stream);
             await sendTransferCompletionSource.Task;
-
-            await notificationHandler.ShowTransferNotification(
-                "TransferNotificationSent/Title".GetLocalizedResource(),
-                $"{metadata.FileName} has been sent successfully",
-                metadata.FileName,
-                notificationSequence++,
-                null,
-                isReceiving: false);
         }
         catch (Exception ex)
         {
@@ -521,9 +478,7 @@ public class FileTransferService(
                 $"Error sending {metadata.FileName}: {ex.Message}",
                 metadata.FileName,
                 notificationSequence++,
-                null,
-                isReceiving: false);
-            throw;
+                null);
         }
     }
 
@@ -558,13 +513,14 @@ public class FileTransferService(
             // Send metadata first
             sessionManager.SendMessage(device.Session!, SocketMessageSerializer.Serialize(transfer));
 
-            foreach (var file in fileMetadataList)
+            foreach (var file in files)
             {
-                logger.Debug($"Sending file: {file.FileName}");
+                var metadata = await file.ToFileMetadata();
+                logger.Debug($"Sending file: {metadata.FileName}");
 
                 sendTransferCompletionSource = new TaskCompletionSource<bool>();
 
-                await SendFileData(file, File.OpenRead(file.Uri!));
+                await SendFileData(metadata, File.OpenRead(file.Path));
 
                 // Wait for the transfer to complete before moving to next file
                 await sendTransferCompletionSource.Task;
@@ -597,7 +553,6 @@ public class FileTransferService(
             {
                 var buffer = new byte[ChunkSize];
                 long totalBytesRead = 0;
-                double lastReportedProgress = 0;
 
                 while (totalBytesRead < metadata.FileSize && session?.IsConnected == true)
                 {
@@ -606,19 +561,6 @@ public class FileTransferService(
 
                     session.Send(buffer, 0, bytesRead);
                     totalBytesRead += bytesRead;
-
-                    var progress = (double)totalBytesRead / metadata.FileSize * 100;
-                    if (Math.Floor(progress) > Math.Floor(lastReportedProgress))
-                    {
-                        await notificationHandler.ShowTransferNotification(
-                            "TransferNotificationSending/Title".GetLocalizedResource(),
-                            $"Sending {metadata.FileName}",
-                            metadata.FileName,
-                            notificationSequence,
-                            progress,
-                            isReceiving: false);
-                        lastReportedProgress = progress;
-                    }
                 }
             }
 
@@ -641,7 +583,10 @@ public class FileTransferService(
         }
 
         var certificate = await CertificateHelper.GetOrCreateCertificateAsync();
-        var context = new SslContext(SslProtocols.Tls12, certificate);
+        var context = new SslContext(SslProtocols.Tls12 | SslProtocols.Tls13, certificate, (sender, cert, chain, errors) => true)
+        {
+            ClientCertificateRequired = false,
+        };
 
         // Try each port in the range
         foreach (int port in PORT_RANGE)
@@ -688,7 +633,7 @@ public class FileTransferService(
         session = null;
     }
 
-    // Server session event handlers
+    #region Server Events
     public void OnConnected(ServerSession session)
     {
         logger.Info($"Client connected to file transfer server: {session.Id}");
@@ -718,4 +663,7 @@ public class FileTransferService(
             sendTransferCompletionSource?.TrySetResult(true);
         }
     }
+    #endregion
+
+    #endregion
 }
