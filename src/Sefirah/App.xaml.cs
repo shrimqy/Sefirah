@@ -169,19 +169,25 @@ public partial class App : Application
         await MainWindow!.DispatcherQueue.EnqueueAsync(() => InitializeApplicationAsync(activatedEventArgs));
     }
 
-    public async Task InitializeApplicationAsync(AppActivationArguments activatedEventArgs)
+    public static async Task InitializeApplicationAsync(AppActivationArguments activatedEventArgs)
     {
+        try
+        {
         switch (activatedEventArgs.Data)
         {
-            case ShareTargetActivatedEventArgs:
-                // Handle share target activation
-                await HandleShareTargetActivation(activatedEventArgs.Data as ShareTargetActivatedEventArgs);
+                case ShareTargetActivatedEventArgs shareArgs:
+                    await HandleShareTargetActivation(shareArgs);
                 break;
-
             default:
-                MainWindow!.AppWindow.Show();
-                MainWindow!.Activate();
+                    MainWindow.AppWindow.Show();
+                    MainWindow.Activate();
                 break;
+        }
+    }
+        catch (COMException)
+        {
+            // Data not available, just return safely
+            return;
         }
     }
 
