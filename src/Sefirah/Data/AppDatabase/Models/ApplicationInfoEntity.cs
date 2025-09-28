@@ -9,30 +9,26 @@ public partial class ApplicationInfoEntity
 {
     [PrimaryKey]
     public string PackageName { get; set; } = string.Empty;
-    
+
     public string AppName { get; set; } = string.Empty;
-    
+
     public string? AppIconPath { get; set; }
 
     [Column("AppDeviceInfo")]
-    public string? AppDeviceInfoJson { get; set; }
+    public string AppDeviceInfoJson { get; set; } = string.Empty;
+
+    [Ignore]
+    public List<AppDeviceInfo> AppDeviceInfoList
+    {
+        get => JsonSerializer.Deserialize<List<AppDeviceInfo>>(AppDeviceInfoJson) ?? [];
+        set => AppDeviceInfoJson = JsonSerializer.Serialize(value);
+    }
 
     #region Helpers
-    internal ApplicationInfo ToApplicationInfo()
+    internal ApplicationInfo ToApplicationInfo(string deviceId)
     {
-        List<AppDeviceInfo> deviceInfo = [];
-        if (!string.IsNullOrEmpty(AppDeviceInfoJson))
-        {
-            deviceInfo = JsonSerializer.Deserialize<List<AppDeviceInfo>>(AppDeviceInfoJson) ?? [];
-        }
-
-        return new ApplicationInfo
-        {
-            PackageName = PackageName,
-            AppName = AppName,
-            IconPath = AppIconPath,
-            DeviceInfo = deviceInfo
-        };
+        var deviceInfo =  AppDeviceInfoList.FirstOrDefault(d => d.DeviceId == deviceId) ?? new AppDeviceInfo(deviceId, NotificationFilter.ToastFeed);
+        return new ApplicationInfo(PackageName, AppName, AppIconPath, deviceInfo);
     }
 
     internal static async Task<ApplicationInfoEntity> FromApplicationInfoMessage(ApplicationInfoMessage info, string deviceId)
@@ -49,14 +45,14 @@ public partial class ApplicationInfoEntity
             catch (Exception) { }
         }
 
-        List<AppDeviceInfo> appDeviceInfo = [new AppDeviceInfo { DeviceId = deviceId, Filter = NotificationFilter.ToastFeed }];
+        List<AppDeviceInfo> appDeviceInfoList = [new(deviceId, NotificationFilter.ToastFeed)];
 
         return new ApplicationInfoEntity
         {
             PackageName = info.PackageName,
             AppName = info.AppName,
             AppIconPath = appIconPath,
-            AppDeviceInfoJson = JsonSerializer.Serialize(appDeviceInfo)
+            AppDeviceInfoJson = JsonSerializer.Serialize(appDeviceInfoList)
         };
     }
     #endregion

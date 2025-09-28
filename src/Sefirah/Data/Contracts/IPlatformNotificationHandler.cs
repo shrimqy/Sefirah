@@ -44,7 +44,7 @@ public interface IPlatformNotificationHandler
     /// <returns>Task that completes when the notification is displayed</returns>
     Task ShowFileTransferNotification(string title, string text, string? filePath = null, string? folderPath = null);
 
-    Task ShowTransferNotification(string title, string message, string fileName, uint notificationSequence, double? progress = null, bool isReceiving = true, bool silent = false);
+    Task ShowTransferNotification(string title, string message, string fileName, uint notificationSequence, double? progress = null, bool silent = false);
     /// <summary>
     /// Registers for platform-specific notification events
     /// </summary>

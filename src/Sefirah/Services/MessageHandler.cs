@@ -23,7 +23,7 @@ public class MessageHandler(
             switch (message)
             {
                 case ApplicationInfoMessage applicationInfo:
-                    await remoteAppRepository.AddOrUpdateApplication(await ApplicationInfoEntity.FromApplicationInfoMessage(applicationInfo, device.Id));
+                    await remoteAppRepository.AddOrUpdateApplicationForDevice(await ApplicationInfoEntity.FromApplicationInfoMessage(applicationInfo, device.Id), device.Id);
                     break;
 
                 case ApplicationList applicationList:

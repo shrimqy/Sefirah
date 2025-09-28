@@ -21,6 +21,103 @@
         <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
         <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
         <converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
+        
+        <DataTemplate x:Key="AppItemTemplate" x:DataType="models:ApplicationInfo">
+            <Grid
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Background="Transparent"
+                IsRightTapEnabled="True">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem
+                            Command="{Binding ElementName=AppPageRoot, Path=ViewModel.PinAppCommand}"
+                            CommandParameter="{x:Bind}"
+                            Text="{x:Bind IsPinned(x:True)}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="{x:Bind IsPinned(x:False)}" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem
+                            Command="{Binding ElementName=AppPageRoot, Path=ViewModel.UninstallAppCommand}"
+                            CommandParameter="{x:Bind}"
+                            Text="{helpers:ResourceString Name=Uninstall}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE74D;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </Grid.ContextFlyout>
+
+                <Border
+                    Grid.Row="0"
+                    Width="48"
+                    Height="48"
+                    Margin="0,10,0,10"
+                    HorizontalAlignment="Center"
+                    CornerRadius="24"
+                    Visibility="{x:Bind IsLoading, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                    <Image
+                        Width="48"
+                        Height="48"
+                        Source="{x:Bind IconPath, Mode=OneWay}"
+                        Stretch="Fill" />
+                </Border>
+
+                <ProgressRing
+                    Grid.Row="0"
+                    Width="48"
+                    Height="48"
+                    Margin="0,10,0,10"
+                    HorizontalAlignment="Center"
+                    IsActive="{x:Bind IsLoading, Mode=OneWay}" />
+
+                <TextBlock
+                    Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Bottom"
+                    MaxLines="2"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="{x:Bind AppName}"
+                    TextAlignment="Center"
+                    TextWrapping="Wrap" />
+            </Grid>
+        </DataTemplate>
+        
+        <DataTemplate x:Key="SearchSuggestionTemplate" x:DataType="models:ApplicationInfo">
+            <StackPanel
+                Margin="0,8,0,8"
+                VerticalAlignment="Center"
+                Orientation="Horizontal">
+                <Border
+                    Width="36"
+                    Height="36"
+                    CornerRadius="18">
+                    <Image
+                        Width="36"
+                        Height="36"
+                        Source="{x:Bind IconPath, Mode=OneWay}"
+                        Stretch="Fill" />
+                </Border>
+                <TextBlock
+                    Margin="12,0,0,0"
+                    VerticalAlignment="Center"
+                    Text="{x:Bind AppName, Mode=OneWay}" />
+            </StackPanel>
+        </DataTemplate>
+        
+        <Style x:Key="AppItemContainerStyle" BasedOn="{StaticResource DefaultGridViewItemStyle}" TargetType="GridViewItem">
+            <Setter Property="Margin" Value="12,12,12,0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+            <Setter Property="Width" Value="100" />
+            <Setter Property="Height" Value="110" />
+        </Style>
     </Page.Resources>
 
     <Grid Margin="16,12,0,0">
@@ -65,31 +162,13 @@
             Margin="6,12,16,12"
             HorizontalAlignment="Right"
             AutomationProperties.Name="App AutoSuggestBox"
+            ItemTemplate="{StaticResource SearchSuggestionTemplate}"
             PlaceholderText="{helpers:ResourceString Name=SearchApps}"
             QueryIcon="Find"
             QuerySubmitted="AppSearchBox_QuerySubmitted"
             SuggestionChosen="AppSearchBox_SuggestionChosen"
             TextChanged="AppSearchBox_TextChanged"
-            UpdateTextOnSelect="False">
-            <AutoSuggestBox.ItemTemplate>
-                <DataTemplate x:DataType="models:ApplicationInfo">
-                    <StackPanel
-                        Margin="0,8,0,8"
-                        VerticalAlignment="Center"
-                        Orientation="Horizontal">
-                        <Image
-                            Width="36"
-                            Height="36"
-                            Source="{x:Bind IconPath, Mode=OneWay}"
-                            Stretch="Uniform" />
-                        <TextBlock
-                            Margin="12,0,0,0"
-                            VerticalAlignment="Center"
-                            Text="{x:Bind AppName, Mode=OneWay}" />
-                    </StackPanel>
-                </DataTemplate>
-            </AutoSuggestBox.ItemTemplate>
-        </AutoSuggestBox>
+            UpdateTextOnSelect="False" />
 
         <ScrollViewer
             Grid.Row="1"
@@ -102,7 +181,7 @@
             VerticalScrollBarVisibility="Auto">
 
             <StackPanel>
-                <!--  Pinned Apps Section  -->
+                <!--  Pinned Apps -->
                 <Grid Visibility="{x:Bind ViewModel.HasPinnedApps, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <GridView
                         x:Name="PinnedAppsGridView"
@@ -110,86 +189,13 @@
                         IsItemClickEnabled="True"
                         IsRightTapEnabled="True"
                         ItemClick="AppsGridView_ItemClick"
+                        ItemContainerStyle="{StaticResource AppItemContainerStyle}"
+                        ItemTemplate="{StaticResource AppItemTemplate}"
                         ItemsSource="{x:Bind ViewModel.PinnedApps, Mode=OneWay}"
-                        SelectionMode="None">
-
-                        <GridView.ItemContainerStyle>
-                            <Style BasedOn="{StaticResource DefaultGridViewItemStyle}" TargetType="GridViewItem">
-                                <Setter Property="Margin" Value="12,12,12,0" />
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                <Setter Property="VerticalContentAlignment" Value="Stretch" />
-                                <Setter Property="Width" Value="100" />
-                                <Setter Property="Height" Value="110" />
-                            </Style>
-                        </GridView.ItemContainerStyle>
-
-                        <GridView.ItemTemplate>
-                            <DataTemplate x:DataType="models:ApplicationInfo">
-                                <Grid
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Stretch"
-                                    Background="Transparent"
-                                    IsRightTapEnabled="True">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-
-                                    <Grid.ContextFlyout>
-                                        <MenuFlyout>
-                                            <MenuFlyoutItem
-                                                Command="{Binding ElementName=AppPageRoot, Path=ViewModel.UnpinAppCommand}"
-                                                CommandParameter="{x:Bind}"
-                                                Text="{helpers:ResourceString Name=Unpin}">
-                                                <MenuFlyoutItem.Icon>
-                                                    <FontIcon Glyph="&#xE77A;" />
-                                                </MenuFlyoutItem.Icon>
-                                            </MenuFlyoutItem>
-                                            <MenuFlyoutItem
-                                                Command="{Binding ElementName=AppPageRoot, Path=ViewModel.UninstallAppCommand}"
-                                                CommandParameter="{x:Bind}"
-                                                Text="{helpers:ResourceString Name=Uninstall}">
-                                                <MenuFlyoutItem.Icon>
-                                                    <FontIcon Glyph="&#xE74D;" />
-                                                </MenuFlyoutItem.Icon>
-                                            </MenuFlyoutItem>
-                                        </MenuFlyout>
-                                    </Grid.ContextFlyout>
-
-                                    <Image
-                                        Grid.Row="0"
-                                        Width="48"
-                                        Height="48"
-                                        Margin="0,10,0,10"
-                                        HorizontalAlignment="Center"
-                                        Source="{x:Bind IconPath, Mode=OneWay}"
-                                        Stretch="Uniform"
-                                        Visibility="{x:Bind IsLoading, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
-
-                                    <ProgressRing
-                                        Grid.Row="0"
-                                        Width="48"
-                                        Height="48"
-                                        Margin="0,10,0,10"
-                                        HorizontalAlignment="Center"
-                                        IsActive="{x:Bind IsLoading, Mode=OneWay}" />
-
-                                    <TextBlock
-                                        Grid.Row="1"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Bottom"
-                                        MaxLines="2"
-                                        Style="{StaticResource CaptionTextBlockStyle}"
-                                        Text="{x:Bind AppName}"
-                                        TextAlignment="Center"
-                                        TextWrapping="Wrap" />
-                                </Grid>
-                            </DataTemplate>
-                        </GridView.ItemTemplate>
-                    </GridView>
+                        SelectionMode="None" />
                 </Grid>
 
-                <!--  All Apps Section  -->
+                <!--  All Apps -->
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -211,83 +217,10 @@
                         IsItemClickEnabled="True"
                         IsRightTapEnabled="True"
                         ItemClick="AppsGridView_ItemClick"
+                        ItemContainerStyle="{StaticResource AppItemContainerStyle}"
+                        ItemTemplate="{StaticResource AppItemTemplate}"
                         ItemsSource="{x:Bind ViewModel.Apps, Mode=OneWay}"
-                        SelectionMode="None">
-
-                        <GridView.ItemContainerStyle>
-                            <Style BasedOn="{StaticResource DefaultGridViewItemStyle}" TargetType="GridViewItem">
-                                <Setter Property="Margin" Value="12,12,12,0" />
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                <Setter Property="VerticalContentAlignment" Value="Stretch" />
-                                <Setter Property="Width" Value="100" />
-                                <Setter Property="Height" Value="110" />
-                            </Style>
-                        </GridView.ItemContainerStyle>
-
-                        <GridView.ItemTemplate>
-                            <DataTemplate x:DataType="models:ApplicationInfo">
-                                <Grid
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Stretch"
-                                    Background="Transparent"
-                                    IsRightTapEnabled="True">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-
-                                    <Grid.ContextFlyout>
-                                        <MenuFlyout>
-                                            <MenuFlyoutItem
-                                                Command="{Binding ElementName=AppPageRoot, Path=ViewModel.PinAppCommand}"
-                                                CommandParameter="{x:Bind}"
-                                                Text="{helpers:ResourceString Name=Pin}">
-                                                <MenuFlyoutItem.Icon>
-                                                    <FontIcon Glyph="&#xE141;" />
-                                                </MenuFlyoutItem.Icon>
-                                            </MenuFlyoutItem>
-                                            <MenuFlyoutItem
-                                                Command="{Binding ElementName=AppPageRoot, Path=ViewModel.UninstallAppCommand}"
-                                                CommandParameter="{x:Bind}"
-                                                Text="{helpers:ResourceString Name=Uninstall}">
-                                                <MenuFlyoutItem.Icon>
-                                                    <FontIcon Glyph="&#xE74D;" />
-                                                </MenuFlyoutItem.Icon>
-                                            </MenuFlyoutItem>
-                                        </MenuFlyout>
-                                    </Grid.ContextFlyout>
-
-                                    <Image
-                                        Grid.Row="0"
-                                        Width="48"
-                                        Height="48"
-                                        Margin="0,10,0,10"
-                                        HorizontalAlignment="Center"
-                                        Source="{x:Bind IconPath, Mode=OneWay}"
-                                        Stretch="Uniform"
-                                        Visibility="{x:Bind IsLoading, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
-
-                                    <ProgressRing
-                                        Grid.Row="0"
-                                        Width="48"
-                                        Height="48"
-                                        Margin="0,10,0,10"
-                                        HorizontalAlignment="Center"
-                                        IsActive="{x:Bind IsLoading, Mode=OneWay}" />
-
-                                    <TextBlock
-                                        Grid.Row="1"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Bottom"
-                                        MaxLines="2"
-                                        Style="{StaticResource CaptionTextBlockStyle}"
-                                        Text="{x:Bind AppName}"
-                                        TextAlignment="Center"
-                                        TextWrapping="Wrap" />
-                                </Grid>
-                            </DataTemplate>
-                        </GridView.ItemTemplate>
-                    </GridView>
+                        SelectionMode="None" />
                 </Grid>
             </StackPanel>
         </ScrollViewer>

@@ -3,31 +3,31 @@ using Sefirah.Extensions;
 
 namespace Sefirah.Data.Models;
 
-public partial class ApplicationInfo : ObservableObject
+public partial class ApplicationInfo(string packageName, string appName, string? iconPath, AppDeviceInfo deviceInfo) : ObservableObject
 {
-    private string packageName = string.Empty;
+    private string packageName = packageName;
     public string PackageName 
     { 
         get => packageName;
         set => SetProperty(ref packageName, value);
     }
     
-    private string appName = string.Empty;
+    private string appName = appName;
     public string AppName 
     { 
         get => appName;
         set => SetProperty(ref appName, value);
     }
     
-    private string? iconPath;
+    private string? iconPath = iconPath;
     public string? IconPath
     {
         get => iconPath;
         set => SetProperty(ref iconPath, value);
     }
     
-    private List<AppDeviceInfo> deviceInfo = [];
-    public List<AppDeviceInfo> DeviceInfo 
+    private AppDeviceInfo deviceInfo = deviceInfo;
+    public AppDeviceInfo DeviceInfo 
     { 
         get => deviceInfo;
         set => SetProperty(ref deviceInfo, value);
@@ -40,75 +40,21 @@ public partial class ApplicationInfo : ObservableObject
         set => SetProperty(ref isLoading, value);
     }
 
-    public string currentNotificationFilter = string.Empty;
-    public string CurrentNotificationFilter
-    {
-        get => currentNotificationFilter;
-        set
-        {
-            currentNotificationFilter = value;
-            OnPropertyChanged(nameof(CurrentNotificationFilter));
-        }
-    }
-
     #region Helpers
-    public void AddDevice(string deviceId)
+    public string IsPinned(bool isText)
     {
-        if (!DeviceInfo.Any(d => d.DeviceId == deviceId))
+        if (isText)
         {
-            var newDeviceInfo = new List<AppDeviceInfo>(DeviceInfo)
-            {
-                new() { DeviceId = deviceId, Filter = NotificationFilter.ToastFeed }
-            };
-            DeviceInfo = newDeviceInfo;
+            return DeviceInfo.Pinned ?  "Unpin".GetLocalizedResource() : "Pin".GetLocalizedResource();
         }
+        return DeviceInfo.Pinned ? "\uE77A" : "\uE141";
     }
 
-    public void RemoveDevice(string deviceId)
+    private string? selectedNotificationFilter;
+    public string SelectedNotificationFilter
     {
-        var deviceToRemove = DeviceInfo.FirstOrDefault(d => d.DeviceId == deviceId);
-        if (deviceToRemove is not null)
-        {
-            var newDeviceInfo = new List<AppDeviceInfo>(DeviceInfo);
-            newDeviceInfo.Remove(deviceToRemove);
-            DeviceInfo = newDeviceInfo;
-        }
-    }
-
-    public bool HasDevice(string deviceId)
-    {
-        return DeviceInfo.Any(d => d.DeviceId == deviceId);
-    }
-
-    public bool IsPinned(string deviceId)
-    {
-        var deviceInfo = DeviceInfo.FirstOrDefault(d => d.DeviceId == deviceId);
-        return deviceInfo?.Pinned ?? false;
-    }
-
-    public void SetPinned(string deviceId, bool pinned)
-    {
-        var deviceInfo = DeviceInfo.FirstOrDefault(d => d.DeviceId == deviceId);
-        if (deviceInfo != null)
-        {
-            deviceInfo.Pinned = pinned;
-            OnPropertyChanged(nameof(DeviceInfo));
-        }
-    }
-
-    public void UpdateNotificationFilter(string deviceId)
-    {
-        CurrentNotificationFilter = GetNotificationFilter(deviceId);
-    }
-
-    public string GetNotificationFilter(string deviceId)
-    {
-        var deviceInfo = DeviceInfo.FirstOrDefault(d => d.DeviceId == deviceId);
-        if (deviceInfo != null)
-        {
-            return NotificationFilterTypes[deviceInfo.Filter];
-        }
-        return NotificationFilterTypes[NotificationFilter.ToastFeed];
+        get => selectedNotificationFilter ?? NotificationFilterTypes[DeviceInfo.Filter];
+        set => SetProperty(ref selectedNotificationFilter, value);
     }
 
     public static Dictionary<NotificationFilter, string> NotificationFilterTypes { get; } = new()

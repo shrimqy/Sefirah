@@ -9,7 +9,7 @@ public static class DeviceSelector
     {
         PairedDevice? selectedDevice = null;
 
-        await App.MainWindow!.DispatcherQueue!.EnqueueAsync(async () =>
+        await App.MainWindow.DispatcherQueue!.EnqueueAsync(async () =>
         {
             var deviceOptions = new List<ComboBoxItem>();
             foreach (var device in onlineDevices)
@@ -32,7 +32,7 @@ public static class DeviceSelector
 
             var dialog = new ContentDialog
             {
-                XamlRoot = App.MainWindow!.Content!.XamlRoot,
+                XamlRoot = App.MainWindow.Content!.XamlRoot,
                 Title = "SelectDevice".GetLocalizedResource(),
                 Content = deviceSelector,
                 PrimaryButtonText = "Start".GetLocalizedResource(),

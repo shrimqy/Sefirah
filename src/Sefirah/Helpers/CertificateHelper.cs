@@ -1,6 +1,3 @@
-using System.Diagnostics;
-using System.IO;
-using System.Security;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -20,10 +17,10 @@ public class CertificateHelper
 
         // Add certificate extensions
         certRequest.CertificateExtensions.Add(
-            new X509BasicConstraintsExtension(true, false, 0, true));
+            new X509BasicConstraintsExtension(false, false, 0, true));
 
         certRequest.CertificateExtensions.Add(
-            new X509KeyUsageExtension(X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.KeyEncipherment, true));
+            new X509KeyUsageExtension(X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.KeyEncipherment | X509KeyUsageFlags.DataEncipherment, true));
 
         // Create self-signed certificate valid for 10 years
         X509Certificate2 certificate = certRequest.CreateSelfSigned(
@@ -31,20 +28,16 @@ public class CertificateHelper
             DateTimeOffset.Now.AddYears(10));
 
         // Ensure the certificate is exportable
-        certificate = new X509Certificate2(
-            certificate.Export(X509ContentType.Pfx),
-            password: null as SecureString,
+        byte[] exportedData = certificate.Export(X509ContentType.Pfx);
+        certificate = X509CertificateLoader.LoadPkcs12(exportedData, null, 
             X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet);
 
         string certPath = Path.Combine(
             ApplicationData.Current.LocalFolder.Path,
             CertificateFileName);
 
-        // Export and save
-        byte[] certData = certificate.Export(X509ContentType.Pfx);
-        await File.WriteAllBytesAsync(certPath, certData);
+        await File.WriteAllBytesAsync(certPath, exportedData);
         
-        Debug.WriteLine($"Certificate saved to: {certPath}");
         return certificate;
     }
 
@@ -56,7 +49,7 @@ public class CertificateHelper
         {
             try
             {
-                return new X509Certificate2(certPath);
+                return X509CertificateLoader.LoadPkcs12FromFile(certPath, null);
             }
             catch (Exception ex)
             {

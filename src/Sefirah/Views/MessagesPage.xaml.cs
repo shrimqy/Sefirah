@@ -1,3 +1,4 @@
+using CommunityToolkit.WinUI.Helpers;
 using Microsoft.UI.Xaml.Input;
 using Sefirah.Data.Models.Messages;
 using Sefirah.ViewModels;
@@ -9,7 +10,7 @@ public sealed partial class MessagesPage : Page
 {
     public MessagesViewModel ViewModel { get; }
 
-    private readonly Random _random = new();
+    private readonly Random random = new();
     private readonly Dictionary<long, Windows.UI.Color> conversationColors = [];
     private readonly Dictionary<string, Windows.UI.Color> contactColors = [];
 
@@ -82,13 +83,17 @@ public sealed partial class MessagesPage : Page
         return color;
     }
 
+    private static readonly string[] PredefinedColors = [
+        "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7",
+        "#DDA0DD", "#98D8C8", "#F7DC6F", "#BB8FCE", "#85C1E9",
+        "#F8C471", "#82E0AA", "#F1948A", "#85C1E9", "#D7BDE2",
+        "#A9DFBF", "#F9E79F", "#AED6F1", "#FADBD8", "#D5DBDB"
+    ];
+
     private Windows.UI.Color GenerateRandomColor()
     {
-        var hue = _random.Next(0, 360);
-        var saturation = _random.Next(65, 85) / 100.0; // 65-85% saturation
-        var lightness = _random.Next(45, 65) / 100.0; // 45-65% lightness 
-        
-        return HslToRgb(hue, saturation, lightness);
+        var randomColorHex = PredefinedColors[random.Next(PredefinedColors.Length)];
+        return randomColorHex.ToColor();
     }
 
     private static readonly char[] separator = [' ', '\t', '\n', '\r'];
@@ -112,40 +117,6 @@ public sealed partial class MessagesPage : Page
         return (string.Concat(words[0].AsSpan()[..1], words[1].AsSpan(0, 1))).ToUpper();
     }
 
-    private Windows.UI.Color HslToRgb(double h, double s, double l)
-    {
-        double r, g, b;
-
-        if (s == 0)
-        {
-            r = g = b = l; // achromatic
-        }
-        else
-        {
-            double hue2rgb(double p, double q, double t)
-            {
-                if (t < 0) t += 1;
-                if (t > 1) t -= 1;
-                if (t < 1.0/6.0) return p + (q - p) * 6 * t;
-                if (t < 1.0/2.0) return q;
-                if (t < 2.0/3.0) return p + (q - p) * (2.0/3.0 - t) * 6;
-                return p;
-            }
-
-            var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-            var p = 2 * l - q;
-            
-            h /= 360;
-            r = hue2rgb(p, q, h + 1.0/3.0);
-            g = hue2rgb(p, q, h);
-            b = hue2rgb(p, q, h - 1.0/3.0);
-        }
-
-        return Windows.UI.Color.FromArgb(255, 
-            (byte)Math.Round(r * 255), 
-            (byte)Math.Round(g * 255), 
-            (byte)Math.Round(b * 255));
-    }
 
     private void ConversationAvatarBorder_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
     {
@@ -160,7 +131,7 @@ public sealed partial class MessagesPage : Page
                 // Set initials for text content if it's a TextBlock
                 if (border.Child is TextBlock textBlock)
                 {
-                    textBlock.Text = MessagesPage.GetInitials(conversation.DisplayName);
+                    textBlock.Text = GetInitials(conversation.DisplayName);
                 }
             }
             else if (border.DataContext is Contact contact)
@@ -244,7 +215,6 @@ public sealed partial class MessagesPage : Page
 
     private void SearchBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
     {
-        // Handle search submission if needed
     }
 
     private void SearchBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)

@@ -10,12 +10,14 @@ namespace Sefirah.ViewModels.Settings;
 
 public partial class DevicesViewModel : ObservableObject
 {
+    #region Services
     private readonly DispatcherQueue Dispatcher;
     private ISessionManager SessionManager { get; } = Ioc.Default.GetRequiredService<ISessionManager>();
     private IDiscoveryService DiscoveryService { get; } = Ioc.Default.GetRequiredService<IDiscoveryService>();
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
     private ISftpService SftpService { get; } = Ioc.Default.GetRequiredService<ISftpService>();
     private IAdbService AdbService { get; } = Ioc.Default.GetRequiredService<IAdbService>();
+    #endregion
     
     public ObservableCollection<PairedDevice> PairedDevices => DeviceManager.PairedDevices;
     public ObservableCollection<DiscoveredDevice> DiscoveredDevices => DiscoveryService.DiscoveredDevices;
@@ -23,13 +25,6 @@ public partial class DevicesViewModel : ObservableObject
     public DevicesViewModel()
     {
         Dispatcher = DispatcherQueue.GetForCurrentThread();
-        AdbService.AdbDevices.CollectionChanged += OnAdbDevicesChanged;
-    }
-
-    private void OnAdbDevicesChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-    {
-        // No need to manually refresh ADB status anymore - PairedDevice now automatically 
-        // observes ADB device changes and updates its properties accordingly
     }
 
     [RelayCommand]
@@ -54,7 +49,7 @@ public partial class DevicesViewModel : ObservableObject
             PrimaryButtonText = "Remove".GetLocalizedResource(),
             CloseButtonText = "Cancel".GetLocalizedResource(),
             DefaultButton = ContentDialogButton.Close,
-            XamlRoot = App.MainWindow!.Content!.XamlRoot
+            XamlRoot = App.MainWindow.Content!.XamlRoot
         };
 
         var result = await dialog.ShowAsync();
@@ -84,7 +79,7 @@ public partial class DevicesViewModel : ObservableObject
                     Title = "Error",
                     Content = $"Failed to remove device: {ex.Message}",
                     CloseButtonText = "OK",
-                    XamlRoot = App.MainWindow!.Content!.XamlRoot
+                    XamlRoot = App.MainWindow.Content!.XamlRoot
                 };
                 await errorDialog.ShowAsync();
             }

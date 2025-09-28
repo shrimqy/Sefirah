@@ -11,7 +11,7 @@ public sealed partial class DeviceSettingsPage : Page
 
     public DeviceSettingsPage()
     {
-        this.InitializeComponent();
+        InitializeComponent();
         ViewModel = new DeviceSettingsViewModel();
         DataContext = ViewModel;
     }

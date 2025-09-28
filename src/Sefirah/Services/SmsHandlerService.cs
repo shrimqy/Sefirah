@@ -17,7 +17,7 @@ public class SmsHandlerService(
 {
     private readonly Dictionary<string, ObservableCollection<Conversation>> deviceConversations = [];
     private readonly SemaphoreSlim semaphore = new(1, 1);
-    private readonly DispatcherQueue dispatcher = App.MainWindow!.DispatcherQueue;
+    private readonly DispatcherQueue dispatcher = App.MainWindow.DispatcherQueue;
 
     public event EventHandler<(string DeviceId, long ThreadId)>? ConversationsUpdated;
 

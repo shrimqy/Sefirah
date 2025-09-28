@@ -12,7 +12,8 @@
     xmlns:utu="using:Uno.Toolkit.UI"
     xmlns:win="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     Background="{ThemeResource App.PageBackgroundBrush}"
-    mc:Ignorable="not_win">
+    mc:Ignorable="not_win"
+    x:Name="PageRoot">
 
     <Page.Resources>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
@@ -53,8 +54,7 @@
     <Grid
         AllowDrop="True"
         DragOver="Grid_DragOver"
-        Drop="Page_Drop"
-        DropCompleted="Page_DropCompleted">
+        Drop="Page_Drop">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -134,7 +134,7 @@
                             x:Name="PhoneFrameOverlay"
                             Background="#80000000"
                             Opacity="0"
-                            Tapped="ToggleScreenMirror"
+                            utu:CommandExtensions.Command="{x:Bind ViewModel.StartScrcpyCommand}"
                             Visibility="Collapsed">
                             <FontIcon
                                 Foreground="White"
@@ -406,21 +406,20 @@
                                                             Background="Transparent"
                                                             BorderBrush="Transparent"
                                                             IsHitTestVisible="False"
-                                                            Opacity="0"
-                                                            Tag="{x:Bind Key}">
+                                                            Opacity="0">
                                                             <SymbolIcon Symbol="More" />
                                                             <Button.Flyout>
                                                                 <MenuFlyout Closed="MoreButtonFlyoutClosed" Placement="BottomEdgeAlignedLeft">
                                                                     <MenuFlyoutItem
                                                                         Click="OpenAppClick"
-                                                                        Tag="{x:Bind}"
+                                                                        DataContext="{x:Bind}"
                                                                         Text="{helpers:ResourceString Name=OpenApp}">
                                                                         <MenuFlyoutItem.Icon>
                                                                             <FontIcon Glyph="&#xED35;" />
                                                                         </MenuFlyoutItem.Icon>
                                                                     </MenuFlyoutItem>
                                                                     <MenuFlyoutItem
-                                                                        Click="OnNotificationFilterClick"
+                                                                        Click="UpdateNotificationFilterClick"
                                                                         Tag="{x:Bind AppPackage}"
                                                                         Text="{x:Bind FlyoutFilterString}">
                                                                         <MenuFlyoutItem.Icon>
@@ -428,8 +427,8 @@
                                                                         </MenuFlyoutItem.Icon>
                                                                     </MenuFlyoutItem>
                                                                     <MenuFlyoutItem
-                                                                        Click="OnNotificationPinClick"
-                                                                        Tag="{x:Bind Key}"
+                                                                        Click="ToggleNotificationPinClick"
+                                                                        DataContext="{x:Bind}"
                                                                         Text="{x:Bind IsPinned, Converter={StaticResource PinConverter}}">
                                                                         <MenuFlyoutItem.Icon>
                                                                             <FontIcon Glyph="{x:Bind IsPinned, Converter={StaticResource PinIconConverter}}" />
@@ -444,11 +443,11 @@
                                                             Height="20"
                                                             Margin="0,0,0,0"
                                                             Padding="0"
-                                                            Click="OnNotificationCloseButtonClick"
+                                                            Command="{Binding ViewModel.RemoveNotificationCommand, ElementName=PageRoot}"
+                                                            CommandParameter="{x:Bind}"
                                                             IsHitTestVisible="False"
                                                             Opacity="0"
-                                                            Style="{StaticResource AlternateCloseButtonStyle}"
-                                                            Tag="{x:Bind Key}" />
+                                                            Style="{StaticResource AlternateCloseButtonStyle}" />
                                                         <SymbolIcon
                                                             x:Name="PinIcon"
                                                             RenderTransformOrigin="0.5,0.5"
@@ -579,9 +578,9 @@
                                                                 HorizontalContentAlignment="Stretch"
                                                                 Background="Transparent"
                                                                 BorderBrush="Transparent"
-                                                                Click="ActionButton_Click"
+                                                                Command="{Binding ViewModel.HandleNotificationActionCommand, ElementName=PageRoot}"
+                                                                CommandParameter="{x:Bind}"
                                                                 Content="{x:Bind Label}"
-                                                                Tag="{x:Bind}"
                                                                 Visibility="{x:Bind IsReplyAction, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
                                                         </DataTemplate>
                                                     </ItemsRepeater.ItemTemplate>
@@ -631,7 +630,7 @@
                         <NavigationViewItem
                             x:Name="UpdateButton"
                             SelectsOnInvoked="False"
-                            Tapped="UpdateButtonClick"
+                            utu:CommandExtensions.Command="{x:Bind ViewModel.UpdateCommand}"
                             ToolTipService.ToolTip="Update Available"
                             Visibility="{x:Bind ViewModel.IsUpdateAvailable, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <NavigationViewItem.Icon>

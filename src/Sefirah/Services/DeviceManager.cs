@@ -12,7 +12,6 @@ namespace Sefirah.Services;
 
 public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceRepository repository) : ObservableObject, IDeviceManager
 {
-
     public ObservableCollection<PairedDevice> PairedDevices { get; set; } = [];
 
     [ObservableProperty]
@@ -62,9 +61,9 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
         throw new NotImplementedException();
     }   
 
-    public Task<List<RemoteDeviceEntity>> GetDeviceListAsync()
+    public List<string> GetRemoteDeviceIpAddresses()
     {
-        throw new NotImplementedException();
+        return repository.GetRemoteDeviceIpAddresses();
     }
 
     public async Task<PairedDevice?> GetLastConnectedDevice()
@@ -74,7 +73,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
 
     public void RemoveDevice(PairedDevice device)
     {
-        App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+        App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {
             PairedDevices.Remove(device);
             repository.DeletePairedDevice(device.Id);
@@ -94,7 +93,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
     {
         var pairedDevice = PairedDevices.FirstOrDefault(d => d.Id == device.Id);
         if (pairedDevice == null) return;
-        App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+        App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {
             pairedDevice.Status = deviceStatus;
         });
@@ -104,29 +103,26 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
     {
         try
         {
-            var localDevice = await GetLocalDeviceAsync();
-            var existingDevice = repository.GetPairedDevice(device.DeviceId);
-
             // If device exists and we've already verified it before, validate the proof
-            if (existingDevice != null)
+            if (repository.HasDevice(device.DeviceId, out var existingDevice))
             {
                 if (!EcdhHelper.VerifyProof(existingDevice.SharedSecret!, device.Nonce!, device.Proof!)) { return null; }
 
                 // Update device info
                 existingDevice.LastConnected = DateTime.Now;
                 existingDevice.Name = device.DeviceName;
-                existingDevice.Model = device.Model;
+                existingDevice.Model = device.Model!;
 
                 if (!string.IsNullOrEmpty(device.Avatar))
                 {
                     existingDevice.WallpaperBytes = Convert.FromBase64String(device.Avatar);
                 }
-                if (ipAddress != null && existingDevice.IpAddresses?.Contains(ipAddress) == false)
+                if (ipAddress != null && existingDevice.IpAddresses.Contains(ipAddress) == false)
                 {
-                    var updatedIpAddresses = new List<string>(existingDevice.IpAddresses ?? [])
-                    {
-                        ipAddress
-                    };
+                    List<string> updatedIpAddresses =
+                    [
+                        ..existingDevice.IpAddresses, ipAddress
+                    ];
                     existingDevice.IpAddresses = updatedIpAddresses;
                 }
 
@@ -142,12 +138,13 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
 
             // For new devices, show connection request dialog
             var tcs = new TaskCompletionSource<PairedDevice?>();
+            var localDevice = await GetLocalDeviceAsync();
 
             var sharedSecret = EcdhHelper.DeriveKey(device.PublicKey!, localDevice.PrivateKey);
 
             if (!EcdhHelper.VerifyProof(sharedSecret, device.Nonce!, device.Proof!)) { return null; }
 
-            await App.MainWindow!.DispatcherQueue.EnqueueAsync(async () =>
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
             {
                 try
                 {
@@ -171,7 +168,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
                         DeviceId = device.DeviceId,
                         Name = device.DeviceName,
                         LastConnected = DateTime.Now,
-                        Model = device.Model,
+                        Model = device.Model!,
                         SharedSecret = sharedSecret,
                         WallpaperBytes = !string.IsNullOrEmpty(device.Avatar)
                             ? Convert.FromBase64String(device.Avatar)

@@ -8,7 +8,7 @@ public sealed partial class SyncPage : Page
     public DevicesViewModel ViewModel { get; }
     public SyncPage()
     {
-        this.InitializeComponent();
+        InitializeComponent();
         ViewModel = Ioc.Default.GetRequiredService<DevicesViewModel>();
     }
 

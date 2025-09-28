@@ -38,11 +38,11 @@ public class ScreenMirrorService(
             if (!File.Exists(scrcpyPath))
             {
                 logger.LogError("Scrcpy not found at {ScrcpyPath}", scrcpyPath);
-                await dispatcher!.EnqueueAsync(async () =>
+                var result = await dispatcher!.EnqueueAsync(async () =>
                 {
                     var dialog = new ContentDialog
                     {
-                        XamlRoot = App.MainWindow!.Content!.XamlRoot,
+                        XamlRoot = App.MainWindow.Content!.XamlRoot,
                         Title = "ScrcpyNotFound".GetLocalizedResource(),
                         Content = "ScrcpyNotFoundDescription".GetLocalizedResource(),
                         PrimaryButtonText = "SelectLocation".GetLocalizedResource(),
@@ -50,13 +50,16 @@ public class ScreenMirrorService(
                         CloseButtonText = "Dismiss".GetLocalizedResource()
                     };
 
-                    var result = await dialog.ShowAsync();
-                    if (result == ContentDialogResult.Primary)
+                    var dialogResult = await dialog.ShowAsync();
+                    if (dialogResult == ContentDialogResult.Primary)
                     {
-                        await SelectScrcpyLocationClick();
+                        scrcpyPath = await SelectScrcpyLocationClick();
+                        return !string.IsNullOrEmpty(scrcpyPath) && File.Exists(scrcpyPath);
                     }
+                    return false;
                 });
-                return false;
+
+                if (!result) return false;
             }
 
             var devicePreferenceType = deviceSettings.ScrcpyDevicePreference;
@@ -68,7 +71,7 @@ public class ScreenMirrorService(
                 argBuilder.Add(customArgs);
             }
 
-            var pairedDevices = devices.Where(d => d != null && d.AndroidId == device.Id).ToList();
+            var pairedDevices = devices.Where(d => d != null && d.Model == device.Model).ToList();
             if (pairedDevices.Count > 0)
             {
                 switch (devicePreferenceType)
@@ -169,7 +172,7 @@ public class ScreenMirrorService(
                 {
                     var dialog = new ContentDialog
                     {
-                        XamlRoot = App.MainWindow!.Content!.XamlRoot,
+                        XamlRoot = App.MainWindow.Content!.XamlRoot,
                         Title = "AdbDeviceOffline".GetLocalizedResource(),
                         Content = "AdbDeviceOfflineDescription".GetLocalizedResource(),
                         CloseButtonText = "Dismiss".GetLocalizedResource()
@@ -180,14 +183,9 @@ public class ScreenMirrorService(
             }
 
             // Validate that we have a selected device
-            if (!string.IsNullOrEmpty(selectedDeviceSerial))
-            {
-                argBuilder.Add($"-s {selectedDeviceSerial}");
-            }
-            else
-            {
-                return false;
-            }
+            if (string.IsNullOrEmpty(selectedDeviceSerial)) return false;
+            
+            argBuilder.Add($"-s {selectedDeviceSerial}");
 
             // Build arguments for scrcpy with the selected device
             var (args, deviceSerial) = BuildScrcpyArguments(argBuilder, selectedDeviceSerial!, deviceSettings);
@@ -279,7 +277,7 @@ public class ScreenMirrorService(
         
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
-        logger.LogInformation($"scrcpy process started (PID: {process.Id})");
+        logger.LogInformation("scrcpy process started {pid}", process.Id);
        
 
         scrcpyProcesses.Add(deviceSerial, process);
@@ -289,7 +287,7 @@ public class ScreenMirrorService(
             try
             {
                 await process.WaitForExitAsync(processCts.Token);
-                logger.LogInformation($"scrcpy process exited with code {process.ExitCode}");
+                logger.LogInformation("scrcpy process exited with code: {exitCode}", process.ExitCode);
                 
                 if (process.ExitCode != 0 && process.ExitCode != 2)
                 {
@@ -298,7 +296,7 @@ public class ScreenMirrorService(
                     {
                         errorMessage = $"Scrcpy process exited with code {process.ExitCode}\n\nError Output:\n{errorOutput.ToString().TrimEnd()}";
                     }
-                    logger.LogError($"Scrcpy failed: {errorMessage}");
+                    logger.LogError("Scrcpy failed: {error}", errorMessage);
 
                     await dispatcher!.EnqueueAsync(async () =>
                     {
@@ -317,7 +315,7 @@ public class ScreenMirrorService(
                         
                         var errorDialog = new ContentDialog
                         {
-                            XamlRoot = App.MainWindow!.Content!.XamlRoot,
+                            XamlRoot = App.MainWindow.Content!.XamlRoot,
                             Title = "ScrcpyErrorTitle".GetLocalizedResource(),
                             Content = scrollViewer,
                             CloseButtonText = "Dismiss".GetLocalizedResource(),
@@ -339,7 +337,7 @@ public class ScreenMirrorService(
             {
                 if (ex is not OperationCanceledException)
                 {
-                    logger.LogError($"Error monitoring scrcpy process {ex}", ex);
+                    logger.LogError("Error monitoring scrcpy process {ex}", ex);
                 }
             }
             finally
@@ -383,7 +381,7 @@ public class ScreenMirrorService(
 
             var dialog = new ContentDialog
             {
-                XamlRoot = App.MainWindow!.Content!.XamlRoot,
+                XamlRoot = App.MainWindow.Content!.XamlRoot,
                 Title = "SelectDevice".GetLocalizedResource(),
                 Content = deviceSelector,
                 PrimaryButtonText = "Start".GetLocalizedResource(),
@@ -540,14 +538,17 @@ public class ScreenMirrorService(
         return (string.Join(" ", args), deviceSerial);
     }
 
-    public async Task SelectScrcpyLocationClick()
+    public async Task<string> SelectScrcpyLocationClick()
     {
         var file = await PickerHelper.PickFileAsync();
         if (file?.Path is string path)
         {
             userSettingsService.GeneralSettingsService.ScrcpyPath = path;
             GeneralPage.TrySetCompanionTool(path, "adb.exe", p => userSettingsService.GeneralSettingsService.AdbPath = p);
+            await adbService.StartAsync();
+            return path;
         }
+        return string.Empty;
     }
 
     private async Task<string?> ShowPasswordInputDialog()
@@ -558,7 +559,7 @@ public class ScreenMirrorService(
         {
             var dialog = new PasswordInputDialog
             {
-                XamlRoot = App.MainWindow!.Content!.XamlRoot
+                XamlRoot = App.MainWindow.Content!.XamlRoot
             };
 
             var result = await dialog.ShowAsync();

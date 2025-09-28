@@ -12,7 +12,7 @@ public sealed partial class ClipboardSettingsPage : Page
 
     public ClipboardSettingsPage()
     {
-        this.InitializeComponent();
+        InitializeComponent();
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)

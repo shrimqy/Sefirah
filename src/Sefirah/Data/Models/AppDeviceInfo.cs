@@ -2,9 +2,26 @@ using Sefirah.Data.Enums;
 
 namespace Sefirah.Data.Models;
 
-public class AppDeviceInfo
+public partial class AppDeviceInfo(string deviceId, NotificationFilter filter) : ObservableObject
 {
-    public string DeviceId { get; set; } = string.Empty;
-    public NotificationFilter Filter { get; set; }
-    public bool Pinned { get; set; } = false;
+    private string deviceId = deviceId;
+    public string DeviceId
+    {
+        get => deviceId;
+        set => SetProperty(ref deviceId, value);
+    }
+    
+    private bool pinned = false;
+    public bool Pinned
+    {
+        get => pinned;
+        set => SetProperty(ref pinned, value);
+    }
+
+    private NotificationFilter filter = filter;
+    public NotificationFilter Filter
+    {
+        get => filter;
+        set => SetProperty(ref filter, value);
+    }
 }

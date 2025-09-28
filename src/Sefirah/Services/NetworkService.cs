@@ -50,7 +50,7 @@ public class NetworkService(
 
             certificate = await CertificateHelper.GetOrCreateCertificateAsync();
 
-            var context = new SslContext(SslProtocols.Tls12, certificate);
+            var context = new SslContext(SslProtocols.Tls12 | SslProtocols.Tls13, certificate, (sender, cert, chain, errors) => true);
 
             foreach (int port in PORT_RANGE)
             {

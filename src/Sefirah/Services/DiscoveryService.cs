@@ -1,5 +1,4 @@
 using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using CommunityToolkit.WinUI;
 using MeaMod.DNS.Multicast;
@@ -15,7 +14,7 @@ using Sefirah.Utils.Serialization;
 
 namespace Sefirah.Services;
 public class DiscoveryService(
-    ILogger<DiscoveryService> logger,
+    ILogger logger,
     IMdnsService mdnsService,
     IDeviceManager deviceManager
     ) : IDiscoveryService, IUdpClientProvider
@@ -29,17 +28,15 @@ public class DiscoveryService(
     public List<DiscoveredMdnsServiceArgs> DiscoveredMdnsServices { get; } = [];
     private List<IPEndPoint> broadcastEndpoints = [];
     private const int DiscoveryPort = 5149;
-    private readonly System.Threading.Lock collectionLock = new();
+    private readonly Lock collectionLock = new();
 
     public async Task StartDiscoveryAsync(int serverPort)
     {
         try
         {
             localDevice = await deviceManager.GetLocalDeviceAsync();
-            var remoteDevice = await deviceManager.GetLastConnectedDevice();
 
             var networkInterfaces = NetworkHelper.GetAllValidAddresses();
-
 
             var publicKey = Convert.ToBase64String(localDevice.PublicKey);
             var localAddresses = NetworkHelper.GetAllValidAddresses();
@@ -73,15 +70,13 @@ public class DiscoveryService(
             // Always include default broadcast as fallback
             broadcastEndpoints.Add(new IPEndPoint(IPAddress.Parse(DEFAULT_BROADCAST), DiscoveryPort));
 
-            if (remoteDevice != null && remoteDevice.IpAddresses != null)
-            {
-                broadcastEndpoints.AddRange(remoteDevice.IpAddresses.Select(ip => new IPEndPoint(IPAddress.Parse(ip), DiscoveryPort)));
-            }
+            var ipAddresses = deviceManager.GetRemoteDeviceIpAddresses();
+            broadcastEndpoints.AddRange(ipAddresses.Select(ip => new IPEndPoint(IPAddress.Parse(ip), DiscoveryPort)));
 
             logger.LogInformation("Active broadcast endpoints: {endpoints}", string.Join(", ", broadcastEndpoints));
 
 
-            udpClient = new MulticastClient("0.0.0.0", port, this)
+            udpClient = new MulticastClient("0.0.0.0", port, this, logger)
             {
                 OptionDualMode = false,
                 OptionMulticast = true,
@@ -260,14 +255,28 @@ public class DiscoveryService(
     }
 
     private DispatcherQueueTimer? _cleanupTimer;
+    private readonly Lock _timerLock = new();
+    
     private void StartCleanupTimer()
     {
-        if (_cleanupTimer != null) return;
+        lock (_timerLock)
+        {
+            if (_cleanupTimer != null) return;
 
-        _cleanupTimer = dispatcher.CreateTimer();
-        _cleanupTimer.Interval = TimeSpan.FromSeconds(3);
-        _cleanupTimer.Tick += (s, e) => CleanupStaleDevices();
-        _cleanupTimer.Start();
+            _cleanupTimer = dispatcher.CreateTimer();
+            _cleanupTimer.Interval = TimeSpan.FromSeconds(3);
+            _cleanupTimer.Tick += (s, e) => CleanupStaleDevices();
+            _cleanupTimer.Start();
+        }
+    }
+
+    private void StopCleanupTimer()
+    {
+        lock (_timerLock)
+        {
+            _cleanupTimer?.Stop();
+            _cleanupTimer = null;
+        }
     }
 
     private async void CleanupStaleDevices()
@@ -288,14 +297,13 @@ public class DiscoveryService(
 
                     foreach (var device in staleDevices)
                     {
-                        DiscoveredDevices.Remove(device);
+                            DiscoveredDevices.Remove(device);
                     }
 
                     // Stop timer if no UDP devices left
                     if (!DiscoveredDevices.Any(d => d.Origin == DeviceOrigin.UdpBroadcast))
                     {
-                        _cleanupTimer?.Stop();
-                        _cleanupTimer = null;
+                        StopCleanupTimer();
                     }
                 }
             });
@@ -308,7 +316,8 @@ public class DiscoveryService(
 
     public void Dispose()
     {
-        // Dispose default client
+        StopCleanupTimer();
+
         try
         {
             udpClient?.Dispose();

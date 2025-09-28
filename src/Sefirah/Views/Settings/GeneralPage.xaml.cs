@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
+using Sefirah.Data.Items;
 using Sefirah.Extensions;
 using Sefirah.Utils;
 using Windows.System;
@@ -25,18 +26,18 @@ public sealed partial class GeneralPage : Page
 
     private void SetupBreadcrumb()
     {
-        BreadcrumbBar.ItemsSource = new ObservableCollection<NavigationItem>
+        BreadcrumbBar.ItemsSource = new ObservableCollection<BreadcrumbBarItemModel>
         {
-            new() { Name = "General".GetLocalizedResource(), PageType = typeof(GeneralPage) }
+            new("General".GetLocalizedResource(), typeof(GeneralPage))
         };
         BreadcrumbBar.ItemClicked += BreadcrumbBar_ItemClicked;
     }
     private void BreadcrumbBar_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)
     {
-        var items = BreadcrumbBar.ItemsSource as ObservableCollection<NavigationItem>;
+        var items = BreadcrumbBar.ItemsSource as ObservableCollection<BreadcrumbBarItemModel>;
         var clickedItem = items?[args.Index];
 
-        if (clickedItem?.PageType != null && clickedItem.PageType != typeof(ActionsPage))
+        if (clickedItem?.PageType != typeof(ActionsPage))
         {
             // Navigate back to general page
             if (Frame.CanGoBack)
@@ -63,7 +64,7 @@ public sealed partial class GeneralPage : Page
             PrimaryButtonText = "Continue",
             CloseButtonText = "Cancel",
             DefaultButton = ContentDialogButton.Close,
-            XamlRoot = App.MainWindow!.Content!.XamlRoot
+            XamlRoot = App.MainWindow.Content!.XamlRoot
         };
 
         if (await dialog.ShowAsync() == ContentDialogResult.Primary)

@@ -59,7 +59,7 @@ public sealed partial class ActionsViewModel : BaseViewModel
     {
         var dialog = new ProcessActionDialog()
         {
-            XamlRoot = App.MainWindow!.Content!.XamlRoot
+            XamlRoot = App.MainWindow.Content!.XamlRoot
         };
 
         if (await dialog.ShowAsync() == ContentDialogResult.Primary && dialog.Result is not null)
@@ -76,7 +76,7 @@ public sealed partial class ActionsViewModel : BaseViewModel
     {
         if (action is not IActionDialog actionDialog) return;
 
-        if (await actionDialog.ShowDialogAsync(App.MainWindow!.Content!.XamlRoot!) is { } result)
+        if (await actionDialog.ShowDialogAsync(App.MainWindow.Content!.XamlRoot!) is { } result)
         {
             userSettingsService.GeneralSettingsService.UpdateAction(result);
             var existingAction = Actions.First(a => a.Id == result.Id);
@@ -97,7 +97,7 @@ public sealed partial class ActionsViewModel : BaseViewModel
             PrimaryButtonText = "Remove",
             CloseButtonText = "Cancel",
             DefaultButton = ContentDialogButton.Close,
-            XamlRoot = App.MainWindow!.Content!.XamlRoot
+            XamlRoot = App.MainWindow.Content!.XamlRoot
         };
 
         if (await dialog.ShowAsync() == ContentDialogResult.Primary)

@@ -8,13 +8,17 @@ using Sefirah.Utils.Serialization;
 namespace Sefirah.ViewModels;
 public sealed partial class AppsViewModel : BaseViewModel
 {
-    public RemoteAppRepository RemoteAppsRepository { get; } = Ioc.Default.GetRequiredService<RemoteAppRepository>();
+    #region Services
+    private RemoteAppRepository RemoteAppsRepository { get; } = Ioc.Default.GetRequiredService<RemoteAppRepository>();
     private IScreenMirrorService ScreenMirrorService { get; } = Ioc.Default.GetRequiredService<IScreenMirrorService>();
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
     private ISessionManager SessionManager { get; } = Ioc.Default.GetRequiredService<ISessionManager>();
-    public ObservableCollection<ApplicationInfo> Apps => RemoteAppsRepository.Applications;
-    public ObservableCollection<ApplicationInfo> PinnedApps => RemoteAppsRepository.PinnedApplications;
     private IAdbService AdbService { get; } = Ioc.Default.GetRequiredService<IAdbService>();
+    #endregion
+
+    #region Properties
+    public ObservableCollection<ApplicationInfo> Apps => RemoteAppsRepository.Applications;
+    public ObservableCollection<ApplicationInfo> PinnedApps { get; } = [];
 
     [ObservableProperty]
     public partial bool IsLoading { get; set; }
@@ -25,56 +29,45 @@ public sealed partial class AppsViewModel : BaseViewModel
     public bool IsEmpty => !Apps.Any() && !IsLoading;
     public bool HasPinnedApps => PinnedApps.Any();
 
-    public AppsViewModel()
+    #endregion
+
+    #region Commands
+
+    [RelayCommand]
+    public void RefreshApps()
     {
-        LoadApps();
-        
-        RemoteAppsRepository.ApplicationListUpdated += OnApplicationListUpdated;
-        ((INotifyPropertyChanged)DeviceManager).PropertyChanged += (s, e) =>
-        {
-            if (e.PropertyName == nameof(IDeviceManager.ActiveDevice))
-                LoadApps();
-        };
+        if (DeviceManager.ActiveDevice == null) return;
+
+        IsLoading = true;
+        var message = new CommandMessage { CommandType = CommandType.RequestAppList };
+        SessionManager.SendMessage(DeviceManager.ActiveDevice!.Session!, SocketMessageSerializer.Serialize(message));
     }
 
-
-    private async void LoadApps()
+    [RelayCommand]
+    public void PinApp(ApplicationInfo app)
     {
         try
         {
-            IsLoading = true;
+            if (app == null || DeviceManager.ActiveDevice == null) return;
 
-            var activeDevice = DeviceManager.ActiveDevice;
-            if (activeDevice == null)
+            if (app.DeviceInfo.Pinned)
             {
-                Logger.LogDebug("No active device, clearing apps");
-                return;
+                app.DeviceInfo.Pinned = false;
+                RemoteAppsRepository.UnpinApp(app, DeviceManager.ActiveDevice.Id);
+                PinnedApps.Remove(app);
             }
-            
-            await RemoteAppsRepository.LoadApplicationsFromDevice(activeDevice.Id);
-        
+            else
+            {
+                app.DeviceInfo.Pinned = true;
+                RemoteAppsRepository.PinApp(app, DeviceManager.ActiveDevice.Id);
+                PinnedApps.Add(app);
+            }
+            OnPropertyChanged(nameof(HasPinnedApps));
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error loading apps");
+            Logger.LogError(ex, "Error pinning app: {AppPackage}", app?.PackageName);
         }
-        finally
-        {
-            await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
-            {
-                IsLoading = false;
-            });
-        }
-    }
-
-    private void OnApplicationListUpdated(object? sender, string deviceId)
-    {
-        App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
-        {
-            IsLoading = false;
-            OnPropertyChanged(nameof(IsEmpty));
-            OnPropertyChanged(nameof(HasPinnedApps));
-        });
     }
 
     [RelayCommand]
@@ -91,45 +84,60 @@ public sealed partial class AppsViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error uninstalling app: {AppPackage}", app?.PackageName);
+            Logger.LogError(ex, "Error uninstalling app: {AppPackage}", app.PackageName);
         }
     }
 
-    [RelayCommand]
-    public async Task PinApp(ApplicationInfo app)
+    #endregion
+
+    #region Methods
+
+    private async void LoadApps()
     {
         try
         {
-            if (app == null || DeviceManager.ActiveDevice == null) return;
+            IsLoading = true;
 
-            await RemoteAppsRepository.PinApp(app.PackageName, DeviceManager.ActiveDevice.Id);
-            OnPropertyChanged(nameof(HasPinnedApps));
+            var activeDevice = DeviceManager.ActiveDevice;
+            if (activeDevice == null) return;
+
+            await RemoteAppsRepository.LoadApplicationsFromDevice(activeDevice.Id);
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+            {
+                PinnedApps.Clear();
+                foreach (var app in Apps.Where(a => a.DeviceInfo.Pinned))
+                {
+                    PinnedApps.Add(app);
+                }
+                OnPropertyChanged(nameof(HasPinnedApps));
+            });
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error pinning app: {AppPackage}", app?.PackageName);
+            Logger.LogError(ex, "Error loading apps");
+        }
+        finally
+        {
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+            {
+                IsLoading = false;
+            });
         }
     }
 
-    [RelayCommand]
-    public async Task UnpinApp(ApplicationInfo app)
+    private void OnApplicationListUpdated(object? sender, string deviceId)
     {
-        try
+        App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {
-            if (app == null || DeviceManager.ActiveDevice == null) return;
-
-            await RemoteAppsRepository.UnpinApp(app.PackageName, DeviceManager.ActiveDevice.Id);
+            IsLoading = false;
+            OnPropertyChanged(nameof(IsEmpty));
             OnPropertyChanged(nameof(HasPinnedApps));
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error unpinning app: {AppPackage}", app?.PackageName);
-        }
+        });
     }
 
     public async Task OpenApp(string appPackage, string appName)
     {
-        await App.MainWindow!.DispatcherQueue.EnqueueAsync(async () =>
+        await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
         {
             try
             {
@@ -152,7 +160,7 @@ public sealed partial class AppsViewModel : BaseViewModel
                 {
                     Apps[index].IsLoading = true;
                     Logger.LogDebug("Opening app: {AppPackage} on device: {DeviceId}", appPackage, activeDevice.Id);
-                    
+
                     // Use the icon path directly for saving
                     var filePath = app.IconPath;
                     var started = await ScreenMirrorService.StartScrcpy(device: activeDevice, customArgs: $"--start-app={appPackage} --window-title=\"{appName}\"", iconPath: filePath);
@@ -173,13 +181,17 @@ public sealed partial class AppsViewModel : BaseViewModel
         });
     }
 
-    [RelayCommand]
-    public void RefreshApps()
+    #endregion
+
+    public AppsViewModel()
     {
-        if (DeviceManager.ActiveDevice == null) return;
+        LoadApps();
         
-        IsLoading = true;
-        var message = new CommandMessage { CommandType = CommandType.RequestAppList };
-        SessionManager.SendMessage(DeviceManager.ActiveDevice!.Session!, SocketMessageSerializer.Serialize(message));
+        RemoteAppsRepository.ApplicationListUpdated += OnApplicationListUpdated;
+        ((INotifyPropertyChanged)DeviceManager).PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(IDeviceManager.ActiveDevice))
+                LoadApps();
+        };
     }
 }

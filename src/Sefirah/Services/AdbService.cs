@@ -166,7 +166,7 @@ public class AdbService(
                     AndroidId = "" // Will be populated when device comes online
                 };
 
-                await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+                await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
                 {
                     AdbDevices.Add(adbDevice);
                 });
@@ -176,7 +176,7 @@ public class AdbService(
             // Refresh the full device information
             var connectedDevice = await GetFullDeviceInfoAsync(e.Device);
             
-            await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
             {
                 AdbDevices.Add(connectedDevice);
             });
@@ -194,7 +194,7 @@ public class AdbService(
         var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == e.Device.Serial);
         if (existingDevice != null)
         {
-            await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
             {
                 var index = AdbDevices.IndexOf(existingDevice);
                 if (index != -1)
@@ -215,7 +215,7 @@ public class AdbService(
         {
             var deviceInfo = await GetFullDeviceInfoAsync(e.Device);
                 
-            await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
             {
                 if (existingDevice != null)
                 {
@@ -242,7 +242,7 @@ public class AdbService(
             // Device is going offline/authorizing - just update the state if it exists
             if (existingDevice != null)
             {
-                await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+                await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
                 {
                     var index = AdbDevices.IndexOf(existingDevice);
                     if (index != -1)
@@ -261,14 +261,14 @@ public class AdbService(
         if (devices.Any())
         {
             logger.LogWarning("No devices found");
-            await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
             {
                 AdbDevices.Clear();
             });
             return;
         }
 
-        await App.MainWindow!.DispatcherQueue.EnqueueAsync(async() =>
+        await App.MainWindow.DispatcherQueue.EnqueueAsync(async() =>
         {
             var adbDevices = new List<AdbDevice>();
             foreach (var device in devices)

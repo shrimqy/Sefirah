@@ -7,7 +7,7 @@ public sealed partial class WelcomePage : Page
 {
     public WelcomePage()
     {
-        this.InitializeComponent();
+        InitializeComponent();
     }
 
     private async void OnGitHubButton_Click(object sender, RoutedEventArgs e)

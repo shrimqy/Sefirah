@@ -591,7 +591,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     private async Task ShowErrorDialog(string title, string content)
     {
-        await App.MainWindow!.DispatcherQueue.EnqueueAsync(async () =>
+        await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
         {
             var dialog = new ContentDialog
             {
@@ -646,27 +646,17 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         LoadApps(device.Id);
     }
 
-    public async void LoadApps(string id)
+    public void LoadApps(string id)
     {
-        var remoteAppEntity = RemoteAppsRepository.GetApplicationsFromDevice(id).ToObservableCollection();
-        foreach (var entity in remoteAppEntity)
-        {
-            var app = entity.ToApplicationInfo();
-            app.UpdateNotificationFilter(id);
-            RemoteApps.Add(app);
-        }
+        RemoteApps = RemoteAppsRepository.GetApplicationsForDevice(id);
     }
 
     public void ChangeNotificationFilter(string notificationFilter, string appPackage)
     {
         var filterKey = ApplicationInfo.NotificationFilterTypes.First(f => f.Value == notificationFilter).Key;
         RemoteAppsRepository.UpdateAppNotificationFilter(device!.Id, appPackage, filterKey);
-        var existingItem = RemoteApps.First(p => p.PackageName == appPackage);
-        existingItem.CurrentNotificationFilter = notificationFilter;
-    }
-
-
-    public DeviceSettingsViewModel()
-    {
+        var app = RemoteApps.First(p => p.PackageName == appPackage);
+        app.DeviceInfo.Filter = filterKey;
+        app.SelectedNotificationFilter = notificationFilter;
     }
 }

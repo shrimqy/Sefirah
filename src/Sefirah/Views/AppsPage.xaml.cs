@@ -8,7 +8,7 @@ public sealed partial class AppsPage : Page
     public AppsViewModel ViewModel { get; }
     public AppsPage()
     {
-        this.InitializeComponent();
+        InitializeComponent();
         ViewModel = Ioc.Default.GetRequiredService<AppsViewModel>();
     }
 
@@ -34,7 +34,7 @@ public sealed partial class AppsPage : Page
             {
                 // Filter apps based on the query
                 var suggestions = ViewModel.Apps
-                    .Where(app => app.AppName.ToLower().Contains(query))
+                    .Where(app => app.AppName.Contains(query, StringComparison.OrdinalIgnoreCase))
                     .ToList();
 
                 sender.ItemsSource = suggestions;

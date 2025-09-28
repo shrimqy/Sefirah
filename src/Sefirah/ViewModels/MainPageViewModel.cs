@@ -2,30 +2,31 @@ using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
-using Sefirah.Dialogs;
 using Sefirah.Utils.Serialization;
 
 namespace Sefirah.ViewModels;
 public sealed partial class MainPageViewModel : BaseViewModel
 {
-    public IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
+    #region Services
+    private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
     private IScreenMirrorService ScreenMirrorService { get; } = Ioc.Default.GetRequiredService<IScreenMirrorService>();
     private INotificationService NotificationService { get; } = Ioc.Default.GetRequiredService<INotificationService>();
     private RemoteAppRepository RemoteAppsRepository { get; } = Ioc.Default.GetRequiredService<RemoteAppRepository>();
     private ISessionManager SessionManager { get; } = Ioc.Default.GetRequiredService<ISessionManager>();
     private IUpdateService UpdateService { get; } = Ioc.Default.GetRequiredService<IUpdateService>();
     private IFileTransferService FileTransferService { get; } = Ioc.Default.GetRequiredService<IFileTransferService>();
+    #endregion
 
-    private ObservableCollection<PairedDevice> PairedDevices => DeviceManager.PairedDevices;
-
+    #region Properties
+    public ObservableCollection<PairedDevice> PairedDevices => DeviceManager.PairedDevices;
     public ReadOnlyObservableCollection<Notification> Notifications => NotificationService.NotificationHistory;
-
     public PairedDevice? Device => DeviceManager.ActiveDevice;
 
     [ObservableProperty]
     public partial bool LoadingScrcpy { get; set; } = false;
 
     public bool IsUpdateAvailable => UpdateService.IsUpdateAvailable;
+    #endregion
 
     #region Commands
 
@@ -45,6 +46,7 @@ public sealed partial class MainPageViewModel : BaseViewModel
         }
     }
 
+    [RelayCommand]
     public async Task StartScrcpy()
     {
         try
@@ -60,7 +62,7 @@ public sealed partial class MainPageViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    public void SwitchToNextDevice(bool scrollDown)
+    public void SwitchToNextDevice(int delta)
     {
         if (PairedDevices.Count <= 1)
             return;
@@ -79,7 +81,7 @@ public sealed partial class MainPageViewModel : BaseViewModel
             return;
 
         int nextIndex;
-        if (scrollDown)
+        if (delta < 0)
         {
             // Move to next device (or loop back to first)
             nextIndex = (currentIndex + 1) % PairedDevices.Count;
@@ -110,9 +112,15 @@ public sealed partial class MainPageViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    public void RemoveNotification(string notificationKey)
+    public void Update()
     {
-        NotificationService.RemoveNotification(Device!, notificationKey, false);
+        UpdateService.DownloadUpdatesAsync();
+    }
+
+    [RelayCommand]
+    public void RemoveNotification(Notification notification)
+    {
+        NotificationService.RemoveNotification(Device!, notification);
     }
 
     [RelayCommand]
@@ -121,30 +129,52 @@ public sealed partial class MainPageViewModel : BaseViewModel
         NotificationService.ProcessClickAction(Device!, action.NotificationKey, action.ActionIndex);
     }
 
-    public void HandleNotificationReply(Notification message, string replyText)
+    #endregion
+
+    #region Methods
+
+    public async Task OpenApp(Notification notification)
     {
-        NotificationService.ProcessReplyAction(Device!, message.Key, message.ReplyResultKey!, replyText);
+        var notificationToInvoke = new NotificationMessage
+        {
+            NotificationType = NotificationType.Invoke,
+            NotificationKey = notification.Key,
+        };
+        string? appIcon = string.Empty;
+        if (!string.IsNullOrEmpty(notification.AppPackage))
+        {
+            appIcon = RemoteAppsRepository.GetAppIcon(notification.AppPackage);
+        }
+        var started = await ScreenMirrorService.StartScrcpy(Device!, $"--new-display --start-app={notification.AppPackage}", appIcon);
+
+        // Scrcpy doesn't have a way of opening notifications afaik, so we will just have the notification listener on Android to open it for us
+        // Plus we have to wait (2s will do ig?) until the app is actually launched to send the intent for launching the notification since Google added a lot more restrictions in this particular case
+        if (started && Device!.Session != null)
+        {
+            await Task.Delay(2000);
+            SessionManager.SendMessage(Device.Session, SocketMessageSerializer.Serialize(notificationToInvoke));
+        }
     }
 
-    public void PinNotification(string notificationKey)
+    public void UpdateNotificationFilter(string appPackage)
     {
-        NotificationService.TogglePinNotification(notificationKey);
+        RemoteAppsRepository.UpdateAppNotificationFilter(Device!.Id, appPackage, NotificationFilter.Disabled);
     }
 
-    public async void UpdateNotificationFilter(string appPackage)
+    public void ToggleNotificationPin(Notification notification)
     {
-        await RemoteAppsRepository.AddOrUpdateAppNotificationFilter(deviceId: Device!.Id, appPackage: appPackage, filter: NotificationFilter.Disabled);
-    }
-
-    public void UpdateApp()
-    {
-        UpdateService.DownloadUpdatesAsync();
+        NotificationService.TogglePinNotification(notification);
     }
 
     public void SendFiles(IReadOnlyList<IStorageItem> storageItems)
-        {
+    {
         FileTransferService.SendFiles(storageItems);
-        }
+    }
+
+    public void HandleNotificationReply(Notification notification, string replyText)
+    {
+        NotificationService.ProcessReplyAction(Device!, notification.Key, notification.ReplyResultKey!, replyText);
+    }
 
     #endregion
 

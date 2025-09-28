@@ -68,7 +68,7 @@
                                         <TextBlock FontSize="16" Text="{x:Bind AppName}" />
                                     </StackPanel>
                                 </wuc:SettingsCard.Header>
-                                <Button Content="{x:Bind CurrentNotificationFilter, Mode=OneWay}">
+                                <Button Content="{x:Bind SelectedNotificationFilter, Mode=OneWay}">
                                     <Button.Flyout>
                                         <MenuFlyout>
                                             <MenuFlyoutItem

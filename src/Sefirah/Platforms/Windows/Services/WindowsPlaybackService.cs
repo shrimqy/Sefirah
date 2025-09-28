@@ -354,6 +354,8 @@ public class WindowsPlaybackService(
             var timelineProperties = session.GetTimelineProperties();
             var playbackInfo = session.GetPlaybackInfo();
 
+            if (playbackInfo == null) return null;
+
             lastTimelinePosition[session.SourceAppUserModelId] = timelineProperties.Position.TotalMilliseconds;
 
             var playbackSession = new PlaybackSession

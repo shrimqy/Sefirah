@@ -34,9 +34,10 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
         context.Database.InsertOrReplace(device);
     }
 
-    public RemoteDeviceEntity? GetPairedDevice(string deviceId)
+    public bool HasDevice(string deviceId, out RemoteDeviceEntity device)
     {
-        return context.Database.Table<RemoteDeviceEntity>().FirstOrDefault(d => d.DeviceId == deviceId);
+        device = context.Database.Find<RemoteDeviceEntity>(deviceId);
+        return device != null;
     }
 
     public async Task<PairedDevice?> GetLastConnectedDevice()
@@ -71,10 +72,18 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
         }
     }
 
-
     public void DeletePairedDevice(string deviceId)
     {
-        context.Database.Delete(context.Database.Table<RemoteDeviceEntity>().FirstOrDefault(d => d.DeviceId == deviceId));
+        var device = context.Database.Find<RemoteDeviceEntity>(deviceId);
+        if (device != null)
+        {
+            context.Database.Delete(device);
+        }
+    }
+
+    public List<string> GetRemoteDeviceIpAddresses()
+    {
+        return context.Database.Table<RemoteDeviceEntity>().SelectMany(d => d.IpAddresses).ToList();
     }
 }
  

@@ -8,10 +8,13 @@ using Sefirah.Helpers;
 namespace Sefirah.ViewModels.Settings;
 public sealed partial class GeneralViewModel : BaseViewModel
 {
+    #region Services
     private readonly IUserSettingsService UserSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
     private readonly IDeviceManager _deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
     private readonly IAdbService AdbService = Ioc.Default.GetRequiredService<IAdbService>();
+    #endregion
 
+    #region Properties
     // Theme settings
     public Theme CurrentTheme
     {
@@ -154,7 +157,8 @@ public sealed partial class GeneralViewModel : BaseViewModel
             }
         }
     }
-
+    #endregion
+    
     public GeneralViewModel()
     {
         selectedThemeType = ThemeTypes[CurrentTheme];

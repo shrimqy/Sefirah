@@ -111,7 +111,7 @@ public partial class PairedDevice : ObservableObject
         try
         {
             // Use UI thread if available
-            await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
             {
                 ConnectedAdbDevices.Clear();
 
