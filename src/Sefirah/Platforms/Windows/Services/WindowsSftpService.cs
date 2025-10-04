@@ -24,10 +24,7 @@ public class WindowsSftpService(
     {
         try
         {
-            if (!StorageProviderSyncRootManager.IsSupported())
-            {
-                return;
-            }
+            if (!StorageProviderSyncRootManager.IsSupported()) return;
 
             // Retrieve and parse the OS version from the device family version string.
             string deviceFamilyVersion = AnalyticsInfo.VersionInfo.DeviceFamilyVersion;
@@ -49,7 +46,7 @@ public class WindowsSftpService(
                 return;
             }
 
-            logger.LogInformation("Initializing SFTP service, IP: {0}, Port: {1}, Password: {2}, Username: {3}",
+            logger.LogInformation("Initializing SFTP service, IP: {ip}, Port: {port}, Password: {pass}, Username: {name}",
                 info.IpAddress, info.Port, info.Password, info.Username);
 
             var sftpContext = new SftpContext
@@ -62,23 +59,18 @@ public class WindowsSftpService(
                 WatchPeriodSeconds = 2,
             };
 
+            // Parent directory for all devices
             var directory = userSettingsService.GeneralSettingsService.RemoteStoragePath;
-            
-            // Ensure the parent directory exists
             if (!Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
-                logger.LogInformation("Created main remote storage directory: {0}", directory);
             }
 
+            // Device-specific directory
             var deviceDirectory = Path.Combine(directory, device.Name);
-            logger.LogInformation("RemoteDirectory: {0}", deviceDirectory);
-            
-            // Ensure the device directory exists
             if (!Directory.Exists(deviceDirectory))
             {
                 Directory.CreateDirectory(deviceDirectory);
-                logger.LogInformation("Created device directory: {0}", deviceDirectory);
             }
             
             await Register(
@@ -138,7 +130,7 @@ public class WindowsSftpService(
         }
         catch (Exception ex) 
         {
-            logger.LogError(ex, $"Failed to register sync root. Directory: {directory}, AccountId: {accountId}");
+            logger.LogError(ex, "Failed to register sync root. Directory: {directory}, AccountId: {accountId}", directory, accountId);
         }
     }
 }

@@ -15,19 +15,11 @@ public partial class PairedDevice : ObservableObject
     public List<PhoneNumber>? PhoneNumbers { get; set; } = [];
     public ImageSource? Wallpaper { get; set; }
 
-    public string ConnectionButtonText => ConnectionStatus ? "Connected/Text".GetLocalizedResource() : "Disconnected/Text".GetLocalizedResource();
-
     private bool connectionStatus;
     public bool ConnectionStatus 
     {
         get => connectionStatus;
-        set
-        {
-            if (SetProperty(ref connectionStatus, value))
-            {
-                OnPropertyChanged(nameof(ConnectionButtonText));
-            }
-        }
+        set => SetProperty(ref connectionStatus, value);
     }
 
     private DeviceStatus? _status;
@@ -44,13 +36,7 @@ public partial class PairedDevice : ObservableObject
     public ServerSession? Session
     {
         get => _session;
-        set
-        {
-            if (SetProperty(ref _session, value))
-            {
-                OnPropertyChanged(nameof(ConnectionButtonText));
-            }
-        }
+        set => SetProperty(ref _session, value);
     }
 
     private readonly IAdbService adbService;

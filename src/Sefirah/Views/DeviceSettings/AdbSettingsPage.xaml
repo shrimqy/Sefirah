@@ -14,10 +14,6 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
-        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
-        <converters:CountToVisibilityConverter x:Key="InverseCountToVisibilityConverter" Inverse="True" />
     </Page.Resources>
 
     <ScrollViewer>

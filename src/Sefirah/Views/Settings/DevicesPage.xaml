@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Sefirah.UserControls"
     xmlns:converters="using:Sefirah.Converters"
+    xmlns:wctconverters="using:CommunityToolkit.WinUI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dbModel="using:Sefirah.Data.AppDatabase.Models"
     xmlns:helpers="using:Sefirah.Helpers"
@@ -16,15 +17,15 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-        <converters:StringNullOrEmptyToBooleanConverter x:Key="StringNullOrEmptyToBooleanConverter" />
-        <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
-        <converters:StringEqualsConverter x:Key="StringEqualsConverter" />
-        <converters:CountToVisibilityConverter x:Key="InverseCountToVisibilityConverter" Inverse="True" />
-        <converters:NullToOpacityConverter x:Key="NullToOpacityConverter" />
-        <converters:NullBooleanConverter x:Key="NullBooleanConverter" />
+        <wctconverters:BoolToObjectConverter x:Key="BoolToConnectionButtonTextConverter"
+            FalseValue="{helpers:ResourceString Name=Disconnected/Text}"
+            TrueValue="{helpers:ResourceString Name=Connected/Text}" />
+
+        <converters:EmptyCollectionToVisibilityConverter x:Key="EmptyCollectionToVisibilityConverter" Inverse="True" />
+        <wctconverters:EmptyObjectToObjectConverter x:Key="EmptyObjectToOpacityConverter" EmptyValue="1.0" NotEmptyValue="0.0" />
+        <converters:EmptyObjectToBooleanConverter x:Key="EmptyObjectToFalseBooleanConverter" Inverse="True" />
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" Inverse="True" />
     </Page.Resources>
 
     <Page.DataContext>
@@ -39,7 +40,7 @@
                 FontSize="24"
                 FontWeight="SemiBold"
                 Text="{helpers:ResourceString Name=PairedDevices/Title}"
-                Visibility="{x:Bind ViewModel.PairedDevices.Count, Mode=OneWay, Converter={StaticResource InverseCountToVisibilityConverter}}" />
+                Visibility="{x:Bind ViewModel.PairedDevices, Mode=OneWay, Converter={StaticResource EmptyCollectionToVisibilityConverter}}" />
 
             <ItemsRepeater ItemsSource="{x:Bind ViewModel.PairedDevices, Mode=OneWay}">
                 <ItemsRepeater.Layout>
@@ -69,21 +70,21 @@
                                             StrokeThickness="1" />
                                         <Border Margin="3" CornerRadius="4">
                                             <Border.Background>
-                                                <LinearGradientBrush Opacity="{x:Bind Wallpaper, Converter={StaticResource NullToOpacityConverter}, Mode=OneWay}" StartPoint="0,0" EndPoint="0,1">
+                                                <LinearGradientBrush Opacity="{x:Bind Wallpaper, Converter={StaticResource EmptyObjectToOpacityConverter}, Mode=OneWay}" StartPoint="0,0" EndPoint="0,1">
                                                     <GradientStop Offset="0" Color="#FF0070FF" />
                                                     <GradientStop Offset="1" Color="#FF2E90FF" />
                                                 </LinearGradientBrush>
                                             </Border.Background>
                                             <Image
                                                 x:Name="WallpaperImage"
-                                                x:Load="{x:Bind Wallpaper, Converter={StaticResource NullBooleanConverter}, Mode=OneWay}"
+                                                x:Load="{x:Bind Wallpaper, Converter={StaticResource EmptyObjectToFalseBooleanConverter}, Mode=OneWay}"
                                                 Source="{x:Bind Wallpaper, Mode=OneWay}"
                                                 Stretch="UniformToFill" />
                                         </Border>
                                     </Grid>
                                     <StackPanel Margin="15,0,0,0" VerticalAlignment="Center">
                                         <TextBlock Text="{x:Bind Name, Mode=OneWay}" />
-                                        <TextBlock Text="{x:Bind ConnectionButtonText, Mode=OneWay}" />
+                                        <TextBlock Text="{x:Bind ConnectionStatus, Converter={StaticResource BoolToConnectionButtonTextConverter}, Mode=OneWay}" />
                                     </StackPanel>
 
                                 </StackPanel>

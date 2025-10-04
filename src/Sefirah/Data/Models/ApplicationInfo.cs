@@ -41,15 +41,6 @@ public partial class ApplicationInfo(string packageName, string appName, string?
     }
 
     #region Helpers
-    public string IsPinned(bool isText)
-    {
-        if (isText)
-        {
-            return DeviceInfo.Pinned ?  "Unpin".GetLocalizedResource() : "Pin".GetLocalizedResource();
-        }
-        return DeviceInfo.Pinned ? "\uE77A" : "\uE141";
-    }
-
     private string? selectedNotificationFilter;
     public string SelectedNotificationFilter
     {

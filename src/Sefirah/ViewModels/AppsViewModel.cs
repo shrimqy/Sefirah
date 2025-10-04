@@ -79,8 +79,10 @@ public sealed partial class AppsViewModel : BaseViewModel
 
             await AdbService.UninstallApp(DeviceManager.ActiveDevice!.Id, app.PackageName);
             Apps.Remove(app);
+            PinnedApps.Remove(app);
             await RemoteAppsRepository.RemoveDeviceFromApplication(app.PackageName, DeviceManager.ActiveDevice!.Id);
             OnPropertyChanged(nameof(IsEmpty));
+            OnPropertyChanged(nameof(HasPinnedApps));
         }
         catch (Exception ex)
         {

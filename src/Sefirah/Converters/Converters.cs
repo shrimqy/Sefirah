@@ -115,7 +115,94 @@ internal abstract class ToObjectConverter<T> : ValueConverter<T?, object?>
     }
 }
 
-public class DateTimeConverter : IValueConverter
+internal sealed partial class EmptyObjectToBooleanConverter : ValueConverter<object?, bool>
+{
+    public bool Inverse { get; set; }
+
+    protected override bool Convert(object? value, object? parameter, string? language)
+    {
+        return Inverse ? value is not null : value is null;
+    }
+
+    protected override object? ConvertBack(bool value, object? parameter, string? language)
+    {
+        return null;
+    }
+}
+
+internal sealed partial class EmptyCollectionToBooleanConverter : IValueConverter
+{
+    public bool Inverse { get; set; }
+
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (value is int count && count == 0)
+        {
+            return !Inverse;
+        }
+        return Inverse;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+internal sealed partial class EmptyObjectToVisibilityConverter : IValueConverter
+{
+    public bool Inverse { get; set; }
+
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (Inverse)
+            return value == null ? Visibility.Visible : Visibility.Collapsed;
+        else
+            return value == null ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+internal sealed partial class BooleanToVisibilityConverter : ValueConverter<bool, Visibility>
+{
+    public bool Inverse { get; set; }
+
+    protected override Visibility Convert(bool value, object? parameter, string? language)
+    {
+        return Inverse ? !value ? Visibility.Visible : Visibility.Collapsed : value ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    protected override bool ConvertBack(Visibility value, object? parameter, string? language)
+    {
+        throw new NotSupportedException();
+    }
+}
+
+internal sealed partial class EmptyCollectionToVisibilityConverter : ValueConverter<IEnumerable, Visibility>
+{
+    public bool Inverse { get; set; }
+
+    protected override Visibility Convert(IEnumerable? value, object? parameter, string? language)
+    {
+        bool isEmpty = value == null || !value.GetEnumerator().MoveNext();
+
+        if (Inverse)
+            return isEmpty ? Visibility.Visible : Visibility.Collapsed;
+        else
+            return isEmpty ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    protected override IEnumerable? ConvertBack(Visibility value, object? parameter, string? language)
+    {
+        throw new NotSupportedException();
+    }
+}
+
+internal sealed partial class DateTimeConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
@@ -142,7 +229,7 @@ public class DateTimeConverter : IValueConverter
     }
 }
 
-public class DateTimeDevicesConverter : IValueConverter
+internal sealed partial class DateTimeDevicesConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
@@ -170,7 +257,7 @@ public class DateTimeDevicesConverter : IValueConverter
     }
 }
 
-public class BatteryStatusToIconConverter : IValueConverter
+internal sealed partial class BatteryStatusToIconConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
@@ -222,51 +309,20 @@ public class BatteryStatusToIconConverter : IValueConverter
     }
 }
 
-internal sealed class StringNullOrWhiteSpaceToTrueConverter : ValueConverter<string, bool>
-{
-    /// <summary>
-    /// Determines whether an inverse conversion should take place.
-    /// </summary>
-    /// <remarks>If set, the value True results in <see cref="Visibility.Collapsed"/>, and false in <see cref="Visibility.Visible"/>.</remarks>
-    public bool Inverse { get; set; }
-
-    /// <summary>
-    /// Converts a source value to the target type.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="parameter"></param>
-    /// <param name="language"></param>
-    /// <returns></returns>
-    protected override bool Convert(string? value, object? parameter, string? language)
-    {
-        return Inverse ? !string.IsNullOrWhiteSpace(value) : string.IsNullOrWhiteSpace(value);
-    }
-
-    /// <summary>
-    /// Converts a target value back to the source type.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="parameter"></param>
-    /// <param name="language"></param>
-    /// <returns></returns>
-    protected override string ConvertBack(bool value, object? parameter, string? language)
-    {
-        return string.Empty;
-    }
-}
-
-public class StringEqualsConverter : IValueConverter
+/// <summary>
+/// Converter for handling string equality to visibility
+/// </summary>
+internal sealed partial class StringEqualsConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        if (value == null || parameter == null)
+        if (value is string givenString && parameter is string targetString)
         {
-            return Visibility.Collapsed;
+            return givenString.Equals(targetString, StringComparison.OrdinalIgnoreCase)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
         }
-
-        return value.ToString().Equals(parameter.ToString(), StringComparison.OrdinalIgnoreCase)
-            ? Visibility.Visible
-            : Visibility.Collapsed;
+        return Visibility.Collapsed;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)
@@ -275,158 +331,7 @@ public class StringEqualsConverter : IValueConverter
     }
 }
 
-
-internal sealed class NullToTrueConverter : ValueConverter<object?, bool>
-{
-    /// <summary>
-    /// Determines whether an inverse conversion should take place.
-    /// </summary>
-    /// <remarks>If set, the value True results in <see cref="Visibility.Collapsed"/>, and false in <see cref="Visibility.Visible"/>.</remarks>
-    public bool Inverse { get; set; }
-
-    /// <summary>
-    /// Converts a source value to the target type.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="parameter"></param>
-    /// <param name="language"></param>
-    /// <returns></returns>
-    protected override bool Convert(object? value, object? parameter, string? language)
-    {
-        return Inverse ? value is not null : value is null;
-    }
-
-    /// <summary>
-    /// Converts a target value back to the source type.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="parameter"></param>
-    /// <param name="language"></param>
-    /// <returns></returns>
-    protected override object? ConvertBack(bool value, object? parameter, string? language)
-    {
-        return null;
-    }
-}
-
-public class NullToVisibilityConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, string language)
-    {
-        return value == null ? Visibility.Collapsed : Visibility.Visible;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-public class CountToVisibilityConverter : IValueConverter
-{
-    public bool Inverse { get; set; }
-
-    public object Convert(object value, Type targetType, object parameter, string language)
-    {
-        if (value is int count && count == 0)
-        {
-            return Inverse ? Visibility.Collapsed : Visibility.Visible;
-        }
-        return Inverse ? Visibility.Visible : Visibility.Collapsed;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-public class InverseNullToVisibilityConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, string language)
-    {
-        return value == null ? Visibility.Visible : Visibility.Collapsed;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-public class NullBooleanConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, string language)
-    {
-        // Return true if the value is not null, false if it is null
-        return value != null;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-public class InverseNullToBooleanConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, string language)
-    {
-        return value == null;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-public class NullToOpacityConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, string language)
-    {
-        return value == null ? 1.0 : 0.0;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-
-public class BooleanToOpacityConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, string language)
-    {
-        if (value is bool isPinned)
-        {
-            return isPinned ? 100 : 0;
-        }
-        return 0;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-
-public class PinIconConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, string language)
-    {
-        return value is bool isPinned ? isPinned ? "\uE77A" : "\uE718" : "\uE718";
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-public class RingerModeToIconConverter : IValueConverter
+internal sealed partial class RingerModeToIconConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
@@ -450,7 +355,7 @@ public class RingerModeToIconConverter : IValueConverter
     }
 }
 
-public class MessageTypeToAlignmentConverter : IValueConverter
+internal sealed partial class MessageTypeToAlignmentConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
@@ -465,7 +370,7 @@ public class MessageTypeToAlignmentConverter : IValueConverter
     }
 }
 
-public class MessageTypeToVisibilityConverter : IValueConverter
+internal sealed partial class MessageTypeToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
@@ -479,7 +384,7 @@ public class MessageTypeToVisibilityConverter : IValueConverter
     }
 }
 
-public class InverseMessageTypeToVisibilityConverter : IValueConverter
+internal sealed partial class InverseMessageTypeToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
@@ -493,7 +398,7 @@ public class InverseMessageTypeToVisibilityConverter : IValueConverter
     }
 }
 
-public class UnixTimestampConverter : IValueConverter
+internal sealed partial class UnixTimestampConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
@@ -570,13 +475,13 @@ public class UnixTimestampConverter : IValueConverter
     }
 }
 
-public class IndexConverter : IValueConverter
+internal sealed partial class IndexConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
         if (value is int intValue)
         {
-            // Convert from 1-based SIM ID to 0-based index
+            // Convert from 1-based to 0-based index
             return intValue - 1;
         }
         return 0;
@@ -586,14 +491,13 @@ public class IndexConverter : IValueConverter
     {
         if (value is int intValue)
         {
-            // Convert from index to subscription ID
             return intValue + 1;
         }
         return 1;
     }
 }
 
-public class GreaterThanOneToBooleanConverter : IValueConverter
+internal sealed partial class GreaterThanOneToBooleanConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
@@ -606,7 +510,7 @@ public class GreaterThanOneToBooleanConverter : IValueConverter
     }
 }
 
-public class SubscriptionToIconConverter : IValueConverter
+internal sealed partial class SubscriptionToIconConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
@@ -620,23 +524,6 @@ public class SubscriptionToIconConverter : IValueConverter
             };
         }
         return "\uE884";
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-public class PinConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, string language)
-    {
-        if (value is bool isPinned && isPinned)
-        {
-            return "Unpin".GetLocalizedResource();
-        }
-        return "Pin".GetLocalizedResource();
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)

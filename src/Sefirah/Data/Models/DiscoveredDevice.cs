@@ -1,3 +1,5 @@
+using Sefirah.Data.Enums;
+
 namespace Sefirah.Data.Models;
 
 public class DiscoveredDevice(
@@ -30,8 +32,3 @@ public class DiscoveredDevice(
     }
 }
 
-public enum DeviceOrigin
-{
-    MdnsService,
-    UdpBroadcast
-}

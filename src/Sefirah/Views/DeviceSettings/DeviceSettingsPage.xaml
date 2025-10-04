@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Sefirah.UserControls"
     xmlns:converters="using:Sefirah.Converters"
+    xmlns:wctconverters="using:CommunityToolkit.WinUI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="using:Sefirah.Helpers"
     xmlns:local="using:Sefirah.Views.DevicePreferences"
@@ -13,12 +14,8 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <converters:NullToOpacityConverter x:Key="NullToOpacityConverter" />
-        <converters:NullBooleanConverter x:Key="NullBooleanConverter" />
-        <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
-        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
-        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
+        <wctconverters:EmptyObjectToObjectConverter x:Key="EmptyObjectToOpacityConverter" EmptyValue="1.0" NotEmptyValue="0.0" />
+        <converters:EmptyObjectToVisibilityConverter x:Key="EmptyObjectToVisibilityConverter" />
     </Page.Resources>
 
     <ScrollViewer>
@@ -62,7 +59,7 @@
                                 StrokeThickness="1" />
                             <Border Margin="3" CornerRadius="6">
                                 <Border.Background>
-                                    <LinearGradientBrush Opacity="{x:Bind ViewModel.Device.Wallpaper, Converter={StaticResource NullToOpacityConverter}, Mode=OneWay}" StartPoint="0,0" EndPoint="0,1">
+                                    <LinearGradientBrush Opacity="{x:Bind ViewModel.Device.Wallpaper, Converter={StaticResource EmptyObjectToOpacityConverter}, Mode=OneWay}" StartPoint="0,0" EndPoint="0,1">
                                         <GradientStop Offset="0" Color="#FF0070FF" />
                                         <GradientStop Offset="1" Color="#FF2E90FF" />
                                     </LinearGradientBrush>
@@ -71,7 +68,7 @@
                                     x:Name="WallpaperImage"
                                     Source="{x:Bind ViewModel.Device.Wallpaper, Mode=OneWay}"
                                     Stretch="UniformToFill"
-                                    Visibility="{x:Bind ViewModel.Device.Wallpaper, Converter={StaticResource NullToVisibilityConverter}, Mode=OneWay}" />
+                                    Visibility="{x:Bind ViewModel.Device.Wallpaper, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}" />
                             </Border>
                         </Grid>
 

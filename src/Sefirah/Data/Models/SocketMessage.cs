@@ -134,19 +134,13 @@ public class NotificationAction : SocketMessage
     public bool IsReplyAction { get; set; }
 }
 
-public class GroupedNotificationTextMessage
-{
-    public string Sender { get; set; }
-    public List<string> Messages { get; set; }
-}
-
 public class NotificationTextMessage
 {
     [JsonPropertyName("sender")]
-    public string Sender { get; set; }
+    public required string Sender { get; set; }
 
     [JsonPropertyName("text")]
-    public string Text { get; set; }
+    public required string Text { get; set; }
 }
 
 public class DeviceInfo : SocketMessage

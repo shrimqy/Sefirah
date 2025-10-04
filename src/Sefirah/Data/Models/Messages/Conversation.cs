@@ -37,25 +37,7 @@ public partial class Conversation : ObservableObject
     #region Helpers
     public async Task UpdateFromTextConversationAsync(TextConversation textConversation, SmsRepository repository, string deviceId)
     {
-        if (textConversation.ThreadId != ThreadId)
-        {
-            throw new ArgumentException($"Thread ID mismatch: {textConversation.ThreadId} vs {ThreadId}");
-        }
-
-        if(textConversation.Recipients.Count > 0)
-        {
-            // Look up contact information for each recipient
-            var updatedContacts = new List<Contact>();
-            foreach (var recipient in textConversation.Recipients)
-            {
-                var contactEntity = await repository.GetContactAsync(deviceId, recipient);
-                var contact = contactEntity != null ? await contactEntity.ToContact() : new Contact(recipient, recipient);
-                updatedContacts.Add(contact);
-            }
-            
-            Contacts = updatedContacts;
-            OnPropertyChanged(nameof(DisplayName));
-        }
+        await UpdateContactsFromRecipientsAsync(textConversation.Recipients, repository, deviceId);
 
         var existingMessageIds = new HashSet<long>(Messages.Select(m => m.UniqueId));
         var incomingMessageIds = new HashSet<long>(textConversation.Messages.Select(m => m.UniqueId));
@@ -67,57 +49,48 @@ public partial class Conversation : ObservableObject
             Messages.Remove(message);
         }
 
-        // Only add messages that don't already exist in our collection
-        var newMessages = new List<Message>();
-        foreach (var tm in textConversation.Messages.Where(message => !existingMessageIds.Contains(message.UniqueId)))
-        {
-            var contactAddress = tm.Addresses[0];
-            var contactEntity = await repository.GetContactAsync(deviceId, contactAddress);
-            var contact = contactEntity != null ? await contactEntity.ToContact() : new Contact(contactAddress, contactAddress);
-
-            var message = new Message
-            {
-                UniqueId = tm.UniqueId,
-                ThreadId = tm.ThreadId,
-                Body = tm.Body,
-                Timestamp = tm.Timestamp,
-                MessageType = tm.MessageType,
-                Read = tm.Read,
-                SubscriptionId = tm.SubscriptionId,
-                Attachments = tm.Attachments,
-                Contact = contact,
-                IsTextMessage = tm.IsTextMessage
-            };
-
-            newMessages.Add(message);
-        }
-
-        foreach (var message in newMessages)
-        {
-            int insertIndex = 0;
-
-            while (insertIndex < Messages.Count &&
-                   Messages[insertIndex].Timestamp < message.Timestamp)
-            {
-                insertIndex++;
-            }
-
-            Messages.Insert(insertIndex, message);
-        }
+        var newMessages = await CreateMessagesFromTextConversationAsync(textConversation, repository, deviceId, existingMessageIds);
+        InsertMessagesInChronologicalOrder(newMessages);
     }
 
     public async Task NewMessageFromConversationAsync(TextConversation textConversation, SmsRepository repository, string deviceId)
     {
-        // Track existing message IDs
         var existingMessageIds = new HashSet<long>(Messages.Select(m => m.UniqueId));
+        var newMessages = await CreateMessagesFromTextConversationAsync(textConversation, repository, deviceId, existingMessageIds);
+        
+        await UpdateContactsFromRecipientsAsync(textConversation.Recipients, repository, deviceId);
+        InsertMessagesInChronologicalOrder(newMessages);
+    }
 
-        // Only add messages that don't already exist in our collection
-        var newMessages = new List<Message>();
+    private async Task UpdateContactsFromRecipientsAsync(List<string> recipients, SmsRepository repository, string deviceId)
+    {
+        if (recipients.Count == 0) return;
+
+        List<Contact> updatedContacts = [];
+        foreach (var recipient in recipients)
+        {
+            var contact = await GetOrCreateContactAsync(recipient, repository, deviceId);
+            updatedContacts.Add(contact);
+        }
+        
+        Contacts = updatedContacts;
+        OnPropertyChanged(nameof(DisplayName));
+    }
+
+    private static async Task<Contact> GetOrCreateContactAsync(string address, SmsRepository repository, string deviceId)
+    {
+        var contactEntity = await repository.GetContactAsync(deviceId, address);
+        return contactEntity != null ? await contactEntity.ToContact() : new Contact(address, address);
+    }
+
+    private static async Task<List<Message>> CreateMessagesFromTextConversationAsync(TextConversation textConversation, SmsRepository repository, string deviceId, HashSet<long> existingMessageIds)
+    {
+        List<Message> newMessages = [];
+        
         foreach (var tm in textConversation.Messages.Where(message => !existingMessageIds.Contains(message.UniqueId)))
         {
             var contactAddress = tm.Addresses[0];
-            var contactEntity = await repository.GetContactAsync(deviceId, contactAddress);
-            var contact = contactEntity != null ? await contactEntity.ToContact() : new Contact(contactAddress, contactAddress);
+            var contact = await GetOrCreateContactAsync(contactAddress, repository, deviceId);
 
             var message = new Message
             {
@@ -136,22 +109,12 @@ public partial class Conversation : ObservableObject
             newMessages.Add(message);
         }
 
-        if (textConversation.Recipients.Count > 0)
-        {
-            // Look up contact information for each recipient
-            var updatedContacts = new List<Contact>();
-            foreach (var recipient in textConversation.Recipients)
-            {
-                var contactEntity = await repository.GetContactAsync(deviceId, recipient);
-                var contact = contactEntity != null ? await contactEntity.ToContact() : new Contact(recipient, recipient);
-                updatedContacts.Add(contact);
-            }
-            
-            Contacts = updatedContacts;
-            OnPropertyChanged(nameof(DisplayName));
-        }
-        
-        foreach (var message in newMessages)
+        return newMessages;
+    }
+
+    private void InsertMessagesInChronologicalOrder(List<Message> messages)
+    {
+        foreach (var message in messages)
         {
             int insertIndex = 0;
 

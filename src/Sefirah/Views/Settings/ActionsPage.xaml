@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:contracts="using:Sefirah.Data.Contracts"
     xmlns:converters="using:Sefirah.Converters"
+    xmlns:wctconverters="using:CommunityToolkit.WinUI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="using:Sefirah.Helpers"
     xmlns:items="using:Sefirah.Data.Items"
@@ -17,9 +18,8 @@
 
     <Page.Resources>
         <x:Double x:Key="BreadcrumbBarChevronFontSize">17</x:Double>
-        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
-        <converters:CountToVisibilityConverter x:Key="InverseCountToVisibilityConverter" Inverse="True" />
-        <converters:StringNullOrEmptyToBooleanConverter x:Key="StringNullOrEmptyToBooleanConverter" />
+        <converters:EmptyCollectionToVisibilityConverter x:Key="EmptyCollectionToVisibilityConverter" />
+        <converters:EmptyCollectionToVisibilityConverter x:Key="InverseEmptyCollectionToVisibilityConverter" Inverse="True" />
     </Page.Resources>
 
     <Page.DataContext>
@@ -97,7 +97,7 @@
                 Margin="0,32"
                 HorizontalAlignment="Center"
                 Spacing="8"
-                Visibility="{x:Bind ViewModel.Actions.Count, Mode=OneWay, Converter={StaticResource CountToVisibilityConverter}}">
+                Visibility="{x:Bind ViewModel.Actions, Mode=OneWay, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
                 <FontIcon
                     FontSize="32"
                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"

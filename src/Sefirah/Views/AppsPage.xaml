@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="using:Sefirah.Converters"
+    xmlns:wctconverters="using:CommunityToolkit.WinUI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="using:Sefirah.Helpers"
     xmlns:local="using:Sefirah.Views"
@@ -14,13 +15,10 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-        <converters:StringNullOrEmptyToBooleanConverter x:Key="StringNullOrEmptyToBooleanConverter" />
-        <converters:NullBooleanConverter x:Key="NullBooleanConverter" />
+        <wctconverters:BoolToObjectConverter x:Key="BoolToPinGlyphConverter" FalseValue="&#xE718;" TrueValue="&#xE77A;" />
+        <wctconverters:BoolToObjectConverter x:Key="BoolToPinTextConverter" FalseValue="{helpers:ResourceString Name=Pin}" TrueValue="{helpers:ResourceString Name=Unpin}" />
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
-        <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
-        <converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" Inverse="True" />
         
         <DataTemplate x:Key="AppItemTemplate" x:DataType="models:ApplicationInfo">
             <Grid
@@ -38,9 +36,9 @@
                         <MenuFlyoutItem
                             Command="{Binding ElementName=AppPageRoot, Path=ViewModel.PinAppCommand}"
                             CommandParameter="{x:Bind}"
-                            Text="{x:Bind IsPinned(x:True)}">
+                            Text="{x:Bind DeviceInfo.Pinned, Mode=OneWay, Converter={StaticResource BoolToPinTextConverter}}">
                             <MenuFlyoutItem.Icon>
-                                <FontIcon Glyph="{x:Bind IsPinned(x:False)}" />
+                                <FontIcon Glyph="{x:Bind DeviceInfo.Pinned, Mode=OneWay, Converter={StaticResource BoolToPinGlyphConverter}}" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
                         <MenuFlyoutItem

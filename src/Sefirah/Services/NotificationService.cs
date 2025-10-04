@@ -90,9 +90,9 @@ public class NotificationService(
                         {
                             // Update existing notification
                             var index = notifications.IndexOf(existingNotification);
-                            if (existingNotification.IsPinned)
+                            if (existingNotification.Pinned)
                             {
-                                notification.IsPinned = true;
+                                notification.Pinned = true;
                             }
                             notifications[index] = notification;
                         }
@@ -130,7 +130,7 @@ public class NotificationService(
             {
                 if (!deviceNotifications.TryGetValue(device.Id, out var notifications)) return;
                 var notification = notifications.FirstOrDefault(n => n.Key == message.NotificationKey);
-                if (notification != null && !notification.IsPinned)
+                if (notification != null && !notification.Pinned)
                 {
                     await dispatcher.EnqueueAsync(() => notifications.Remove(notification));
                     // Update active notifications if this is for the active device
@@ -153,7 +153,7 @@ public class NotificationService(
         {
             if (!deviceNotifications.TryGetValue(device.Id, out var notifications)) return;
                 
-            if (!notification.IsPinned)
+            if (!notification.Pinned)
             {
                 dispatcher.EnqueueAsync(() => notifications.Remove(notification));
                 logger.LogDebug("Removed notification with key: {NotificationKey} from device {DeviceId}", notification, device.Id);
@@ -193,7 +193,7 @@ public class NotificationService(
             
             if (notification != null)
             {
-                notification.IsPinned = !notification.IsPinned;
+                notification.Pinned = !notification.Pinned;
                 // Update existing notification
                 var index = notifications.IndexOf(notification);
                 notifications[index] = notification;
@@ -249,7 +249,7 @@ public class NotificationService(
         {
             if (!deviceNotifications.TryGetValue(deviceId, out var notifications)) return;
 
-            var sorted = notifications.OrderByDescending(n => n.IsPinned)
+            var sorted = notifications.OrderByDescending(n => n.Pinned)
                 .ThenByDescending(n => n.TimeStamp)
                 .ToList();
 

@@ -149,7 +149,6 @@ public class WindowsPlaybackService(
 
     private void SessionsChanged(GlobalSystemMediaTransportControlsSessionManager manager, SessionsChangedEventArgs args)
     {
-        logger.LogWarning("Sessions changed");
         UpdateSessionsList(manager.GetSessions());
     }
 
@@ -222,33 +221,16 @@ public class WindowsPlaybackService(
     {
         try
         {
-            if (!activeSessions.ContainsKey(sender.SourceAppUserModelId))
-            {
-                logger.LogInformation("Ignoring timeline properties change for removed session: {SourceAppUserModelId}", sender.SourceAppUserModelId);
-                return;
-            }
-
+            if (!activeSessions.ContainsKey(sender.SourceAppUserModelId)) return;
             var timelineProperties = sender.GetTimelineProperties();
             var isCurrentSession = manager?.GetCurrentSession()?.SourceAppUserModelId == sender.SourceAppUserModelId;
 
-            if (timelineProperties == null)
-            {
-                logger.LogDebug("Null timeline properties for {SourceAppUserModelId}", sender.SourceAppUserModelId);
-                return;
-            }
-
-            if (!isCurrentSession)
-            {
-                return;
-            }
+            if (timelineProperties == null || !isCurrentSession) return;
 
             if (lastTimelinePosition.TryGetValue(sender.SourceAppUserModelId, out var lastPosition))
             {
                 double currentPosition = timelineProperties.Position.TotalMilliseconds;
-                if (Math.Abs(currentPosition - lastPosition) < 1000)
-                {
-                    return;
-                }
+                if (Math.Abs(currentPosition - lastPosition) < 1000) return; // Ignore minor changes under 1 second
 
                 lastTimelinePosition[sender.SourceAppUserModelId] = currentPosition;
 
@@ -260,10 +242,6 @@ public class WindowsPlaybackService(
                 };
                 SendPlaybackData(message);
             }
-        }
-        catch (COMException ex)
-        {
-            logger.LogError(ex, "COM Exception in timeline properties for {SourceAppUserModelId}", sender.SourceAppUserModelId);
         }
         catch (Exception ex)
         {
@@ -283,7 +261,6 @@ public class WindowsPlaybackService(
             SessionType = SessionType.RemovedSession,
             Source = session.SourceAppUserModelId
         };
-        logger.LogDebug("Removing session {SourceAppUserModelId}", session.SourceAppUserModelId);
         SendPlaybackData(message);
     }
 
@@ -305,7 +282,6 @@ public class WindowsPlaybackService(
     {
         try
         {
-            logger.LogDebug("Playback info changed for {SourceAppUserModelId}", sender.SourceAppUserModelId);
             var playbackInfo = sender.GetPlaybackInfo();
             var message = new PlaybackSession
             {
@@ -444,21 +420,11 @@ public class WindowsPlaybackService(
         try
         {
             var endpoint = enumerator.GetDevice(deviceId);
-            if (endpoint == null)
-            {
-                logger.LogWarning("Endpoint not found: {DeviceId}", deviceId);
-                return;
-            }
-            // Check if device is active
-            if (endpoint.State != DeviceState.Active)
-            {
-                logger.LogWarning("Device {DeviceId} is not in active state: {State}", deviceId, endpoint.State);
-                return;
-            }
+            if (endpoint == null || endpoint.State != DeviceState.Active) return;
+
             try
             {
                 endpoint.AudioEndpointVolume.Mute = !endpoint.AudioEndpointVolume.Mute;
-                logger.LogInformation("Device {DeviceId} muted: {Mute}", deviceId, endpoint.AudioEndpointVolume.Mute);
             }
             catch (COMException comEx) when (comEx.HResult == unchecked((int)0x8007001F))
             {
@@ -476,23 +442,11 @@ public class WindowsPlaybackService(
         try
         {
             var endpoint = enumerator.GetDevice(deviceId);
-            if (endpoint == null)
-            {
-                logger.LogWarning("Endpoint not found: {DeviceId}", deviceId);
-                return;
-            }
-
-            // Check if device is active
-            if (endpoint.State != DeviceState.Active)
-            {
-                logger.LogWarning("Device {DeviceId} is not in active state: {State}", deviceId, endpoint.State);
-                return;
-            }
+            if (endpoint == null || endpoint.State != DeviceState.Active) return;
 
             try
             {
                 endpoint.AudioEndpointVolume.MasterVolumeLevelScalar = volume;
-                logger.LogInformation("Volume set to {Volume} for device {DeviceId}", volume, deviceId);
             }
             catch (COMException comEx) when (comEx.HResult == unchecked((int)0x8007001F))
             {
@@ -508,36 +462,24 @@ public class WindowsPlaybackService(
 
     public void SetDefaultAudioDevice(string deviceId)
     {
-
         object? policyConfigObject = null;
-
         try
         {
             Type? policyConfigType = Type.GetTypeFromCLSID(new Guid("870af99c-171d-4f9e-af0d-e63df40c2bc9"));
-            if (policyConfigType == null)
-            {
-                logger.LogDebug("Failed to get PolicyConfig type");
-                return;
-            }
+            if (policyConfigType == null) return; 
 
             policyConfigObject = Activator.CreateInstance(policyConfigType);
-            if (policyConfigObject == null)
-            {
-                return;
-            }
+            if (policyConfigObject == null) return;
 
-            if (policyConfigObject is not IPolicyConfig policyConfig)
-            {
-                return;
-            }
+            if (policyConfigObject is not IPolicyConfig policyConfig) return;
 
             int result1 = policyConfig.SetDefaultEndpoint(deviceId, ERole.eMultimedia);
             int result2 = policyConfig.SetDefaultEndpoint(deviceId, ERole.eCommunications);
             int result3 = policyConfig.SetDefaultEndpoint(deviceId, ERole.eConsole);
 
-            if (result1 != (int)HResult.S_OK || result2 != (int)HResult.S_OK || result3 != (int)HResult.S_OK)
+            if (result1 != HResult.S_OK || result2 != HResult.S_OK || result3 != HResult.S_OK)
             {
-                logger.LogDebug("SetDefaultEndpoint returned error codes: {Result1}, {Result2}, {Result3}", result1, result2, result3);
+                logger.LogError("SetDefaultEndpoint returned error codes: {Result1}, {Result2}, {Result3}", result1, result2, result3);
                 return;
             }
 
@@ -548,9 +490,6 @@ public class WindowsPlaybackService(
                 AudioDevices.First().IsSelected = false;
                 AudioDevices[index].IsSelected = true;
             }
-
-            logger.LogInformation("Successfully set default device");
-            return;
         }
         catch (Exception ex)
         {
