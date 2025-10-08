@@ -704,6 +704,6 @@ input text %pwd%</value>
     <value>Zu sendende Dateien ablegen</value>
   </data>
   <data name="Save" xml:space="preserve">
-    <value>Save</value>
+    <value>Speichern</value>
   </data>
 </root>
