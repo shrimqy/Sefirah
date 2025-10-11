@@ -33,25 +33,13 @@ public partial class ApplicationInfoEntity
 
     internal static async Task<ApplicationInfoEntity> FromApplicationInfoMessage(ApplicationInfoMessage info, string deviceId)
     {
-        string? appIconPath = null;
-        if (!string.IsNullOrEmpty(info.AppIcon))
-        {
-            try
-            {
-                var iconBytes = Convert.FromBase64String(info.AppIcon);
-                var fileName = $"{info.PackageName}.png";
-                appIconPath = await ImageUtils.SaveAppIconToPathAsync(iconBytes, fileName);
-            }
-            catch (Exception) { }
-        }
-
         List<AppDeviceInfo> appDeviceInfoList = [new(deviceId, NotificationFilter.ToastFeed)];
 
         return new ApplicationInfoEntity
         {
             PackageName = info.PackageName,
             AppName = info.AppName,
-            AppIconPath = appIconPath,
+            AppIconPath = await IconUtils.SaveAppIconToPathAsync(info.AppIcon, info.PackageName),
             AppDeviceInfoJson = JsonSerializer.Serialize(appDeviceInfoList)
         };
     }

@@ -36,7 +36,7 @@ public class NotificationService(
         
         ((INotifyPropertyChanged)deviceManager).PropertyChanged += (s, e) =>
         {
-            if (e.PropertyName == nameof(IDeviceManager.ActiveDevice))
+            if (e.PropertyName is nameof(IDeviceManager.ActiveDevice) && deviceManager.ActiveDevice is not null)
                 UpdateActiveNotifications(deviceManager.ActiveDevice);
         };
     }
@@ -69,7 +69,7 @@ public class NotificationService(
         
         try
         { 
-            if (message.Title != null && message.AppPackage != null)
+            if (message.Title is not null && message.AppPackage is not null)
             {
                 var filter = remoteAppsRepository.GetAppNotificationFilterAsync(message.AppPackage, device.Id)
                 ?? await remoteAppsRepository.AddOrUpdateApplicationForDevice(device.Id, message.AppPackage, message.AppName!, message.AppIcon);
@@ -86,7 +86,7 @@ public class NotificationService(
                         // Check for existing notification in this device's collection
                         var existingNotification = notifications.FirstOrDefault(n => n.Key == notification.Key);
 
-                        if (existingNotification != null)
+                        if (existingNotification is not null)
                         {
                             // Update existing notification
                             var index = notifications.IndexOf(existingNotification);
@@ -107,8 +107,8 @@ public class NotificationService(
 #endif
                         await platformNotificationHandler.ShowRemoteNotification(message, device.Id);
                     }
-                    else if ((message.NotificationType == NotificationType.Active || message.NotificationType == NotificationType.New)
-                        && (filter == NotificationFilter.Feed || filter == NotificationFilter.ToastFeed))
+                    else if ((message.NotificationType is NotificationType.Active || message.NotificationType is NotificationType.New)
+                        && (filter is NotificationFilter.Feed || filter is NotificationFilter.ToastFeed))
                     {
                         notifications.Add(notification);
                     }
@@ -130,7 +130,7 @@ public class NotificationService(
             {
                 if (!deviceNotifications.TryGetValue(device.Id, out var notifications)) return;
                 var notification = notifications.FirstOrDefault(n => n.Key == message.NotificationKey);
-                if (notification != null && !notification.Pinned)
+                if (notification is not null && !notification.Pinned)
                 {
                     await dispatcher.EnqueueAsync(() => notifications.Remove(notification));
                     // Update active notifications if this is for the active device
@@ -170,10 +170,9 @@ public class NotificationService(
                     NotificationType = NotificationType.Removed
                 };
                 string jsonMessage = SocketMessageSerializer.Serialize(notificationToRemove);
-                if (device.Session != null)
+                if (device.Session is not null)
                 {
                     sessionManager.SendMessage(device.Session, jsonMessage);
-                    logger.LogDebug("Sent notification removal message to remote device {DeviceId}", device.Id);
                 }
             }
         }
@@ -191,8 +190,6 @@ public class NotificationService(
         {
             if (!deviceNotifications.TryGetValue(activeDevice.Id, out var notifications)) return;
             
-            if (notification != null)
-            {
                 notification.Pinned = !notification.Pinned;
                 // Update existing notification
                 var index = notifications.IndexOf(notification);
@@ -201,7 +198,6 @@ public class NotificationService(
                 
                 // Update active notifications since this is for the active device
                 UpdateActiveNotifications(activeDevice);
-            }
         });
     }
 
@@ -211,7 +207,7 @@ public class NotificationService(
         try
         {
             ClearHistory(activeDevice);
-            if (activeDevice.Session == null) return;
+            if (activeDevice.Session is null) return;
 
             var command = new CommandMessage { CommandType = CommandType.ClearNotifications };
             string jsonMessage = SocketMessageSerializer.Serialize(command);
@@ -273,7 +269,7 @@ public class NotificationService(
             ReplyText = replyText,
         };
 
-        if (device.Session == null) return;
+        if (device.Session is null) return;
 
         sessionManager.SendMessage(device.Session, SocketMessageSerializer.Serialize(replyAction));
         logger.LogDebug("Sent reply action for notification {NotificationKey} to device {DeviceId}", notificationKey, device.Id);
@@ -288,19 +284,19 @@ public class NotificationService(
             IsReplyAction = false
         };
 
-        if (device.Session == null) return;
+        if (device.Session is null) return;
 
         sessionManager.SendMessage(device.Session, SocketMessageSerializer.Serialize(notificationAction));
         logger.LogDebug("Sent click action for notification {NotificationKey} to device {DeviceId}", notificationKey, device.Id);
     }
 
-    private void UpdateActiveNotifications(PairedDevice? activeDevice)
+    private void UpdateActiveNotifications(PairedDevice activeDevice)
     {
         dispatcher.EnqueueAsync(() =>
         {
             activeNotifications.Clear();
 
-            if (activeDevice != null && deviceNotifications.TryGetValue(activeDevice.Id, out var deviceNotifs))
+            if (deviceNotifications.TryGetValue(activeDevice.Id, out var deviceNotifs))
             {
                 activeNotifications.AddRange(deviceNotifs);
 

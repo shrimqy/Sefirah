@@ -29,13 +29,8 @@ public sealed partial class TrayIconControl : UserControl
     [RelayCommand]
     public void ShowHideWindow()
     {
+#if WINDOWS
         var window = App.MainWindow;
-
-        // Ensure window and AppWindow are not null
-        if (window == null || window.AppWindow == null)
-        {
-            return;
-        }
         if (window.Visible)
         {
             window.AppWindow.Hide();
@@ -43,10 +38,9 @@ public sealed partial class TrayIconControl : UserControl
         else
         {
             window.AppWindow.Show();
-#if WINDOWS
             InteropHelpers.SetForegroundWindow(App.WindowHandle);
-#endif
         }
+#endif
     }
 
     [RelayCommand]

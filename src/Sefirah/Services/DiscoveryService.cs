@@ -62,7 +62,7 @@ public class DiscoveryService(
                 var broadcastAddress = network.BroadcastAddress;
 
                 // Fallback to gateway if broadcast is limited
-                return broadcastAddress.Equals(IPAddress.Broadcast) && ipInfo.Gateway != null
+                return broadcastAddress.Equals(IPAddress.Broadcast) && ipInfo.Gateway is not null
                     ? new IPEndPoint(ipInfo.Gateway, DiscoveryPort)
                     : new IPEndPoint(broadcastAddress, DiscoveryPort);
 
@@ -109,7 +109,7 @@ public class DiscoveryService(
 
     private async void BroadcastDeviceInfoAsync(UdpBroadcast udpBroadcast)
     {
-        while (udpClient != null)
+        while (udpClient is not null)
         {
             udpBroadcast.TimeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
             string jsonMessage = SocketMessageSerializer.Serialize(udpBroadcast);
@@ -155,7 +155,7 @@ public class DiscoveryService(
             lock (collectionLock)
             {
                 var existing = DiscoveredDevices.FirstOrDefault(d => d.DeviceId == device.DeviceId);
-                if (existing != null)
+                if (existing is not null)
                 {
                     DiscoveredDevices[DiscoveredDevices.IndexOf(existing)] = device;
                 }
@@ -185,7 +185,7 @@ public class DiscoveryService(
                         .Where(d => d.Origin == DeviceOrigin.MdnsService)
                         .FirstOrDefault(d => d.DeviceId == deviceId);
 
-                    if (deviceToRemove != null)
+                    if (deviceToRemove is not null)
                     {
                         DiscoveredDevices.Remove(deviceToRemove);
                     }
@@ -213,7 +213,7 @@ public class DiscoveryService(
 
             IPEndPoint? deviceEndpoint = broadcast.IpAddresses.Select(ip => new IPEndPoint(IPAddress.Parse(ip), DiscoveryPort)).FirstOrDefault();
 
-            if (deviceEndpoint != null && !broadcastEndpoints.Contains(deviceEndpoint))
+            if (deviceEndpoint is not null && !broadcastEndpoints.Contains(deviceEndpoint))
             {
                 broadcastEndpoints.Add(deviceEndpoint);
             }
@@ -235,7 +235,7 @@ public class DiscoveryService(
                 lock (collectionLock)
                 {
                     var existingDevice = DiscoveredDevices.FirstOrDefault(d => d.DeviceId == device.DeviceId);
-                    if (existingDevice != null)
+                    if (existingDevice is not null)
                     {
                         var index = DiscoveredDevices.IndexOf(existingDevice);
                         DiscoveredDevices[index] = device;
@@ -262,7 +262,7 @@ public class DiscoveryService(
     {
         lock (_timerLock)
         {
-            if (_cleanupTimer != null) return;
+            if (_cleanupTimer is not null) return;
 
             _cleanupTimer = dispatcher.CreateTimer();
             _cleanupTimer.Interval = TimeSpan.FromSeconds(3);

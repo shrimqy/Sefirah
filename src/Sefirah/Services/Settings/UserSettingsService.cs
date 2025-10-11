@@ -42,8 +42,8 @@ internal sealed class UserSettingsService : BaseJsonSettings, IUserSettingsServi
         return deviceSettings;
     }
 
-    private TSettingsService GetSettingsService<TSettingsService>(ref TSettingsService settingsServiceMember)
-    where TSettingsService : class, IBaseSettingsService
+    private static TSettingsService GetSettingsService<TSettingsService>(ref TSettingsService settingsServiceMember)
+        where TSettingsService : class, IBaseSettingsService
     {
         settingsServiceMember ??= Ioc.Default.GetService<TSettingsService>()!;
 

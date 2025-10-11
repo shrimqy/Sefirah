@@ -51,7 +51,7 @@ public class ScreenMirrorService(
                     };
 
                     var dialogResult = await dialog.ShowAsync();
-                    if (dialogResult == ContentDialogResult.Primary)
+                    if (dialogResult is ContentDialogResult.Primary)
                     {
                         scrcpyPath = await SelectScrcpyLocationClick();
                         return !string.IsNullOrEmpty(scrcpyPath) && File.Exists(scrcpyPath);
@@ -111,7 +111,7 @@ public class ScreenMirrorService(
                     .Where(c => !string.IsNullOrEmpty(c))
                     .ToList();
                 var adbDevice = pairedDevices.FirstOrDefault(d => d.Serial == selectedDeviceSerial);
-                if (adbDevice == null || !adbDevice.DeviceData.HasValue) return false;
+                if (adbDevice is null || !adbDevice.DeviceData.HasValue) return false;
 
                 if (commands?.Count > 0 && await adbService.IsLocked(adbDevice.DeviceData.Value))
                 {
@@ -130,10 +130,10 @@ public class ScreenMirrorService(
                         }
                         
                         // If no cached password or caching is disabled, ask user for password
-                        if (password == null)
+                        if (password is null)
                         {
                             password = await ShowPasswordInputDialog();
-                            if (password == null) return false;
+                            if (password is null) return false;
                             
                             // Only cache the password if timeout is greater than 0
                             if (timeoutSeconds > 0)
@@ -146,10 +146,7 @@ public class ScreenMirrorService(
                         commands = commands.Select(c => c.Replace("%pwd%", password)).ToList();
                     }
                     
-                    if (adbDevice != null && adbDevice.DeviceData.HasValue)
-                    {
-                        adbService.UnlockDevice(adbDevice.DeviceData.Value, commands);
-                    }
+                    adbService.UnlockDevice(adbDevice.DeviceData.Value, commands);
                 }
             }
             else if(deviceSettings.AdbTcpipModeEnabled && device.Session != null)
@@ -323,7 +320,7 @@ public class ScreenMirrorService(
                         };
                         
                         var result = await errorDialog.ShowAsync();
-                        if (result == ContentDialogResult.Secondary)
+                        if (result is ContentDialogResult.Secondary)
                         {
                             var dataPackage = new DataPackage();
                             dataPackage.SetText(errorMessage);
@@ -391,7 +388,7 @@ public class ScreenMirrorService(
 
             var result = await dialog.ShowAsync();
 
-            if (result == ContentDialogResult.Primary && deviceSelector.SelectedItem is ComboBoxItem selected)
+            if (result is ContentDialogResult.Primary && deviceSelector.SelectedItem is ComboBoxItem selected)
             {
                 selectedDeviceSerial = selected.Tag as string;
             }

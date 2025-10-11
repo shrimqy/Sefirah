@@ -26,7 +26,7 @@ public abstract class BaseActionService(
 
     private void OnConnectionStatusChanged(object? sender, (PairedDevice Device, bool IsConnected) args)
     {
-        if (args.IsConnected && args.Device.Session != null)
+        if (args.IsConnected && args.Device.Session is not null)
         {
             var actions = generalSettingsService.Actions;
             foreach (var action in actions)

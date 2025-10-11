@@ -80,7 +80,7 @@ public partial class Conversation : ObservableObject
     private static async Task<Contact> GetOrCreateContactAsync(string address, SmsRepository repository, string deviceId)
     {
         var contactEntity = await repository.GetContactAsync(deviceId, address);
-        return contactEntity != null ? await contactEntity.ToContact() : new Contact(address, address);
+        return contactEntity is not null ? await contactEntity.ToContact() : new Contact(address, address);
     }
 
     private static async Task<List<Message>> CreateMessagesFromTextConversationAsync(TextConversation textConversation, SmsRepository repository, string deviceId, HashSet<long> existingMessageIds)
@@ -130,7 +130,7 @@ public partial class Conversation : ObservableObject
 
     private void Messages_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
+        if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems is not null)
         {
             foreach (Message message in e.NewItems)
             {

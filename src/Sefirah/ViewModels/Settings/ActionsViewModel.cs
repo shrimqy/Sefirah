@@ -2,7 +2,6 @@ using System.Collections.Specialized;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models.Actions;
 using Sefirah.Dialogs;
-using Sefirah.Services;
 
 namespace Sefirah.ViewModels.Settings;
 
@@ -62,7 +61,7 @@ public sealed partial class ActionsViewModel : BaseViewModel
             XamlRoot = App.MainWindow.Content!.XamlRoot
         };
 
-        if (await dialog.ShowAsync() == ContentDialogResult.Primary && dialog.Result is not null)
+        if (await dialog.ShowAsync() is ContentDialogResult.Primary && dialog.Result is not null)
         {
             isBulkOperation = true;
             Actions.Add(dialog.Result);
@@ -100,7 +99,7 @@ public sealed partial class ActionsViewModel : BaseViewModel
             XamlRoot = App.MainWindow.Content!.XamlRoot
         };
 
-        if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+        if (await dialog.ShowAsync() is ContentDialogResult.Primary)
         {
             isBulkOperation = true;
             Actions.Remove(action);

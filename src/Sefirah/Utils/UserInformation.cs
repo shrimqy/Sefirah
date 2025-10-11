@@ -17,13 +17,13 @@ public static class UserInformation
             string? avatarBase64 = null;
             
             // Windows-specific code
-            var users = await global::Windows.System.User.FindAllAsync();
+            var users = await Windows.System.User.FindAllAsync();
             if (!users.Any())
             {
                 return (GetFallbackUserName(), null);
             }
             var currentUser = users[0];
-            if (currentUser == null)
+            if (currentUser is null)
             {
                 return (GetFallbackUserName(), null);
             }
@@ -31,11 +31,11 @@ public static class UserInformation
             // Try to get the avatar
             try
             {
-                var picture = await currentUser.GetPictureAsync(global::Windows.System.UserPictureSize.Size1080x1080);
-                if (picture != null)
+                var picture = await currentUser.GetPictureAsync(Windows.System.UserPictureSize.Size1080x1080);
+                if (picture is not null)
                 {
                     using var stream = await picture.OpenReadAsync();
-                    using var reader = new global::Windows.Storage.Streams.DataReader(stream);
+                    using var reader = new Windows.Storage.Streams.DataReader(stream);
 
                     await reader.LoadAsync((uint)stream.Size);
                     byte[] buffer = new byte[stream.Size];
@@ -89,7 +89,7 @@ public static class UserInformation
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error getting user info: {ex}");
+            Debug.WriteLine($"Error getting user info: {ex}");
             return (GetFallbackUserName(), null);
         }
 #else

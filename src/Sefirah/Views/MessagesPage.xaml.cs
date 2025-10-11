@@ -22,7 +22,7 @@ public sealed partial class MessagesPage : Page
 
         Loaded += (s, e) => {
             ViewModel.PropertyChanged += (sender, args) => {
-                if (args.PropertyName == nameof(ViewModel.SelectedConversation))
+                if (args.PropertyName is nameof(ViewModel.SelectedConversation))
                 {
                     DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () => {
                         UpdateAvatarColors();
@@ -32,7 +32,7 @@ public sealed partial class MessagesPage : Page
         };
         
         ViewModel.PropertyChanged += (sender, args) => {
-            if (args.PropertyName == nameof(ViewModel.Conversations))
+            if (args.PropertyName is nameof(ViewModel.Conversations))
             {
                 DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () => {
                     UpdateConversationListColors();
@@ -43,8 +43,7 @@ public sealed partial class MessagesPage : Page
 
     private void UpdateAvatarColors()
     {
-        if (ViewModel.SelectedConversation == null || AvatarGlyphBorder == null || AvatarGlyphIcon == null)
-            return;
+        if (ViewModel.SelectedConversation is null) return;
 
         var conversationId = ViewModel.SelectedConversation.ThreadId;
         var backgroundColor = GetOrCreateConversationColor(conversationId);
@@ -54,7 +53,7 @@ public sealed partial class MessagesPage : Page
 
     private void UpdateConversationListColors()
     {
-        if (ViewModel.Conversations == null) return;
+        if (ViewModel.Conversations is null) return;
 
         foreach (var conversation in ViewModel.Conversations)
         {
@@ -159,7 +158,7 @@ public sealed partial class MessagesPage : Page
             border.Background = new SolidColorBrush(backgroundColor);
             
             // Set initials for text content if it's a TextBlock
-            if (border.Child is TextBlock textBlock && messageGroup.Sender.DisplayName != null)
+            if (border.Child is TextBlock textBlock && messageGroup.Sender.DisplayName is not null)
             {
                 textBlock.Text = GetInitials(messageGroup.Sender.DisplayName);
             }
@@ -177,7 +176,7 @@ public sealed partial class MessagesPage : Page
 
     private void MessageTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key == Windows.System.VirtualKey.Enter)
+        if (e.Key is Windows.System.VirtualKey.Enter)
         {
             var shiftPressed = Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Shift).HasFlag(Windows.UI.Core.CoreVirtualKeyStates.Down);
             
@@ -207,7 +206,7 @@ public sealed partial class MessagesPage : Page
 
     private void SearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
-        if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+        if (args.Reason is AutoSuggestionBoxTextChangeReason.UserInput)
         {
             ViewModel.SearchConversationsCommand.Execute(sender.Text);
         }
@@ -232,7 +231,7 @@ public sealed partial class MessagesPage : Page
 
     private void AddressInput_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
     {
-        if (args.SelectedItem != null && args.SelectedItem is Contact contact)
+        if (args.SelectedItem is not null && args.SelectedItem is Contact contact)
         {
             ViewModel.AddAddress(contact);
             sender.Text = string.Empty;
@@ -249,7 +248,7 @@ public sealed partial class MessagesPage : Page
 
     private void AddressInput_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
-        if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+        if (args.Reason is AutoSuggestionBoxTextChangeReason.UserInput)
         {
             ViewModel.SearchContacts(sender.Text);
         }

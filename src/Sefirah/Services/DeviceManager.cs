@@ -38,7 +38,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
         App.MainWindow?.DispatcherQueue.EnqueueAsync(() =>
         {
             var existingDevice = PairedDevices.FirstOrDefault(d => d.Id == device.Id);
-            if (existingDevice != null)
+            if (existingDevice is not null)
             {
                 existingDevice.Name = device.Name;
                 existingDevice.Model = device.Model;
@@ -91,8 +91,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
 
     public void UpdateDeviceStatus(PairedDevice device, DeviceStatus deviceStatus)
     {
-        var pairedDevice = PairedDevices.FirstOrDefault(d => d.Id == device.Id);
-        if (pairedDevice == null) return;
+        var pairedDevice = PairedDevices.First(d => d.Id == device.Id);
         App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {
             pairedDevice.Status = deviceStatus;
@@ -117,7 +116,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
                 {
                     existingDevice.WallpaperBytes = Convert.FromBase64String(device.Avatar);
                 }
-                if (ipAddress != null && existingDevice.IpAddresses.Contains(ipAddress) == false)
+                if (ipAddress is not null && !existingDevice.IpAddresses.Contains(ipAddress))
                 {
                     List<string> updatedIpAddresses =
                     [
@@ -126,7 +125,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
                     existingDevice.IpAddresses = updatedIpAddresses;
                 }
 
-                if (device.PhoneNumbers != null && existingDevice.PhoneNumbers?.Count != device.PhoneNumbers.Count)
+                if (device.PhoneNumbers is not null && existingDevice.PhoneNumbers?.Count != device.PhoneNumbers.Count)
                 {
                     existingDevice.PhoneNumbers = device.PhoneNumbers ?? [];
                 }
@@ -156,7 +155,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
 
                     var result = await dialog.ShowAsync();
 
-                    if (result != ContentDialogResult.Primary)
+                    if (result is not ContentDialogResult.Primary)
                     {
                         logger.LogInformation("User declined device verification");
                         tcs.SetResult(null);
@@ -173,7 +172,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
                         WallpaperBytes = !string.IsNullOrEmpty(device.Avatar)
                             ? Convert.FromBase64String(device.Avatar)
                             : null,
-                        IpAddresses = ipAddress != null ? [ipAddress] : [],
+                        IpAddresses = ipAddress is not null ? [ipAddress] : [],
                         PhoneNumbers = device.PhoneNumbers ?? []
                     };
 
@@ -200,7 +199,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
         try
         {
             var localDevice =  repository.GetLocalDevice();
-            if (localDevice == null)
+            if (localDevice is null)
             {
                 var (name, _) = await UserInformation.GetCurrentUserInfoAsync();
                 var keyPair = EcdhHelper.GetKeyPair();

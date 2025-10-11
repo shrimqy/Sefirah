@@ -1,7 +1,6 @@
 using System.Collections.Specialized;
 using CommunityToolkit.WinUI;
 using Sefirah.Data.Contracts;
-using Sefirah.Extensions;
 using Sefirah.Services.Socket;
 
 namespace Sefirah.Data.Models;

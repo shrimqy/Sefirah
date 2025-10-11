@@ -22,23 +22,14 @@ public sealed partial class AppsPage : Page
 
     private void AppSearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
-        if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+        if (args.Reason is AutoSuggestionBoxTextChangeReason.UserInput)
         {
-            string query = sender.Text.ToLower();
+            var suggestions = ViewModel.Apps
+                .Where(app => app.AppName.Contains(sender.Text, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
-            if (string.IsNullOrWhiteSpace(query))
-            {
-                sender.ItemsSource = null;
-            }
-            else
-            {
-                // Filter apps based on the query
-                var suggestions = ViewModel.Apps
-                    .Where(app => app.AppName.Contains(query, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-
-                sender.ItemsSource = suggestions;
-            }
+            sender.ItemsSource = suggestions;
+            
         }
     }
 

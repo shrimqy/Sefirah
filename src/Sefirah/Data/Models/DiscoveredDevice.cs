@@ -21,7 +21,7 @@ public class DiscoveredDevice(
     {
         get
         {
-            if (HashedKey == null)
+            if (HashedKey is null)
             {
                 return "000000";
             }

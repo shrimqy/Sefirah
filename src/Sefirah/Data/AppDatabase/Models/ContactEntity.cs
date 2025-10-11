@@ -24,7 +24,7 @@ public class ContactEntity
     internal async Task<Contact> ToContact()
     {
         var displayName = !string.IsNullOrEmpty(DisplayName) ? DisplayName : Number;
-        return new Contact(Number, displayName, Avatar != null ? await Avatar.ToBitmapAsync() : null);
+        return new Contact(Number, displayName, Avatar is not null ? await Avatar.ToBitmapAsync() : null);
     }
     #endregion
 }

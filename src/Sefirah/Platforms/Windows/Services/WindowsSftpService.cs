@@ -122,7 +122,7 @@ public class WindowsSftpService(
             StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(directory);
 
             info = registrar.Register(registerCommand, storageFolder, context);
-            if (info != null)
+            if (info is not null)
             {
                 syncProviderPool.Start(info);
                 logger.LogDebug("Starting sync provider pool");

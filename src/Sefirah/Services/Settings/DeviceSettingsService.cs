@@ -4,13 +4,8 @@ using Sefirah.Utils.Serialization;
 
 namespace Sefirah.Services.Settings;
 
-internal sealed class DeviceSettingsService : BaseDeviceAwareJsonSettings, IDeviceSettingsService
+internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSharingContext settingsSharingContext) : BaseDeviceAwareJsonSettings(deviceId, settingsSharingContext), IDeviceSettingsService
 {
-    public DeviceSettingsService(string deviceId, ISettingsSharingContext settingsSharingContext)
-        : base(deviceId, settingsSharingContext)
-    {
-    }
-
     public bool ClipboardSyncEnabled 
     { 
         get => Get(true);

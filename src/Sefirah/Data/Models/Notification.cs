@@ -37,9 +37,7 @@ public class Notification
         }
     }
 
-    public string? FlyoutFilterString => AppName != null 
-        ? string.Format("NotificationFilterButton".GetLocalizedResource(), AppName)
-        : null;
+    public string FlyoutFilterString => string.Format("NotificationFilterButton".GetLocalizedResource(), AppName);
 
     #region Helpers
     public static async Task<Notification> FromMessage(NotificationMessage message)

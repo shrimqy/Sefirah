@@ -7,13 +7,12 @@ namespace Sefirah.Views.DevicePreferences;
 
 public sealed partial class DeviceSettingsPage : Page
 {
-    public DeviceSettingsViewModel ViewModel { get; }
+    public DeviceSettingsViewModel? ViewModel { get; set; }
 
     public DeviceSettingsPage()
     {
         InitializeComponent();
-        ViewModel = new DeviceSettingsViewModel();
-        DataContext = ViewModel;
+        
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -22,7 +21,7 @@ public sealed partial class DeviceSettingsPage : Page
         
         if (e.Parameter is PairedDevice device)
         {
-            ViewModel.SetDevice(device);
+            ViewModel = new DeviceSettingsViewModel(device);
         }
     }
 

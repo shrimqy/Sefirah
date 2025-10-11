@@ -1,5 +1,5 @@
+using System.Runtime.InteropServices;
 using CommunityToolkit.WinUI;
-using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
@@ -10,7 +10,6 @@ using Sefirah.Data.Models;
 using Sefirah.Helpers;
 using Sefirah.Platforms.Windows.Interop;
 using Sefirah.Utils.Serialization;
-using System.Runtime.InteropServices;
 using Windows.Media;
 using Windows.Media.Control;
 
@@ -34,7 +33,7 @@ public class WindowsPlaybackService(
         try
         {
             manager = await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
-            if (manager == null)
+            if (manager is null)
             {
                 logger.LogError("Failed to initialize GlobalSystemMediaTransportControlsSessionManager");
                 return;
@@ -100,7 +99,7 @@ public class WindowsPlaybackService(
                         await session?.TrySkipPreviousAsync();
                         break;
                     case PlaybackActionType.Seek:
-                        if (mediaAction.Value != null)
+                        if (mediaAction.Value.HasValue)
                         {
                             // We need to use Ticks here
                             TimeSpan position = TimeSpan.FromMilliseconds(mediaAction.Value.Value);
@@ -111,7 +110,7 @@ public class WindowsPlaybackService(
                         await session?.TryChangeShuffleActiveAsync(true);
                         break;
                     case PlaybackActionType.Repeat:
-                        if (mediaAction.Value != null)
+                        if (mediaAction.Value.HasValue)
                         {
                             if (mediaAction.Value == 1.0)
                             {
@@ -127,7 +126,7 @@ public class WindowsPlaybackService(
                         SetDefaultAudioDevice(mediaAction.Source);
                         break;
                     case PlaybackActionType.VolumeUpdate:
-                        if (mediaAction.Value != null)
+                        if (mediaAction.Value.HasValue)
                         {
                             SetVolume(mediaAction.Source, Convert.ToSingle(mediaAction.Value.Value));
                         }
@@ -154,7 +153,7 @@ public class WindowsPlaybackService(
 
     private void UpdateActiveSessions()
     {
-        if (manager == null) return;
+        if (manager is null) return;
 
         try
         {
@@ -181,7 +180,7 @@ public class WindowsPlaybackService(
                 }
             }
 
-            foreach (var session in activeSessions.Where(s => s != null))
+            foreach (var session in activeSessions.Where(s => s is not null))
             {
                 if (!this.activeSessions.ContainsKey(session.SourceAppUserModelId))
                 {
@@ -225,7 +224,7 @@ public class WindowsPlaybackService(
             var timelineProperties = sender.GetTimelineProperties();
             var isCurrentSession = manager?.GetCurrentSession()?.SourceAppUserModelId == sender.SourceAppUserModelId;
 
-            if (timelineProperties == null || !isCurrentSession) return;
+            if (timelineProperties is null || !isCurrentSession) return;
 
             if (lastTimelinePosition.TryGetValue(sender.SourceAppUserModelId, out var lastPosition))
             {
@@ -308,11 +307,8 @@ public class WindowsPlaybackService(
             {
 
                 var playbackSession = await GetPlaybackSessionAsync(session);
+                if (playbackSession is null || !activeSessions.ContainsKey(session.SourceAppUserModelId)) return;
 
-                if (playbackSession == null || !activeSessions.ContainsKey(session.SourceAppUserModelId))
-                {
-                    return;
-                }
                 SendPlaybackData(playbackSession);
             });
         }
@@ -330,7 +326,7 @@ public class WindowsPlaybackService(
             var timelineProperties = session.GetTimelineProperties();
             var playbackInfo = session.GetPlaybackInfo();
 
-            if (playbackInfo == null) return null;
+            if (playbackInfo is null) return null;
 
             lastTimelinePosition[session.SourceAppUserModelId] = timelineProperties.Position.TotalMilliseconds;
 
@@ -347,10 +343,8 @@ public class WindowsPlaybackService(
                 MaxSeekTime = timelineProperties?.MaxSeekTime.TotalMilliseconds
             };
 
-            if (mediaProperties.Thumbnail != null)
-            {
+            if (mediaProperties.Thumbnail is not null)
                 playbackSession.Thumbnail = await mediaProperties.Thumbnail.ToBase64Async();
-            }
 
             return playbackSession;
         }
@@ -368,7 +362,7 @@ public class WindowsPlaybackService(
         {
             foreach (var device in deviceManager.PairedDevices)
             {
-                if (device.Session != null && device.DeviceSettings?.MediaSessionSyncEnabled == true)
+                if (device.Session is not null && device.DeviceSettings.MediaSessionSyncEnabled)
                 {
                     string jsonMessage = SocketMessageSerializer.Serialize(playbackSession);
                     sessionManager.SendMessage(device.Session, jsonMessage);
@@ -420,7 +414,7 @@ public class WindowsPlaybackService(
         try
         {
             var endpoint = enumerator.GetDevice(deviceId);
-            if (endpoint == null || endpoint.State != DeviceState.Active) return;
+            if (endpoint is null || endpoint.State != DeviceState.Active) return;
 
             try
             {
@@ -442,7 +436,7 @@ public class WindowsPlaybackService(
         try
         {
             var endpoint = enumerator.GetDevice(deviceId);
-            if (endpoint == null || endpoint.State != DeviceState.Active) return;
+            if (endpoint is null || endpoint.State is not DeviceState.Active) return;
 
             try
             {
@@ -466,10 +460,10 @@ public class WindowsPlaybackService(
         try
         {
             Type? policyConfigType = Type.GetTypeFromCLSID(new Guid("870af99c-171d-4f9e-af0d-e63df40c2bc9"));
-            if (policyConfigType == null) return; 
+            if (policyConfigType is null) return; 
 
             policyConfigObject = Activator.CreateInstance(policyConfigType);
-            if (policyConfigObject == null) return;
+            if (policyConfigObject is null) return;
 
             if (policyConfigObject is not IPolicyConfig policyConfig) return;
 
@@ -498,7 +492,7 @@ public class WindowsPlaybackService(
         }
         finally
         {
-            if (policyConfigObject != null)
+            if (policyConfigObject is not null)
             {
                 Marshal.ReleaseComObject(policyConfigObject);
             }

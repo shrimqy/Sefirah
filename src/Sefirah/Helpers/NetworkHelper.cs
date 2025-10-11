@@ -13,7 +13,7 @@ public static class NetworkHelper
         foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
         {
             if (ni.NetworkInterfaceType is NetworkInterfaceType.Wireless80211 or NetworkInterfaceType.Ethernet &&
-                ni.OperationalStatus == OperationalStatus.Up)
+                ni.OperationalStatus is OperationalStatus.Up)
             {
                 var gateway = ni.GetIPProperties().GatewayAddresses
                     .FirstOrDefault(g => g.Address?.AddressFamily == AddressFamily.InterNetwork)?
@@ -21,7 +21,7 @@ public static class NetworkHelper
 
                 foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
                 {
-                    if (ip.Address.AddressFamily == AddressFamily.InterNetwork && 
+                    if (ip.Address.AddressFamily is AddressFamily.InterNetwork && 
                         !IPAddress.IsLoopback(ip.Address))
                     {
                         addresses.Add(new IPAddressInfo(

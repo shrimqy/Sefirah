@@ -35,7 +35,7 @@ public class MessageEntity
     internal async Task<Message> ToMessageAsync(SmsRepository repository)
     {
         var contact = await repository.GetContactAsync(DeviceId, Address);
-        var sender = contact != null ? await contact.ToContact() : new Contact(Address, Address);
+        var sender = contact is not null ? await contact.ToContact() : new Contact(Address, Address);
 
         return new Message
         {

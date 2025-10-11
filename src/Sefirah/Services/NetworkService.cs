@@ -172,14 +172,12 @@ public class NetworkService(
                 if (string.IsNullOrEmpty(message)) continue;
         
                 var device = PairedDevices.FirstOrDefault(d => d.Session?.Id == session.Id);
-                if (device != null)
-                {
-                    ProcessMessage(device, message);
-                }
-                else
+                if (device is null)
                 {
                     await HandleVerification(session, message);
+                    return;
                 }
+                ProcessMessage(device, message);
             }
         }
         catch (Exception ex)
@@ -213,7 +211,7 @@ public class NetworkService(
 
             var device = await deviceManager.VerifyDevice(deviceInfo, connectedSessionIpAddress);
 
-            if (device != null)
+            if (device is not null)
             {
                 logger.Info($"Device {device.Id} connected");
                 
@@ -226,7 +224,7 @@ public class NetworkService(
                     deviceManager.ActiveDevice = connectedDevice;
                     device = connectedDevice;
 
-                    if (device.DeviceSettings.AdbAutoConnect && connectedSessionIpAddress != null)
+                    if (device.DeviceSettings.AdbAutoConnect && !string.IsNullOrEmpty(connectedSessionIpAddress))
                     {
                         adbService.TryConnectTcp(connectedSessionIpAddress);
                     }
@@ -277,10 +275,8 @@ public class NetworkService(
             if (message.TrimStart().StartsWith('{') || message.TrimStart().StartsWith('['))
             {
                 var socketMessage = SocketMessageSerializer.DeserializeMessage(message);
-                if (socketMessage != null)
-                {
-                    await messageHandler.Value.HandleMessageAsync(device, socketMessage);
-                }
+                if (socketMessage is null) return;
+                await messageHandler.Value.HandleMessageAsync(device, socketMessage);
                 return;
             }
             logger.Debug("Received non-JSON data, skipping JSON parsing");
@@ -299,9 +295,9 @@ public class NetworkService(
             session.Disconnect();
             session.Dispose();
             var device = PairedDevices.FirstOrDefault(d => d.Session == session);   
-            if (device != null)
+            if (device is not null)
             {
-                App.MainWindow?.DispatcherQueue.EnqueueAsync(() =>
+                App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
                 {
                     device.ConnectionStatus = false;
                     device.Session = null;

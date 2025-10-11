@@ -567,7 +567,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         get => DeviceSettings?.AdbTcpipModeEnabled ?? false;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.AdbTcpipModeEnabled != value)
+            if (DeviceSettings is not null && DeviceSettings.AdbTcpipModeEnabled != value)
             {
                 DeviceSettings.AdbTcpipModeEnabled = value;
                 OnPropertyChanged();
@@ -588,61 +588,28 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         }
     }
 
-
-    private async Task ShowErrorDialog(string title, string content)
-    {
-        await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
-        {
-            var dialog = new ContentDialog
-            {
-                XamlRoot = App.MainWindow.Content?.XamlRoot,
-                Title = title,
-                Content = content,
-                CloseButtonText = "OK"
-            };
-            await dialog.ShowAsync();
-        });
-    }
-
     #endregion
 
 
     private readonly IAdbService AdbService = Ioc.Default.GetRequiredService<IAdbService>();
-    private IDeviceSettingsService? DeviceSettings;
+    private readonly IDeviceSettingsService DeviceSettings;
+    public PairedDevice Device;
 
     private readonly RemoteAppRepository RemoteAppsRepository = Ioc.Default.GetRequiredService<RemoteAppRepository>();
     public ObservableCollection<ApplicationInfo> RemoteApps { get; set; } = [];
 
-    private PairedDevice? device;
-    public PairedDevice? Device 
-    { 
-        get => device;
-        set 
-        {
-            SetProperty(ref device, value);
-            OnPropertyChanged(nameof(DisplayPhoneNumbers));
-            OnPropertyChanged(nameof(DisplayIpAddresses));
-        }
-    }
 
-    public void SetDevice(PairedDevice device)
+    public DeviceSettingsViewModel(PairedDevice device)
     {
         Device = device;
-        
-        device.PropertyChanged += (s, e) =>
-        {
-            OnPropertyChanged(nameof(Device));
-        };
-
         DeviceSettings = device.DeviceSettings;
         OnPropertyChanged(nameof(DeviceSettings));
 
         selectedAudioOutputMode = AudioOutputModeOptions[AudioOutputMode];
         selectedScrcpyDevicePreference = ScrcpyDevicePreferenceOptions[ScrcpyDevicePreference];
-        
+
         OnPropertyChanged(nameof(SelectedAudioOutputMode));
         OnPropertyChanged(nameof(SelectedScrcpyDevicePreference));
-
         LoadApps(device.Id);
     }
 
@@ -654,7 +621,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
     public void ChangeNotificationFilter(string notificationFilter, string appPackage)
     {
         var filterKey = ApplicationInfo.NotificationFilterTypes.First(f => f.Value == notificationFilter).Key;
-        RemoteAppsRepository.UpdateAppNotificationFilter(device!.Id, appPackage, filterKey);
+        RemoteAppsRepository.UpdateAppNotificationFilter(Device!.Id, appPackage, filterKey);
         var app = RemoteApps.First(p => p.PackageName == appPackage);
         app.DeviceInfo.Filter = filterKey;
         app.SelectedNotificationFilter = notificationFilter;

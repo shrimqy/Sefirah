@@ -108,7 +108,7 @@ public sealed partial class GeneralViewModel : BaseViewModel
         }
     }
 
-    public string? ScrcpyPath
+    public string ScrcpyPath
     {
         get => UserSettingsService.GeneralSettingsService.ScrcpyPath;
         set
@@ -118,7 +118,7 @@ public sealed partial class GeneralViewModel : BaseViewModel
         }
     }
 
-    public string? AdbPath
+    public string AdbPath
     {
         get => UserSettingsService.GeneralSettingsService.AdbPath;
         set

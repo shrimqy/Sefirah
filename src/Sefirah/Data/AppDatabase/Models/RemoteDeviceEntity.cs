@@ -26,7 +26,7 @@ public partial class RemoteDeviceEntity
     public List<string> IpAddresses
     {
         get => string.IsNullOrEmpty(IpAddressesJson) ? [] : JsonSerializer.Deserialize<List<string>>(IpAddressesJson) ?? [];
-        set => IpAddressesJson = value == null ? null : JsonSerializer.Serialize(value);
+        set => IpAddressesJson = value is null ? null : JsonSerializer.Serialize(value);
     }
 
     [Column("PhoneNumbers")]
@@ -36,7 +36,7 @@ public partial class RemoteDeviceEntity
     public List<PhoneNumber>? PhoneNumbers
     {
         get => string.IsNullOrEmpty(PhoneNumbersJson) ? null : JsonSerializer.Deserialize<List<PhoneNumber>>(PhoneNumbersJson);
-        set => PhoneNumbersJson = value == null ? null : JsonSerializer.Serialize(value);
+        set => PhoneNumbersJson = value is null ? null : JsonSerializer.Serialize(value);
     }
 
     #region Helpers

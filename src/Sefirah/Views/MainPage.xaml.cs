@@ -163,7 +163,7 @@ public sealed partial class MainPage : Page
     private void ReplyTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
     {
         if (sender is TextBox textBox &&
-            e.Key == VirtualKey.Enter &&
+            e.Key is VirtualKey.Enter &&
             textBox.Tag is Notification message)
         {
             ViewModel.HandleNotificationReply(message, textBox.Text);

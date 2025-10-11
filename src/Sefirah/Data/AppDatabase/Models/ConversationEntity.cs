@@ -45,12 +45,12 @@ public class ConversationEntity
         foreach (var address in Addresses)
         {
             var contactEntity = await repository.GetContactAsync(DeviceId, address);
-            var contact = contactEntity != null ? await contactEntity.ToContact() : new Contact(address, address);
+            var contact = contactEntity is not null ? await contactEntity.ToContact() : new Contact(address, address);
             contacts.Add(contact);
         }
 
         string avatarGlyph = string.Empty;
-        if (contacts.Count == 1 && contacts[0].Avatar == null)
+        if (contacts.Count == 1 && contacts[0].Avatar is null)
         {
             avatarGlyph = "\uE77B";
         }

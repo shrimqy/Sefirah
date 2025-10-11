@@ -100,7 +100,7 @@ public class SmsHandlerService(
         try
         {
             var conversationEntity = await smsRepository.GetConversationAsync(deviceId, textConversation.ThreadId);
-            if (conversationEntity == null)
+            if (conversationEntity is null)
             {
                 conversationEntity = SmsRepository.ToEntity(textConversation, deviceId);
             }
@@ -128,17 +128,17 @@ public class SmsHandlerService(
             {
                 var existingConversation = conversations.FirstOrDefault(c => c.ThreadId == textConversation.ThreadId);
                 
-                if (existingConversation != null)
+                if (existingConversation is not null)
                 {
                     await existingConversation.UpdateFromTextConversationAsync(textConversation, smsRepository, deviceId);
-                    
+
                     // Move conversation to correct position based on new timestamp
-                    InsertOrMoveConversation(existingConversation, conversations);
+                    SmsHandlerService.InsertOrMoveConversation(existingConversation, conversations);
                 }
                 else
                 {
                     var newConversation = await conversationEntity.ToConversationAsync(smsRepository);
-                    InsertOrMoveConversation(newConversation, conversations);
+                    SmsHandlerService.InsertOrMoveConversation(newConversation, conversations);
                 }
             });
         }
@@ -156,7 +156,7 @@ public class SmsHandlerService(
             var latestMessage = textConversation.Messages.OrderByDescending(m => m.Timestamp).First();
 
             var conversationEntity = await smsRepository.GetConversationAsync(deviceId, textConversation.ThreadId);
-            if (conversationEntity != null && textConversation.Messages.Count > 0)
+            if (conversationEntity is not null && textConversation.Messages.Count > 0)
             {
                 conversationEntity.LastMessageTimestamp = latestMessage.Timestamp;
                 conversationEntity.LastMessage = latestMessage.Body;
@@ -171,22 +171,22 @@ public class SmsHandlerService(
             await dispatcher.EnqueueAsync(async () =>
             {
                 var existingConversation = conversations.FirstOrDefault(c => c.ThreadId == textConversation.ThreadId);
-                if (existingConversation != null)
+                if (existingConversation is not null)
                 {
                     logger.LogInformation("Adding new messages to conversation: {ThreadId}", existingConversation.ThreadId);
                     existingConversation.LastMessageTimestamp = latestMessage.Timestamp;
                     existingConversation.LastMessage = latestMessage.Body;
                     await existingConversation.NewMessageFromConversationAsync(textConversation, smsRepository, deviceId);
-                    
+
                     // Move conversation to correct position based on new timestamp
-                    InsertOrMoveConversation(existingConversation, conversations);
+                    SmsHandlerService.InsertOrMoveConversation(existingConversation, conversations);
                 }
                 else
                 {
                     logger.LogInformation("Updated conversation not found in UI, creating new: {ThreadId}", textConversation.ThreadId);
                     var conversationEntity = SmsRepository.ToEntity(textConversation, deviceId);
                     var newConversation = await conversationEntity.ToConversationAsync(smsRepository);
-                    InsertOrMoveConversation(newConversation, conversations);
+                    SmsHandlerService.InsertOrMoveConversation(newConversation, conversations);
                 }
             });
         }
@@ -204,7 +204,7 @@ public class SmsHandlerService(
             await dispatcher.EnqueueAsync(() =>
             {
                 var existingConversation = conversations.FirstOrDefault(c => c.ThreadId == textConversation.ThreadId);
-                if (existingConversation != null)
+                if (existingConversation is not null)
                 {
                     conversations.Remove(existingConversation);
                 }
@@ -298,7 +298,7 @@ public class SmsHandlerService(
         }
     }
 
-    public void InsertOrMoveConversation(Conversation conversation, ObservableCollection<Conversation> conversations)
+    public static void InsertOrMoveConversation(Conversation conversation, ObservableCollection<Conversation> conversations)
     {
         var existingIndex = conversations.IndexOf(conversation);
         var targetIndex = FindInsertionIndex(conversations, conversation.LastMessageTimestamp);

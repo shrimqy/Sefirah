@@ -45,7 +45,7 @@ public class MdnsService(ILogger<MdnsService> logger) : IMdnsService
     {
         try
         {
-            if (serviceDiscovery != null && serviceProfile != null && multicastService != null)
+            if (serviceDiscovery is not null && serviceProfile is not null && multicastService is not null)
             {
                 logger.LogInformation("Un-advertising service for {0}", serviceProfile.InstanceName);
 
@@ -72,7 +72,7 @@ public class MdnsService(ILogger<MdnsService> logger) : IMdnsService
             serviceProfile = null;
         }
 
-        if (serviceDiscovery == null)
+        if (serviceDiscovery is null)
         {
             logger.LogWarning("Service already unadvertised or not initialized");
         }
@@ -84,12 +84,12 @@ public class MdnsService(ILogger<MdnsService> logger) : IMdnsService
     {
         try
         {
-            if (serviceDiscovery == null || multicastService == null) return;
+            if (serviceDiscovery is null || multicastService is null) return;
 
             serviceDiscovery.ServiceInstanceDiscovered += (sender, args) =>
             {
                 // Ignore our own service instance
-                if (serviceProfile != null && args.ServiceInstanceName == serviceProfile.FullyQualifiedName) return;
+                if (serviceProfile is not null && args.ServiceInstanceName == serviceProfile.FullyQualifiedName) return;
                 
                 // Only process _sefirah._udp services
                 if (!args.ServiceInstanceName.ToCanonical().ToString().Contains("_sefirah._udp")) return;

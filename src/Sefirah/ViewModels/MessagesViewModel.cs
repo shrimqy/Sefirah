@@ -77,7 +77,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
     private async void InitializeAsync()
     {
-        if (ActiveDevice != null)
+        if (ActiveDevice is not null)
         {
             await LoadConversationsForActiveDevice();
             LoadPhoneNumbers();
@@ -86,7 +86,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
     private void OnDeviceManagerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(IDeviceManager.ActiveDevice))
+        if (e.PropertyName is nameof(IDeviceManager.ActiveDevice))
         {
             OnPropertyChanged(nameof(ActiveDevice));
             InitializeAsync();
@@ -99,7 +99,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
     private void LoadPhoneNumbers()
     {
         PhoneNumbers.Clear();
-        if (ActiveDevice?.PhoneNumbers != null)
+        if (ActiveDevice?.PhoneNumbers is not null)
         {
             foreach (var phoneNumber in ActiveDevice.PhoneNumbers)
             {
