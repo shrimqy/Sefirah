@@ -313,20 +313,8 @@ page.</value>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>앱별 설정</value>
   </data>
-  <data name="TransferNotificationReceiving.Content" xml:space="preserve">
-    <value>{0} 수신 중</value>
-  </data>
-  <data name="TransferNotificationReceivingError" xml:space="preserve">
-    <value>{0} 수신 중 오류 발생</value>
-  </data>
-  <data name="TransferNotificationReceiving.Title" xml:space="preserve">
-    <value>파일 수신 중</value>
-  </data>
-  <data name="TransferNotificationReceived.Title" xml:space="preserve">
-    <value>파일 수신 완료</value>
-  </data>
-  <data name="TransferNotification.Title" xml:space="preserve">
-    <value>파일 전송</value>
+  <data name="FileTransferNotification.Title" xml:space="preserve">
+    <value>File transfer</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>전송</value>
@@ -334,11 +322,11 @@ page.</value>
   <data name="ReplyPlaceholder" xml:space="preserve">
     <value>답장 입력</value>
   </data>
-  <data name="TransferNotificationActionOpenFile" xml:space="preserve">
-    <value>파일 열기</value>
+  <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
+    <value>Open file</value>
   </data>
-  <data name="TransferNotificationActionOpenFolder" xml:space="preserve">
-    <value>폴더 열기</value>
+  <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
+    <value>Open folder</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
     <value>{0}에 의한 알림 끄기</value>
@@ -532,12 +520,6 @@ page.</value>
   <data name="EnableVirtualDisplay" xml:space="preserve">
     <value>가상 디스플레이 활성화</value>
   </data>
-  <data name="TransferNotificationSending.Title" xml:space="preserve">
-    <value>Sending file</value>
-  </data>
-  <data name="TransferNotificationSent.Title" xml:space="preserve">
-    <value>Sent file</value>
-  </data>
   <data name="Uninstall" xml:space="preserve">
     <value>삭제</value>
   </data>
@@ -705,5 +687,35 @@ input touchscreen swipe 540 1800 540 900</value>
   </data>
   <data name="Save" xml:space="preserve">
     <value>저장</value>
+  </data>
+  <data name="FileTransferNotification.Receiving" xml:space="preserve">
+    <value>Receiving from {0}</value>
+  </data>
+  <data name="FileTransferNotification.Sending" xml:space="preserve">
+    <value>Sending to {0}</value>
+  </data>
+  <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
+    <value>Receiving {0}/{1} from {2}</value>
+  </data>
+  <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
+    <value>Sending {0}/{1} to {2}</value>
+  </data>
+  <data name="FileTransferNotification.Completed" xml:space="preserve">
+    <value>File transfer completed</value>
+  </data>
+  <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
+    <value>Received {0} from {1}</value>
+  </data>
+  <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
+    <value>Received {0} files from {1}</value>
+  </data>
+  <data name="FileTransferNotification.SentSingle" xml:space="preserve">
+    <value>Sent {0} to {1}</value>
+  </data>
+  <data name="FileTransferNotification.SentBulk" xml:space="preserve">
+    <value>Sent {0} files to {1}</value>
+  </data>
+  <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
+    <value>Cancel</value>
   </data>
 </root>
