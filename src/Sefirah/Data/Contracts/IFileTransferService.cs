@@ -1,3 +1,4 @@
+using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 
 namespace Sefirah.Data.Contracts;
@@ -13,7 +14,7 @@ public interface IFileTransferService
     /// </summary>
     Task ReceiveBulkFiles(BulkFileTransfer data, PairedDevice device);
 
-    Task SendFileWithStream(Stream stream, FileMetadata metadata, PairedDevice device, bool isClipboard);
+    Task SendFile(StorageFile file, FileMetadata metadata, PairedDevice device, FileTransferType transferType);
 
     /// <summary>
     /// Sends a file to the remote device (Used for clipboard image transfer)
@@ -23,4 +24,5 @@ public interface IFileTransferService
     event EventHandler<(PairedDevice device, StorageFile data)> FileReceived;
 
     void SendFiles(IReadOnlyList<IStorageItem> storageItems);
+    void CancelTransfer();
 }

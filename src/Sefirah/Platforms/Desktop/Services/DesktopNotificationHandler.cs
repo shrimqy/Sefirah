@@ -1,5 +1,6 @@
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
+using Sefirah.Extensions;
 using Sefirah.Utils;
 using Tmds.DBus.Protocol;
 
@@ -17,8 +18,8 @@ public class DesktopNotificationHandler(
     private NotificationsService? _notificationService;
     private Notifications? _notifications;
     private bool _isInitialized = false;
-    private readonly Dictionary<string, uint> _notificationIds = new();
-    private readonly Dictionary<uint, NotificationActionData> _notificationActions = new();
+    private readonly Dictionary<string, uint> _notificationIds = [];
+    private readonly Dictionary<uint, NotificationActionData> _notificationActions = [];
     private IDisposable? _actionWatcher;
 
     private async Task<bool> EnsureInitializedAsync()
@@ -89,12 +90,12 @@ public class DesktopNotificationHandler(
                 NotificationType = "RemoteNotification",
                 DeviceId = deviceId,
                 NotificationKey = message.NotificationKey,
-                Actions = new List<NotificationActionInfo>()
+                Actions = []
             };
 
             foreach (var action in message.Actions)
             {
-                if (action == null || action.IsReplyAction) continue; // Skip reply actions
+                if (action is null || action?.Label is null || action.IsReplyAction) continue; // Skip reply actions
 
                 var actionId = $"action_{action.ActionIndex}";
                 actions.Add(actionId);
@@ -139,7 +140,7 @@ public class DesktopNotificationHandler(
         }
     }
 
-    public async Task ShowClipboardNotification(string title, string text, string? iconPath = null)
+    public async void ShowClipboardNotification(string title, string text, string? iconPath = null)
     {
         if (!await EnsureInitializedAsync() || _notifications == null)
             return;
@@ -181,7 +182,7 @@ public class DesktopNotificationHandler(
         }
     }
 
-    public async Task ShowClipboardNotificationWithActions(string title, string text, string? actionLabel = null, string? actionData = null)
+    public async void ShowClipboardNotificationWithActions(string title, string text, string? actionLabel = null, string? actionData = null)
     {
         if (!await EnsureInitializedAsync() || _notifications == null)
             return;
@@ -202,7 +203,7 @@ public class DesktopNotificationHandler(
             var notificationActionData = new NotificationActionData
             {
                 NotificationType = "Clipboard",
-                Actions = new List<NotificationActionInfo>()
+                Actions = []
             };
 
             if (!string.IsNullOrEmpty(actionLabel) && !string.IsNullOrEmpty(actionData))
@@ -245,7 +246,7 @@ public class DesktopNotificationHandler(
         }
     }
 
-    public async Task ShowFileTransferNotification(string title, string text, string? filePath = null, string? folderPath = null)
+    public async void ShowCompletedFileTransferNotification(string subtitle, string transferId, string? filePath = null, string? folderPath = null)
     {
         if (!await EnsureInitializedAsync() || _notifications == null)
             return;
@@ -265,8 +266,8 @@ public class DesktopNotificationHandler(
                 appName: "Sefirah",
                 replacesId: 0,
                 appIcon: "folder-download",
-                summary: title,
-                body: text,
+                summary: "FileTransferNotification.Completed".GetLocalizedResource(),
+                body: subtitle,
                 actions: [], 
                 hints: hints,
                 expireTimeout: 6000 // 6 seconds
@@ -280,10 +281,9 @@ public class DesktopNotificationHandler(
         }
     }
 
-    public async Task ShowTransferNotification(string title, string message, string fileName, uint notificationSequence, double? progress = null, bool silent = false)
+    public void ShowFileTransferNotification(string subtitle, string fileName, string transferId, uint notificationSequence, double? progress = null)
     {
-        // Progress notification to be implemented 
-        await Task.CompletedTask;
+        return; // Not implemented for D-Bus notifications
     }
 
     public async Task RegisterForNotifications()
@@ -291,9 +291,9 @@ public class DesktopNotificationHandler(
         await EnsureInitializedAsync();
     }
 
-    public async Task RemoveNotification(string notificationKey)
+    public async Task RemoveNotificationByTag(string? notificationKey)
     {
-        if (!_isInitialized || _notifications == null)
+        if (!_isInitialized || _notifications is null || string.IsNullOrEmpty(notificationKey))
             return;
 
         try
@@ -311,7 +311,13 @@ public class DesktopNotificationHandler(
         }
     }
 
-    public Task RemoveNotificationsByGroup(string groupKey)
+    public Task RemoveNotificationsByGroup(string? groupKey)
+    {
+        // D-Bus notifications don't have group concept like Windows, so we ignore this
+        return Task.CompletedTask;
+    }
+
+    public Task RemoveNotificationsByTagAndGroup(string? tag, string? groupKey)
     {
         // D-Bus notifications don't have group concept like Windows, so we ignore this
         return Task.CompletedTask;
@@ -468,7 +474,7 @@ internal class NotificationActionData
     public string NotificationType { get; set; } = string.Empty;
     public string? DeviceId { get; set; }
     public string? NotificationKey { get; set; }
-    public List<NotificationActionInfo> Actions { get; set; } = new();
+    public List<NotificationActionInfo> Actions { get; set; } = [];
 }
 
 /// <summary>

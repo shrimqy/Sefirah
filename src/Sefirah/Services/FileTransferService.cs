@@ -14,6 +14,7 @@ using Sefirah.Utils.Serialization;
 using Uno.Logging;
 
 namespace Sefirah.Services;
+
 public class FileTransferService(
     ILogger logger,
     ISessionManager sessionManager,
@@ -25,22 +26,28 @@ public class FileTransferService(
     private string? storageLocation;
     private FileStream? currentFileStream;
     private FileMetadata? currentFileMetadata;
-    private long bytesReceived;
+    private long bytesTransferred = 0;
     private Client? client;
     private Server? server;
     private ServerInfo? serverInfo;
     private ServerSession? session;
     private uint notificationSequence = 1;
+    private TransferContext? currentTransfer;
+    private CancellationTokenSource? cancellationTokenSource;
 
     private const string COMPLETE_MESSAGE = "Complete";
 
     private TaskCompletionSource<ServerSession>? connectionSource;
-    private TaskCompletionSource<bool>? sendTransferCompletionSource;
-    private TaskCompletionSource<bool>? receiveTransferCompletionSource;
+    private TaskCompletionSource<bool>? transferCompletionSource;
 
     public event EventHandler<(PairedDevice device, StorageFile data)>? FileReceived;
 
     private readonly IEnumerable<int> PORT_RANGE = Enumerable.Range(5152, 18);
+
+    public void CancelTransfer()
+    {
+        cancellationTokenSource?.Cancel();
+    }
 
     #region Receive
     public async Task ReceiveBulkFiles(BulkFileTransfer bulkFile, PairedDevice device)
@@ -48,24 +55,22 @@ public class FileTransferService(
         try
         {
             // Wait for any existing transfer to complete
-            if (receiveTransferCompletionSource?.Task is not null)
+            if (transferCompletionSource?.Task is not null)
             {
-                await receiveTransferCompletionSource.Task;
+                await transferCompletionSource.Task;
             }
 
             storageLocation = userSettingsService.GeneralSettingsService.ReceivedFilesPath;
             var serverInfo = bulkFile.ServerInfo;
-            var totalFiles = bulkFile.Files.Count;
-            var receivedFiles = 0;
-            var failedFiles = new List<string>();
 
-            // Show initial bulk transfer notification
-            await notificationHandler.ShowTransferNotification(
-                "TransferNotificationReceiving/Title".GetLocalizedResource(),
-                $"Receiving {totalFiles} files",
-                $"{totalFiles} files",
-                notificationSequence++,
-                0);
+            currentTransfer = new TransferContext(
+                device.Name,
+                $"transfer_{DateTime.Now.Ticks}",
+                bulkFile.Files
+            );
+
+            // Create cancellation token for the entire bulk transfer
+            cancellationTokenSource = new CancellationTokenSource();
 
             var certificate = await CertificateHelper.GetOrCreateCertificateAsync();
             var context = new SslContext(
@@ -74,169 +79,137 @@ public class FileTransferService(
                 (sender, cert, chain, errors) => true
             );
 
-            client = new Client(context, serverInfo.IpAddress, serverInfo.Port, this, logger);
-            if (!client.ConnectAsync())
-            {
+            client = new Client(context, serverInfo.IpAddress, serverInfo.Port, this);
+
+            if (!client.ConnectAsync()) 
                 throw new IOException("Failed to connect to file transfer server");
-            }
-            logger.Info($"Connected to file transfer server at {serverInfo.IpAddress}:{serverInfo.Port}");
 
             // Adding a small delay for the android to open a read channel
             await Task.Delay(500);
             var passwordBytes = Encoding.UTF8.GetBytes(serverInfo.Password + "\n");
             client?.SendAsync(passwordBytes);
 
-            // Process each file in the bulk transfer
+            notificationHandler.ShowFileTransferNotification(
+                string.Format("FileTransferNotification.ReceivingBulk".GetLocalizedResource(), 1, currentTransfer.Files.Count, currentTransfer.Device),
+                currentTransfer.Files[0].FileName,
+                currentTransfer.TransferId,
+                notificationSequence++);
+
             foreach (var fileMetadata in bulkFile.Files)
             {
                 try
                 {
-                    logger.Info($"Starting to receive file {receivedFiles + 1}/{totalFiles}: {fileMetadata.FileName}");
+                    // Check if the entire bulk transfer has been cancelled
+                    cancellationTokenSource.Token.ThrowIfCancellationRequested();
 
-                    // Wait for any existing transfer to complete
-                    if (receiveTransferCompletionSource?.Task is not null && !receiveTransferCompletionSource.Task.IsCompleted)
+                    logger.Info($"Starting to receive file {currentTransfer.CurrentFileIndex + 1}/{bulkFile.Files.Count}: {fileMetadata.FileName}");
+
+                    if (transferCompletionSource?.Task is not null && !transferCompletionSource.Task.IsCompleted)
                     {
-                        await receiveTransferCompletionSource.Task;
+                        await transferCompletionSource.Task;
                     }
                     string fullPath = Path.Combine(storageLocation, fileMetadata.FileName);
                     Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
 
-                    receiveTransferCompletionSource = new TaskCompletionSource<bool>();
+                    transferCompletionSource = new();
                     currentFileMetadata = fileMetadata;
-
-                    // Open file stream
-                    currentFileStream = new FileStream(
-                        fullPath,
-                        FileMode.Create,
-                        FileAccess.Write,
-                        FileShare.None,
-                        bufferSize: 81920); // 80KB buffer
+                    currentFileStream = new FileStream(fullPath, FileMode.Create);
 
                     // Wait for this file transfer to complete
-                    await receiveTransferCompletionSource.Task;
-                    receivedFiles++;
+                    await transferCompletionSource.Task;
 
-                    logger.Info($"Successfully received file {receivedFiles}/{totalFiles}: {fileMetadata.FileName}");
+                    currentTransfer.CurrentFileIndex++;
+                    logger.Info($"Received file {fileMetadata.FileName}");
 
-                    // Update bulk transfer progress
-                    var overallProgress = (double)receivedFiles / totalFiles * 100;
-                    await notificationHandler.ShowTransferNotification(
-                        "TransferNotificationReceiving/Title".GetLocalizedResource(),
-                        $"Receiving {totalFiles} files ({receivedFiles}/{totalFiles})",
-                        $"{totalFiles} files",
-                        notificationSequence,
-                        overallProgress);
+                    // Clean up the file stream for the previous file
+                    CleanupFileStream();
                 }
                 catch (Exception ex)
                 {
-                    logger.Error($"Error receiving file {fileMetadata.FileName}", ex);
-                    failedFiles.Add(fileMetadata.FileName);
-                    
-                    // Clean up the failed file
+                    CleanupFileStream();
                     var failedFilePath = Path.Combine(storageLocation, fileMetadata.FileName);
                     if (File.Exists(failedFilePath))
                     {
-                        try
-                        {
-                            File.Delete(failedFilePath);
-                        }
-                        catch (Exception deleteEx)
-                        {
-                            logger.Error($"Failed to delete incomplete file {failedFilePath}", deleteEx);
-                        }
+                        File.Delete(failedFilePath);
                     }
+
+                    if (ex is OperationCanceledException)
+                    {
+                        logger.Info("Bulk file transfer cancelled by user");
+                        throw;
+                    }
+                    logger.Error($"Error receiving file {fileMetadata.FileName}", ex);
                 }
             }
 
-            // Show final notification
-            if (failedFiles.Count == 0)
-            {
-                await notificationHandler.ShowTransferNotification(
-                    "TransferNotificationReceived/Title".GetLocalizedResource(),
-                    $"Successfully received all {totalFiles} files",
-                    $"{totalFiles} files",
-                    notificationSequence++,
-                    null);
-                logger.Info($"Bulk file transfer completed successfully: {receivedFiles}/{totalFiles} files received");
-            }
-            else
-            {
-                await notificationHandler.ShowTransferNotification(
-                    "TransferNotification/Title".GetLocalizedResource(),
-                    $"Received {receivedFiles}/{totalFiles} files. {failedFiles.Count} files failed.",
-                    $"{totalFiles} files",
-                    notificationSequence++,
-                    null);
-                logger.Warn($"Bulk file transfer completed with errors: {receivedFiles}/{totalFiles} files received, {failedFiles.Count} failed");
-            }
+            notificationHandler.ShowCompletedFileTransferNotification(
+                string.Format("FileTransferNotification.CompletedBulk".GetLocalizedResource(), currentTransfer.Files.Count, currentTransfer.Device),
+                currentTransfer.TransferId,
+                folderPath: storageLocation);
+
+            logger.Warn($"Bulk file transfer completed with errors: {currentTransfer.CurrentFileIndex}/{currentTransfer.Files.Count} files received failed");
         }
         catch (Exception ex)
         {
             logger.Error("Error during bulk file transfer setup", ex);
-            await notificationHandler.ShowTransferNotification(
-                "TransferNotification/Title".GetLocalizedResource(),
-                "Bulk file transfer failed",
-                "Bulk transfer",
-                notificationSequence++,
-                null);
         }
         finally
         {
-            CleanupTransfer();
+            CleanupClient();
         }
+    }
+
+    private void CleanupFileStream()
+    {
+        currentFileStream?.Close();
+        currentFileStream?.Dispose();
+        currentFileStream = null;
+        currentFileMetadata = null;
     }
 
     public async Task ReceiveFile(FileTransfer data, PairedDevice device)
     {
+        storageLocation = userSettingsService.GeneralSettingsService.ReceivedFilesPath;
+        string fullPath = Path.Combine(storageLocation, data.FileMetadata.FileName);
         try
         {
             // Wait for any existing transfer to complete
-            if (receiveTransferCompletionSource?.Task is not null)
+            if (transferCompletionSource?.Task is not null)
             {
-                await receiveTransferCompletionSource.Task;
+                await transferCompletionSource.Task;
             }
+            
+            // Create transfer context for single file
+            currentTransfer = new TransferContext(
+                device.Name,
+                $"transfer_{DateTime.Now.Ticks}",
+                [data.FileMetadata]
+            );
 
-            ArgumentNullException.ThrowIfNull(data);
-
-            storageLocation = userSettingsService.GeneralSettingsService.ReceivedFilesPath;
-            string fullPath = Path.Combine(storageLocation, data.FileMetadata.FileName);
-
-            Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
-
-            receiveTransferCompletionSource = new TaskCompletionSource<bool>();
+            transferCompletionSource = new TaskCompletionSource<bool>();
+            cancellationTokenSource = new CancellationTokenSource();
             var serverInfo = data.ServerInfo;
             currentFileMetadata = data.FileMetadata;
 
-            // Open file stream
-            currentFileStream = new FileStream(
-                fullPath,
-                FileMode.Create,
-                FileAccess.Write,
-                FileShare.None,
-                bufferSize: 81920); // 80KB buffer
-
-            var certificate = await CertificateHelper.GetOrCreateCertificateAsync();
+            currentFileStream = new FileStream(fullPath, FileMode.Create);
 
             var context = new SslContext(
                 SslProtocols.Tls12 | SslProtocols.Tls13,
-                certificate,
+                await CertificateHelper.GetOrCreateCertificateAsync(),
                 (sender, cert, chain, errors) => true
             )
             {
                 ClientCertificateRequired = false,
             };
 
-            client = new Client(context, serverInfo.IpAddress, serverInfo.Port, this, logger);
+            client = new Client(context, serverInfo.IpAddress, serverInfo.Port, this);
             if (!client.ConnectAsync())
-            {
                 throw new IOException("Failed to connect to file transfer server");
-            }
-            logger.Info($"Connected to file transfer server at {serverInfo.IpAddress}:{serverInfo.Port}");
 
-            await notificationHandler.ShowTransferNotification(
-                "TransferNotificationReceiving/Title".GetLocalizedResource(), 
-                $"Receiving {currentFileMetadata.FileName}", 
+            notificationHandler.ShowFileTransferNotification(
+                string.Format("FileTransferNotification.Receiving".GetLocalizedResource(), currentTransfer.Device), 
                 currentFileMetadata.FileName, 
+                currentTransfer.TransferId,
                 notificationSequence++, 
                 0);
 
@@ -245,36 +218,39 @@ public class FileTransferService(
             var passwordBytes = Encoding.UTF8.GetBytes(serverInfo.Password + "\n");
             client?.SendAsync(passwordBytes);
 
-            // Wait for transfer completion
-            await receiveTransferCompletionSource.Task;
+            await transferCompletionSource.Task;
+
             if (device.DeviceSettings.ClipboardFilesEnabled)
             {
                 var file = await StorageFile.GetFileFromPathAsync(fullPath);
                 FileReceived?.Invoke(this, (device, file));
             }
 
-            await notificationHandler.ShowTransferNotification(
-                "TransferNotificationReceived/Title".GetLocalizedResource(), 
-                $"{currentFileMetadata.FileName} has been saved successfully", 
-                fullPath, 
-                notificationSequence++, 
-                null);
+            notificationHandler.ShowCompletedFileTransferNotification(
+                string.Format("FileTransferNotification.CompletedSingle".GetLocalizedResource(), currentFileMetadata.FileName, currentTransfer.Device), 
+                currentTransfer.TransferId, 
+                fullPath);
         }
         catch (Exception ex)
         {
             logger.Error("Error during file transfer setup", ex);
+            CleanupFileStream();
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+            }
         }
         finally
         {
-            CleanupTransfer();
+            CleanupClient();
         }
     }
 
     #region Server Events
+
     public void OnConnected()
     {
         logger.Info("Connected to file transfer server");
-        bytesReceived = 0;
     }
 
     public void OnDisconnected()
@@ -284,99 +260,76 @@ public class FileTransferService(
         // if transfer is not complete
         if (currentFileMetadata != null &&
             currentFileStream != null &&
-            bytesReceived < currentFileMetadata.FileSize)
+            currentTransfer != null &&
+            currentTransfer.BytesTransferred < currentFileMetadata.FileSize)
         {
-            receiveTransferCompletionSource?.TrySetException(new IOException("Connection to server lost"));
-            CleanupTransfer();
+            transferCompletionSource?.TrySetException(new IOException("Connection to server lost"));
+            CleanupClient();
         }
     }
 
     public void OnError(SocketError error)
     {
         logger.Error($"Socket error occurred during file transfer: {error}");
-        receiveTransferCompletionSource?.TrySetException(new IOException($"Socket error: {error}"));
-        CleanupTransfer();
+        transferCompletionSource?.TrySetException(new IOException($"Socket error: {error}"));
+        CleanupClient();
     }
 
-    public async void OnReceived(byte[] buffer, long offset, long size)
+    public void OnReceived(byte[] buffer, long offset, long size)
     {
         try
         {
-            // Early exit if we don't have valid state
-            if (currentFileStream == null || currentFileMetadata == null)
-            {
-                logger.Debug("Metadata is null");
-                return;
-            }
+            // Check if transfer has been canceled before processing
+            cancellationTokenSource?.Token.ThrowIfCancellationRequested();
+
+            if (currentFileStream == null || currentFileMetadata == null || currentTransfer == null) return;
+
+            // Double-check cancellation after null checks
+            cancellationTokenSource?.Token.ThrowIfCancellationRequested();
 
             // Write received data to file
             currentFileStream.Write(buffer, (int)offset, (int)size);
-            bytesReceived += size;
+            bytesTransferred += size;
+            currentTransfer.BytesTransferred += size;
+
+            // Calculate progress based on total bytes transferred vs total bytes
+            var progress = (double)currentTransfer.BytesTransferred / currentTransfer.TotalBytes * 100;
+            
+            notificationHandler.ShowFileTransferNotification(
+                string.Format("FileTransferNotification.Receiving".GetLocalizedResource(), currentTransfer.Device),
+                currentFileMetadata.FileName,
+                currentTransfer.TransferId,
+                notificationSequence,
+                progress);
 
             // Check if transfer is complete immediately after writing
-            if (bytesReceived >= currentFileMetadata.FileSize)
+            if (bytesTransferred >= currentFileMetadata.FileSize)
             {
                 // Send acknowledgment to the server (add '\n' to ensure proper line ending)
                 client?.Send(Encoding.UTF8.GetBytes(COMPLETE_MESSAGE + "\n"));
-
+                bytesTransferred = 0;
                 // Signal completion before cleanup
-                receiveTransferCompletionSource?.TrySetResult(true);
-                bytesReceived = 0;
-
-                return; // Exit after handling completion
-            }
-
-            // Only proceed with progress update if not complete
-            var progress = (double)bytesReceived / currentFileMetadata.FileSize * 100;
-            if (Math.Floor(progress) > Math.Floor((double)(bytesReceived - size) / currentFileMetadata.FileSize * 100))
-            {
-                await notificationHandler.ShowTransferNotification(
-                    "TransferNotificationReceiving/Title".GetLocalizedResource(),
-                    $"Receiving {currentFileMetadata.FileName}",
-                    currentFileMetadata.FileName,
-                    notificationSequence,
-                    progress);
+                transferCompletionSource?.TrySetResult(true);
             }
         }
         catch (Exception ex)
         {
-            logger.Error("Error processing received file data", ex);
-            await notificationHandler.ShowTransferNotification(
-                 "TransferNotification/Title".GetLocalizedResource(),
-                string.Format("TransferNotificationReceivingError".GetLocalizedResource(), currentFileMetadata?.FileName),
-                currentFileMetadata?.FileName ?? "",
-                notificationSequence++,
-                null);
-            CleanupTransfer();
-            if (receiveTransferCompletionSource?.Task.IsCompleted == false)
-            {
-                receiveTransferCompletionSource.TrySetException(ex);
-            }
+            transferCompletionSource?.TrySetException(ex);
         }
     }
     #endregion
     #endregion
 
-    private void CleanupTransfer()
+    private void CleanupClient()
     {
         try
         {
-            if (currentFileStream != null)
-            {
-                currentFileStream.Close();
-                currentFileStream.Dispose();
-                currentFileStream = null;
-            }
+            CleanupFileStream();
 
             client?.DisconnectAsync();
             client?.Dispose();
             client = null;
-
-            // Only try to complete the task if it hasn't been completed yet
-            if (receiveTransferCompletionSource?.Task.IsCompleted == false)
-            {
-                receiveTransferCompletionSource.TrySetResult(true);
-            }
+            transferCompletionSource = null;
         }
         catch (Exception ex)
         {
@@ -385,7 +338,9 @@ public class FileTransferService(
         finally
         {
             currentFileMetadata = null;
-            bytesReceived = 0;
+            currentTransfer = null;
+            cancellationTokenSource?.Dispose();
+            cancellationTokenSource = null;
         }
     }
 
@@ -423,11 +378,10 @@ public class FileTransferService(
                 }
                 else if (files.Length == 1)
                 {
-                    var file = files[0];
-                    var metadata = await file.ToFileMetadata();
+                    var metadata = await files[0].ToFileMetadata();
                     if (metadata == null) return;
 
-                    await SendFileWithStream(await file.OpenStreamForReadAsync(), metadata, selectedDevice);
+                    await SendFile(files[0], metadata, selectedDevice);
                 }
             });
         }
@@ -437,27 +391,35 @@ public class FileTransferService(
         }
     }
 
-    public async Task SendFileWithStream(Stream stream, FileMetadata metadata, PairedDevice device, bool isClipboard = false)
+    public async Task SendFile(StorageFile file, FileMetadata metadata, PairedDevice device, FileTransferType transferType = FileTransferType.File)
     {
         try
         {
             // Wait for any existing transfer to complete
-            if (sendTransferCompletionSource?.Task.IsCompleted == false)
+            if (transferCompletionSource?.Task.IsCompleted == false)
             {
-                await sendTransferCompletionSource.Task;
+                await transferCompletionSource.Task;
             }
 
             server?.Stop();
             session?.Disconnect();
             session = null;
-
-            sendTransferCompletionSource = null;
             connectionSource = null;
+
+            // Create transfer context for single file
+            currentTransfer = new TransferContext(
+                device.Name,
+                $"transfer_{DateTime.Now.Ticks}",
+                [metadata]
+            );
+
+            // Create cancellation token for the transfer
+            cancellationTokenSource = new CancellationTokenSource();
 
             var serverInfo = await InitializeServer();
             var transfer = new FileTransfer
             {
-                TransferType = isClipboard ? FileTransferType.Clipboard : FileTransferType.File,
+                TransferType = transferType,
                 ServerInfo = serverInfo,
                 FileMetadata = metadata
             };
@@ -466,19 +428,34 @@ public class FileTransferService(
             logger.Debug($"Sending metadata: {json}");
             sessionManager.SendMessage(device.Session!, json);
 
-            sendTransferCompletionSource = new TaskCompletionSource<bool>();
-            await SendFileData(metadata, stream);
-            await sendTransferCompletionSource.Task;
+            // Show initial sending notification
+            notificationHandler.ShowFileTransferNotification(
+                string.Format("FileTransferNotification.Sending".GetLocalizedResource(), currentTransfer.Device),
+                metadata.FileName,
+                currentTransfer.TransferId,
+                notificationSequence++,
+                0);
+
+            transferCompletionSource = new();
+            await SendFileData(metadata, await file.OpenStreamForReadAsync());
+            await transferCompletionSource.Task;
+
+            // Show completion notification
+            notificationHandler.ShowCompletedFileTransferNotification(
+                string.Format("FileTransferNotification.SentSingle".GetLocalizedResource(), metadata.FileName, currentTransfer.Device),
+                currentTransfer.TransferId);
+        }
+        catch (OperationCanceledException)
+        {
+            logger.Info("File transfer cancelled by user");
         }
         catch (Exception ex)
         {
             logger.Error("Error sending stream data", ex);
-            await notificationHandler.ShowTransferNotification(
-                "TransferNotification/Title".GetLocalizedResource(),
-                $"Error sending {metadata.FileName}: {ex.Message}",
-                metadata.FileName,
-                notificationSequence++,
-                null);
+        }
+        finally
+        {
+            CleanupServer();
         }
     }
 
@@ -486,21 +463,17 @@ public class FileTransferService(
     {
         try
         {
-            if (files.Length == 1)
-            {
-                var metadata = await files[0].ToFileMetadata();
-                if (metadata == null)
-                {
-                    return;
-                }
+            var fileMetadataList = await Task.WhenAll(files.Select(file => file.ToFileMetadata()));
 
-                await SendFileWithStream(await files[0].OpenStreamForReadAsync(), metadata, device);
-                return;
-            }
+            // Create transfer context for bulk files
+            currentTransfer = new TransferContext(
+                device.Name,
+                $"transfer_{DateTime.Now.Ticks}",
+                fileMetadataList.ToList()
+            );
 
-            var fileMetadataTasks = files.Select(file => file.ToFileMetadata());
-
-            var fileMetadataList = await Task.WhenAll(fileMetadataTasks);
+            // Create cancellation token for the entire bulk transfer
+            cancellationTokenSource = new CancellationTokenSource();
 
             serverInfo = await InitializeServer();
 
@@ -513,25 +486,57 @@ public class FileTransferService(
             // Send metadata first
             sessionManager.SendMessage(device.Session!, SocketMessageSerializer.Serialize(transfer));
 
-            foreach (var file in files)
+            // Show initial bulk transfer notification
+            notificationHandler.ShowFileTransferNotification(
+                string.Format("FileTransferNotification.SendingBulk".GetLocalizedResource(), 1, currentTransfer.Files.Count, currentTransfer.Device),
+                currentTransfer.Files[0].FileName,
+                currentTransfer.TransferId,
+                notificationSequence++);
+
+            for (int i = 0; i < files.Length; i++)
             {
-                var metadata = await file.ToFileMetadata();
-                logger.Debug($"Sending file: {metadata.FileName}");
+                try
+                {
+                    // Check if the entire bulk transfer has been cancelled
+                    cancellationTokenSource.Token.ThrowIfCancellationRequested();
 
-                sendTransferCompletionSource = new TaskCompletionSource<bool>();
+                    logger.Debug($"Sending file: {fileMetadataList[i].FileName}");
 
-                await SendFileData(metadata, File.OpenRead(file.Path));
+                    transferCompletionSource = new TaskCompletionSource<bool>();
 
-                // Wait for the transfer to complete before moving to next file
-                await sendTransferCompletionSource.Task;
+                    await SendFileData(fileMetadataList[i], await files[i].OpenStreamForReadAsync());
+
+                    // Wait for the transfer to complete before moving to next file
+                    await transferCompletionSource.Task;
+
+                    // Update current file index
+                    currentTransfer.CurrentFileIndex++;
+                }
+                catch (OperationCanceledException)
+                {
+                    logger.Info("Bulk file transfer cancelled by user");
+                    throw;
+                }
             }
 
+            // Show completion notification for bulk transfer
+            notificationHandler.ShowCompletedFileTransferNotification(
+                string.Format("FileTransferNotification.SentBulk".GetLocalizedResource(), currentTransfer.Files.Count, currentTransfer.Device),
+                currentTransfer.TransferId);
+
             logger.Debug("All files transferred successfully");
+        }
+        catch (OperationCanceledException)
+        {
+            logger.Info("Bulk file transfer cancelled by user");
         }
         catch (Exception ex)
         {
             logger.Error("Error in SendBulkFiles", ex);
-            throw;
+        }
+        finally
+        {
+            CleanupServer();
         }
     }
 
@@ -541,7 +546,7 @@ public class FileTransferService(
         {
             if (session == null)
             {
-                connectionSource = new TaskCompletionSource<ServerSession>();
+                connectionSource = new();
 
                 // Wait for Authentication from onReceived event to trigger
                 session = await connectionSource.Task;
@@ -556,11 +561,45 @@ public class FileTransferService(
 
                 while (totalBytesRead < metadata.FileSize && session?.IsConnected == true)
                 {
+                    // Check if transfer has been canceled
+                    cancellationTokenSource?.Token.ThrowIfCancellationRequested();
+
                     int bytesRead = await stream.ReadAsync(buffer);
                     if (bytesRead == 0) break;
 
                     session.Send(buffer, 0, bytesRead);
                     totalBytesRead += bytesRead;
+
+                    // Double-check cancellation after sending data
+                    cancellationTokenSource?.Token.ThrowIfCancellationRequested();
+
+                    // Update transfer context and show progress notification
+                    if (currentTransfer != null)
+                    {
+                        currentTransfer.BytesTransferred = totalBytesRead;
+                        var progress = (double)totalBytesRead / metadata.FileSize * 100;
+                        
+                        // For bulk transfers, show current file progress
+                        if (currentTransfer.Files.Count > 1)
+                        {
+                            notificationHandler.ShowFileTransferNotification(
+                                string.Format("FileTransferNotification.SendingBulk".GetLocalizedResource(), currentTransfer.CurrentFileIndex + 1, currentTransfer.Files.Count, currentTransfer.Device),
+                                metadata.FileName,
+                                currentTransfer.TransferId,
+                                notificationSequence,
+                                progress);
+                        }
+                        else
+                        {
+                            // For single file transfers, show file-specific progress
+                            notificationHandler.ShowFileTransferNotification(
+                                string.Format("FileTransferNotification.Sending".GetLocalizedResource(), currentTransfer.Device),
+                                metadata.FileName,
+                                currentTransfer.TransferId,
+                                notificationSequence,
+                                progress);
+                        }
+                    }
                 }
             }
 
@@ -569,19 +608,12 @@ public class FileTransferService(
         catch (Exception ex)
         {
             logger.Error("Error in SendFileData", ex);
-            sendTransferCompletionSource?.TrySetException(ex);
             throw;
         }
     }
 
     public async Task<ServerInfo> InitializeServer()
     {
-        // Reuse server if it exists
-        if (server != null && serverInfo != null)
-        {
-            return serverInfo;
-        }
-
         var certificate = await CertificateHelper.GetOrCreateCertificateAsync();
         var context = new SslContext(SslProtocols.Tls12 | SslProtocols.Tls13, certificate, (sender, cert, chain, errors) => true)
         {
@@ -596,11 +628,10 @@ public class FileTransferService(
                 server = new Server(context, IPAddress.Any, port, this, logger)
                 {
                     OptionDualMode = true,
-                    OptionReuseAddress = true
+                    OptionReuseAddress = true,
                 };
                 server.Start();
 
-                // Server started successfully
                 serverInfo = new ServerInfo
                 {
                     Port = port,
@@ -631,6 +662,9 @@ public class FileTransferService(
         serverInfo = null;
         connectionSource = null;
         session = null;
+        currentTransfer = null;
+        cancellationTokenSource?.Dispose();
+        cancellationTokenSource = null;
     }
 
     #region Server Events
@@ -641,9 +675,9 @@ public class FileTransferService(
 
     public void OnDisconnected(ServerSession session)
     {
-        if (sendTransferCompletionSource?.Task.IsCompleted == false)
+        if (transferCompletionSource?.Task.IsCompleted == false)
         {
-            sendTransferCompletionSource?.TrySetException(new Exception("Client disconnected"));
+            transferCompletionSource?.TrySetException(new Exception("Client disconnected"));
         }
         logger.Info($"Client disconnected from file transfer server: {session.Id}");
         CleanupServer();
@@ -652,7 +686,6 @@ public class FileTransferService(
     public void OnReceived(ServerSession session, byte[] buffer, long offset, long size)
     {
         string message = Encoding.UTF8.GetString(buffer, (int)offset, (int)size);
-        logger.Info($"Received message from client: {message}, server password: {serverInfo?.Password}");
         if (connectionSource?.Task.IsCompleted == false && message == serverInfo?.Password)
         {
             connectionSource.SetResult(session);
@@ -660,9 +693,10 @@ public class FileTransferService(
         if (message == COMPLETE_MESSAGE)
         {
             logger.Info($"Transfer completed");
-            sendTransferCompletionSource?.TrySetResult(true);
+            transferCompletionSource?.TrySetResult(true);
         }
     }
+
     #endregion
 
     #endregion

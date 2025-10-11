@@ -28,20 +28,24 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
                 .SetTag(message.Tag ?? string.Empty)
                 .SetGroup(message.GroupKey ?? string.Empty);
 
-            // Handle icons - check for local app icon first
             if (!string.IsNullOrEmpty(message.LargeIcon))
             {
-                await SetNotificationIcon(builder, message.LargeIcon, "largeIcon.png");
+                var fileUri = await IconUtils.SaveBase64ToFileAsync(message.LargeIcon, "largeIcon.png");
+                builder.SetAppLogoOverride(fileUri, AppNotificationImageCrop.Circle);
             }
-            else if (!string.IsNullOrEmpty(message.AppIcon) || !string.IsNullOrEmpty(message.AppPackage))
+            else if (!string.IsNullOrEmpty(message.AppPackage))
             {
-                await SetAppNotificationIcon(builder, message.AppPackage, message.AppIcon);
+                var iconUri = await IconUtils.GetAppIconUriAsync(message.AppPackage);
+                if (iconUri is not null)
+                {
+                    builder.SetAppLogoOverride(iconUri, AppNotificationImageCrop.Circle);
+                }
             }
 
             // Handle actions
             foreach (var action in message.Actions)
             {
-                if (action == null) continue;
+                if (action is null) continue;
 
                 if (action.IsReplyAction)
                 {
@@ -49,7 +53,7 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
                         .AddTextBox("textBox", "ReplyPlaceholder".GetLocalizedResource(), "")
                         .AddButton(new AppNotificationButton("SendButton".GetLocalizedResource())
                             .AddArgument("notificationType", ToastNotificationType.RemoteNotification)
-                            .AddArgument("notificationKey", message.NotificationKey)
+                            .AddArgument("tag", message.NotificationKey)
                             .AddArgument("replyResultKey", message.ReplyResultKey)
                             .AddArgument("action", "Reply")
                             .AddArgument("deviceId", deviceId)
@@ -61,7 +65,7 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
                         .AddArgument("notificationType", ToastNotificationType.RemoteNotification)
                         .AddArgument("action", "Click")
                         .AddArgument("actionIndex", action.ActionIndex.ToString())
-                        .AddArgument("notificationKey", message.NotificationKey)
+                        .AddArgument("tag", message.NotificationKey)
                         .AddArgument("deviceId", deviceId));
                 }
             }
@@ -76,79 +80,49 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
         }
     }
 
-    public async Task ShowTransferNotification(string title, string message, string fileName, uint notificationSequence, double? progress = null, bool silent = false)
+    public async void ShowFileTransferNotification(string subtitle, string fileName, string transferId, uint notificationSequence, double? progress = null)
     {
         try
         {
-            var tag = $"filetransfer_{notificationSequence}";
+            // if transfer is in progress, update existing notification
             if (progress.HasValue && progress > 0 && progress < 100)
             {
-                // Update existing notification with progress
                 var progressData = new AppNotificationProgressData(notificationSequence)
                 {
-                    Title = title,
+                    Title = fileName,
                     Value = progress.Value / 100,
                     ValueStringOverride = $"{progress.Value:F0}%",
-                    Status = message
+                    Status = subtitle 
                 };
-
-                await AppNotificationManager.Default.UpdateAsync(progressData, tag, Constants.Notification.FileTransferGroup);
+                await AppNotificationManager.Default.UpdateAsync(progressData, transferId, Constants.Notification.FileTransferGroup);
             }
             else
             {
                 var builder = new AppNotificationBuilder()
-                    .AddText(title)
-                    .AddText(message)
-                    .SetTag(tag)
-                    .SetGroup(Constants.Notification.FileTransferGroup);
-
-                // Only add progress bar for initial notification
-                if (progress == 0)
-                {
-                    builder.AddProgressBar(new AppNotificationProgressBar()
+                    .AddText("FileTransferNotification.Title".GetLocalizedResource())
+                    .SetTag(transferId)
+                    .SetGroup(Constants.Notification.FileTransferGroup)
+                    .MuteAudio()
+                    .AddButton(new AppNotificationButton("FileTransferNotificationAction.Cancel".GetLocalizedResource())
+                        .AddArgument("notificationType", ToastNotificationType.FileTransfer)
+                        .AddArgument("action", "cancel"))
+                    .AddProgressBar(new AppNotificationProgressBar()
                         .BindTitle()
                         .BindValue()
                         .BindValueStringOverride()
                         .BindStatus());
-                }
-
-                // Add action buttons for completion notification
-                if (progress == null && !string.IsNullOrEmpty(fileName))
-                {
-                    // For received files, get the default received files location
-                    var filePath = fileName; // This will be the full path passed from FileTransferService
-
-                    builder
-                        .AddButton(new AppNotificationButton("TransferNotificationActionOpenFile".GetLocalizedResource())
-                            .AddArgument("notificationType", ToastNotificationType.FileTransfer)
-                            .AddArgument("action", "openFile")
-                            .AddArgument("filePath", filePath))
-                        .AddButton(new AppNotificationButton("TransferNotificationActionOpenFolder".GetLocalizedResource())
-                            .AddArgument("notificationType", ToastNotificationType.FileTransfer)
-                            .AddArgument("action", "openFolder")
-                            .AddArgument("folderPath", Path.GetDirectoryName(filePath)));
-                }
-
-                if (silent)
-                {
-                    builder.MuteAudio();
-                }
 
                 var notification = builder.BuildNotification();
+                notification.ExpiresOnReboot = true;
 
-                // Set initial progress data only for initial notification
-                if (progress == 0)
+                // Set initial progress data
+                notification.Progress = new AppNotificationProgressData(notificationSequence)
                 {
-                    var initialProgress = new AppNotificationProgressData(notificationSequence)
-                    {
-                        Title = title,
-                        Value = 0,
-                        ValueStringOverride = "0%",
-                        Status = message
-                    };
-
-                    notification.Progress = initialProgress;
-                }
+                    Title = fileName,
+                    Value = 0,
+                    ValueStringOverride = "0%",
+                    Status = subtitle
+                };
 
                 AppNotificationManager.Default.Show(notification);
             }
@@ -159,16 +133,57 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
         }
     }
 
+
     /// <inheritdoc />
-    public async Task ShowClipboardNotification(string title, string text, string? iconPath = null)
+    public async void ShowCompletedFileTransferNotification(string subtitle, string transferId, string? filePath = null, string? folderPath = null)
+    {
+        // TODO: show hero image if available   
+        try
+        {
+            await Task.Delay(500);
+            var builder = new AppNotificationBuilder()
+                .AddText("FileTransferNotification.Completed".GetLocalizedResource())
+                .AddText(subtitle)
+                .SetTag(transferId)
+                .SetGroup(Constants.Notification.FileTransferGroup);
+
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                builder.AddButton(new AppNotificationButton("FileTransferNotificationAction.OpenFile".GetLocalizedResource())
+                    .AddArgument("notificationType", ToastNotificationType.FileTransfer)
+                    .AddArgument("action", "openFile")
+                    .AddArgument("filePath", filePath));
+            }
+
+            if (!string.IsNullOrEmpty(folderPath))
+            {
+                builder.AddButton(new AppNotificationButton("FileTransferNotificationAction.OpenFolder".GetLocalizedResource())
+                    .AddArgument("notificationType", ToastNotificationType.FileTransfer)
+                    .AddArgument("action", "openFolder")
+                    .AddArgument("folderPath", folderPath));
+            }
+
+            var notification = builder.BuildNotification();
+            notification.ExpiresOnReboot = true;
+            AppNotificationManager.Default.Show(notification);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to show file transfer notification");
+        }
+    }
+
+
+    /// <inheritdoc />
+    public void ShowClipboardNotification(string title, string text, string? iconPath = null)
     {
         try
         {
             var builder = new AppNotificationBuilder()
                 .AddText(title)
                 .AddText(text)
-                .SetTag($"simple_{DateTime.Now.Ticks}")
-                .SetGroup("simple");
+                .SetTag($"clipboard_{DateTime.Now.Ticks}")
+                .SetGroup("clipboard");
 
             var notification = builder.BuildNotification();
             notification.ExpiresOnReboot = true;
@@ -181,7 +196,7 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
     }
 
     /// <inheritdoc />
-    public async Task ShowClipboardNotificationWithActions(string title, string text, string? actionLabel = null, string? actionData = null)
+    public void ShowClipboardNotificationWithActions(string title, string text, string? actionLabel = null, string? actionData = null)
     {
         try
         {
@@ -209,44 +224,6 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
     }
 
     /// <inheritdoc />
-    public async Task ShowFileTransferNotification(string title, string text, string? filePath = null, string? folderPath = null)
-    {
-        // TODO: show hero image if available
-        try
-        {
-            var builder = new AppNotificationBuilder()
-                .AddText(title)
-                .AddText(text)
-                .SetTag($"filetransfer_{DateTime.Now.Ticks}")
-                .SetGroup("filetransfer");
-
-            if (!string.IsNullOrEmpty(filePath))
-            {
-                builder.AddButton(new AppNotificationButton("Open File")
-                    .AddArgument("notificationType", ToastNotificationType.FileTransfer)
-                    .AddArgument("action", "openFile")
-                    .AddArgument("filePath", filePath));
-            }
-
-            if (!string.IsNullOrEmpty(folderPath))
-            {
-                builder.AddButton(new AppNotificationButton("Open Folder")
-                    .AddArgument("notificationType", ToastNotificationType.FileTransfer)
-                    .AddArgument("action", "openFolder")
-                    .AddArgument("folderPath", folderPath));
-            }
-
-            var notification = builder.BuildNotification();
-            notification.ExpiresOnReboot = true;
-            AppNotificationManager.Default.Show(notification);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to show file transfer notification");
-        }
-    }
-
-    /// <inheritdoc />
     public async Task RegisterForNotifications()
     {
         AppNotificationManager.Default.NotificationInvoked -= OnNotificationInvoked;
@@ -266,27 +243,10 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
     {
         try
         {
-            logger.LogDebug("Notification invoked - Arguments: {Arguments}", string.Join(", ", args.Arguments.Select(x => $"{x.Key}={x.Value}")));
+            logger.LogInformation("Notification invoked - Arguments: {Arguments}", string.Join(", ", args.Arguments.Select(x => $"{x.Key}={x.Value}")));
 
-            // Common cleanup for all notifications
-            try
-            {
-                await sender.RemoveByGroupAsync(Constants.Notification.FileTransferGroup);
-                await Task.Delay(100); // Small delay to ensure removal
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning(ex, "Failed to remove notifications");
-            }
-
-            // Determine notification type first
-            if (!args.Arguments.TryGetValue("notificationType", out var notificationType))
-            {
-                logger.LogWarning("Notification missing type identifier");
-                return;
-            }
-
-            // Route to appropriate handler
+            if (!args.Arguments.TryGetValue("notificationType", out var notificationType)) return;
+            
             switch (notificationType)
             {
                 case ToastNotificationType.FileTransfer:
@@ -312,18 +272,15 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
         }
     }
 
-    private async void HandleClipboardNotification(AppNotificationActivatedEventArgs args)
+    private static async void HandleClipboardNotification(AppNotificationActivatedEventArgs args)
     {
-        if (args.Arguments.TryGetValue("uri", out var uriString) && Uri.TryCreate(uriString, UriKind.Absolute, out Uri? uri))
+        if (args.Arguments.TryGetValue("uri", out var uriString) && Uri.TryCreate(uriString, UriKind.Absolute, out Uri? uri) && ClipboardService.IsValidWebUrl(uri))
         {
-            if (ClipboardService.IsValidWebUrl(uri))
-            {
-                await Launcher.LaunchUriAsync(uri);
-            }
+            await Launcher.LaunchUriAsync(uri);
         }
     }
 
-    private void HandleFileTransferNotification(AppNotificationActivatedEventArgs args)
+    private static void HandleFileTransferNotification(AppNotificationActivatedEventArgs args)
     {
         if (args.Arguments.TryGetValue("action", out string? action))
         {
@@ -338,12 +295,7 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
                             UseShellExecute = true
                         });
                     }
-                    else
-                    {
-                        logger.LogWarning("File not found or path not provided - FilePath: {FilePath}", filePath);
-                    }
                     break;
-
                 case "openFolder":
                     if (args.Arguments.TryGetValue("folderPath", out string? folderPath) && Directory.Exists(folderPath))
                     {
@@ -354,10 +306,10 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
                             UseShellExecute = true
                         });
                     }
-                    else
-                    {
-                        logger.LogWarning("Folder not found or path not provided - FolderPath: {FolderPath}", folderPath);
-                    }
+                    break;
+                case "cancel":
+                    var fileTransferService = Ioc.Default.GetRequiredService<IFileTransferService>();
+                    fileTransferService.CancelTransfer();
                     break;
             }
         }
@@ -372,9 +324,9 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
             return;
 
         var device = deviceManager.FindDeviceById(deviceId);
-        if (device == null) return;
+        if (device is null) return;
 
-        var notificationKey = args.Arguments["notificationKey"];
+        var notificationKey = args.Arguments["tag"];
         switch (actionType)
         {
             case "Reply" when args.UserInput.TryGetValue("textBox", out var replyText):
@@ -384,90 +336,37 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
                 }
                 break;
             case "Click":
-                if (args.Arguments.TryGetValue("actionIndex", out var actionIndexStr) && int.TryParse(actionIndexStr, out var actionIndex))
+                if (args.Arguments.TryGetValue("actionIndex", out var actionIndexStr))
                 {
-                    NotificationActionUtils.ProcessClickAction(sessionManager, logger, device, notificationKey, actionIndex);
+                    NotificationActionUtils.ProcessClickAction(sessionManager, logger, device, notificationKey, int.Parse(actionIndexStr));
                 }
                 break;
         }
     }
 
     /// <inheritdoc />
-    public async Task RemoveNotification(string notificationKey)
+    public async Task RemoveNotificationByTag(string? tag)
     {
-        try
-        {
-            await AppNotificationManager.Default.RemoveByTagAsync(notificationKey);
-        }
-        catch (Exception ex)
-        {
-            logger.LogWarning(ex, "Failed to remove notification with key {NotificationKey}", notificationKey);
-        }
+        if (string.IsNullOrEmpty(tag)) return;
+        await AppNotificationManager.Default.RemoveByTagAsync(tag);
     }
 
     /// <inheritdoc />
-    public async Task RemoveNotificationsByGroup(string groupKey)
+    public async Task RemoveNotificationsByGroup(string? groupKey)
     {
-        try
-        {
-            await AppNotificationManager.Default.RemoveByGroupAsync(groupKey);
-        }
-        catch (Exception ex)
-        {
-            logger.LogWarning(ex, "Failed to remove notifications for group {GroupKey}", groupKey);
-        }
+        if (string.IsNullOrEmpty(groupKey)) return;
+        await AppNotificationManager.Default.RemoveByGroupAsync(groupKey);
+    }
+
+    public async Task RemoveNotificationsByTagAndGroup(string? tag, string? groupKey)
+    {
+        if (string.IsNullOrEmpty(tag) || string.IsNullOrEmpty(groupKey)) return;
+        await AppNotificationManager.Default.RemoveByTagAndGroupAsync(tag, groupKey);
     }
 
     /// <inheritdoc />
     public async Task ClearAllNotifications()
     {
-        try
-        {
-            await AppNotificationManager.Default.RemoveAllAsync();
-        }
-        catch (Exception ex)
-        {
-            logger.LogWarning(ex, "Failed to clear all notifications");
-        }
-    }
-
-    private async Task SetAppNotificationIcon(AppNotificationBuilder builder, string? appPackage, string? appIconBase64)
-    {
-        try
-        {
-
-            if (!string.IsNullOrEmpty(appPackage))
-            {
-                var iconUri = await ImageUtils.GetAppIconUri($"{appPackage}.png");
-                if (iconUri != null)
-                {
-                    builder.SetAppLogoOverride(iconUri, AppNotificationImageCrop.Circle);
-                    return;
-                }
-            }
-
-            // Fall back to saving the base64 icon if no local icon exists
-            if (!string.IsNullOrEmpty(appIconBase64))
-            {
-                await SetNotificationIcon(builder, appIconBase64, "appIcon.png");
-            }
-        }
-        catch (Exception ex)
-        {
-            logger.LogWarning(ex, "Failed to set app notification icon");
-        }
-    }
-
-    private async Task SetNotificationIcon(AppNotificationBuilder builder, string iconBase64, string fileName)
-    {
-        try
-        {
-            var fileUri = await ImageUtils.SaveBase64ToFileAsync(iconBase64, fileName);
-            builder.SetAppLogoOverride(fileUri, AppNotificationImageCrop.Circle);
-        }
-        catch (Exception ex)
-        {
-            logger.LogWarning(ex, "Failed to set notification icon");
-        }
+        await AppNotificationManager.Default.RemoveAllAsync();
     }
 }

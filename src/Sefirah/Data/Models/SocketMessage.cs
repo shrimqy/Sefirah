@@ -266,7 +266,7 @@ public class AudioDevice : SocketMessage
 public class FileTransfer : SocketMessage
 {
     [JsonPropertyName("transferType")]
-    public required FileTransferType TransferType { get; set; }
+    public FileTransferType TransferType { get; set; }
 
     [JsonPropertyName("fileMetadata")]
     public required FileMetadata FileMetadata { get; set; }

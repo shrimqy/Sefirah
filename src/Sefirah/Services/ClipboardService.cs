@@ -1,5 +1,6 @@
 using CommunityToolkit.WinUI;
 using Sefirah.Data.Contracts;
+using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Utils.Serialization;
 using Windows.ApplicationModel.DataTransfer;
@@ -114,7 +115,7 @@ public class ClipboardService : IClipboardService
                             var fileExtension = file.FileType[1..];
 
                             // Validate that this is a supported image type and get MIME type
-                            if (!SupportedImageFileTypes.TryGetValue(fileExtension, out var detectedMimeType)) 
+                            if (!SupportedImageFileTypes.TryGetValue(fileExtension, out var detectedMimeType))
                                 return;
 
                             // Content type from StorageFile can be unreliable
@@ -125,12 +126,10 @@ public class ClipboardService : IClipboardService
 
                             logger.LogInformation("fileName: {fileName}, fileExtension: {fileExtension}, Mime type: {mimeType}", file.Name, fileExtension, mimeType);
 
-                            using var dataStream = await file.OpenReadAsync();
-                            using var stream = dataStream.AsStream();
-                            if (stream.Length > DirectTransferThreshold)
-                                await HandleLargeImageTransfer(stream, fileExtension, mimeType, devicesWithImageSync);
+                            if ((long)(await file.GetBasicPropertiesAsync()).Size > DirectTransferThreshold)
+                                await HandleLargeImageTransfer(file, fileExtension, mimeType, devicesWithImageSync);
                             else
-                                await HandleSmallImageTransfer(stream, mimeType, devicesWithImageSync);
+                                await HandleSmallImageTransfer(await file.OpenStreamForReadAsync(), mimeType, devicesWithImageSync);
                         }
                         return;
                     }
@@ -186,20 +185,20 @@ public class ClipboardService : IClipboardService
         return;
     }
 
-    private async Task HandleLargeImageTransfer(Stream stream, string fileType, string mimeType, List<PairedDevice> devices)
+    private async Task HandleLargeImageTransfer(StorageFile file, string fileType, string mimeType, List<PairedDevice> devices)
     {
         var metadata = new FileMetadata
         {
             FileName = $"sefirah_clipboard_image.{fileType}",
             MimeType = mimeType,
-            FileSize = stream.Length
+            FileSize = (long)(await file.GetBasicPropertiesAsync()).Size
         };
 
         await Task.Run(async() =>
         {
             foreach (var device in devices)
             {
-                await fileTransferService.SendFileWithStream(stream, metadata, device, true);
+                await fileTransferService.SendFile(file, metadata, device, FileTransferType.Clipboard);
             }
         });
     }
@@ -253,7 +252,7 @@ public class ClipboardService : IClipboardService
                         }
                         else if (isValidUri && sourceDevice.DeviceSettings.ShowClipboardToast)
                         {
-                            await platformNotificationHandler.ShowClipboardNotificationWithActions(
+                            platformNotificationHandler.ShowClipboardNotificationWithActions(
                                 "Clipboard data received",
                                 "Click to open link in browser",
                                 "Open in browser",
@@ -270,7 +269,7 @@ public class ClipboardService : IClipboardService
 
                 if (sourceDevice.DeviceSettings.ShowClipboardToast && content is not string)
                 {
-                    await platformNotificationHandler.ShowClipboardNotification(
+                    platformNotificationHandler.ShowClipboardNotification(
                         "Clipboard data received",
                         $"Content type: {content.GetType().Name}");
                 }

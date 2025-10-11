@@ -313,19 +313,7 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>App-spezifische Einstellungen</value>
   </data>
-  <data name="TransferNotificationReceiving.Content" xml:space="preserve">
-    <value>Empfange {0}</value>
-  </data>
-  <data name="TransferNotificationReceivingError" xml:space="preserve">
-    <value>Fehler beim Empfang von {0}</value>
-  </data>
-  <data name="TransferNotificationReceiving.Title" xml:space="preserve">
-    <value>Empfange Datei</value>
-  </data>
-  <data name="TransferNotificationReceived.Title" xml:space="preserve">
-    <value>Empfangene Datei</value>
-  </data>
-  <data name="TransferNotification.Title" xml:space="preserve">
+  <data name="FileTransferNotification.Title" xml:space="preserve">
     <value>Datentransfer</value>
   </data>
   <data name="SendButton" xml:space="preserve">
@@ -334,10 +322,10 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
   <data name="ReplyPlaceholder" xml:space="preserve">
     <value>Antwort eingeben</value>
   </data>
-  <data name="TransferNotificationActionOpenFile" xml:space="preserve">
+  <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
     <value>Datei öffnen</value>
   </data>
-  <data name="TransferNotificationActionOpenFolder" xml:space="preserve">
+  <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
     <value>Ordner öffnen</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
@@ -532,12 +520,6 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
   <data name="EnableVirtualDisplay" xml:space="preserve">
     <value>Virtuellen Bildschirm aktivieren</value>
   </data>
-  <data name="TransferNotificationSending.Title" xml:space="preserve">
-    <value>Sending file</value>
-  </data>
-  <data name="TransferNotificationSent.Title" xml:space="preserve">
-    <value>Sent file</value>
-  </data>
   <data name="Uninstall" xml:space="preserve">
     <value>Deinstallieren</value>
   </data>
@@ -706,7 +688,34 @@ input text %pwd%</value>
   <data name="Save" xml:space="preserve">
     <value>Save</value>
   </data>
-  <data name="Save" xml:space="preserve">
-    <value>Save</value>
+  <data name="FileTransferNotification.Receiving" xml:space="preserve">
+    <value>Empfange von {0}</value>
+  </data>
+  <data name="FileTransferNotification.Sending" xml:space="preserve">
+    <value>Sende an {0}</value>
+  </data>
+  <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
+    <value>Empfange {0}/{1} von {2}</value>
+  </data>
+  <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
+    <value>Sende {0}/{1} an {2}</value>
+  </data>
+  <data name="FileTransferNotification.Completed" xml:space="preserve">
+    <value>Dateiübertragung abgeschlossen</value>
+  </data>
+  <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
+    <value>{0} von {1} empfangen</value>
+  </data>
+  <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
+    <value>{0} Dateien von {1} empfangen</value>
+  </data>
+  <data name="FileTransferNotification.SentSingle" xml:space="preserve">
+    <value>{0} an {1} gesendet</value>
+  </data>
+  <data name="FileTransferNotification.SentBulk" xml:space="preserve">
+    <value>{0} Dateien an {1} gesendet</value>
+  </data>
+  <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
+    <value>Abbrechen</value>
   </data>
 </root>
