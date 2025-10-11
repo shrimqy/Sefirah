@@ -312,20 +312,8 @@
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>Réglages spécifiques à l'application</value>
   </data>
-  <data name="TransferNotificationReceiving.Content" xml:space="preserve">
-    <value>Réception de {0}</value>
-  </data>
-  <data name="TransferNotificationReceivingError" xml:space="preserve">
-    <value>Erreur lors de la réception de {0}</value>
-  </data>
-  <data name="TransferNotificationReceiving.Title" xml:space="preserve">
-    <value>Réception du fichier</value>
-  </data>
-  <data name="TransferNotificationReceived.Title" xml:space="preserve">
-    <value>Fichier reçu</value>
-  </data>
-  <data name="TransferNotification.Title" xml:space="preserve">
-    <value>Transfert de fichier</value>
+  <data name="FileTransferNotification.Title" xml:space="preserve">
+    <value>File transfer</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>Envoyer</value>
@@ -333,11 +321,11 @@
   <data name="ReplyPlaceholder" xml:space="preserve">
     <value>Tapez une réponse</value>
   </data>
-  <data name="TransferNotificationActionOpenFile" xml:space="preserve">
-    <value>Ouvrir le fichier</value>
+  <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
+    <value>Open file</value>
   </data>
-  <data name="TransferNotificationActionOpenFolder" xml:space="preserve">
-    <value>Ouvrir le dossier</value>
+  <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
+    <value>Open folder</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
     <value>Désactiver les notifications de {0}</value>
@@ -531,12 +519,6 @@
   <data name="EnableVirtualDisplay" xml:space="preserve">
     <value>Activer l'affichage virtuel</value>
   </data>
-  <data name="TransferNotificationSending.Title" xml:space="preserve">
-    <value>Sending file</value>
-  </data>
-  <data name="TransferNotificationSent.Title" xml:space="preserve">
-    <value>Sent file</value>
-  </data>
   <data name="Uninstall" xml:space="preserve">
     <value>Désinstaller</value>
   </data>
@@ -704,5 +686,35 @@ input text %pwd%</value>
   </data>
   <data name="Save" xml:space="preserve">
     <value>Sauvegarder</value>
+  </data>
+  <data name="FileTransferNotification.Receiving" xml:space="preserve">
+    <value>Receiving from {0}</value>
+  </data>
+  <data name="FileTransferNotification.Sending" xml:space="preserve">
+    <value>Sending to {0}</value>
+  </data>
+  <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
+    <value>Receiving {0}/{1} from {2}</value>
+  </data>
+  <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
+    <value>Sending {0}/{1} to {2}</value>
+  </data>
+  <data name="FileTransferNotification.Completed" xml:space="preserve">
+    <value>File transfer completed</value>
+  </data>
+  <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
+    <value>Received {0} from {1}</value>
+  </data>
+  <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
+    <value>Received {0} files from {1}</value>
+  </data>
+  <data name="FileTransferNotification.SentSingle" xml:space="preserve">
+    <value>Sent {0} to {1}</value>
+  </data>
+  <data name="FileTransferNotification.SentBulk" xml:space="preserve">
+    <value>Sent {0} files to {1}</value>
+  </data>
+  <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
+    <value>Cancel</value>
   </data>
 </root>
