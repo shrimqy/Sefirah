@@ -13,6 +13,7 @@
     xmlns:rescap5="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities/5"
     
     xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+    xmlns:desktop2="http://schemas.microsoft.com/appx/manifest/desktop/windows10/2"
     xmlns:desktop3="http://schemas.microsoft.com/appx/manifest/desktop/windows10/3"
     xmlns:desktop4="http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
     xmlns:desktop6="http://schemas.microsoft.com/appx/manifest/desktop/windows10/6"
@@ -22,7 +23,7 @@
     xmlns:cloudfiles="http://schemas.microsoft.com/appx/manifest/cloudfiles/windows10"
     xmlns:cloudfiles2="http://schemas.microsoft.com/appx/manifest/cloudfiles/windows10/2"
     xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
-    IgnorableNamespaces="uap rescap rescap5 uap3 desktop3 desktop4 desktop6 desktop7 cloudfiles cloudfiles2 mp">
+    IgnorableNamespaces="uap rescap rescap5 uap3 desktop2 desktop3 desktop4 desktop6 desktop7 cloudfiles cloudfiles2 mp">
     
     <Identity  Version="2.0.1.0" Name="shrimqy.Seki-PhoneLink" Publisher="CN=BEC0F2AA-07EB-4762-A2FE-13550AF289A5"/>
     
@@ -106,6 +107,17 @@
             </Extensions>
         </Application>
     </Applications>   
+
+    <Extensions>
+        <desktop2:Extension Category="windows.firewallRules">
+            <desktop2:FirewallRules Executable="Sefirah.exe">
+                <desktop2:Rule Direction="in" IPProtocol="TCP" LocalPortMin="5149" LocalPortMax="5169" Profile="all"/>
+                <desktop2:Rule Direction="out" IPProtocol="TCP" LocalPortMin="5149" LocalPortMax="5169" Profile="all"/>
+                <desktop2:Rule Direction="in" IPProtocol="UDP" LocalPortMin="5149" LocalPortMax="5169" Profile="all"/>
+                <desktop2:Rule Direction="out" IPProtocol="UDP" LocalPortMin="5149" LocalPortMax="5169" Profile="all"/>
+            </desktop2:FirewallRules>
+        </desktop2:Extension>
+    </Extensions>
 
     <Capabilities>
         <Capability Name="internetClient" />
