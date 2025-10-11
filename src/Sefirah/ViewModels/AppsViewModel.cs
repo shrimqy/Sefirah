@@ -43,7 +43,6 @@ public sealed partial class AppsViewModel : BaseViewModel
         SessionManager.SendMessage(DeviceManager.ActiveDevice!.Session!, SocketMessageSerializer.Serialize(message));
     }
 
-    [RelayCommand]
     public void PinApp(ApplicationInfo app)
     {
         try
@@ -68,8 +67,7 @@ public sealed partial class AppsViewModel : BaseViewModel
         }
     }
 
-    [RelayCommand]
-    public async Task UninstallApp(ApplicationInfo app)
+    public async void UninstallApp(ApplicationInfo app)
     {
         try
         {
@@ -94,6 +92,7 @@ public sealed partial class AppsViewModel : BaseViewModel
     {
         try
         {
+            Logger.LogInformation("Loading apps");
             IsLoading = true;
 
             if (DeviceManager.ActiveDevice is null) return;

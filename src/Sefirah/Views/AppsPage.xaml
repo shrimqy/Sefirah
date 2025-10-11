@@ -34,16 +34,16 @@
                 <Grid.ContextFlyout>
                     <MenuFlyout>
                         <MenuFlyoutItem
-                            Command="{Binding ElementName=AppPageRoot, Path=ViewModel.PinAppCommand}"
-                            CommandParameter="{x:Bind}"
+                            Click="PinAppClick"
+                            DataContext="{x:Bind}"
                             Text="{x:Bind DeviceInfo.Pinned, Mode=OneWay, Converter={StaticResource BoolToPinTextConverter}}">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon Glyph="{x:Bind DeviceInfo.Pinned, Mode=OneWay, Converter={StaticResource BoolToPinGlyphConverter}}" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
                         <MenuFlyoutItem
-                            Command="{Binding ElementName=AppPageRoot, Path=ViewModel.UninstallAppCommand}"
-                            CommandParameter="{x:Bind}"
+                            Click="UninstallAppClick"
+                            DataContext="{x:Bind}"
                             Text="{helpers:ResourceString Name=Uninstall}">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon Glyph="&#xE74D;" />

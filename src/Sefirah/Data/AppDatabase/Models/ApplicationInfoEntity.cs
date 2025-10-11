@@ -12,8 +12,6 @@ public partial class ApplicationInfoEntity
 
     public string AppName { get; set; } = string.Empty;
 
-    public string? AppIconPath { get; set; }
-
     [Column("AppDeviceInfo")]
     public string AppDeviceInfoJson { get; set; } = string.Empty;
 
@@ -28,18 +26,17 @@ public partial class ApplicationInfoEntity
     internal ApplicationInfo ToApplicationInfo(string deviceId)
     {
         var deviceInfo =  AppDeviceInfoList.FirstOrDefault(d => d.DeviceId == deviceId) ?? new AppDeviceInfo(deviceId, NotificationFilter.ToastFeed);
-        return new ApplicationInfo(PackageName, AppName, AppIconPath, deviceInfo);
+        return new ApplicationInfo(PackageName, AppName, IconUtils.GetAppIconPath(PackageName), deviceInfo);
     }
 
     internal static async Task<ApplicationInfoEntity> FromApplicationInfoMessage(ApplicationInfoMessage info, string deviceId)
     {
         List<AppDeviceInfo> appDeviceInfoList = [new(deviceId, NotificationFilter.ToastFeed)];
-
+        IconUtils.SaveAppIconToPathAsync(info.AppIcon, info.PackageName);
         return new ApplicationInfoEntity
         {
             PackageName = info.PackageName,
             AppName = info.AppName,
-            AppIconPath = await IconUtils.SaveAppIconToPathAsync(info.AppIcon, info.PackageName),
             AppDeviceInfoJson = JsonSerializer.Serialize(appDeviceInfoList)
         };
     }

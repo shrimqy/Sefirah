@@ -66,17 +66,22 @@ public static class IconUtils
         }
     }
 
+    public static string GetAppIconPath(string packageName)
+    {
+        return $"ms-appdata:///local/{AppIconsFolderName}/{packageName}.png";
+    }
+
     /// <summary>
     /// Saves app icon bytes to the AppIcons folder and returns the file system path
     /// </summary>
     /// <param name="bytes">App icon bytes to save</param>
     /// <param name="fileName">Name of the app icon file</param>
     /// <returns>File system path to the saved app icon file</returns>
-    public static async Task<string?> SaveAppIconToPathAsync(string? appIconBase64, string appPackage)
+    public static async void SaveAppIconToPathAsync(string? appIconBase64, string appPackage)
     {
         try
         {
-            if (string.IsNullOrEmpty(appIconBase64)) return null;
+            if (string.IsNullOrEmpty(appIconBase64)) return;
             
             var bytes = Convert.FromBase64String(appIconBase64);
             var appIconsFolder = await GetAppIconsFolderAsync();
@@ -85,11 +90,9 @@ public static class IconUtils
             using var dataWriter = new DataWriter(stream);
             dataWriter.WriteBytes(bytes);
             await dataWriter.StoreAsync();
-            return file.Path;
         }
         catch (Exception)
-        { 
-            return null;
+        {
         }
     }
 } 

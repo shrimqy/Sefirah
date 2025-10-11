@@ -48,8 +48,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
         {
             // Update app info (icon, name might be different)
             existingApp.AppName = application.AppName;
-            existingApp.AppIconPath = application.AppIconPath ?? existingApp.AppIconPath;
-            
+
             // Add device to existing app if not already present
             if (!HasDevice(existingApp, deviceId))
             {
@@ -77,9 +76,8 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
         {
             context.Database.Insert(application);
             await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
-            {
-                Applications.Add(application.ToApplicationInfo(deviceId));
-            });
+                Applications.Add(application.ToApplicationInfo(deviceId))
+            );
         }
     }
 
@@ -246,16 +244,6 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
         deviceInfoList.First(d => d.DeviceId == deviceId).Pinned = false;
         app.AppDeviceInfoJson = JsonSerializer.Serialize(deviceInfoList);
         context.Database.Update(app);
-    }
-
-    public string? GetAppIcon(string packageName)
-    {
-        var app = context.Database.Find<ApplicationInfoEntity>(packageName);
-        if (app != null)
-        {
-            return app.AppIconPath;
-        }
-        return null;
     }
     
     #region Helpers

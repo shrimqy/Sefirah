@@ -51,4 +51,20 @@ public sealed partial class AppsPage : Page
             await ViewModel.OpenApp(selectedApp.PackageName, selectedApp.AppName);
         }
     }
+
+    private void PinAppClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuFlyoutItem menuItem && menuItem.DataContext is ApplicationInfo app)
+        {
+            ViewModel.PinApp(app);
+        }
+    }
+
+    private async void UninstallAppClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuFlyoutItem menuItem && menuItem.DataContext is ApplicationInfo app)
+        {
+            ViewModel.UninstallApp(app);
+        }
+    }
 }

@@ -2,6 +2,7 @@ using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
+using Sefirah.Utils;
 using Sefirah.Utils.Serialization;
 
 namespace Sefirah.ViewModels;
@@ -143,7 +144,7 @@ public sealed partial class MainPageViewModel : BaseViewModel
         string? appIcon = string.Empty;
         if (!string.IsNullOrEmpty(notification.AppPackage))
         {
-            appIcon = RemoteAppsRepository.GetAppIcon(notification.AppPackage);
+            appIcon = IconUtils.GetAppIconPath(notification.AppPackage);
         }
         var started = await ScreenMirrorService.StartScrcpy(Device!, $"--new-display --start-app={notification.AppPackage}", appIcon);
 
