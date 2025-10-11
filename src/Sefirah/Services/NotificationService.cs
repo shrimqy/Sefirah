@@ -158,6 +158,8 @@ public class NotificationService(
                 dispatcher.EnqueueAsync(() => notifications.Remove(notification));
                 logger.LogDebug("Removed notification with key: {NotificationKey} from device {DeviceId}", notification, device.Id);
 
+                platformNotificationHandler.RemoveNotificationsByTagAndGroup(notification.Tag, notification.GroupKey);
+
                 // Update active notifications if this is for the active device
                 if (deviceManager.ActiveDevice?.Id == device.Id)
                 {   
@@ -190,14 +192,14 @@ public class NotificationService(
         {
             if (!deviceNotifications.TryGetValue(activeDevice.Id, out var notifications)) return;
             
-                notification.Pinned = !notification.Pinned;
-                // Update existing notification
-                var index = notifications.IndexOf(notification);
-                notifications[index] = notification;
-                SortNotifications(activeDevice.Id);
+            notification.Pinned = !notification.Pinned;
+            // Update existing notification
+            var index = notifications.IndexOf(notification);
+            notifications[index] = notification;
+            SortNotifications(activeDevice.Id);
                 
-                // Update active notifications since this is for the active device
-                UpdateActiveNotifications(activeDevice);
+            // Update active notifications since this is for the active device
+            UpdateActiveNotifications(activeDevice);
         });
     }
 
