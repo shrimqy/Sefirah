@@ -21,7 +21,7 @@
             FalseValue="{helpers:ResourceString Name=Disconnected/Text}"
             TrueValue="{helpers:ResourceString Name=Connected/Text}" />
 
-        <converters:EmptyCollectionToVisibilityConverter x:Key="EmptyCollectionToVisibilityConverter" Inverse="True" />
+        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
         <wctconverters:EmptyObjectToObjectConverter x:Key="EmptyObjectToOpacityConverter" EmptyValue="1.0" NotEmptyValue="0.0" />
         <converters:EmptyObjectToBooleanConverter x:Key="EmptyObjectToFalseBooleanConverter" Inverse="True" />
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -40,7 +40,7 @@
                 FontSize="24"
                 FontWeight="SemiBold"
                 Text="{helpers:ResourceString Name=PairedDevices/Title}"
-                Visibility="{x:Bind ViewModel.PairedDevices, Mode=OneWay, Converter={StaticResource EmptyCollectionToVisibilityConverter}}" />
+                Visibility="{x:Bind ViewModel.PairedDevices.Count, Mode=OneWay, Converter={StaticResource CountToVisibilityConverter}}" />
 
             <ItemsRepeater ItemsSource="{x:Bind ViewModel.PairedDevices, Mode=OneWay}">
                 <ItemsRepeater.Layout>

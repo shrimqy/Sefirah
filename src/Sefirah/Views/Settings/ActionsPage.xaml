@@ -18,8 +18,8 @@
 
     <Page.Resources>
         <x:Double x:Key="BreadcrumbBarChevronFontSize">17</x:Double>
-        <converters:EmptyCollectionToVisibilityConverter x:Key="EmptyCollectionToVisibilityConverter" />
-        <converters:EmptyCollectionToVisibilityConverter x:Key="InverseEmptyCollectionToVisibilityConverter" Inverse="True" />
+        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
+        <converters:CountToVisibilityConverter x:Key="InverseCountToVisibilityConverter" Inverse="True" />
     </Page.Resources>
 
     <Page.DataContext>
@@ -97,7 +97,7 @@
                 Margin="0,32"
                 HorizontalAlignment="Center"
                 Spacing="8"
-                Visibility="{x:Bind ViewModel.Actions, Mode=OneWay, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
+                Visibility="{x:Bind ViewModel.Actions.Count, Mode=OneWay, Converter={StaticResource InverseCountToVisibilityConverter}}">
                 <FontIcon
                     FontSize="32"
                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"

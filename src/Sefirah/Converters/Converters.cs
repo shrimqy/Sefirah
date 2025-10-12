@@ -130,24 +130,6 @@ internal sealed partial class EmptyObjectToBooleanConverter : ValueConverter<obj
     }
 }
 
-internal sealed partial class EmptyCollectionToBooleanConverter : IValueConverter
-{
-    public bool Inverse { get; set; }
-
-    public object Convert(object value, Type targetType, object parameter, string language)
-    {
-        if (value is int count && count == 0)
-        {
-            return !Inverse;
-        }
-        return Inverse;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        throw new NotImplementedException();
-    }
-}
 
 internal sealed partial class EmptyObjectToVisibilityConverter : IValueConverter
 {
@@ -182,13 +164,14 @@ internal sealed partial class BooleanToVisibilityConverter : ValueConverter<bool
     }
 }
 
-internal sealed partial class EmptyCollectionToVisibilityConverter : ValueConverter<IEnumerable, Visibility>
+internal sealed partial class CountToVisibilityConverter : IValueConverter
 {
     public bool Inverse { get; set; }
 
-    protected override Visibility Convert(IEnumerable? value, object? parameter, string? language)
+    public object Convert(object value, Type targetType, object parameter, string language)
     {
-        bool isEmpty = value == null || !value.GetEnumerator().MoveNext();
+        int count = value is int intCount ? intCount : 0;
+        bool isEmpty = count == 0;
 
         if (Inverse)
             return isEmpty ? Visibility.Visible : Visibility.Collapsed;
@@ -196,9 +179,9 @@ internal sealed partial class EmptyCollectionToVisibilityConverter : ValueConver
             return isEmpty ? Visibility.Collapsed : Visibility.Visible;
     }
 
-    protected override IEnumerable? ConvertBack(Visibility value, object? parameter, string? language)
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
     {
-        throw new NotSupportedException();
+        throw new NotImplementedException();
     }
 }
 

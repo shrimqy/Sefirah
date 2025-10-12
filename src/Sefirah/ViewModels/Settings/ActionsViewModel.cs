@@ -71,7 +71,7 @@ public sealed partial class ActionsViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private async Task EditAction(BaseAction? action)
+    private async Task EditAction(BaseAction action)
     {
         if (action is not IActionDialog actionDialog) return;
 
@@ -85,10 +85,8 @@ public sealed partial class ActionsViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private async Task RemoveAction(BaseAction? action)
+    private async Task RemoveAction(BaseAction action)
     {
-        if (action is null) return;
-
         var dialog = new ContentDialog
         {
             Title = "Remove Action",
