@@ -66,6 +66,11 @@ public static class IconUtils
         }
     }
 
+    public static string GetAppIconFilePath(string packageName)
+    {
+        return $"{ApplicationData.Current.LocalFolder.Path}\\{AppIconsFolderName}\\{packageName}.png";
+    }
+
     public static string GetAppIconPath(string packageName)
     {
         return $"ms-appdata:///local/{AppIconsFolderName}/{packageName}.png";

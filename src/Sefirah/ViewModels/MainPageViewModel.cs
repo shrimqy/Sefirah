@@ -144,7 +144,7 @@ public sealed partial class MainPageViewModel : BaseViewModel
         string? appIcon = string.Empty;
         if (!string.IsNullOrEmpty(notification.AppPackage))
         {
-            appIcon = IconUtils.GetAppIconPath(notification.AppPackage);
+            appIcon = IconUtils.GetAppIconFilePath(notification.AppPackage);
         }
         var started = await ScreenMirrorService.StartScrcpy(Device!, $"--new-display --start-app={notification.AppPackage}", appIcon);
 

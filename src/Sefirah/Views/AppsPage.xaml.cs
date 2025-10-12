@@ -16,7 +16,7 @@ public sealed partial class AppsPage : Page
     {
         if (e.ClickedItem is ApplicationInfo app)
         {
-            await ViewModel.OpenApp(app.PackageName, app.AppName);
+            await ViewModel.OpenApp(app);
         }
     }
 
@@ -48,7 +48,7 @@ public sealed partial class AppsPage : Page
             sender.Text = string.Empty;
             sender.ItemsSource = null;
 
-            await ViewModel.OpenApp(selectedApp.PackageName, selectedApp.AppName);
+            await ViewModel.OpenApp(selectedApp);   
         }
     }
 

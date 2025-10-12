@@ -4,6 +4,7 @@ using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Utils.Serialization;
+using static Sefirah.Utils.IconUtils;
 
 namespace Sefirah.ViewModels;
 public sealed partial class AppsViewModel : BaseViewModel
@@ -125,16 +126,15 @@ public sealed partial class AppsViewModel : BaseViewModel
         OnPropertyChanged(nameof(HasPinnedApps));
     }
 
-    public async Task OpenApp(string appPackage, string appName)
+    public async Task OpenApp(ApplicationInfo app)
     {
         await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
         {
-            var app = Apps.First(a => a.PackageName == appPackage);
             app.IsLoading = true;
             try
             {
-                Logger.LogDebug("Opening app: {AppPackage}", appPackage);
-                var started = await ScreenMirrorService.StartScrcpy(DeviceManager.ActiveDevice!, $"--start-app={appPackage} --window-title=\"{appName}\"", app.IconPath);
+                Logger.LogDebug("Opening app: {AppPackage}", app.AppName);
+                var started = await ScreenMirrorService.StartScrcpy(DeviceManager.ActiveDevice!, $"--start-app={app.PackageName} --window-title=\"{app.AppName}\"", GetAppIconFilePath(app.PackageName));
                 if (started)
                 {
                     await Task.Delay(2000);
