@@ -54,7 +54,7 @@ public partial class AdbDevice : ObservableObject
             if (SetProperty(ref state, value))
             {
                 OnPropertyChanged(nameof(IsOnline));
-                IsConnected = value == DeviceState.Online;
+                IsConnected = value is DeviceState.Online;
             }
         }
     }
@@ -86,9 +86,9 @@ public partial class AdbDevice : ObservableObject
         set => SetProperty(ref isConnected, value);
     }
 
-    public string TypeDisplay => Type == DeviceType.WIFI ? "WiFi" : "USB";
+    public string TypeDisplay => Type is DeviceType.WIFI ? "WiFi" : "USB";
     
-    public bool IsOnline => State == DeviceState.Online;
+    public bool IsOnline => State is DeviceState.Online;
 
     private void UpdateDisplayName()
     {

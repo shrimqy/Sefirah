@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using Microsoft.Windows.ApplicationModel.Resources;
 
 namespace Sefirah.Extensions;
 
@@ -8,11 +7,7 @@ namespace Sefirah.Extensions;
 /// </summary>
 public static class StringExtensions
 {
-    /// <summary>
-    /// Resource map for accessing localized strings.
-    /// It is initialized with the main resource map of the application's resources and the subtree "Resources".
-    /// </summary>
-    private static readonly ResourceMap resourcesTree = new ResourceManager().MainResourceMap.TryGetSubtree("Resources");
+    private static readonly IStringLocalizer stringLocalizer = Ioc.Default.GetRequiredService<IStringLocalizer>();
 
     private static readonly ConcurrentDictionary<string, string> cachedResources = new();
 
@@ -23,32 +18,14 @@ public static class StringExtensions
     /// <returns>The localized resource string.</returns>
     public static string GetLocalizedResource(this string resourceKey)
     {
-        //if (cachedResources.TryGetValue(resourceKey, out var value))
-        //{
-        //    return value;
-        //}
-        
-        // Get the string localizer when needed instead of static initialization
-        IStringLocalizer? stringLocalizer = null;
-        try
+        if (cachedResources.TryGetValue(resourceKey, out var value))
         {
-            stringLocalizer = Ioc.Default.GetService<IStringLocalizer>();
+            return value;
         }
-        catch
-        {
-            // Fallback if service is not available yet
-        }
-        
-        string? value = null;
-        if (stringLocalizer != null)
-        {
-            value = stringLocalizer[resourceKey];
-        }
-        
-        // Fallback to resource map if stringLocalizer failed
+
         if (string.IsNullOrEmpty(value))
         {
-            value = resourcesTree?.TryGetValue(resourceKey)?.ValueAsString;
+            value = stringLocalizer[resourceKey];
         }
 
         return value ?? string.Empty;
