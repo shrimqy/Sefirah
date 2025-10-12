@@ -8,11 +8,26 @@ namespace Sefirah.Data.Models;
 public partial class PairedDevice : ObservableObject
 {
     public string Id { get; private set; }
-    public string Name { get; set; } = string.Empty;
+
+    private string name = string.Empty;
+    public string Name
+    {
+        get => name;
+        set => SetProperty(ref name, value);
+    }
+
     public string Model { get; set; } = string.Empty;
+
     public List<string>? IpAddresses { get; set; } = [];
+
     public List<PhoneNumber>? PhoneNumbers { get; set; } = [];
-    public ImageSource? Wallpaper { get; set; }
+
+    private ImageSource? wallpaper;
+    public ImageSource? Wallpaper
+    {
+        get => wallpaper;
+        set => SetProperty(ref wallpaper, value);
+    }
 
     private bool connectionStatus;
     public bool ConnectionStatus 
@@ -21,21 +36,18 @@ public partial class PairedDevice : ObservableObject
         set => SetProperty(ref connectionStatus, value);
     }
 
-    private DeviceStatus? _status;
+    private DeviceStatus? status;
     public DeviceStatus? Status
     {
-        get => _status;
-        set
-        {
-            SetProperty(ref _status, value);
-        }
+        get => status;
+        set => SetProperty(ref status, value);
     }
 
-    private ServerSession? _session;
+    private ServerSession? session;
     public ServerSession? Session
     {
-        get => _session;
-        set => SetProperty(ref _session, value);
+        get => session;
+        set => SetProperty(ref session, value);
     }
 
     private readonly IAdbService adbService;

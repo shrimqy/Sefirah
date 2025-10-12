@@ -60,8 +60,8 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
         try
         {
             var devices = context.Database.Table<RemoteDeviceEntity>()
-                                .OrderByDescending(d => d.LastConnected)
-                                .ToList();
+                .OrderByDescending(d => d.LastConnected)
+                .ToList();
             var pairedDevices = await Task.WhenAll(devices.Select(d => d.ToPairedDevice()));
             return pairedDevices.ToList();
         }

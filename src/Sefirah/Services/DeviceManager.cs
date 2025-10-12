@@ -131,7 +131,9 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
                 }
 
                 repository.AddOrUpdateRemoteDevice(existingDevice);
-                var pairedDevice = await existingDevice.ToPairedDevice();
+                
+                var pairedDevice = await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+                    existingDevice.ToPairedDevice());
                 return pairedDevice;
             }
 
