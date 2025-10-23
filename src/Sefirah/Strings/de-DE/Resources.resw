@@ -717,6 +717,6 @@ Eingabe Text %pwd%</value>
     <value>An {1} wurden {0} Dateien gesendet</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>Abbrechen</value>
   </data>
 </root>
