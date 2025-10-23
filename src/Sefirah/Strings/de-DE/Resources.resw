@@ -256,7 +256,7 @@
     <value>Verbinde dein Gerät</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>In Ihrem Netzwerk entdeckte Geräte werden unten angezeigt. Die Verbindung wird dann von Ihrem
+    <value>In Ihrem Netzwerk entdeckte Geräte werden unten erscheinen. Die Verbindung wird dann von Ihrem
 Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
@@ -314,7 +314,7 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
     <value>App-spezifische Einstellungen</value>
   </data>
   <data name="FileTransferNotification.Title" xml:space="preserve">
-    <value>File transfer</value>
+    <value>Dateiübertragung</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>Senden</value>
@@ -323,10 +323,10 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
     <value>Antwort eingeben</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
-    <value>Open file</value>
+    <value>Datei öffnen</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
-    <value>Open folder</value>
+    <value>Ordner öffnen</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
     <value>Benachrichtigungen von {0} deaktivieren</value>
@@ -527,7 +527,7 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
     <value>Shell-Befehle - Hilfe</value>
   </data>
   <data name="UnlockDeviceHelpDescription" xml:space="preserve">
-    <value>The shell commands in the text box will be executed before launching scrcpy. Enter commands that work on your device, separated by line.</value>
+    <value>Die Shell-Befehle im Textfeld werden ausgeführt, bevor scrcpy gestartet wird. Geben Sie Befehle ein, die auf Ihrem Gerät funktionieren, getrennt durch Zeile. Verwenden Sie %pwd% als Platzhalter für Ihr Passwort, wenn Sie danach gefragt werden müssen.</value>
   </data>
   <data name="UnlockDeviceHelpExample" xml:space="preserve">
     <value>Beispiel:</value>
@@ -536,11 +536,12 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
     <value>Nützliche Informationen:</value>
   </data>
   <data name="UnlockDeviceHelpNote" xml:space="preserve">
-    <value>26 or POWER: Wakes or sleeps the device screen.
-66 or ENTER: Simulates the Enter key press.
-82 or MENU: Brings up the unlock interface, or prompts for fingerprint authentication.
-Some devices may also require a swipe gesture to bring up the unlock UI:
-input touchscreen swipe 540 1800 540 900</value>
+    <value>26 oder POWER: Weckt oder schläft den Bildschirm des Geräts.
+66 oder ENTER: Simuliert die Enter-Taste.
+82 oder MENU: Stellt das Entsperr-Interface zur Verfügung oder fragt nach Fingerabdruck-Authentifizierung.
+%pwd%: Platzhalter für Passwort - Sie werden aufgefordert, es einzugeben.
+Einige Geräte können auch eine Wischgeste benötigen, um die Entsperr-UI zu öffnen:
+Input Touchscreen-Wischen 540 1800 540 900</value>
   </data>
   <data name="PinnedApps" xml:space="preserve">
     <value>Angeheftete Apps</value>
@@ -555,7 +556,7 @@ input touchscreen swipe 540 1800 540 900</value>
     <value>Keine ADB-Geräte verbunden</value>
   </data>
   <data name="AdbNoDeviceSubtitle" xml:space="preserve">
-    <value>Turn on ADB and connect your device via USB or Wi-Fi to see it here</value>
+    <value>Schalten Sie ADB ein und verbinden Sie Ihr Gerät über USB oder WLAN, um es hier zu sehen.</value>
   </data>
   <data name="ClipboardSettings" xml:space="preserve">
     <value>Clipboard Settings</value>
@@ -678,9 +679,9 @@ input touchscreen swipe 540 1800 540 900</value>
     <value>Gerät entsperren, bevor scrcpy gestartet wird</value>
   </data>
   <data name="UnlockCommandsPlaceholder" xml:space="preserve">
-    <value>input keyevent 26
-input keyevent 66
-input text %pwd%</value>
+    <value>Eingabe Tastennummer 26
+Eingabe Tastennummer 66
+Eingabe Text %pwd%</value>
   </data>
   <data name="FileDropCaption" xml:space="preserve">
     <value>Zu sendende Dateien ablegen</value>
@@ -689,31 +690,31 @@ input text %pwd%</value>
     <value>Speichern</value>
   </data>
   <data name="FileTransferNotification.Receiving" xml:space="preserve">
-    <value>Receiving from {0}</value>
+    <value>Empfang von {0}</value>
   </data>
   <data name="FileTransferNotification.Sending" xml:space="preserve">
-    <value>Sending to {0}</value>
+    <value>Versand an {0}</value>
   </data>
   <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
-    <value>Receiving {0}/{1} from {2}</value>
+    <value>Von {2} wird {0}/ {1} empfangen</value>
   </data>
   <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
-    <value>Sending {0}/{1} to {2}</value>
+    <value>An {2} wird {0}/ {1} gesendet</value>
   </data>
   <data name="FileTransferNotification.Completed" xml:space="preserve">
-    <value>File transfer completed</value>
+    <value>Dateiübertragung abgeschlossen</value>
   </data>
   <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
-    <value>Received {0} from {1}</value>
+    <value>Von {1} wurde {0} empfangen</value>
   </data>
   <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
-    <value>Received {0} files from {1}</value>
+    <value>Von {1} wurden {0} Dateien empfangen</value>
   </data>
   <data name="FileTransferNotification.SentSingle" xml:space="preserve">
-    <value>Sent {0} to {1}</value>
+    <value>An {1} wurde {0} gesendet</value>
   </data>
   <data name="FileTransferNotification.SentBulk" xml:space="preserve">
-    <value>Sent {0} files to {1}</value>
+    <value>An {1} wurden {0} Dateien gesendet</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
     <value>Cancel</value>
