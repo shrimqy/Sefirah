@@ -209,6 +209,7 @@ public class NotificationService(
         try
         {
             ClearHistory(activeDevice);
+            activeNotifications.Clear();
             if (activeDevice.Session is null) return;
 
             var command = new CommandMessage { CommandType = CommandType.ClearNotifications };
