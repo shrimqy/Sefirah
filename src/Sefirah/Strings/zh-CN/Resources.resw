@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -389,7 +389,7 @@
     <value>信息</value>
   </data>
   <data name="EmptyMessages" xml:space="preserve">
-    <value>Start a new conversation or select one to reply</value>
+    <value>开始一个新的对话来使用</value>
   </data>
   <data name="MessagePlaceholder" xml:space="preserve">
     <value>输入一条消息</value>
@@ -404,7 +404,7 @@
     <value>搜索消息</value>
   </data>
   <data name="AddressInputPlaceholder" xml:space="preserve">
-    <value>To</value>
+    <value>发送给</value>
   </data>
   <data name="RemoveAddress" xml:space="preserve">
     <value>删除地址</value>
@@ -419,7 +419,7 @@
     <value>所有应用</value>
   </data>
   <data name="AdditionalArguments" xml:space="preserve">
-    <value>Additional arguments</value>
+    <value>额外参数</value>
   </data>
   <data name="AdbDeviceOffline" xml:space="preserve">
     <value>Adb 设备已离线</value>
@@ -437,103 +437,103 @@
     <value>选择 Scrcpy 所在文件夹</value>
   </data>
   <data name="PreferTcpIp" xml:space="preserve">
-    <value>Prefer wireless connection</value>
+    <value>偏好远程连接</value>
   </data>
   <data name="SearchApps" xml:space="preserve">
-    <value>Search apps</value>
+    <value>搜索应用</value>
   </data>
   <data name="DisableVideoForwarding" xml:space="preserve">
-    <value>Disable video forwarding</value>
+    <value>关闭视频转发</value>
   </data>
   <data name="VideoCodec" xml:space="preserve">
-    <value>Video codec</value>
+    <value>视频编码</value>
   </data>
   <data name="FrameRate" xml:space="preserve">
-    <value>Frame rate</value>
+    <value>帧数</value>
   </data>
   <data name="Crop" xml:space="preserve">
-    <value>Crop</value>
+    <value>出现错误</value>
   </data>
   <data name="Display" xml:space="preserve">
-    <value>Display</value>
+    <value>显示</value>
   </data>
   <data name="VirtualDisplaySize" xml:space="preserve">
-    <value>Virtual display size</value>
+    <value>虚拟显示屏尺寸</value>
   </data>
   <data name="DisplayOrientation" xml:space="preserve">
-    <value>Display orientation</value>
+    <value>显示方向</value>
   </data>
   <data name="RotationAngle" xml:space="preserve">
-    <value>Rotation angle</value>
+    <value>旋转角度</value>
   </data>
   <data name="AudioOutputMode" xml:space="preserve">
-    <value>Audio output</value>
+    <value>音频输出</value>
   </data>
   <data name="ForwardMicrophone" xml:space="preserve">
-    <value>Forward microphone</value>
+    <value>麦克风转发</value>
   </data>
   <data name="AudioOutputBuffer" xml:space="preserve">
-    <value>Audio output buffer</value>
+    <value>音频输出缓冲</value>
   </data>
   <data name="AudioCodec" xml:space="preserve">
-    <value>Audio codec</value>
+    <value>音频编码</value>
   </data>
   <data name="AdbSettings" xml:space="preserve">
-    <value>Adb Settings</value>
+    <value>ADB 设置</value>
   </data>
   <data name="AutoConnect" xml:space="preserve">
-    <value>Auto connect</value>
+    <value>自动连接</value>
   </data>
   <data name="Both" xml:space="preserve">
-    <value>Both</value>
+    <value>两种</value>
   </data>
   <data name="DesktopDevice" xml:space="preserve">
-    <value>Desktop device</value>
+    <value>桌面设备</value>
   </data>
   <data name="RemoteDevice" xml:space="preserve">
-    <value>Remote device</value>
+    <value>远程设备</value>
   </data>
   <data name="SelectDevice" xml:space="preserve">
-    <value>Select a device</value>
+    <value>选择一个设备</value>
   </data>
   <data name="Start" xml:space="preserve">
-    <value>Start</value>
+    <value>开始</value>
   </data>
   <data name="ScrcpyDevicePreference" xml:space="preserve">
-    <value>Device preference</value>
+    <value>设备偏好</value>
   </data>
   <data name="AskEverytime" xml:space="preserve">
-    <value>Ask every time</value>
+    <value>每次都询问</value>
   </data>
   <data name="Auto" xml:space="preserve">
-    <value>Auto</value>
+    <value>自动</value>
   </data>
   <data name="ScrcpyErrorTitle" xml:space="preserve">
-    <value>Scrcpy failed to start</value>
+    <value>scrcpy 启动失败</value>
   </data>
   <data name="CopyError" xml:space="preserve">
-    <value>Copy error</value>
+    <value>复制失败</value>
   </data>
   <data name="DeviceName" xml:space="preserve">
-    <value>Device name</value>
+    <value>设备名称</value>
   </data>
   <data name="EnableVirtualDisplay" xml:space="preserve">
-    <value>Enable virtual display</value>
+    <value>启动虚拟显示器</value>
   </data>
   <data name="Uninstall" xml:space="preserve">
-    <value>Uninstall</value>
+    <value>卸载</value>
   </data>
   <data name="UnlockDeviceHelpTitle" xml:space="preserve">
-    <value>Shell commands help</value>
+    <value>shell 命令帮助</value>
   </data>
   <data name="UnlockDeviceHelpDescription" xml:space="preserve">
     <value>The shell commands in the text box will be executed before launching scrcpy. Enter commands that work on your device, separated by line.</value>
   </data>
   <data name="UnlockDeviceHelpExample" xml:space="preserve">
-    <value>Example:</value>
+    <value>例子：</value>
   </data>
   <data name="UnlockDeviceHelpUsefulInfo" xml:space="preserve">
-    <value>Useful information:</value>
+    <value>有用的信息：</value>
   </data>
   <data name="UnlockDeviceHelpNote" xml:space="preserve">
     <value>26 or POWER: Wakes or sleeps the device screen.
@@ -543,150 +543,180 @@ Some devices may also require a swipe gesture to bring up the unlock UI:
 input touchscreen swipe 540 1800 540 900</value>
   </data>
   <data name="PinnedApps" xml:space="preserve">
-    <value>Pinned apps</value>
+    <value>固定的应用</value>
   </data>
   <data name="Actions" xml:space="preserve">
-    <value>Actions</value>
+    <value>操作</value>
   </data>
   <data name="ActionsDescription" xml:space="preserve">
-    <value>Configure custom actions and executable commands</value>
+    <value>设置自定义操作和执行的命令</value>
   </data>
   <data name="AdbNoDevice" xml:space="preserve">
-    <value>No ADB devices connected</value>
+    <value>ADB 设备未连接</value>
   </data>
   <data name="AdbNoDeviceSubtitle" xml:space="preserve">
     <value>Turn on ADB and connect your device via USB or Wi-Fi to see it here</value>
   </data>
   <data name="ClipboardSettings" xml:space="preserve">
-    <value>Clipboard settings</value>
+    <value>粘贴板设置</value>
   </data>
   <data name="DeviceSettings" xml:space="preserve">
-    <value>Device settings</value>
+    <value>设备设置</value>
   </data>
   <data name="NotificationSettings" xml:space="preserve">
-    <value>Notification settings</value>
+    <value>通知设置</value>
   </data>
   <data name="ScreenMirrorSettings" xml:space="preserve">
-    <value>Screen mirror settings</value>
+    <value>屏幕镜像设置</value>
   </data>
   <data name="OpenLinksInBrowserDescription" xml:space="preserve">
-    <value>Automatically open links from clipboard in default browser</value>
+    <value>在默认浏览器中自动打开来自粘贴板的链接</value>
   </data>
   <data name="ShowClipboardToastDescription" xml:space="preserve">
-    <value>Show toast notifications for clipboard changes</value>
+    <value>粘贴板变化时显示 toast 消息</value>
   </data>
   <data name="ClipboardFilesDescription" xml:space="preserve">
-    <value>Enable file synchronization through clipboard</value>
+    <value>启用通过粘贴板实现的文件同步</value>
   </data>
   <data name="ImageToClipboardDescription" xml:space="preserve">
-    <value>Enable image synchronization through clipboard</value>
+    <value>启用通过粘贴板实现的图片同步</value>
   </data>
   <data name="AutoConnectDescription" xml:space="preserve">
-    <value>Automatically connect to ADB when device connects</value>
+    <value>当设备连接时自动连接到 ADB</value>
   </data>
   <data name="SyncClipboardChanges" xml:space="preserve">
-    <value>Sync clipboard changes with this device</value>
+    <value>和这个设备同步粘贴板</value>
   </data>
   <data name="ConfigureNotificationSettings" xml:space="preserve">
-    <value>Configure notification settings</value>
+    <value>设置通知选项</value>
   </data>
   <data name="ConfigureScreenMirroring" xml:space="preserve">
-    <value>Configure screen mirroring</value>
+    <value>设置屏幕镜像</value>
   </data>
   <data name="ConfigureAdbConnection" xml:space="preserve">
-    <value>Configure ADB connection and manage addresses</value>
+    <value>设置 ADB 连接和地址</value>
   </data>
   <data name="SyncMediaSessions" xml:space="preserve">
-    <value>Sync media and audio sessions</value>
+    <value>同步媒体和音频会话</value>
   </data>
   <data name="MediaSessions" xml:space="preserve">
-    <value>Media sessions</value>
+    <value>媒体会话</value>
   </data>
   <data name="DisplayToastNotifications" xml:space="preserve">
-    <value>Display toast notifications on this PC</value>
+    <value>在此电脑上显示 toast 通知</value>
   </data>
   <data name="ShowBadge" xml:space="preserve">
-    <value>Show badge</value>
+    <value>显示标记</value>
   </data>
   <data name="ShowBadgeDescription" xml:space="preserve">
-    <value>Show notification badge on taskbar</value>
+    <value>在任务栏上显示通知标记</value>
   </data>
   <data name="IgnoreDuringDoNotDisturb" xml:space="preserve">
-    <value>Ignore during Do Not Disturb</value>
+    <value>忽略请勿打扰时</value>
   </data>
   <data name="IgnoreDuringDoNotDisturbDescription" xml:space="preserve">
-    <value>Don't show notifications when Do Not Disturb is enabled</value>
+    <value>启用 "请勿打扰 "时不显示通知</value>
   </data>
   <data name="ConnectionPreference" xml:space="preserve">
-    <value>Connection preference</value>
+    <value>连接偏好</value>
   </data>
   <data name="AddAction" xml:space="preserve">
-    <value>Add action</value>
+    <value>添加动作</value>
   </data>
   <data name="Edit" xml:space="preserve">
-    <value>Edit</value>
+    <value>编辑</value>
   </data>
   <data name="NoActionsConfigured" xml:space="preserve">
-    <value>No actions configured</value>
+    <value>没有设置动作</value>
   </data>
   <data name="ActionName" xml:space="preserve">
-    <value>Action name</value>
+    <value>动作名称</value>
   </data>
   <data name="ExecutablePath" xml:space="preserve">
-    <value>Executable path</value>
+    <value>可执行文件位置</value>
   </data>
   <data name="Arguments" xml:space="preserve">
-    <value>Arguments</value>
+    <value>参数</value>
   </data>
   <data name="StartInDirectory" xml:space="preserve">
-    <value>Start In directory</value>
+    <value>在目录中打开</value>
   </data>
   <data name="EnterActionName" xml:space="preserve">
-    <value>Enter action name</value>
+    <value>输入动作名称</value>
   </data>
   <data name="PathToExecutable" xml:space="preserve">
-    <value>Path to executable</value>
+    <value>可执行文件路径</value>
   </data>
   <data name="CommandLineArguments" xml:space="preserve">
-    <value>Command line arguments (optional)</value>
+    <value>命令行参数（可选）</value>
   </data>
   <data name="EnterPassword" xml:space="preserve">
-    <value>Enter password</value>
+    <value>输入密码</value>
   </data>
   <data name="Reply" xml:space="preserve">
-    <value>Reply</value>
+    <value>回复</value>
   </data>
   <data name="Back" xml:space="preserve">
-    <value>Back</value>
+    <value>返回</value>
   </data>
   <data name="Browse" xml:space="preserve">
-    <value>Browse</value>
+    <value>浏览</value>
   </data>
   <data name="EnterAddressesAndCompose" xml:space="preserve">
-    <value>Enter addresses above and compose your message below</value>
+    <value>请在上方输入地址并在下方撰写您的留言</value>
   </data>
   <data name="UseTcpIpMode" xml:space="preserve">
-    <value>Use TCP/IP mode</value>
+    <value>使用 TCP/IP 模式</value>
   </data>
   <data name="UseTcpIpModeDescription" xml:space="preserve">
-    <value>Enable wireless ADB connections</value>
+    <value>启用 ADB 无线调试</value>
   </data>
   <data name="WorkingDirectory" xml:space="preserve">
-    <value>Working directory (optional)</value>
+    <value>工作目录（可选）</value>
   </data>
   <data name="UnlockDeviceBeforeLaunch" xml:space="preserve">
-    <value>Unlock device before launching scrcpy</value>
+    <value>启动 scrcpy 前解锁设备</value>
   </data>
   <data name="UnlockCommandsPlaceholder" xml:space="preserve">
-    <value>input keyevent 26
-input keyevent 66
-input text %pwd%</value>
+    <value>输入关键事件 26
+输入关键事件 66
+输入文本 %pwd%</value>
   </data>
   <data name="FileDropCaption" xml:space="preserve">
-    <value>Drop files to send</value>
+    <value>拖动要发送文件</value>
   </data>
   <data name="Save" xml:space="preserve">
-    <value>Save</value>
+    <value>保存</value>
+  </data>
+  <data name="FileTransferNotification.Receiving" xml:space="preserve">
+    <value>Receiving from {0}</value>
+  </data>
+  <data name="FileTransferNotification.Sending" xml:space="preserve">
+    <value>Sending to {0}</value>
+  </data>
+  <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
+    <value>Receiving {0}/{1} from {2}</value>
+  </data>
+  <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
+    <value>Sending {0}/{1} to {2}</value>
+  </data>
+  <data name="FileTransferNotification.Completed" xml:space="preserve">
+    <value>File transfer completed</value>
+  </data>
+  <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
+    <value>Received {0} from {1}</value>
+  </data>
+  <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
+    <value>Received {0} files from {1}</value>
+  </data>
+  <data name="FileTransferNotification.SentSingle" xml:space="preserve">
+    <value>Sent {0} to {1}</value>
+  </data>
+  <data name="FileTransferNotification.SentBulk" xml:space="preserve">
+    <value>Sent {0} files to {1}</value>
+  </data>
+  <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
+    <value>Cancel</value>
   </data>
   <data name="FileTransferNotification.Receiving" xml:space="preserve">
     <value>正在从 {0} 接收</value>

@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -388,7 +388,7 @@
     <value>Messages</value>
   </data>
   <data name="EmptyMessages" xml:space="preserve">
-    <value>Start a new conversation or select one to reply</value>
+    <value>Commencer une nouvelle conversation ou en sélectionner une pour y répondre</value>
   </data>
   <data name="MessagePlaceholder" xml:space="preserve">
     <value>Écrivez un message…</value>
@@ -403,7 +403,7 @@
     <value>Rechercher des messages</value>
   </data>
   <data name="AddressInputPlaceholder" xml:space="preserve">
-    <value>To</value>
+    <value>À</value>
   </data>
   <data name="RemoveAddress" xml:space="preserve">
     <value>Supprimer l'adresse</value>
@@ -514,13 +514,13 @@
     <value>Copier l'erreur</value>
   </data>
   <data name="DeviceName" xml:space="preserve">
-    <value>Device name</value>
+    <value>Nom de l'appareil</value>
   </data>
   <data name="EnableVirtualDisplay" xml:space="preserve">
-    <value>Enable virtual display</value>
+    <value>Activer l'affichage virtuel</value>
   </data>
   <data name="Uninstall" xml:space="preserve">
-    <value>Uninstall</value>
+    <value>Désinstaller</value>
   </data>
   <data name="UnlockDeviceHelpTitle" xml:space="preserve">
     <value>Shell commands help</value>
@@ -529,10 +529,10 @@
     <value>The shell commands in the text box will be executed before launching scrcpy. Enter commands that work on your device, separated by line.</value>
   </data>
   <data name="UnlockDeviceHelpExample" xml:space="preserve">
-    <value>Example:</value>
+    <value>Exemple :</value>
   </data>
   <data name="UnlockDeviceHelpUsefulInfo" xml:space="preserve">
-    <value>Useful information:</value>
+    <value>Bon à savoir :</value>
   </data>
   <data name="UnlockDeviceHelpNote" xml:space="preserve">
     <value>26 or POWER: Wakes or sleeps the device screen.
@@ -542,94 +542,94 @@ Some devices may also require a swipe gesture to bring up the unlock UI:
 input touchscreen swipe 540 1800 540 900</value>
   </data>
   <data name="PinnedApps" xml:space="preserve">
-    <value>Pinned apps</value>
+    <value>Applis épinglées</value>
   </data>
   <data name="Actions" xml:space="preserve">
     <value>Actions</value>
   </data>
   <data name="ActionsDescription" xml:space="preserve">
-    <value>Configure custom actions and executable commands</value>
+    <value>Configurer des actions personnalisées et des commandes exécutables</value>
   </data>
   <data name="AdbNoDevice" xml:space="preserve">
-    <value>No ADB devices connected</value>
+    <value>Aucun périphérique ADB n'est connecté</value>
   </data>
   <data name="AdbNoDeviceSubtitle" xml:space="preserve">
     <value>Turn on ADB and connect your device via USB or Wi-Fi to see it here</value>
   </data>
   <data name="ClipboardSettings" xml:space="preserve">
-    <value>Clipboard settings</value>
+    <value>Paramètres du presse-papiers</value>
   </data>
   <data name="DeviceSettings" xml:space="preserve">
-    <value>Device settings</value>
+    <value>Paramètres de l'appareil</value>
   </data>
   <data name="NotificationSettings" xml:space="preserve">
-    <value>Notification settings</value>
+    <value>Paramètres de notification</value>
   </data>
   <data name="ScreenMirrorSettings" xml:space="preserve">
-    <value>Screen mirror settings</value>
+    <value>Paramètres du miroir d'écran</value>
   </data>
   <data name="OpenLinksInBrowserDescription" xml:space="preserve">
-    <value>Automatically open links from clipboard in default browser</value>
+    <value>Ouvrir automatiquement les liens depuis le presse-papiers dans le navigateur par défaut</value>
   </data>
   <data name="ShowClipboardToastDescription" xml:space="preserve">
-    <value>Show toast notifications for clipboard changes</value>
+    <value>Afficher les notifications toast pour les modifications du presse-papiers</value>
   </data>
   <data name="ClipboardFilesDescription" xml:space="preserve">
-    <value>Enable file synchronization through clipboard</value>
+    <value>Activer la synchronisation des fichiers via le presse-papiers</value>
   </data>
   <data name="ImageToClipboardDescription" xml:space="preserve">
-    <value>Enable image synchronization through clipboard</value>
+    <value>Activer la synchronisation des images via le presse-papiers</value>
   </data>
   <data name="AutoConnectDescription" xml:space="preserve">
-    <value>Automatically connect to ADB when device connects</value>
+    <value>Se connecter automatiquement à ADB lorsque l'appareil se connecte</value>
   </data>
   <data name="SyncClipboardChanges" xml:space="preserve">
-    <value>Sync clipboard changes with this device</value>
+    <value>Synchroniser les modifications du presse-papiers avec cet appareil</value>
   </data>
   <data name="ConfigureNotificationSettings" xml:space="preserve">
-    <value>Configure notification settings</value>
+    <value>Configurer les paramètres de notification</value>
   </data>
   <data name="ConfigureScreenMirroring" xml:space="preserve">
-    <value>Configure screen mirroring</value>
+    <value>Configurer la mise en miroir de l'écran</value>
   </data>
   <data name="ConfigureAdbConnection" xml:space="preserve">
-    <value>Configure ADB connection and manage addresses</value>
+    <value>Configurer la connexion ADB et gérer les adresses</value>
   </data>
   <data name="SyncMediaSessions" xml:space="preserve">
-    <value>Sync media and audio sessions</value>
+    <value>Synchroniser les médias et les sessions audio</value>
   </data>
   <data name="MediaSessions" xml:space="preserve">
-    <value>Media sessions</value>
+    <value>Sessions média</value>
   </data>
   <data name="DisplayToastNotifications" xml:space="preserve">
-    <value>Display toast notifications on this PC</value>
+    <value>Afficher les notifications toast sur ce PC</value>
   </data>
   <data name="ShowBadge" xml:space="preserve">
-    <value>Show badge</value>
+    <value>Afficher le badge</value>
   </data>
   <data name="ShowBadgeDescription" xml:space="preserve">
-    <value>Show notification badge on taskbar</value>
+    <value>Afficher le badge de notification dans la barre des tâches</value>
   </data>
   <data name="IgnoreDuringDoNotDisturb" xml:space="preserve">
-    <value>Ignore during Do Not Disturb</value>
+    <value>Ignorer pendant le mode "Ne pas déranger"</value>
   </data>
   <data name="IgnoreDuringDoNotDisturbDescription" xml:space="preserve">
-    <value>Don't show notifications when Do Not Disturb is enabled</value>
+    <value>Ne pas afficher les notifications lorsque le mode Ne pas déranger est activé</value>
   </data>
   <data name="ConnectionPreference" xml:space="preserve">
-    <value>Connection preference</value>
+    <value>Préférences de connexion</value>
   </data>
   <data name="AddAction" xml:space="preserve">
-    <value>Add action</value>
+    <value>Ajouter une action</value>
   </data>
   <data name="Edit" xml:space="preserve">
-    <value>Edit</value>
+    <value>Modifier</value>
   </data>
   <data name="NoActionsConfigured" xml:space="preserve">
-    <value>No actions configured</value>
+    <value>Aucune action configurée</value>
   </data>
   <data name="ActionName" xml:space="preserve">
-    <value>Action name</value>
+    <value>Nom de l'action</value>
   </data>
   <data name="ExecutablePath" xml:space="preserve">
     <value>Executable Path</value>
@@ -638,43 +638,43 @@ input touchscreen swipe 540 1800 540 900</value>
     <value>Arguments</value>
   </data>
   <data name="StartInDirectory" xml:space="preserve">
-    <value>Start In directory</value>
+    <value>Démarrer dans le répertoire</value>
   </data>
   <data name="EnterActionName" xml:space="preserve">
-    <value>Enter action name</value>
+    <value>Entrez le nom de l'action</value>
   </data>
   <data name="PathToExecutable" xml:space="preserve">
-    <value>Path to executable</value>
+    <value>Chemin vers l'exécutable</value>
   </data>
   <data name="CommandLineArguments" xml:space="preserve">
-    <value>Command line arguments (optional)</value>
+    <value>Arguments de ligne de commande (facultatif)</value>
   </data>
   <data name="EnterPassword" xml:space="preserve">
-    <value>Enter password</value>
+    <value>Entrez le mot de passe</value>
   </data>
   <data name="Reply" xml:space="preserve">
-    <value>Reply</value>
+    <value>Répondre</value>
   </data>
   <data name="Back" xml:space="preserve">
-    <value>Back</value>
+    <value>Retour</value>
   </data>
   <data name="Browse" xml:space="preserve">
-    <value>Browse</value>
+    <value>Parcourir</value>
   </data>
   <data name="EnterAddressesAndCompose" xml:space="preserve">
-    <value>Enter addresses above and compose your message below</value>
+    <value>Entrez les adresses ci-dessus et composez votre message ci-dessous</value>
   </data>
   <data name="UseTcpIpMode" xml:space="preserve">
-    <value>Use TCP/IP mode</value>
+    <value>Utiliser le mode TCP/IP</value>
   </data>
   <data name="UseTcpIpModeDescription" xml:space="preserve">
-    <value>Enable wireless ADB connections</value>
+    <value>Activer les connexions ADB sans fil</value>
   </data>
   <data name="WorkingDirectory" xml:space="preserve">
-    <value>Working directory (optional)</value>
+    <value>Répertoire de travail (facultatif)</value>
   </data>
   <data name="UnlockDeviceBeforeLaunch" xml:space="preserve">
-    <value>Unlock device before launching scrcpy</value>
+    <value>Déverrouiller l'appareil avant de lancer scrcpy</value>
   </data>
   <data name="UnlockCommandsPlaceholder" xml:space="preserve">
     <value>input keyevent 26
@@ -682,10 +682,40 @@ input keyevent 66
 input text %pwd%</value>
   </data>
   <data name="FileDropCaption" xml:space="preserve">
-    <value>Drop files to send</value>
+    <value>Déposer les fichiers à envoyer</value>
   </data>
   <data name="Save" xml:space="preserve">
-    <value>Save</value>
+    <value>Sauvegarder</value>
+  </data>
+  <data name="FileTransferNotification.Receiving" xml:space="preserve">
+    <value>Receiving from {0}</value>
+  </data>
+  <data name="FileTransferNotification.Sending" xml:space="preserve">
+    <value>Sending to {0}</value>
+  </data>
+  <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
+    <value>Receiving {0}/{1} from {2}</value>
+  </data>
+  <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
+    <value>Sending {0}/{1} to {2}</value>
+  </data>
+  <data name="FileTransferNotification.Completed" xml:space="preserve">
+    <value>File transfer completed</value>
+  </data>
+  <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
+    <value>Received {0} from {1}</value>
+  </data>
+  <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
+    <value>Received {0} files from {1}</value>
+  </data>
+  <data name="FileTransferNotification.SentSingle" xml:space="preserve">
+    <value>Sent {0} to {1}</value>
+  </data>
+  <data name="FileTransferNotification.SentBulk" xml:space="preserve">
+    <value>Sent {0} files to {1}</value>
+  </data>
+  <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
+    <value>Cancel</value>
   </data>
   <data name="FileTransferNotification.Receiving" xml:space="preserve">
     <value>Réception depuis {0}</value>

@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -211,7 +211,7 @@
     <value>Maximiert starten</value>
   </data>
   <data name="StartupOptionSystemTray.Content" xml:space="preserve">
-    <value>In die Symbolleiste starten</value>
+    <value>Ins System-tray starten</value>
   </data>
   <data name="StartupOptionDisabled.Content" xml:space="preserve">
     <value>Deaktiviert</value>
@@ -256,7 +256,7 @@
     <value>Verbinde dein Gerät</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>In Ihrem Netzwerk entdeckte Geräte werden unten angezeigt. Die Verbindung wird dann von Ihrem
+    <value>In Ihrem Netzwerk entdeckte Geräte werden unten erscheinen. Die Verbindung wird dann von Ihrem
 Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
@@ -314,7 +314,7 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
     <value>App-spezifische Einstellungen</value>
   </data>
   <data name="FileTransferNotification.Title" xml:space="preserve">
-    <value>Datentransfer</value>
+    <value>Dateiübertragung</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>Senden</value>
@@ -527,7 +527,7 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
     <value>Shell-Befehle - Hilfe</value>
   </data>
   <data name="UnlockDeviceHelpDescription" xml:space="preserve">
-    <value>The shell commands in the text box will be executed before launching scrcpy. Enter commands that work on your device, separated by line.</value>
+    <value>Die Shell-Befehle im Textfeld werden ausgeführt, bevor scrcpy gestartet wird. Geben Sie Befehle ein, die auf Ihrem Gerät funktionieren, getrennt durch Zeile. Verwenden Sie %pwd% als Platzhalter für Ihr Passwort, wenn Sie danach gefragt werden müssen.</value>
   </data>
   <data name="UnlockDeviceHelpExample" xml:space="preserve">
     <value>Beispiel:</value>
@@ -536,11 +536,12 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
     <value>Nützliche Informationen:</value>
   </data>
   <data name="UnlockDeviceHelpNote" xml:space="preserve">
-    <value>26 or POWER: Wakes or sleeps the device screen.
-66 or ENTER: Simulates the Enter key press.
-82 or MENU: Brings up the unlock interface, or prompts for fingerprint authentication.
-Some devices may also require a swipe gesture to bring up the unlock UI:
-input touchscreen swipe 540 1800 540 900</value>
+    <value>26 oder POWER: Weckt oder schläft den Bildschirm des Geräts.
+66 oder ENTER: Simuliert die Enter-Taste.
+82 oder MENU: Stellt das Entsperr-Interface zur Verfügung oder fragt nach Fingerabdruck-Authentifizierung.
+%pwd%: Platzhalter für Passwort - Sie werden aufgefordert, es einzugeben.
+Einige Geräte können auch eine Wischgeste benötigen, um die Entsperr-UI zu öffnen:
+Input Touchscreen-Wischen 540 1800 540 900</value>
   </data>
   <data name="PinnedApps" xml:space="preserve">
     <value>Angeheftete Apps</value>
@@ -555,7 +556,7 @@ input touchscreen swipe 540 1800 540 900</value>
     <value>Keine ADB-Geräte verbunden</value>
   </data>
   <data name="AdbNoDeviceSubtitle" xml:space="preserve">
-    <value>Turn on ADB and connect your device via USB or Wi-Fi to see it here</value>
+    <value>Schalten Sie ADB ein und verbinden Sie Ihr Gerät über USB oder WLAN, um es hier zu sehen.</value>
   </data>
   <data name="ClipboardSettings" xml:space="preserve">
     <value>Clipboard Settings</value>
@@ -678,15 +679,15 @@ input touchscreen swipe 540 1800 540 900</value>
     <value>Gerät entsperren, bevor scrcpy gestartet wird</value>
   </data>
   <data name="UnlockCommandsPlaceholder" xml:space="preserve">
-    <value>input keyevent 26
-input keyevent 66
-input text %pwd%</value>
+    <value>Eingabe Tastennummer 26
+Eingabe Tastennummer 66
+Eingabe Text %pwd%</value>
   </data>
   <data name="FileDropCaption" xml:space="preserve">
     <value>Zu sendende Dateien ablegen</value>
   </data>
   <data name="Save" xml:space="preserve">
-    <value>Save</value>
+    <value>Speichern</value>
   </data>
   <data name="FileTransferNotification.Receiving" xml:space="preserve">
     <value>Empfange von {0}</value>

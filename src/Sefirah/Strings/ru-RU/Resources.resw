@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -427,7 +427,7 @@
     <value>Подключите устройство через USB с включенной отладкой по USB и повторите попытку</value>
   </data>
   <data name="Dismiss" xml:space="preserve">
-    <value>Dismiss</value>
+    <value>Отменить</value>
   </data>
   <data name="ScrcpyNotFound" xml:space="preserve">
     <value>Scrcpy не найден</value>
@@ -445,22 +445,22 @@
     <value>Disable video forwarding</value>
   </data>
   <data name="VideoCodec" xml:space="preserve">
-    <value>Video codec</value>
+    <value>Видеокодек</value>
   </data>
   <data name="FrameRate" xml:space="preserve">
-    <value>Frame rate</value>
+    <value>Частота кадров</value>
   </data>
   <data name="Crop" xml:space="preserve">
-    <value>Crop</value>
+    <value>Обрезать</value>
   </data>
   <data name="Display" xml:space="preserve">
     <value>Display</value>
   </data>
   <data name="VirtualDisplaySize" xml:space="preserve">
-    <value>Virtual display size</value>
+    <value>Размер виртуального экрана</value>
   </data>
   <data name="DisplayOrientation" xml:space="preserve">
-    <value>Display orientation</value>
+    <value>Ориентация экрана</value>
   </data>
   <data name="RotationAngle" xml:space="preserve">
     <value>Rotation angle</value>
@@ -478,13 +478,13 @@
     <value>Audio codec</value>
   </data>
   <data name="AdbSettings" xml:space="preserve">
-    <value>Adb Settings</value>
+    <value>Настройки Adb</value>
   </data>
   <data name="AutoConnect" xml:space="preserve">
-    <value>Auto connect</value>
+    <value>Автоматическое соединение</value>
   </data>
   <data name="Both" xml:space="preserve">
-    <value>Both</value>
+    <value>Оба</value>
   </data>
   <data name="DesktopDevice" xml:space="preserve">
     <value>Desktop device</value>
@@ -493,7 +493,7 @@
     <value>Remote device</value>
   </data>
   <data name="SelectDevice" xml:space="preserve">
-    <value>Select a device</value>
+    <value>Выбрать устройство</value>
   </data>
   <data name="Start" xml:space="preserve">
     <value>Start</value>
@@ -505,7 +505,7 @@
     <value>Ask every time</value>
   </data>
   <data name="Auto" xml:space="preserve">
-    <value>Auto</value>
+    <value>Автоматически</value>
   </data>
   <data name="ScrcpyErrorTitle" xml:space="preserve">
     <value>Scrcpy failed to start</value>
@@ -514,13 +514,13 @@
     <value>Copy error</value>
   </data>
   <data name="DeviceName" xml:space="preserve">
-    <value>Device name</value>
+    <value>Имя устройства</value>
   </data>
   <data name="EnableVirtualDisplay" xml:space="preserve">
-    <value>Enable virtual display</value>
+    <value>Включить виртуальный экран</value>
   </data>
   <data name="Uninstall" xml:space="preserve">
-    <value>Uninstall</value>
+    <value>Удалить</value>
   </data>
   <data name="UnlockDeviceHelpTitle" xml:space="preserve">
     <value>Shell commands help</value>
@@ -529,10 +529,10 @@
     <value>The shell commands in the text box will be executed before launching scrcpy. Enter commands that work on your device, separated by line.</value>
   </data>
   <data name="UnlockDeviceHelpExample" xml:space="preserve">
-    <value>Example:</value>
+    <value>Пример:</value>
   </data>
   <data name="UnlockDeviceHelpUsefulInfo" xml:space="preserve">
-    <value>Useful information:</value>
+    <value>Полезная информация:</value>
   </data>
   <data name="UnlockDeviceHelpNote" xml:space="preserve">
     <value>26 or POWER: Wakes or sleeps the device screen.
@@ -542,7 +542,7 @@ Some devices may also require a swipe gesture to bring up the unlock UI:
 input touchscreen swipe 540 1800 540 900</value>
   </data>
   <data name="PinnedApps" xml:space="preserve">
-    <value>Pinned apps</value>
+    <value>Закрепленные приложения</value>
   </data>
   <data name="Actions" xml:space="preserve">
     <value>Actions</value>
@@ -554,7 +554,7 @@ input touchscreen swipe 540 1800 540 900</value>
     <value>No ADB devices connected</value>
   </data>
   <data name="AdbNoDeviceSubtitle" xml:space="preserve">
-    <value>Turn on ADB and connect your device via USB or Wi-Fi to see it here</value>
+    <value>Включите ADB и подключите устройство через USB или Wi-Fi, чтобы увидеть его здесь.</value>
   </data>
   <data name="ClipboardSettings" xml:space="preserve">
     <value>Clipboard settings</value>
@@ -569,7 +569,7 @@ input touchscreen swipe 540 1800 540 900</value>
     <value>Screen mirror settings</value>
   </data>
   <data name="OpenLinksInBrowserDescription" xml:space="preserve">
-    <value>Automatically open links from clipboard in default browser</value>
+    <value>Автоматически открывать ссылки из буфера обмена в браузере</value>
   </data>
   <data name="ShowClipboardToastDescription" xml:space="preserve">
     <value>Show toast notifications for clipboard changes</value>
@@ -581,16 +581,16 @@ input touchscreen swipe 540 1800 540 900</value>
     <value>Enable image synchronization through clipboard</value>
   </data>
   <data name="AutoConnectDescription" xml:space="preserve">
-    <value>Automatically connect to ADB when device connects</value>
+    <value>Автоматически подключаться к ADB при подключении устройства</value>
   </data>
   <data name="SyncClipboardChanges" xml:space="preserve">
-    <value>Sync clipboard changes with this device</value>
+    <value>Синхронизировать изменения буфера обмена с этим устройством</value>
   </data>
   <data name="ConfigureNotificationSettings" xml:space="preserve">
-    <value>Configure notification settings</value>
+    <value>Настройка параметров уведомлений</value>
   </data>
   <data name="ConfigureScreenMirroring" xml:space="preserve">
-    <value>Configure screen mirroring</value>
+    <value>Настройка трансляции экрана</value>
   </data>
   <data name="ConfigureAdbConnection" xml:space="preserve">
     <value>Configure ADB connection and manage addresses</value>
@@ -650,13 +650,13 @@ input touchscreen swipe 540 1800 540 900</value>
     <value>Command line arguments (optional)</value>
   </data>
   <data name="EnterPassword" xml:space="preserve">
-    <value>Enter password</value>
+    <value>Введите пароль</value>
   </data>
   <data name="Reply" xml:space="preserve">
-    <value>Reply</value>
+    <value>Ответить</value>
   </data>
   <data name="Back" xml:space="preserve">
-    <value>Back</value>
+    <value>Назад</value>
   </data>
   <data name="Browse" xml:space="preserve">
     <value>Browse</value>
@@ -665,16 +665,16 @@ input touchscreen swipe 540 1800 540 900</value>
     <value>Enter addresses above and compose your message below</value>
   </data>
   <data name="UseTcpIpMode" xml:space="preserve">
-    <value>Use TCP/IP mode</value>
+    <value>Использовать TCP/IP режим</value>
   </data>
   <data name="UseTcpIpModeDescription" xml:space="preserve">
     <value>Enable wireless ADB connections</value>
   </data>
   <data name="WorkingDirectory" xml:space="preserve">
-    <value>Working directory (optional)</value>
+    <value>Рабочая папка (необязательно)</value>
   </data>
   <data name="UnlockDeviceBeforeLaunch" xml:space="preserve">
-    <value>Unlock device before launching scrcpy</value>
+    <value>Разблокируйте устройство перед запуском scrcpy</value>
   </data>
   <data name="UnlockCommandsPlaceholder" xml:space="preserve">
     <value>input keyevent 26
@@ -682,10 +682,40 @@ input keyevent 66
 input text %pwd%</value>
   </data>
   <data name="FileDropCaption" xml:space="preserve">
-    <value>Drop files to send</value>
+    <value>Перетащите файл для отправки</value>
   </data>
   <data name="Save" xml:space="preserve">
-    <value>Save</value>
+    <value>Сохранить</value>
+  </data>
+  <data name="FileTransferNotification.Receiving" xml:space="preserve">
+    <value>Receiving from {0}</value>
+  </data>
+  <data name="FileTransferNotification.Sending" xml:space="preserve">
+    <value>Sending to {0}</value>
+  </data>
+  <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
+    <value>Receiving {0}/{1} from {2}</value>
+  </data>
+  <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
+    <value>Sending {0}/{1} to {2}</value>
+  </data>
+  <data name="FileTransferNotification.Completed" xml:space="preserve">
+    <value>File transfer completed</value>
+  </data>
+  <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
+    <value>Received {0} from {1}</value>
+  </data>
+  <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
+    <value>Received {0} files from {1}</value>
+  </data>
+  <data name="FileTransferNotification.SentSingle" xml:space="preserve">
+    <value>Sent {0} to {1}</value>
+  </data>
+  <data name="FileTransferNotification.SentBulk" xml:space="preserve">
+    <value>Sent {0} files to {1}</value>
+  </data>
+  <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
+    <value>Cancel</value>
   </data>
   <data name="FileTransferNotification.Receiving" xml:space="preserve">
     <value>Получение от {0}</value>
