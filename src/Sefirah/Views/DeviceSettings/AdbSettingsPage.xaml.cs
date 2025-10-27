@@ -1,4 +1,3 @@
-using Sefirah.Data.Models;
 using Sefirah.ViewModels.Settings;
 
 namespace Sefirah.Views.DeviceSettings;
@@ -13,7 +12,7 @@ public sealed partial class AdbSettingsPage : Page
 
     public AdbSettingsPage()
     {
-        this.InitializeComponent();
+        InitializeComponent();
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)

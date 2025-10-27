@@ -1,17 +1,26 @@
+using CommunityToolkit.WinUI;
 using Microsoft.UI;
 using Microsoft.UI.Xaml.Media.Imaging;
+using Sefirah.Data.Contracts;
+using Sefirah.Data.Models;
+#if WINDOWS
+using Sefirah.Platforms.Windows.Interop;
+#endif
 using Windows.UI.ViewManagement;
 
 namespace Sefirah.UserControls;
 public sealed partial class TrayIconControl : UserControl
 {
     private readonly UISettings uiSettings = new();
+    private IScreenMirrorService ScreenMirrorService { get; } = Ioc.Default.GetRequiredService<IScreenMirrorService>();
+    private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
+    public PairedDevice? Device => DeviceManager.ActiveDevice;
     public TrayIconControl()
     {
         InitializeComponent();
 
         // Set initial icon
-        UpdateTrayIcon(uiSettings, null);
+        UpdateTrayIcon(uiSettings);
 
         // Monitor system theme changes
         uiSettings.ColorValuesChanged += UpdateTrayIcon;
@@ -20,26 +29,30 @@ public sealed partial class TrayIconControl : UserControl
     [RelayCommand]
     public void ShowHideWindow()
     {
+#if WINDOWS
         var window = App.MainWindow;
-
-        // Ensure window and AppWindow are not null
-        if (window == null || window.AppWindow == null)
-        {
-            return;
-        }
         if (window.Visible)
         {
             window.AppWindow.Hide();
         }
         else
         {
-            window.Activate();
             window.AppWindow.Show();
+            InteropHelpers.SetForegroundWindow(App.WindowHandle);
+        }
+#endif
+    }
+
+    [RelayCommand]
+    public void StartScrcpy()
+    {
+        if (Device != null)
+        {
+            ScreenMirrorService.StartScrcpy(Device);
         }
     }
 
-
-    private void UpdateTrayIcon(UISettings sender, object args)
+    private void UpdateTrayIcon(UISettings sender, object? args = null)
     {
         try
         {
@@ -47,21 +60,7 @@ public sealed partial class TrayIconControl : UserControl
                 ? "ms-appx:///Assets/Icons/SefirahDark.ico"
                 : "ms-appx:///Assets/Icons/SefirahLight.ico";
 
-            DispatcherQueue.TryEnqueue(() =>
-            {
-                try
-                {
-                    var imageSource = new BitmapImage
-                    {
-                        UriSource = new Uri(iconPath)
-                    };
-                    TrayIcon.IconSource = imageSource;
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Failed to load tray icon: {ex.Message}");
-                }
-            });
+            DispatcherQueue.EnqueueAsync(() => TrayIcon.IconSource = new BitmapImage(new(iconPath)));
         }
         catch (Exception ex)
         {

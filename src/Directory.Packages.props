@@ -11,6 +11,7 @@
     <PackageVersion Include="AdvancedSharpAdbClient" Version="3.4.14" />
     <PackageVersion Include="BouncyCastle.Cryptography" Version="2.5.1" />
     <PackageVersion Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.250402" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Converters" Version="8.2.250402" />
     <PackageVersion Include="CommunityToolkit.WinUI.Extensions" Version="8.2.250402" />
     <PackageVersion Include="H.NotifyIcon.Uno.WinUI" Version="2.3.0" />
     <PackageVersion Include="MeaMod.DNS" Version="1.0.71" />

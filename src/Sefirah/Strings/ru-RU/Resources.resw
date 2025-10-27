@@ -313,7 +313,7 @@
     <value>Настройки для отдельных приложений</value>
   </data>
   <data name="FileTransferNotification.Title" xml:space="preserve">
-    <value>File transfer</value>
+    <value>Передача файлов</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>Отправить</value>
@@ -322,10 +322,10 @@
     <value>Введите ответ</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
-    <value>Open file</value>
+    <value>Открыть файл</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
-    <value>Open folder</value>
+    <value>Открыть папку</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
     <value>Выключить уведомления от {0}</value>
@@ -716,5 +716,35 @@ input text %pwd%</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
     <value>Cancel</value>
+  </data>
+  <data name="FileTransferNotification.Receiving" xml:space="preserve">
+    <value>Получение от {0}</value>
+  </data>
+  <data name="FileTransferNotification.Sending" xml:space="preserve">
+    <value>Отправка на {0}</value>
+  </data>
+  <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
+    <value>Получение {0}/{1} от {2}</value>
+  </data>
+  <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
+    <value>Отправка {0}/{1} на {2}</value>
+  </data>
+  <data name="FileTransferNotification.Completed" xml:space="preserve">
+    <value>Передача файлов завершена</value>
+  </data>
+  <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
+    <value>Получен {0} от {1}</value>
+  </data>
+  <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
+    <value>Получено {0} файлов от {1}</value>
+  </data>
+  <data name="FileTransferNotification.SentSingle" xml:space="preserve">
+    <value>Отправлен {0} на {1}</value>
+  </data>
+  <data name="FileTransferNotification.SentBulk" xml:space="preserve">
+    <value>Отправлено {0} файлов на {1}</value>
+  </data>
+  <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
+    <value>Отмена</value>
   </data>
 </root>

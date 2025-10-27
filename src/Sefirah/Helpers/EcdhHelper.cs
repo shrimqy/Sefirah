@@ -48,16 +48,6 @@ public class EcdhHelper
         return hashedSecret;
     }
 
-    public static bool VerifyDevice(string androidPublicKey, byte[] localPrivateKey, byte[] expectedHashedSecret)
-    {
-        var derivedHashedSecret = DeriveKey(androidPublicKey, localPrivateKey);
-        if (derivedHashedSecret == null)
-        {
-            return false;
-        }
-        return derivedHashedSecret.SequenceEqual(expectedHashedSecret);
-    }
-
     public static string GenerateNonce()
     {
         var nonce = new byte[32];

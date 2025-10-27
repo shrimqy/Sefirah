@@ -6,33 +6,6 @@ namespace Sefirah.Helpers;
 
 public static class NetworkHelper
 {
-
-    public static async Task<int> FindAvailablePortAsync(int startPort)
-    {
-        int port = startPort;
-        const int maxPortNumber = 65535;
-
-        while (port <= maxPortNumber)
-        {
-            try
-            {
-                using var testListener = new TcpListener(IPAddress.Any, port);
-                await Task.Run(() =>
-                {
-                    testListener.Start();
-                    testListener.Stop();
-                });
-
-                return port;
-            }
-            catch (SocketException)
-            {
-                port++;
-            }
-        }
-        return port;
-    }
-
     public static List<IPAddressInfo> GetAllValidAddresses()
     {
         var addresses = new List<IPAddressInfo>();
@@ -40,7 +13,7 @@ public static class NetworkHelper
         foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
         {
             if (ni.NetworkInterfaceType is NetworkInterfaceType.Wireless80211 or NetworkInterfaceType.Ethernet &&
-                ni.OperationalStatus == OperationalStatus.Up)
+                ni.OperationalStatus is OperationalStatus.Up)
             {
                 var gateway = ni.GetIPProperties().GatewayAddresses
                     .FirstOrDefault(g => g.Address?.AddressFamily == AddressFamily.InterNetwork)?
@@ -48,7 +21,7 @@ public static class NetworkHelper
 
                 foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
                 {
-                    if (ip.Address.AddressFamily == AddressFamily.InterNetwork && 
+                    if (ip.Address.AddressFamily is AddressFamily.InterNetwork && 
                         !IPAddress.IsLoopback(ip.Address))
                     {
                         addresses.Add(new IPAddressInfo(

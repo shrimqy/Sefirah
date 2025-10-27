@@ -8,7 +8,7 @@ public sealed partial class AppsPage : Page
     public AppsViewModel ViewModel { get; }
     public AppsPage()
     {
-        this.InitializeComponent();
+        InitializeComponent();
         ViewModel = Ioc.Default.GetRequiredService<AppsViewModel>();
     }
 
@@ -16,29 +16,20 @@ public sealed partial class AppsPage : Page
     {
         if (e.ClickedItem is ApplicationInfo app)
         {
-            await ViewModel.OpenApp(app.PackageName, app.AppName);
+            await ViewModel.OpenApp(app);
         }
     }
 
     private void AppSearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
-        if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+        if (args.Reason is AutoSuggestionBoxTextChangeReason.UserInput)
         {
-            string query = sender.Text.ToLower();
+            var suggestions = ViewModel.Apps
+                .Where(app => app.AppName.Contains(sender.Text, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
-            if (string.IsNullOrWhiteSpace(query))
-            {
-                sender.ItemsSource = null;
-            }
-            else
-            {
-                // Filter apps based on the query
-                var suggestions = ViewModel.Apps
-                    .Where(app => app.AppName.ToLower().Contains(query))
-                    .ToList();
-
-                sender.ItemsSource = suggestions;
-            }
+            sender.ItemsSource = suggestions;
+            
         }
     }
 
@@ -57,7 +48,23 @@ public sealed partial class AppsPage : Page
             sender.Text = string.Empty;
             sender.ItemsSource = null;
 
-            await ViewModel.OpenApp(selectedApp.PackageName, selectedApp.AppName);
+            await ViewModel.OpenApp(selectedApp);   
+        }
+    }
+
+    private void PinAppClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuFlyoutItem menuItem && menuItem.DataContext is ApplicationInfo app)
+        {
+            ViewModel.PinApp(app);
+        }
+    }
+
+    private async void UninstallAppClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuFlyoutItem menuItem && menuItem.DataContext is ApplicationInfo app)
+        {
+            ViewModel.UninstallApp(app);
         }
     }
 }

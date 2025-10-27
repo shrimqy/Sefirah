@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="using:Sefirah.Converters"
+    xmlns:wctconverters="using:CommunityToolkit.WinUI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:entity="using:Sefirah.Data.AppDatabase.Models"
     xmlns:helpers="using:Sefirah.Helpers"
@@ -14,15 +15,10 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-        <converters:StringNullOrEmptyToBooleanConverter x:Key="StringNullOrEmptyToBooleanConverter" />
-        <converters:NullBooleanConverter x:Key="NullBooleanConverter" />
-        <converters:DateTimeConverter x:Key="DateTimeConverter" />
-        <converters:BatteryStatusToIconConverter x:Key="BatteryStatusToIconConverter" />
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
-        <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
-        <converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" Inverse="True" />
+        <converters:EmptyObjectToVisibilityConverter x:Key="EmptyObjectToVisibilityConverter" />
+        <converters:EmptyObjectToVisibilityConverter x:Key="InverseEmptyObjectToVisibilityConverter" Inverse="True" />
         <converters:MessageTypeToAlignmentConverter x:Key="MessageTypeToAlignmentConverter" />
         <converters:MessageTypeToVisibilityConverter x:Key="MessageTypeToVisibilityConverter" />
         <converters:InverseMessageTypeToVisibilityConverter x:Key="InverseMessageTypeToVisibilityConverter" />
@@ -49,13 +45,13 @@
                         Width="48"
                         DisplayName="{x:Bind DisplayName}"
                         ProfilePicture="{x:Bind AvatarImage}"
-                        Visibility="{x:Bind AvatarImage, Converter={StaticResource NullToVisibilityConverter}}" />
+                        Visibility="{x:Bind AvatarImage, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
                     <Border
                         Width="48"
                         Height="48"
                         CornerRadius="24"
                         DataContextChanged="ConversationAvatarBorder_DataContextChanged"
-                        Visibility="{x:Bind AvatarImage, Converter={StaticResource InverseNullToVisibilityConverter}}">
+                        Visibility="{x:Bind AvatarImage, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}">
                         <FontIcon
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
@@ -174,13 +170,13 @@
                                         Width="40"
                                         DisplayName="{x:Bind DisplayName}"
                                         ProfilePicture="{x:Bind AvatarImage}"
-                                        Visibility="{x:Bind AvatarImage, Converter={StaticResource NullToVisibilityConverter}}" />
+                                        Visibility="{x:Bind AvatarImage, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
                                     <Border
                                         Width="40"
                                         Height="40"
                                         CornerRadius="20"
                                         DataContextChanged="ConversationAvatarBorder_DataContextChanged"
-                                        Visibility="{x:Bind AvatarImage, Converter={StaticResource InverseNullToVisibilityConverter}}">
+                                        Visibility="{x:Bind AvatarImage, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}">
                                         <FontIcon
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
@@ -286,7 +282,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0" Visibility="{x:Bind ViewModel.SelectedConversation, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}">
+                <Grid Grid.Row="0" Visibility="{x:Bind ViewModel.SelectedConversation, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
@@ -303,13 +299,13 @@
                             Width="48"
                             DisplayName="{x:Bind ViewModel.SelectedConversation.DisplayName, Mode=OneWay}"
                             ProfilePicture="{x:Bind ViewModel.SelectedConversation.AvatarImage, Mode=OneWay}"
-                            Visibility="{x:Bind ViewModel.SelectedConversation.AvatarImage, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}" />
+                            Visibility="{x:Bind ViewModel.SelectedConversation.AvatarImage, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
                         <Border
                             x:Name="AvatarGlyphBorder"
                             Width="48"
                             Height="48"
                             CornerRadius="24"
-                            Visibility="{x:Bind ViewModel.SelectedConversation.AvatarImage, Mode=OneWay, Converter={StaticResource InverseNullToVisibilityConverter}}">
+                            Visibility="{x:Bind ViewModel.SelectedConversation.AvatarImage, Mode=OneWay, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}">
                             <FontIcon
                                 x:Name="AvatarGlyphIcon"
                                 HorizontalAlignment="Center"
@@ -369,14 +365,14 @@
                                             Width="40"
                                             DisplayName="{x:Bind DisplayName}"
                                             ProfilePicture="{x:Bind Avatar}"
-                                            Visibility="{x:Bind Avatar, Converter={StaticResource NullToVisibilityConverter}}" />
+                                            Visibility="{x:Bind Avatar, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
                                         <Border
                                             Width="40"
                                             Height="40"
                                             VerticalAlignment="Center"
                                             CornerRadius="20"
                                             DataContextChanged="ConversationAvatarBorder_DataContextChanged"
-                                            Visibility="{x:Bind Avatar, Converter={StaticResource InverseNullToVisibilityConverter}}">
+                                            Visibility="{x:Bind Avatar, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}">
                                             <TextBlock
                                                 HorizontalAlignment="Center"
                                                 VerticalAlignment="Center"
@@ -440,14 +436,14 @@
                                                 Width="24"
                                                 DisplayName="{x:Bind DisplayName}"
                                                 ProfilePicture="{x:Bind Avatar}"
-                                                Visibility="{x:Bind Avatar, Converter={StaticResource NullToVisibilityConverter}}" />
+                                                Visibility="{x:Bind Avatar, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
                                             <Border
                                                 Width="24"
                                                 Height="24"
                                                 VerticalAlignment="Center"
                                                 CornerRadius="12"
                                                 DataContextChanged="ConversationAvatarBorder_DataContextChanged"
-                                                Visibility="{x:Bind Avatar, Converter={StaticResource InverseNullToVisibilityConverter}}">
+                                                Visibility="{x:Bind Avatar, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}">
                                                 <TextBlock
                                                     HorizontalAlignment="Center"
                                                     VerticalAlignment="Center"
@@ -505,7 +501,7 @@
                     Height="1"
                     Margin="0,20,0,4"
                     Fill="{StaticResource SystemControlForegroundBaseLowBrush}"
-                    Visibility="{x:Bind ViewModel.SelectedConversation, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}" />
+                    Visibility="{x:Bind ViewModel.SelectedConversation, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
             </Grid>
 
             <!--  Message content  -->
@@ -520,7 +516,7 @@
                 ScrollViewer.VerticalScrollMode="Enabled"
                 SelectionMode="None"
                 ShowsScrollingPlaceholders="True"
-                Visibility="{x:Bind ViewModel.SelectedConversation, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}">
+                Visibility="{x:Bind ViewModel.SelectedConversation, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}">
 
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -554,13 +550,13 @@
                                         Height="32"
                                         DisplayName="{x:Bind Sender.DisplayName}"
                                         ProfilePicture="{x:Bind Sender.Avatar}"
-                                        Visibility="{x:Bind Sender.Avatar, Converter={StaticResource NullToVisibilityConverter}}" />
+                                        Visibility="{x:Bind Sender.Avatar, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
                                     <Border
                                         Width="32"
                                         Height="32"
                                         CornerRadius="16"
                                         DataContextChanged="MessageAvatarBorder_DataContextChanged"
-                                        Visibility="{x:Bind Sender.Avatar, Converter={StaticResource InverseNullToVisibilityConverter}}">
+                                        Visibility="{x:Bind Sender.Avatar, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}">
                                         <TextBlock
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"

@@ -110,6 +110,8 @@ public partial class AboutViewModel : ObservableObject
         new("https://github.com/meamod/MeaMod.DNS", "MeaMod.DNS"),
         new("https://github.com/PrimalZed/CloudSync", "CloudSync"),
         
+        // ADB
+        new("https://github.com/SharpAdb/AdvancedSharpAdbClient", "AdvancedSharpAdbClient"),
         
         // Windows Integration
         new("https://github.com/HavenDV/H.NotifyIcon", "H.NotifyIcon"),

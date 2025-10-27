@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="using:Sefirah.Helpers"
     xmlns:local="using:Sefirah.Views.Settings"
+    xmlns:items="using:Sefirah.Data.Items"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:Sefirah.ViewModels.Settings"
     xmlns:wuc="using:CommunityToolkit.WinUI.Controls"
@@ -20,7 +21,7 @@
             <!--  Breadcrumb Navigation  -->
             <BreadcrumbBar x:Name="BreadcrumbBar" Margin="0,0,0,8">
                 <BreadcrumbBar.ItemTemplate>
-                    <DataTemplate x:DataType="local:NavigationItem">
+                    <DataTemplate x:DataType="items:BreadcrumbBarItemModel">
                         <BreadcrumbBarItem AutomationProperties.Name="{Binding Name}" Content="{Binding}">
                             <BreadcrumbBarItem.ContentTemplate>
                                 <DataTemplate>

@@ -313,7 +313,7 @@
     <value>应用特定设置</value>
   </data>
   <data name="FileTransferNotification.Title" xml:space="preserve">
-    <value>File transfer</value>
+    <value>文件传输</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>发送</value>
@@ -322,10 +322,10 @@
     <value>输入回复</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
-    <value>Open file</value>
+    <value>打开文件</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
-    <value>Open folder</value>
+    <value>打开文件夹</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
     <value>关闭从 {0} 的通知</value>
@@ -717,5 +717,35 @@ input touchscreen swipe 540 1800 540 900</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
     <value>Cancel</value>
+  </data>
+  <data name="FileTransferNotification.Receiving" xml:space="preserve">
+    <value>正在从 {0} 接收</value>
+  </data>
+  <data name="FileTransferNotification.Sending" xml:space="preserve">
+    <value>正在发送到 {0}</value>
+  </data>
+  <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
+    <value>正在从 {2} 接收 {0}/{1}</value>
+  </data>
+  <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
+    <value>正在发送 {0}/{1} 到 {2}</value>
+  </data>
+  <data name="FileTransferNotification.Completed" xml:space="preserve">
+    <value>文件传输完成</value>
+  </data>
+  <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
+    <value>已从 {1} 接收 {0}</value>
+  </data>
+  <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
+    <value>已从 {1} 接收 {0} 个文件</value>
+  </data>
+  <data name="FileTransferNotification.SentSingle" xml:space="preserve">
+    <value>已发送 {0} 到 {1}</value>
+  </data>
+  <data name="FileTransferNotification.SentBulk" xml:space="preserve">
+    <value>已发送 {0} 个文件到 {1}</value>
+  </data>
+  <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
+    <value>取消</value>
   </data>
 </root>

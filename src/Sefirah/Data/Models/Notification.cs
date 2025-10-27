@@ -8,14 +8,14 @@ namespace Sefirah.Data.Models;
 public class Notification
 {
     public string Key { get; set; } = string.Empty;
-    public bool IsPinned { get; set; } = false;
+    public bool Pinned { get; set; } = false;
     public string? TimeStamp { get; set; }
     public NotificationType Type { get; set; }
     public string? AppName { get; set; }
     public string? AppPackage { get; set; }
     public string? Title { get; set; }
     public string? Text { get; set; }
-    public List<GroupedNotificationTextMessage>? GroupedMessages { get; set; }
+    public List<NotificationGroup>? GroupedMessages { get; set; }
     public bool HasGroupedMessages => GroupedMessages?.Count > 0;
     public string? Tag { get; set; }
     public string? GroupKey { get; set; }
@@ -37,12 +37,9 @@ public class Notification
         }
     }
 
-    public string? FlyoutFilterString => AppName != null 
-        ? string.Format(
-            "NotificationFilterButton".GetLocalizedResource(),
-            AppName)
-        : null;
+    public string FlyoutFilterString => string.Format("NotificationFilterButton".GetLocalizedResource(), AppName);
 
+    #region Helpers
     public static async Task<Notification> FromMessage(NotificationMessage message)
     {
         var notification = new Notification
@@ -54,7 +51,7 @@ public class Notification
             AppPackage = message.AppPackage,
             Title = message.Title,
             Text = message.Text,
-            GroupedMessages = message.Messages?.GroupBySender(),
+            GroupedMessages = GroupBySender(message.Messages),
             Tag = message.Tag,
             GroupKey = message.GroupKey,
             Actions = message.Actions.Where(a => a != null).ToList()!,
@@ -72,38 +69,27 @@ public class Notification
         }
         return notification;
     }
-}
 
-// Helper extension method for grouping messages
-public static class NotificationExtensions
-{
-    public static List<GroupedNotificationTextMessage> GroupBySender(this List<NotificationTextMessage> messages)
+    internal static List<NotificationGroup> GroupBySender(List<NotificationTextMessage>? messages)
     {
-        var result = new List<GroupedNotificationTextMessage>();
-        var currentGroup = new GroupedNotificationTextMessage();
+        if (messages == null || messages.Count == 0) return [];
+
+        List<NotificationGroup> result = [];
+        NotificationGroup? currentGroup = null;
 
         foreach (var message in messages)
         {
-            if (currentGroup.Sender != message.Sender)
+            if (currentGroup?.Sender != message.Sender)
             {
-                if (currentGroup.Sender != null)
-                {
-                    result.Add(currentGroup);
-                }
-                currentGroup = new GroupedNotificationTextMessage
-                {
-                    Sender = message.Sender,
-                    Messages = []
-                };
+                currentGroup = new NotificationGroup(message.Sender, []);
+                result.Add(currentGroup);
             }
-            currentGroup.Messages.Add(message.Text);
+            if (!string.IsNullOrEmpty(message.Text))
+            {
+                currentGroup.Messages.Add(message.Text);
+            }
         }
-
-        if (currentGroup.Sender != null)
-        {
-            result.Add(currentGroup);
-        }
-
         return result;
     }
+    #endregion
 }

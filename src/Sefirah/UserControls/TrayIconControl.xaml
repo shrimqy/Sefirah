@@ -18,6 +18,7 @@
         ToolTipText="Sefirah">
         <tb:TaskbarIcon.ContextFlyout>
             <MenuFlyout AreOpenCloseAnimationsEnabled="True">
+                <MenuFlyoutItem Command="{x:Bind StartScrcpyCommand}" Text="Start screen mirroring" />
                 <MenuFlyoutItem Command="{x:Bind ShowHideWindowCommand}" Text="{helpers:ResourceString Name=ShowHideWindow}" />
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem Command="{x:Bind ExitApplicationCommand}" Text="{helpers:ResourceString Name=Exit}" />

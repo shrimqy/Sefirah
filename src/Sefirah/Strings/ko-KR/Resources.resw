@@ -718,4 +718,34 @@ input touchscreen swipe 540 1800 540 900</value>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="FileTransferNotification.Receiving" xml:space="preserve">
+    <value>{0}에서 수신 중</value>
+  </data>
+  <data name="FileTransferNotification.Sending" xml:space="preserve">
+    <value>{0}으로 전송 중</value>
+  </data>
+  <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
+    <value>{2}에서 {0}/{1} 수신 중</value>
+  </data>
+  <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
+    <value>{2}으로 {0}/{1} 전송 중</value>
+  </data>
+  <data name="FileTransferNotification.Completed" xml:space="preserve">
+    <value>파일 전송 완료</value>
+  </data>
+  <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
+    <value>{1}에서 {0} 수신됨</value>
+  </data>
+  <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
+    <value>{1}에서 {0}개 파일 수신됨</value>
+  </data>
+  <data name="FileTransferNotification.SentSingle" xml:space="preserve">
+    <value>{0}을 {1}으로 전송됨</value>
+  </data>
+  <data name="FileTransferNotification.SentBulk" xml:space="preserve">
+    <value>{0}개 파일을 {1}으로 전송됨</value>
+  </data>
+  <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
+    <value>취소</value>
+  </data>
 </root>

@@ -14,12 +14,12 @@ public interface INotificationService
     void Initialize();
 
     Task HandleNotificationMessage(PairedDevice device, NotificationMessage notificationMessage);
-    void RemoveNotification(PairedDevice device, string notificationKey, bool isRemote);
+    void RemoveNotification(PairedDevice device, Notification notification);
     
     /// <summary>
     /// Toggles pin status for a notification in the active session
     /// </summary>
-    void TogglePinNotification(string notificationKey);
+    void TogglePinNotification(Notification notification);
     
     /// <summary>
     /// Clears all notifications for the active session

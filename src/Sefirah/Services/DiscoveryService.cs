@@ -1,11 +1,11 @@
 using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using CommunityToolkit.WinUI;
 using MeaMod.DNS.Multicast;
 using Microsoft.UI.Dispatching;
 using Sefirah.Data.AppDatabase.Models;
 using Sefirah.Data.Contracts;
+using Sefirah.Data.Enums;
 using Sefirah.Data.EventArguments;
 using Sefirah.Data.Models;
 using Sefirah.Helpers;
@@ -15,7 +15,7 @@ using Sefirah.Utils.Serialization;
 
 namespace Sefirah.Services;
 public class DiscoveryService(
-    ILogger<DiscoveryService> logger,
+    ILogger logger,
     IMdnsService mdnsService,
     IDeviceManager deviceManager
     ) : IDiscoveryService, IUdpClientProvider
@@ -29,17 +29,15 @@ public class DiscoveryService(
     public List<DiscoveredMdnsServiceArgs> DiscoveredMdnsServices { get; } = [];
     private List<IPEndPoint> broadcastEndpoints = [];
     private const int DiscoveryPort = 5149;
-    private readonly System.Threading.Lock collectionLock = new();
+    private readonly Lock collectionLock = new();
 
     public async Task StartDiscoveryAsync(int serverPort)
     {
         try
         {
             localDevice = await deviceManager.GetLocalDeviceAsync();
-            var remoteDevice = await deviceManager.GetLastConnectedDevice();
 
             var networkInterfaces = NetworkHelper.GetAllValidAddresses();
-
 
             var publicKey = Convert.ToBase64String(localDevice.PublicKey);
             var localAddresses = NetworkHelper.GetAllValidAddresses();
@@ -64,7 +62,7 @@ public class DiscoveryService(
                 var broadcastAddress = network.BroadcastAddress;
 
                 // Fallback to gateway if broadcast is limited
-                return broadcastAddress.Equals(IPAddress.Broadcast) && ipInfo.Gateway != null
+                return broadcastAddress.Equals(IPAddress.Broadcast) && ipInfo.Gateway is not null
                     ? new IPEndPoint(ipInfo.Gateway, DiscoveryPort)
                     : new IPEndPoint(broadcastAddress, DiscoveryPort);
 
@@ -73,15 +71,13 @@ public class DiscoveryService(
             // Always include default broadcast as fallback
             broadcastEndpoints.Add(new IPEndPoint(IPAddress.Parse(DEFAULT_BROADCAST), DiscoveryPort));
 
-            if (remoteDevice != null && remoteDevice.IpAddresses != null)
-            {
-                broadcastEndpoints.AddRange(remoteDevice.IpAddresses.Select(ip => new IPEndPoint(IPAddress.Parse(ip), DiscoveryPort)));
-            }
+            var ipAddresses = deviceManager.GetRemoteDeviceIpAddresses();
+            broadcastEndpoints.AddRange(ipAddresses.Select(ip => new IPEndPoint(IPAddress.Parse(ip), DiscoveryPort)));
 
             logger.LogInformation("Active broadcast endpoints: {endpoints}", string.Join(", ", broadcastEndpoints));
 
 
-            udpClient = new MulticastClient("0.0.0.0", port, this)
+            udpClient = new MulticastClient("0.0.0.0", port, this, logger)
             {
                 OptionDualMode = false,
                 OptionMulticast = true,
@@ -113,7 +109,7 @@ public class DiscoveryService(
 
     private async void BroadcastDeviceInfoAsync(UdpBroadcast udpBroadcast)
     {
-        while (udpClient != null)
+        while (udpClient is not null)
         {
             udpBroadcast.TimeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
             string jsonMessage = SocketMessageSerializer.Serialize(udpBroadcast);
@@ -146,22 +142,20 @@ public class DiscoveryService(
         logger.LogInformation("Discovered service instance: {deviceId}, {deviceName}", service.DeviceId, service.DeviceName);
 
         var sharedSecret = EcdhHelper.DeriveKey(service.PublicKey, localDevice!.PrivateKey);
-        var device = new DiscoveredDevice
-        {
-            DeviceId = service.DeviceId,
-            DeviceName = service.DeviceName,
-            PublicKey = service.PublicKey,
-            HashedKey = sharedSecret,
-            LastSeen = DateTimeOffset.UtcNow,
-            Origin = DeviceOrigin.MdnsService
-        };
+        DiscoveredDevice device = new(
+            service.DeviceId,
+            service.PublicKey,
+            service.DeviceName,
+            sharedSecret,
+            DateTimeOffset.UtcNow,
+            DeviceOrigin.MdnsService);
 
         await dispatcher.EnqueueAsync(() =>
         {
             lock (collectionLock)
             {
                 var existing = DiscoveredDevices.FirstOrDefault(d => d.DeviceId == device.DeviceId);
-                if (existing != null)
+                if (existing is not null)
                 {
                     DiscoveredDevices[DiscoveredDevices.IndexOf(existing)] = device;
                 }
@@ -191,7 +185,7 @@ public class DiscoveryService(
                         .Where(d => d.Origin == DeviceOrigin.MdnsService)
                         .FirstOrDefault(d => d.DeviceId == deviceId);
 
-                    if (deviceToRemove != null)
+                    if (deviceToRemove is not null)
                     {
                         DiscoveredDevices.Remove(deviceToRemove);
                     }
@@ -208,21 +202,6 @@ public class DiscoveryService(
         });
     }
 
-    public void OnConnected()
-    {
-
-    }
-
-    public void OnDisconnected()
-    {
-
-    }
-
-    public void OnError(SocketError error)
-    {
-
-    }
-
     public async void OnReceived(EndPoint endpoint, byte[] buffer, long offset, long size)
     {
         try
@@ -234,7 +213,7 @@ public class DiscoveryService(
 
             IPEndPoint? deviceEndpoint = broadcast.IpAddresses.Select(ip => new IPEndPoint(IPAddress.Parse(ip), DiscoveryPort)).FirstOrDefault();
 
-            if (deviceEndpoint != null && !broadcastEndpoints.Contains(deviceEndpoint))
+            if (deviceEndpoint is not null && !broadcastEndpoints.Contains(deviceEndpoint))
             {
                 broadcastEndpoints.Add(deviceEndpoint);
             }
@@ -243,22 +222,20 @@ public class DiscoveryService(
             if (DiscoveredMdnsServices.Any(s => s.PublicKey == broadcast.PublicKey)) return;
 
             var sharedSecret = EcdhHelper.DeriveKey(broadcast.PublicKey, localDevice!.PrivateKey);
-            var device = new DiscoveredDevice
-            {
-                DeviceId = broadcast.DeviceId,
-                DeviceName = broadcast.DeviceName,
-                PublicKey = broadcast.PublicKey,
-                HashedKey = sharedSecret,
-                LastSeen = DateTimeOffset.FromUnixTimeMilliseconds(broadcast.TimeStamp),
-                Origin = DeviceOrigin.UdpBroadcast
-            };
+            DiscoveredDevice device = new(
+                broadcast.DeviceId,
+                broadcast.PublicKey,
+                broadcast.DeviceName,
+                sharedSecret,
+                DateTimeOffset.FromUnixTimeMilliseconds(broadcast.TimeStamp),
+                DeviceOrigin.UdpBroadcast);
 
             await dispatcher.EnqueueAsync(() =>
             {
                 lock (collectionLock)
                 {
                     var existingDevice = DiscoveredDevices.FirstOrDefault(d => d.DeviceId == device.DeviceId);
-                    if (existingDevice != null)
+                    if (existingDevice is not null)
                     {
                         var index = DiscoveredDevices.IndexOf(existingDevice);
                         DiscoveredDevices[index] = device;
@@ -279,14 +256,28 @@ public class DiscoveryService(
     }
 
     private DispatcherQueueTimer? _cleanupTimer;
+    private readonly Lock _timerLock = new();
+    
     private void StartCleanupTimer()
     {
-        if (_cleanupTimer != null) return;
+        lock (_timerLock)
+        {
+            if (_cleanupTimer is not null) return;
 
-        _cleanupTimer = dispatcher.CreateTimer();
-        _cleanupTimer.Interval = TimeSpan.FromSeconds(3);
-        _cleanupTimer.Tick += (s, e) => CleanupStaleDevices();
-        _cleanupTimer.Start();
+            _cleanupTimer = dispatcher.CreateTimer();
+            _cleanupTimer.Interval = TimeSpan.FromSeconds(3);
+            _cleanupTimer.Tick += (s, e) => CleanupStaleDevices();
+            _cleanupTimer.Start();
+        }
+    }
+
+    private void StopCleanupTimer()
+    {
+        lock (_timerLock)
+        {
+            _cleanupTimer?.Stop();
+            _cleanupTimer = null;
+        }
     }
 
     private async void CleanupStaleDevices()
@@ -307,14 +298,13 @@ public class DiscoveryService(
 
                     foreach (var device in staleDevices)
                     {
-                        DiscoveredDevices.Remove(device);
+                            DiscoveredDevices.Remove(device);
                     }
 
                     // Stop timer if no UDP devices left
                     if (!DiscoveredDevices.Any(d => d.Origin == DeviceOrigin.UdpBroadcast))
                     {
-                        _cleanupTimer?.Stop();
-                        _cleanupTimer = null;
+                        StopCleanupTimer();
                     }
                 }
             });
@@ -327,7 +317,8 @@ public class DiscoveryService(
 
     public void Dispose()
     {
-        // Dispose default client
+        StopCleanupTimer();
+
         try
         {
             udpClient?.Dispose();

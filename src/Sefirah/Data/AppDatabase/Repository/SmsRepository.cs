@@ -1,22 +1,10 @@
-using System.Runtime.CompilerServices;
-using System.Text.Json;
 using Sefirah.Data.AppDatabase.Models;
 using Sefirah.Data.Models;
-using Sefirah.Data.Models.Messages;
-using SQLite;
 
 namespace Sefirah.Data.AppDatabase.Repository;
 
-public class SmsRepository
+public class SmsRepository(DatabaseContext databaseContext, ILogger logger)
 {
-    private readonly DatabaseContext databaseContext;
-    private readonly ILogger<SmsRepository> logger;
-
-    public SmsRepository(DatabaseContext databaseContext, ILogger<SmsRepository> logger)
-    {
-        this.databaseContext = databaseContext;
-        this.logger = logger;
-    }
 
     #region Conversation Operations
 

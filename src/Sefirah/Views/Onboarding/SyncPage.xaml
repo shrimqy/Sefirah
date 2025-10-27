@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="using:Sefirah.Converters"
+    xmlns:wctconverters="using:CommunityToolkit.WinUI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="using:Sefirah.Helpers"
     xmlns:local="using:Sefirah.Views.Onboarding"
@@ -12,10 +13,6 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-        <converters:StringNullOrEmptyToBooleanConverter x:Key="StringNullOrEmptyToBooleanConverter" />
-        <converters:DateTimeDevicesConverter x:Key="DateTimeDevicesConverter" />
-        <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
     </Page.Resources>
 
     <Grid

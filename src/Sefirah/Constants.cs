@@ -3,9 +3,15 @@ public static class Constants
 {
     public static class Notification
     {
-        public const string NotificationGroup = "file-transfer";
+        public const string FileTransferGroup = "file-transfer";
     }
 
+    public static class ToastNotificationType
+    {
+        public const string FileTransfer = "FileTransfer";
+        public const string RemoteNotification = "RemoteNotification";
+        public const string Clipboard = "Clipboard";
+    }
     public static class LocalSettings
     {
         public const string DateTimeFormat = "datetimeformat";

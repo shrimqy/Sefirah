@@ -13,6 +13,7 @@ namespace Sefirah.Services;
 
 public class AdbService(
     ILogger<AdbService> logger,
+    IDeviceManager deviceManager,
     IUserSettingsService userSettingsService
 ) : IAdbService
 {
@@ -28,47 +29,48 @@ public class AdbService(
     // Initialize the codec option collections
     public ObservableCollection<ScrcpyPreferenceItem> DisplayOrientationOptions { get; } =
     [
-        new() { Id = 0, Command = "", Display = "Default" },
-        new() { Id = 1, Command = "0", Display = "0°" },
-        new() { Id = 2, Command = "90", Display = "90°" },
-        new() { Id = 3, Command = "180", Display = "180°" },
-        new() { Id = 4, Command = "270", Display = "270°" },
-        new() { Id = 5, Command = "flip0", Display = "flip-0°" },
-        new() { Id = 6, Command = "flip90", Display = "flip-90°" },
-        new() { Id = 7, Command = "flip180", Display = "flip-180°" },
-        new() { Id = 8, Command = "flip270", Display = "flip-270°" }
+        new(0, "", "Default"),
+        new(1, "0", "0°"),
+        new(2, "90", "90°"),
+        new(3, "180", "180°"),
+        new(4, "270", "270°"),
+        new(5, "flip0", "flip-0°"),
+        new(6, "flip90", "flip-90°"),
+        new(7, "flip180", "flip-180°"),
+        new(8, "flip270", "flip-270°")
     ];
 
     public ObservableCollection<ScrcpyPreferenceItem> VideoCodecOptions { get; } =
     [
-        new() { Id = 0, Command = "", Display = "Default" },
-        new() { Id = 1, Command = "--video-codec=h264 --video-encoder=OMX.qcom.video.encoder.avc", Display = "h264 & c2.qti.avc.encoder (hw)" },
-        new() { Id = 2, Command = "--video-codec=h264 --video-encoder=c2.android.avc.encoder", Display = "h264 & c2.android.avc.encoder (sw)" },
-        new() { Id = 4, Command = "--video-codec=h264 --video-encoder=OMX.google.h264.encoder", Display = "h264 & OMX.google.h264.encoder (sw)" },
-        new() { Id = 5, Command = "--video-codec=h265 --video-encoder=OMX.qcom.video.encoder.hevc", Display = "h265 & OMX.qcom.video.encoder.hevc (hw)" },
-        new() { Id = 6, Command = "--video-codec=h265 --video-encoder=c2.android.hevc.encoder", Display = "h265 & c2.android.hevc.encoder (sw)" }
+        new(0, "", "Default"),
+        new(1, "--video-codec=h264 --video-encoder=OMX.qcom.video.encoder.avc", "h264 & c2.qti.avc.encoder (hw)"),
+        new(2, "--video-codec=h264 --video-encoder=c2.android.avc.encoder", "h264 & c2.android.avc.encoder (sw)"),
+        new(4, "--video-codec=h264 --video-encoder=OMX.google.h264.encoder", "h264 & OMX.google.h264.encoder (sw)"),
+        new(5, "--video-codec=h265 --video-encoder=OMX.qcom.video.encoder.hevc", "h265 & OMX.qcom.video.encoder.hevc (hw)"),
+        new(6, "--video-codec=h265 --video-encoder=c2.android.hevc.encoder", "h265 & c2.android.hevc.encoder (sw)")
     ];
 
     public ObservableCollection<ScrcpyPreferenceItem> AudioCodecOptions { get; } =
     [
-        new() { Id = 0, Command = "", Display = "Default" },
-        new() { Id = 1, Command = "--audio-codec=opus --audio-encoder=c2.android.opus.encoder", Display = "opus & c2.android.opus.encoder (sw)" },
-        new() { Id = 2, Command = "--audio-codec=aac --audio-encoder=c2.android.aac.encoder", Display = "aac & c2.android.aac.encoder (sw)" },
-        new() { Id = 3, Command = "--audio-codec=aac --audio-encoder=OMX.google.aac.encoder", Display = "aac & OMX.google.aac.encoder (sw)" },
-        new() { Id = 4, Command = "--audio-codec=raw", Display = "raw" }
+        new(0, "", "Default"),
+        new(1, "--audio-codec=opus --audio-encoder=c2.android.opus.encoder", "opus & c2.android.opus.encoder (sw)"),
+        new(2, "--audio-codec=aac --audio-encoder=c2.android.aac.encoder", "aac & c2.android.aac.encoder (sw)"),
+        new(3, "--audio-codec=aac --audio-encoder=OMX.google.aac.encoder", "aac & OMX.google.aac.encoder (sw)"),
+        new(4, "--audio-codec=raw", "raw")
     ];
+
 
     // TODO: To add new options dynamically
     public void AddVideoCodecOption(string command, string display)
     {
         int newId = VideoCodecOptions.Count > 0 ? VideoCodecOptions.Max(x => x.Id) + 1 : 0;
-        VideoCodecOptions.Add(new ScrcpyPreferenceItem { Id = newId, Command = command, Display = display });
+        VideoCodecOptions.Add(new ScrcpyPreferenceItem(newId, command, display));
     }
 
     public void AddAudioCodecOption(string command, string display)
     {
         int newId = AudioCodecOptions.Count > 0 ? AudioCodecOptions.Max(x => x.Id) + 1 : 0;
-        AudioCodecOptions.Add(new ScrcpyPreferenceItem { Id = newId, Command = command, Display = display });
+        AudioCodecOptions.Add(new ScrcpyPreferenceItem(newId, command, display));
     }
 
 
@@ -164,7 +166,7 @@ public class AdbService(
                     AndroidId = "" // Will be populated when device comes online
                 };
 
-                await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+                await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
                 {
                     AdbDevices.Add(adbDevice);
                 });
@@ -174,7 +176,7 @@ public class AdbService(
             // Refresh the full device information
             var connectedDevice = await GetFullDeviceInfoAsync(e.Device);
             
-            await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
             {
                 AdbDevices.Add(connectedDevice);
             });
@@ -192,7 +194,7 @@ public class AdbService(
         var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == e.Device.Serial);
         if (existingDevice != null)
         {
-            await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
             {
                 var index = AdbDevices.IndexOf(existingDevice);
                 if (index != -1)
@@ -213,7 +215,7 @@ public class AdbService(
         {
             var deviceInfo = await GetFullDeviceInfoAsync(e.Device);
                 
-            await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
             {
                 if (existingDevice != null)
                 {
@@ -240,7 +242,7 @@ public class AdbService(
             // Device is going offline/authorizing - just update the state if it exists
             if (existingDevice != null)
             {
-                await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+                await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
                 {
                     var index = AdbDevices.IndexOf(existingDevice);
                     if (index != -1)
@@ -259,14 +261,14 @@ public class AdbService(
         if (devices.Any())
         {
             logger.LogWarning("No devices found");
-            await App.MainWindow!.DispatcherQueue.EnqueueAsync(() =>
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
             {
                 AdbDevices.Clear();
             });
             return;
         }
 
-        await App.MainWindow!.DispatcherQueue.EnqueueAsync(async() =>
+        await App.MainWindow.DispatcherQueue.EnqueueAsync(async() =>
         {
             var adbDevices = new List<AdbDevice>();
             foreach (var device in devices)
@@ -309,15 +311,42 @@ public class AdbService(
 
                 // adb shell cat /storage/emulated/0/Android/data/com.castle.sefirah/files/device_info.txt
                 // Get the Android ID from the device_info.txt file since we can't directly access the android id of the App 
-                // TODO: Use this for associating the adb devices with paired devices
                 await adbClient.ExecuteShellCommandAsync(deviceData, "cat /storage/emulated/0/Android/data/com.castle.sefirah/files/device_info.txt", androidIdReceiver);
-                androidId = androidIdReceiver.ToString().Trim();
+                var id = androidIdReceiver.ToString().Trim();
+                if (!string.IsNullOrEmpty(id))
+                {
+                    // Extract the Android ID from the output
+                    androidId = id;
+                }
             }
             catch (Exception ex)
             {
                 logger.LogError($"Error getting Android ID for {deviceData.Serial}", ex);
             }
-            logger.LogInformation($"Android ID: {androidId}");
+
+            // Look for paired devices with matching model
+            if (string.IsNullOrEmpty(androidId) && fullDeviceData.Model != null)
+            {
+                var deviceModel = fullDeviceData.Model;
+
+                var pairedDevices = deviceManager.PairedDevices;
+                var matchingDevice = pairedDevices.FirstOrDefault(pd =>
+                    !string.IsNullOrEmpty(pd.Model) &&
+                    (pd.Model.Equals(deviceModel, StringComparison.OrdinalIgnoreCase) ||
+                     pd.Model.Contains(deviceModel, StringComparison.OrdinalIgnoreCase) ||
+                     deviceModel.Contains(pd.Model, StringComparison.OrdinalIgnoreCase)));
+
+                if (matchingDevice != null)
+                {
+                    androidId = matchingDevice.Id;
+                }
+                else
+                {
+                    logger.LogWarning($"No matching paired device found for model: {deviceModel}");
+                    androidId = string.Empty;
+                }
+            }
+
             var device = new AdbDevice
             {
                 Serial = fullDeviceData.Serial,

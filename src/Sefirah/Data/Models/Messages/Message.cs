@@ -1,6 +1,6 @@
 namespace Sefirah.Data.Models.Messages;
 
-public class Message
+public sealed class Message
 {
     public long UniqueId { get; set; }
     public required Contact Contact { get; set; }

@@ -5,7 +5,7 @@ using UdpClient = NetCoreServer.UdpClient;
 
 namespace Sefirah.Services.Socket;
 
-public partial class ServerSession(SslServer server, ITcpServerProvider socketProvider, ILogger logger) : SslSession(server)
+public partial class ServerSession(SslServer server, ITcpServerProvider socketProvider) : SslSession(server)
 {
 
     protected override void OnDisconnected()
@@ -25,7 +25,7 @@ public partial class ServerSession(SslServer server, ITcpServerProvider socketPr
 
     protected override void OnError(SocketError error)
     {
-        logger.LogError("Session {Id} encountered error: {error}", Id, error);
+        socketProvider.OnError(error);
     }
 }
 
@@ -34,25 +34,20 @@ public partial class Server(SslContext context, IPAddress address, int port, ITc
     protected override SslSession CreateSession()
     {
         logger.LogDebug("Creating new session");
-        return new ServerSession(this, socketProvider, logger);
+        return new ServerSession(this, socketProvider);
     }
 
     protected override void OnError(SocketError error)
     {
-        logger.LogError("Session {Id} encountered error: {error}", Id, error);
+        socketProvider.OnError(error);
     }
 }
 
-public partial class Client(SslContext context, string address, int port, ITcpClientProvider socketProvider, ILogger logger) : SslClient(context, address, port)
+public partial class Client(SslContext context, string address, int port, ITcpClientProvider socketProvider) : SslClient(context, address, port)
 {
     protected override void OnConnected()
     {
         socketProvider.OnConnected();
-    }
-
-    protected override void OnHandshaking()
-    {
-        base.OnHandshaking();
     }
 
     protected override void OnDisconnected()
@@ -67,23 +62,21 @@ public partial class Client(SslContext context, string address, int port, ITcpCl
 
     protected override void OnError(SocketError error)
     {
-        logger.LogError("Session {Id} encountered error: {error}", Id, error);
+        socketProvider.OnError(error);
     }
 }
 
 
-class MulticastClient(string address, int port, IUdpClientProvider socketProvider) : UdpClient(address, port)
+public partial class MulticastClient(string address, int port, IUdpClientProvider socketProvider, ILogger logger) : UdpClient(address, port)
 {
 
     protected override void OnConnected()
     {
         ReceiveAsync();
-        socketProvider.OnConnected();
     }
 
     protected override void OnDisconnected()
     {
-        socketProvider.OnDisconnected();
     }
 
     protected override void OnReceived(EndPoint endpoint, byte[] buffer, long offset, long size)
@@ -93,6 +86,6 @@ class MulticastClient(string address, int port, IUdpClientProvider socketProvide
     }
     protected override void OnError(SocketError error)
     {
-        //Debug.WriteLine($"Multicast UDP client caught an error with code {error}");
+        logger.LogError("Session {Id} encountered error: {error}", Id, error);
     }
 }

@@ -1,13 +1,4 @@
-using System.Runtime.Serialization;
-
 namespace Sefirah.Data.Enums;
-public enum FileTransferType
-{
-    [EnumMember(Value = "BulkFile")]
-    BulkFile,
-    [EnumMember(Value = "SingleFile")]
-    SingleFile,
-}
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum SessionType
@@ -79,4 +70,11 @@ public enum ConversationType
     ActiveUpdated,
     Removed,
     New
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum FileTransferType
+{
+    Clipboard,
+    File
 }

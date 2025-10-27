@@ -10,8 +10,8 @@
         <!-- App Identifier -->
         <ApplicationId>com.sefirah.castle</ApplicationId>
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-        <ApplicationVersion>1</ApplicationVersion>
+        <ApplicationDisplayVersion>2.0.1</ApplicationDisplayVersion>
+        <ApplicationVersion>2</ApplicationVersion>
         <!-- Package Publisher -->
         <ApplicationPublisher>shrimqy</ApplicationPublisher>
         <!-- Package Description -->
@@ -96,6 +96,7 @@
         <PackageReference Include="AdvancedSharpAdbClient" />
         <PackageReference Include="BouncyCastle.Cryptography" />
         <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" />
+        <PackageReference Include="CommunityToolkit.WinUI.Converters" />
         <PackageReference Include="CommunityToolkit.WinUI.Extensions" />
         <PackageReference Include="H.NotifyIcon.Uno.WinUI" />
         <PackageReference Include="MeaMod.DNS" />

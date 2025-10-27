@@ -313,7 +313,7 @@
     <value>הגדרות יישום ספציפיות</value>
   </data>
   <data name="FileTransferNotification.Title" xml:space="preserve">
-    <value>File transfer</value>
+    <value>העברת קובץ</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>שלח</value>
@@ -322,10 +322,10 @@
     <value>הקלד תגובה</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
-    <value>Open file</value>
+    <value>פתיחת קובץ</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
-    <value>Open folder</value>
+    <value>פתיחת תיקייה</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
     <value>כבה התראות מ{0}</value>
@@ -688,33 +688,33 @@ input text %pwd%</value>
     <value>Save</value>
   </data>
   <data name="FileTransferNotification.Receiving" xml:space="preserve">
-    <value>Receiving from {0}</value>
+    <value>מקבל מ-{0}</value>
   </data>
   <data name="FileTransferNotification.Sending" xml:space="preserve">
-    <value>Sending to {0}</value>
+    <value>שולח ל-{0}</value>
   </data>
   <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
-    <value>Receiving {0}/{1} from {2}</value>
+    <value>מקבל {0}/{1} מ-{2}</value>
   </data>
   <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
-    <value>Sending {0}/{1} to {2}</value>
+    <value>שולח {0}/{1} ל-{2}</value>
   </data>
   <data name="FileTransferNotification.Completed" xml:space="preserve">
-    <value>File transfer completed</value>
+    <value>העברת קבצים הושלמה</value>
   </data>
   <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
-    <value>Received {0} from {1}</value>
+    <value>קיבל {0} מ-{1}</value>
   </data>
   <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
-    <value>Received {0} files from {1}</value>
+    <value>קיבל {0} קבצים מ-{1}</value>
   </data>
   <data name="FileTransferNotification.SentSingle" xml:space="preserve">
-    <value>Sent {0} to {1}</value>
+    <value>שלח {0} ל-{1}</value>
   </data>
   <data name="FileTransferNotification.SentBulk" xml:space="preserve">
-    <value>Sent {0} files to {1}</value>
+    <value>שלח {0} קבצים ל-{1}</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>ביטול</value>
   </data>
 </root>

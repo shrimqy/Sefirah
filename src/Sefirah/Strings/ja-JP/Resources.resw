@@ -313,7 +313,7 @@
     <value>アプリ固有の設定</value>
   </data>
   <data name="FileTransferNotification.Title" xml:space="preserve">
-    <value>File transfer</value>
+    <value>ファイル転送</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>送信</value>
@@ -322,10 +322,10 @@
     <value>返信を入力</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
-    <value>Open file</value>
+    <value>ファイルを開く</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
-    <value>Open folder</value>
+    <value>フォルダーを開く</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
     <value>「{0}」からの通知をオフにする</value>
@@ -688,33 +688,33 @@ input text %pwd%</value>
     <value>Save</value>
   </data>
   <data name="FileTransferNotification.Receiving" xml:space="preserve">
-    <value>Receiving from {0}</value>
+    <value>{0} から受信中</value>
   </data>
   <data name="FileTransferNotification.Sending" xml:space="preserve">
-    <value>Sending to {0}</value>
+    <value>{0} に送信中</value>
   </data>
   <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
-    <value>Receiving {0}/{1} from {2}</value>
+    <value>{2} から {0}/{1} を受信中</value>
   </data>
   <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
-    <value>Sending {0}/{1} to {2}</value>
+    <value>{2} に {0}/{1} を送信中</value>
   </data>
   <data name="FileTransferNotification.Completed" xml:space="preserve">
-    <value>File transfer completed</value>
+    <value>ファイル転送完了</value>
   </data>
   <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
-    <value>Received {0} from {1}</value>
+    <value>{1} から {0} を受信しました</value>
   </data>
   <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
-    <value>Received {0} files from {1}</value>
+    <value>{1} から {0} 個のファイルを受信しました</value>
   </data>
   <data name="FileTransferNotification.SentSingle" xml:space="preserve">
-    <value>Sent {0} to {1}</value>
+    <value>{0} を {1} に送信しました</value>
   </data>
   <data name="FileTransferNotification.SentBulk" xml:space="preserve">
-    <value>Sent {0} files to {1}</value>
+    <value>{0} 個のファイルを {1} に送信しました</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>キャンセル</value>
   </data>
 </root>

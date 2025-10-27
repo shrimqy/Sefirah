@@ -1,7 +1,7 @@
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 
-namespace Sefirah.Platforms.Desktop;
+namespace Sefirah.Platforms.Desktop.Services;
 public class DesktopPlaybackService : IPlaybackService
 {
     public Task HandleMediaActionAsync(PlaybackAction mediaAction)

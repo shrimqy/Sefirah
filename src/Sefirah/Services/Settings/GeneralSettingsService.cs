@@ -3,14 +3,13 @@ using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
-using Sefirah.Data.Models;
 using Sefirah.Data.Models.Actions;
 using Sefirah.Utils.Serialization;
 using Windows.UI;
 using Windows.UI.ViewManagement;
 
 namespace Sefirah.Services.Settings;
-internal sealed class GeneralSettingsService : BaseObservableJsonSettings, IGeneralSettingsService
+internal sealed partial class GeneralSettingsService : BaseObservableJsonSettings, IGeneralSettingsService
 {
     private readonly UISettings _uiSettings = new();
     private bool _isApplyingTheme;
@@ -144,7 +143,7 @@ internal sealed class GeneralSettingsService : BaseObservableJsonSettings, IGene
 
     public List<BaseAction> Actions
     {
-        get => Get<List<BaseAction>>(new List<BaseAction>());
+        get => Get<List<BaseAction>>([]);
         set => Set(value);
     }
 

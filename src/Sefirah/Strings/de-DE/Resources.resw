@@ -690,31 +690,31 @@ Eingabe Text %pwd%</value>
     <value>Speichern</value>
   </data>
   <data name="FileTransferNotification.Receiving" xml:space="preserve">
-    <value>Empfang von {0}</value>
+    <value>Empfange von {0}</value>
   </data>
   <data name="FileTransferNotification.Sending" xml:space="preserve">
-    <value>Versand an {0}</value>
+    <value>Sende an {0}</value>
   </data>
   <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
-    <value>Von {2} wird {0}/ {1} empfangen</value>
+    <value>Empfange {0}/{1} von {2}</value>
   </data>
   <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
-    <value>An {2} wird {0}/ {1} gesendet</value>
+    <value>Sende {0}/{1} an {2}</value>
   </data>
   <data name="FileTransferNotification.Completed" xml:space="preserve">
     <value>Dateiübertragung abgeschlossen</value>
   </data>
   <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
-    <value>Von {1} wurde {0} empfangen</value>
+    <value>{0} von {1} empfangen</value>
   </data>
   <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
-    <value>Von {1} wurden {0} Dateien empfangen</value>
+    <value>{0} Dateien von {1} empfangen</value>
   </data>
   <data name="FileTransferNotification.SentSingle" xml:space="preserve">
-    <value>An {1} wurde {0} gesendet</value>
+    <value>{0} an {1} gesendet</value>
   </data>
   <data name="FileTransferNotification.SentBulk" xml:space="preserve">
-    <value>An {1} wurden {0} Dateien gesendet</value>
+    <value>{0} Dateien an {1} gesendet</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
     <value>Abbrechen</value>

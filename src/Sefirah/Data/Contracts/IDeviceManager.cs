@@ -37,11 +37,6 @@ public interface IDeviceManager
     Task<PairedDevice?> GetLastConnectedDevice();
 
     /// <summary>
-    /// Gets the list of devices.
-    /// </summary>
-    Task<List<RemoteDeviceEntity>> GetDeviceListAsync();
-
-    /// <summary>
     /// Removes the device from the database.
     /// </summary>
     void RemoveDevice(PairedDevice device);
@@ -67,4 +62,6 @@ public interface IDeviceManager
     Task<LocalDeviceEntity> GetLocalDeviceAsync();
     void UpdateLocalDevice(LocalDeviceEntity localDevice);
     Task Initialize();
+
+    List<string> GetRemoteDeviceIpAddresses();
 }

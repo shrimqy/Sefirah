@@ -27,7 +27,7 @@ public static class PickerHelper
         try
         {
             var picker = new FileOpenPicker();
-            if (fileTypes != null)
+            if (fileTypes is not null)
             {
                 foreach (var type in fileTypes)
                 {

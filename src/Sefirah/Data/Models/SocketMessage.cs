@@ -134,19 +134,13 @@ public class NotificationAction : SocketMessage
     public bool IsReplyAction { get; set; }
 }
 
-public class GroupedNotificationTextMessage
-{
-    public string Sender { get; set; }
-    public List<string> Messages { get; set; }
-}
-
 public class NotificationTextMessage
 {
     [JsonPropertyName("sender")]
-    public string Sender { get; set; }
+    public required string Sender { get; set; }
 
     [JsonPropertyName("text")]
-    public string Text { get; set; }
+    public required string Text { get; set; }
 }
 
 public class DeviceInfo : SocketMessage
@@ -156,6 +150,9 @@ public class DeviceInfo : SocketMessage
 
     [JsonPropertyName("deviceName")]
     public string DeviceName { get; set; }
+
+    [JsonPropertyName("model")]
+    public string? Model { get; set; }
 
     [JsonPropertyName("avatar")]
     public string? Avatar { get; set; }
@@ -198,9 +195,6 @@ public class PlaybackSession : SocketMessage
 {
     [JsonPropertyName("sessionType")]
     public SessionType SessionType { get; set; }
-
-    [JsonPropertyName("isCurrentSession")]
-    public bool IsCurrentSession { get; set; }
 
     [JsonPropertyName("source")]
     public string? Source { get; set; }
@@ -271,6 +265,9 @@ public class AudioDevice : SocketMessage
 
 public class FileTransfer : SocketMessage
 {
+    [JsonPropertyName("transferType")]
+    public FileTransferType TransferType { get; set; }
+
     [JsonPropertyName("fileMetadata")]
     public required FileMetadata FileMetadata { get; set; }
 
@@ -309,22 +306,6 @@ public class FileMetadata
 
     [JsonPropertyName("fileSize")]
     public required long FileSize { get; set; }
-
-    [JsonIgnore]
-    public string? Uri { get; set; } = string.Empty;
-}
-
-public class StorageInfo : SocketMessage
-{
-    [JsonPropertyName("totalSpace")]
-    public long TotalSpace { get; set; }
-
-    [JsonPropertyName("freeSpace")]
-    public long FreeSpace { get; set; }
-
-    [JsonPropertyName("usedSpace")]
-    public long UsedSpace { get; set; }
-
 }
 
 public class ApplicationList : SocketMessage

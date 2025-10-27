@@ -48,7 +48,7 @@ public partial class ProcessAction : BaseAction, IActionDialog
             XamlRoot = xamlRoot
         };
 
-        if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+        if (await dialog.ShowAsync() is ContentDialogResult.Primary)
         {
             return dialog.Result;
         }

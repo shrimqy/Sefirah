@@ -7,21 +7,18 @@ using Sefirah.Utils.Serialization;
 using Windows.Data.Xml.Dom;
 using Windows.System;
 using Windows.UI.Notifications;
-using static Vanara.PInvoke.User32;
 using Notification = Sefirah.Data.Models.Notification;
 
 namespace Sefirah.Services;
 public class NotificationService(
     ILogger logger,
     ISessionManager sessionManager,
-    IUserSettingsService userSettingsService,
     IDeviceManager deviceManager,
     IPlatformNotificationHandler platformNotificationHandler,
     RemoteAppRepository remoteAppsRepository) : INotificationService
 {
-    private readonly SemaphoreSlim semaphore = new(1, 1);
     private readonly Dictionary<string, ObservableCollection<Notification>> deviceNotifications = [];
-    private readonly Microsoft.UI.Dispatching.DispatcherQueue dispatcher = App.MainWindow!.DispatcherQueue;
+    private readonly Microsoft.UI.Dispatching.DispatcherQueue dispatcher = App.MainWindow.DispatcherQueue;
     
     private readonly ObservableCollection<Notification> activeNotifications = [];
 
@@ -39,7 +36,7 @@ public class NotificationService(
         
         ((INotifyPropertyChanged)deviceManager).PropertyChanged += (s, e) =>
         {
-            if (e.PropertyName == nameof(IDeviceManager.ActiveDevice))
+            if (e.PropertyName is nameof(IDeviceManager.ActiveDevice) && deviceManager.ActiveDevice is not null)
                 UpdateActiveNotifications(deviceManager.ActiveDevice);
         };
     }
@@ -63,43 +60,6 @@ public class NotificationService(
         {
             ClearHistory(e.Device);
         }
-        else
-        {
-            // Device disconnected
-            logger.LogInformation("Device {DeviceId} disconnected", e.Device.Id);
-        }
-    }
-
-    private void UpdateActiveNotifications(PairedDevice? activeDevice)
-    {
-        activeNotifications.Clear();
-        
-        if (activeDevice != null && deviceNotifications.TryGetValue(activeDevice.Id, out var deviceNotifs))
-        {
-            activeNotifications.AddRange(deviceNotifs);
-
-            if (activeDevice.DeviceSettings.ShowBadge)
-            {
-                // Get the blank badge XML payload for a badge number
-                XmlDocument badgeXml =
-                    BadgeUpdateManager.GetTemplateContent(BadgeTemplateType.BadgeNumber);
-
-                // Set the value of the badge in the XML to our number
-                XmlElement badgeElement = badgeXml.SelectSingleNode("/badge") as XmlElement;
-                badgeElement.SetAttribute("value", deviceNotifs.Count.ToString());
-
-                // Create the badge notification
-                BadgeNotification badge = new(badgeXml);
-
-                // Create the badge updater for the application
-                BadgeUpdater badgeUpdater =
-                    BadgeUpdateManager.CreateBadgeUpdaterForApplication();
-
-                // And update the badge
-                badgeUpdater.Update(badge);
-            }
-
-        }
     }
 
     public async Task HandleNotificationMessage(PairedDevice device, NotificationMessage message)
@@ -107,14 +67,12 @@ public class NotificationService(
         // Check if device has notification sync enabled
         if (!device.DeviceSettings.NotificationSyncEnabled) return;
         
-
-        await semaphore.WaitAsync().ConfigureAwait(false);
         try
-        {
-            if (message.Title != null && message.AppPackage != null)
+        { 
+            if (message.Title is not null && message.AppPackage is not null)
             {
-                var filter = await remoteAppsRepository.GetAppNotificationFilterAsync(message.AppPackage, device.Id)
-                ?? await remoteAppsRepository.AddOrUpdateAppNotificationFilter(device.Id, message.AppPackage, message.AppName!, !string.IsNullOrEmpty(message.AppIcon) ? Convert.FromBase64String(message.AppIcon) : null!);
+                var filter = remoteAppsRepository.GetAppNotificationFilterAsync(message.AppPackage, device.Id)
+                ?? await remoteAppsRepository.AddOrUpdateApplicationForDevice(device.Id, message.AppPackage, message.AppName!, message.AppIcon);
 
                 if (filter == NotificationFilter.Disabled) return;
 
@@ -128,13 +86,13 @@ public class NotificationService(
                         // Check for existing notification in this device's collection
                         var existingNotification = notifications.FirstOrDefault(n => n.Key == notification.Key);
 
-                        if (existingNotification != null)
+                        if (existingNotification is not null)
                         {
                             // Update existing notification
                             var index = notifications.IndexOf(existingNotification);
-                            if (existingNotification.IsPinned)
+                            if (existingNotification.Pinned)
                             {
-                                notification.IsPinned = true;
+                                notification.Pinned = true;
                             }
                             notifications[index] = notification;
                         }
@@ -149,8 +107,8 @@ public class NotificationService(
 #endif
                         await platformNotificationHandler.ShowRemoteNotification(message, device.Id);
                     }
-                    else if ((message.NotificationType == NotificationType.Active || message.NotificationType == NotificationType.New)
-                        && (filter == NotificationFilter.Feed || filter == NotificationFilter.ToastFeed))
+                    else if ((message.NotificationType is NotificationType.Active || message.NotificationType is NotificationType.New)
+                        && (filter is NotificationFilter.Feed || filter is NotificationFilter.ToastFeed))
                     {
                         notifications.Add(notification);
                     }
@@ -170,19 +128,226 @@ public class NotificationService(
             }
             else if (message.NotificationType == NotificationType.Removed)
             {
-                RemoveNotification(device, message.NotificationKey, true);
+                if (!deviceNotifications.TryGetValue(device.Id, out var notifications)) return;
+                var notification = notifications.FirstOrDefault(n => n.Key == message.NotificationKey);
+                if (notification is not null && !notification.Pinned)
+                {
+                    await dispatcher.EnqueueAsync(() => notifications.Remove(notification));
+                    // Update active notifications if this is for the active device
+                    if (deviceManager.ActiveDevice?.Id == device.Id)
+                    {
+                        UpdateActiveNotifications(deviceManager.ActiveDevice);
+                    }
+                }
             }
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error handling notification message");
         }
-        finally
+    }
+
+    public void RemoveNotification(PairedDevice device, Notification notification)
+    {
+        try
         {
-            semaphore.Release();
+            if (!deviceNotifications.TryGetValue(device.Id, out var notifications)) return;
+                
+            if (!notification.Pinned)
+            {
+                dispatcher.EnqueueAsync(() => notifications.Remove(notification));
+                logger.LogDebug("Removed notification with key: {NotificationKey} from device {DeviceId}", notification, device.Id);
+
+                platformNotificationHandler.RemoveNotificationsByTagAndGroup(notification.Tag, notification.GroupKey);
+
+                // Update active notifications if this is for the active device
+                if (deviceManager.ActiveDevice?.Id == device.Id)
+                {   
+                    UpdateActiveNotifications(deviceManager.ActiveDevice);
+                }
+
+                var notificationToRemove = new NotificationMessage
+                {
+                    NotificationKey = notification.Key,
+                    NotificationType = NotificationType.Removed
+                };
+                string jsonMessage = SocketMessageSerializer.Serialize(notificationToRemove);
+                if (device.Session is not null)
+                {
+                    sessionManager.SendMessage(device.Session, jsonMessage);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error removing notification");
         }
     }
 
+    public void TogglePinNotification(Notification notification)
+    {
+        var activeDevice = deviceManager.ActiveDevice!;
+
+        dispatcher.EnqueueAsync(() =>
+        {
+            if (!deviceNotifications.TryGetValue(activeDevice.Id, out var notifications)) return;
+            
+            notification.Pinned = !notification.Pinned;
+            // Update existing notification
+            var index = notifications.IndexOf(notification);
+            notifications[index] = notification;
+            SortNotifications(activeDevice.Id);
+                
+            // Update active notifications since this is for the active device
+            UpdateActiveNotifications(activeDevice);
+        });
+    }
+
+    public void ClearAllNotification()
+    {
+        var activeDevice = deviceManager.ActiveDevice!;
+        try
+        {
+            ClearHistory(activeDevice);
+            activeNotifications.Clear();
+            if (activeDevice.Session is null) return;
+
+            var command = new CommandMessage { CommandType = CommandType.ClearNotifications };
+            string jsonMessage = SocketMessageSerializer.Serialize(command);
+            sessionManager.SendMessage(activeDevice.Session, jsonMessage);
+            logger.LogInformation("Cleared all notifications for device {DeviceId}", activeDevice.Id);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error clearing all notifications");
+        }
+    }
+
+    public void ClearHistory(PairedDevice device)
+    {
+        dispatcher.EnqueueAsync(() =>
+        {
+            try
+            {
+                if (deviceNotifications.TryGetValue(device.Id, out var notifications))
+                {
+                    notifications.Clear();
+                    ClearBadge();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error clearing history");
+            }
+        });
+    }
+
+    private void SortNotifications(string deviceId)
+    {
+        dispatcher.EnqueueAsync(() =>
+        {
+            if (!deviceNotifications.TryGetValue(deviceId, out var notifications)) return;
+
+            var sorted = notifications.OrderByDescending(n => n.Pinned)
+                .ThenByDescending(n => n.TimeStamp)
+                .ToList();
+
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                int currentIndex = notifications.IndexOf(sorted[i]);
+                if (currentIndex != i)
+                {
+                    notifications.Move(currentIndex, i);
+                }
+            }
+        });
+    }
+
+    public void ProcessReplyAction(PairedDevice device, string notificationKey, string ReplyResultKey, string replyText)
+    {
+        var replyAction = new ReplyAction
+        {
+            NotificationKey = notificationKey,
+            ReplyResultKey = ReplyResultKey,
+            ReplyText = replyText,
+        };
+
+        if (device.Session is null) return;
+
+        sessionManager.SendMessage(device.Session, SocketMessageSerializer.Serialize(replyAction));
+        logger.LogDebug("Sent reply action for notification {NotificationKey} to device {DeviceId}", notificationKey, device.Id);
+    }
+
+    public void ProcessClickAction(PairedDevice device, string notificationKey, int actionIndex)
+    {
+        var notificationAction = new NotificationAction
+        {
+            NotificationKey = notificationKey,
+            ActionIndex = actionIndex,
+            IsReplyAction = false
+        };
+
+        if (device.Session is null) return;
+
+        sessionManager.SendMessage(device.Session, SocketMessageSerializer.Serialize(notificationAction));
+        logger.LogDebug("Sent click action for notification {NotificationKey} to device {DeviceId}", notificationKey, device.Id);
+    }
+
+    private void UpdateActiveNotifications(PairedDevice activeDevice)
+    {
+        dispatcher.EnqueueAsync(() =>
+        {
+            activeNotifications.Clear();
+
+            if (deviceNotifications.TryGetValue(activeDevice.Id, out var deviceNotifs))
+            {
+                activeNotifications.AddRange(deviceNotifs);
+
+                if (activeDevice.DeviceSettings.ShowBadge)
+                {
+                    // Get the blank badge XML payload for a badge number
+                    XmlDocument badgeXml =
+                        BadgeUpdateManager.GetTemplateContent(BadgeTemplateType.BadgeNumber);
+
+                    // Set the value of the badge in the XML to our number
+                    XmlElement badgeElement = badgeXml.SelectSingleNode("/badge") as XmlElement;
+                    badgeElement.SetAttribute("value", deviceNotifs.Count.ToString());
+
+                    // Create the badge notification
+                    BadgeNotification badge = new(badgeXml);
+
+                    // Create the badge updater for the application
+                    BadgeUpdater badgeUpdater =
+                        BadgeUpdateManager.CreateBadgeUpdaterForApplication();
+
+                    // And update the badge
+                    badgeUpdater.Update(badge);
+                }
+
+            }
+        });
+    }
+
+    /// <summary>
+    /// Clears the badge number on the app tile
+    /// </summary>
+    private void ClearBadge()
+    {
+        try
+        {
+            dispatcher.EnqueueAsync(() =>
+            {
+                BadgeUpdater badgeUpdater = BadgeUpdateManager.CreateBadgeUpdaterForApplication();
+                badgeUpdater.Clear();
+            });
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error clearing badge number at startup");
+        }
+    }
+
+#if WINDOWS
     private async Task<bool> IsAppActiveAsync(string appName)
     {
         try
@@ -199,215 +364,5 @@ public class NotificationService(
             return false;
         }
     }
-
-    private void SortNotifications(string deviceId)
-    {
-        dispatcher.EnqueueAsync(() =>
-        {
-            if (!deviceNotifications.TryGetValue(deviceId, out var notifications)) return;
-            
-            var sorted = notifications.OrderByDescending(n => n.IsPinned)
-                .ThenByDescending(n => n.TimeStamp)
-                .ToList();
-
-            for (int i = 0; i < sorted.Count; i++)
-            {
-                int currentIndex = notifications.IndexOf(sorted[i]);
-                if (currentIndex != i)
-                {
-                    notifications.Move(currentIndex, i);
-                }
-            }
-        });
-    }
-
-    public void RemoveNotification(PairedDevice device, string notificationKey, bool isRemote)
-    {
-        dispatcher.EnqueueAsync(() =>
-        {
-            try
-            {
-                if (!deviceNotifications.TryGetValue(device.Id, out var notifications)) return;
-                
-                var notification = notifications.FirstOrDefault(n => n.Key == notificationKey);
-
-                if (notification != null)
-                {
-                    if (!isRemote)
-                    {
-                        var notificationToRemove = new NotificationMessage
-                        {
-                            NotificationKey = notificationKey,
-                            NotificationType = NotificationType.Removed
-                        };  
-                        string jsonMessage = SocketMessageSerializer.Serialize(notificationToRemove);
-                        if (device.Session != null)
-                        {
-                            sessionManager.SendMessage(device.Session, jsonMessage);
-                            logger.LogDebug("Sent notification removal message to remote device {DeviceId}", device.Id);
-                        }
-                    }
-                    if (!notification.IsPinned || !isRemote)
-                    {
-                        notifications.Remove(notification);
-                        logger.LogDebug("Removed notification with key: {NotificationKey} from device {DeviceId}", notificationKey, device.Id);
-                        
-                        // Update active notifications if this is for the active device
-                        if (deviceManager.ActiveDevice?.Id == device.Id)
-                        {
-                            UpdateActiveNotifications(deviceManager.ActiveDevice);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error removing notification");
-            }
-        });
-    }
-
-    public void TogglePinNotification(string notificationKey)
-    {
-        var activeDevice = deviceManager.ActiveDevice;
-        if (activeDevice == null)
-        {
-            logger.LogWarning("No active session to toggle pin notification");
-            return;
-        }
-
-        dispatcher.EnqueueAsync(() =>
-        {
-            if (!deviceNotifications.TryGetValue(activeDevice.Id, out var notifications)) return;
-            
-            var notification = notifications.FirstOrDefault(n => n.Key == notificationKey);
-            if (notification != null)
-            {
-                notification.IsPinned = !notification.IsPinned;
-                // Update existing notification
-                var index = notifications.IndexOf(notification);
-                notifications[index] = notification;
-                SortNotifications(activeDevice.Id);
-                
-                // Update active notifications since this is for the active device
-                UpdateActiveNotifications(activeDevice);
-                
-                logger.LogDebug("Pinned status for notification with key: {NotificationKey} is now {IsPinned} for device {DeviceId}", 
-                    notificationKey, notification.IsPinned, activeDevice.Id);
-            }
-        });
-    }
-
-    public void ClearAllNotification()
-    {
-        var activeDevice = deviceManager.ActiveDevice;
-        if (activeDevice == null)
-        {
-            logger.LogWarning("No active session to clear notifications");
-            return;
-        }
-
-        dispatcher.EnqueueAsync(() =>
-        {
-            try
-            {
-                if (deviceNotifications.TryGetValue(activeDevice.Id, out var notifications))
-                {
-                    notifications.Clear();
-                    // Update active notifications since we cleared the active device's notifications
-                    UpdateActiveNotifications(activeDevice);
-                }
-                
-                if (activeDevice.Session == null) return;
-
-                var command = new CommandMessage { CommandType = CommandType.ClearNotifications };
-                string jsonMessage = SocketMessageSerializer.Serialize(command);
-                sessionManager.SendMessage(activeDevice.Session, jsonMessage);
-                logger.LogInformation("Cleared all notifications for device {DeviceId}", activeDevice.Id);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error clearing all notifications");
-            }
-        });
-    }
-
-    public void ClearHistory(PairedDevice device)
-    {
-        dispatcher.EnqueueAsync(() =>
-        {
-            try
-            {
-                if (deviceNotifications.TryGetValue(device.Id, out var notifications))
-                {
-                    notifications.Clear();
-                    logger.LogInformation("Cleared notification history for device {DeviceId}", device.Id);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error clearing history");
-            }
-        });
-    }
-
-    public void ProcessReplyAction(PairedDevice device, string notificationKey, string ReplyResultKey, string replyText)
-    {
-        var replyAction = new ReplyAction
-        {
-            NotificationKey = notificationKey,
-            ReplyResultKey = ReplyResultKey,
-            ReplyText = replyText,
-        };
-
-        if (device.Session == null) return;
-
-        sessionManager.SendMessage(device.Session, SocketMessageSerializer.Serialize(replyAction));
-        logger.LogDebug("Sent reply action for notification {NotificationKey} to device {DeviceId}", notificationKey, device.Id);
-    }
-
-    public void ProcessClickAction(PairedDevice device, string notificationKey, int actionIndex)
-    {
-        var notificationAction = new NotificationAction
-        {
-            NotificationKey = notificationKey,
-            ActionIndex = actionIndex,
-            IsReplyAction = false
-        };
-
-        if (device.Session == null) return;
-
-        sessionManager.SendMessage(device.Session, SocketMessageSerializer.Serialize(notificationAction));
-        logger.LogDebug("Sent click action for notification {NotificationKey} to device {DeviceId}", notificationKey, device.Id);
-    }
-
-    /// <summary>
-    /// Removes all notifications for a device when it disconnects
-    /// </summary>
-    public void RemoveDeviceNotifications(string deviceId)
-    {
-        dispatcher.EnqueueAsync(() =>
-        {
-            if (deviceNotifications.Remove(deviceId))
-            {
-                logger.LogInformation("Removed all notifications for disconnected device {DeviceId}", deviceId);
-            }
-        });
-    }
-
-    /// <summary>
-    /// Clears the badge number on the app tile
-    /// </summary>
-    private void ClearBadge()
-    {
-        try
-        {
-            BadgeUpdater badgeUpdater = BadgeUpdateManager.CreateBadgeUpdaterForApplication();
-            badgeUpdater.Clear();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error clearing badge number at startup");
-        }
-    }
+#endif
 }

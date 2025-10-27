@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Sefirah.UserControls"
     xmlns:converters="using:Sefirah.Converters"
+    xmlns:wctconverters="using:CommunityToolkit.WinUI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="using:Sefirah.Helpers"
     xmlns:local="using:Sefirah.Views.DeviceSettings"
@@ -12,8 +13,6 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <converters:NullToOpacityConverter x:Key="NullToOpacityConverter" />
-        <converters:NullBooleanConverter x:Key="NullBooleanConverter" />
     </Page.Resources>
 
     <ScrollViewer>

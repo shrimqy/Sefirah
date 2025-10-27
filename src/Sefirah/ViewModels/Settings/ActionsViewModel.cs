@@ -2,13 +2,12 @@ using System.Collections.Specialized;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models.Actions;
 using Sefirah.Dialogs;
-using Sefirah.Services;
 
 namespace Sefirah.ViewModels.Settings;
 
 public sealed partial class ActionsViewModel : BaseViewModel
 {
-    private readonly IUserSettingsService _userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
+    private readonly IUserSettingsService userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
 
     private bool isDragging = true;
     private bool isBulkOperation;
@@ -38,20 +37,10 @@ public sealed partial class ActionsViewModel : BaseViewModel
 
     private void LoadActions()
     {
-        if (ApplicationData.Current.LocalSettings.Values["DefaultActionsLoaded"] == null) 
-        {
-            ApplicationData.Current.LocalSettings.Values["DefaultActionsLoaded"] = true;
-            var defaultActions = DefaultActionsProvider.GetDefaultActions();
-            foreach (var action in defaultActions)
-            {
-                Actions.Add(action);
-            }
-            SaveActions();
-        }
         isBulkOperation = true;
         Actions.Clear();
         
-        var customActions = _userSettingsService.GeneralSettingsService.Actions;
+        var customActions = userSettingsService.GeneralSettingsService.Actions;
         foreach (var action in customActions)
         {
             Actions.Add(action);
@@ -61,7 +50,7 @@ public sealed partial class ActionsViewModel : BaseViewModel
 
     private void SaveActions()
     {
-        _userSettingsService.GeneralSettingsService.Actions = Actions.ToList();
+        userSettingsService.GeneralSettingsService.Actions = Actions.ToList();
     }
 
     [RelayCommand]
@@ -69,10 +58,10 @@ public sealed partial class ActionsViewModel : BaseViewModel
     {
         var dialog = new ProcessActionDialog()
         {
-            XamlRoot = App.MainWindow!.Content!.XamlRoot
+            XamlRoot = App.MainWindow.Content!.XamlRoot
         };
 
-        if (await dialog.ShowAsync() == ContentDialogResult.Primary && dialog.Result is not null)
+        if (await dialog.ShowAsync() is ContentDialogResult.Primary && dialog.Result is not null)
         {
             isBulkOperation = true;
             Actions.Add(dialog.Result);
@@ -82,13 +71,13 @@ public sealed partial class ActionsViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private async Task EditAction(BaseAction? action)
+    private async Task EditAction(BaseAction action)
     {
         if (action is not IActionDialog actionDialog) return;
 
-        if (await actionDialog.ShowDialogAsync(App.MainWindow!.Content!.XamlRoot!) is { } result)
+        if (await actionDialog.ShowDialogAsync(App.MainWindow.Content!.XamlRoot!) is { } result)
         {
-            _userSettingsService.GeneralSettingsService.UpdateAction(result);
+            userSettingsService.GeneralSettingsService.UpdateAction(result);
             var existingAction = Actions.First(a => a.Id == result.Id);
             var index = Actions.IndexOf(existingAction!);
             Actions[index] = result;
@@ -96,10 +85,8 @@ public sealed partial class ActionsViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private async Task RemoveAction(BaseAction? action)
+    private async Task RemoveAction(BaseAction action)
     {
-        if (action is null) return;
-
         var dialog = new ContentDialog
         {
             Title = "Remove Action",
@@ -107,10 +94,10 @@ public sealed partial class ActionsViewModel : BaseViewModel
             PrimaryButtonText = "Remove",
             CloseButtonText = "Cancel",
             DefaultButton = ContentDialogButton.Close,
-            XamlRoot = App.MainWindow!.Content!.XamlRoot
+            XamlRoot = App.MainWindow.Content!.XamlRoot
         };
 
-        if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+        if (await dialog.ShowAsync() is ContentDialogResult.Primary)
         {
             isBulkOperation = true;
             Actions.Remove(action);

@@ -1,6 +1,4 @@
 using Sefirah.ViewModels.Settings;
-using Sefirah.Data.Models;
-using Sefirah.Data.AppDatabase.Models;
 
 namespace Sefirah.Views.DeviceSettings;
 
@@ -14,7 +12,7 @@ public sealed partial class NotificationSettingsPage : Page
 
     public NotificationSettingsPage()
     {
-        this.InitializeComponent();
+        InitializeComponent();
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)

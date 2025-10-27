@@ -9,7 +9,6 @@ using LaunchActivatedEventArgs = Microsoft.UI.Xaml.LaunchActivatedEventArgs;
 using H.NotifyIcon;
 using Sefirah.Data.Contracts;
 using System.Runtime.InteropServices;
-using Uno.Resizetizer;
 using Sefirah.Extensions;
 using Sefirah.Data.Enums;
 using Microsoft.UI.Windowing;
@@ -25,7 +24,7 @@ public partial class App : Application
     public static TaskCompletionSource? SplashScreenLoadingTCS { get; private set; }
     public static bool HandleClosedEvents { get; set; } = true;
     public static nint WindowHandle { get; private set; }
-    public static Window? MainWindow { get; private set; }
+    public static Window MainWindow { get; private set; } = null!;
     protected IHost? Host { get; private set; }
 
     public App()
@@ -103,7 +102,7 @@ public partial class App : Application
             }
             else 
             {
-                MainWindow!.Activate();
+                MainWindow.Activate();
                 // Wait for the Window to initialize
                 await Task.Delay(10);
                 MainWindow.AppWindow.Show();
@@ -138,14 +137,14 @@ public partial class App : Application
         //  NOTE:
         //  Do not repeat app initialization when the Window already has content,
         //  just ensure that the window is active
-        if (MainWindow?.Content is not Frame rootFrame)
+        if (MainWindow.Content is not Frame rootFrame)
         {
             // Create a Frame to act as the navigation context and navigate to the first page
             rootFrame = new() { CacheSize = 1 };
             rootFrame.NavigationFailed += OnNavigationFailed;
 
             // Place the frame in the current Window
-            MainWindow!.Content = rootFrame;
+            MainWindow.Content = rootFrame;
         }
 
         return rootFrame;
@@ -166,28 +165,35 @@ public partial class App : Application
     public async Task OnActivatedAsync(AppActivationArguments activatedEventArgs)
     {
         // InitializeApplication accesses UI, needs to be called on UI thread
-        await MainWindow!.DispatcherQueue.EnqueueAsync(() => InitializeApplicationAsync(activatedEventArgs));
+        await MainWindow.DispatcherQueue.EnqueueAsync(() => InitializeApplicationAsync(activatedEventArgs));
     }
 
-    public async Task InitializeApplicationAsync(AppActivationArguments activatedEventArgs)
+    public static async Task InitializeApplicationAsync(AppActivationArguments activatedEventArgs)
     {
-        switch (activatedEventArgs.Data)
+        try
         {
-            case ShareTargetActivatedEventArgs:
-                // Handle share target activation
-                await HandleShareTargetActivation(activatedEventArgs.Data as ShareTargetActivatedEventArgs);
-                break;
-
-            default:
-                MainWindow!.AppWindow.Show();
-                MainWindow!.Activate();
-                break;
+            switch (activatedEventArgs.Data)
+            {
+                case ShareTargetActivatedEventArgs shareArgs:
+                    await HandleShareTargetActivation(shareArgs);
+                    break;
+                default:
+                    MainWindow.AppWindow.Show();
+                    MainWindow.Activate();
+                    break;
+            }
+        }
+        catch (COMException)
+        {
+            // Data not available 
+            // Can happen when share data operation is not completed
+            return;
         }
     }
 
     private void HookEventsForWindow()
     {
-        MainWindow!.Activated += Window_Activated;
+        MainWindow.Activated += Window_Activated;
         MainWindow.Closed += Window_Closed;
     }
 
@@ -196,7 +202,7 @@ public partial class App : Application
         if (HandleClosedEvents)
         {
             args.Handled = true;
-            MainWindow!.Hide();
+            MainWindow.Hide();
         }
     }
 
@@ -209,16 +215,14 @@ public partial class App : Application
             ApplicationData.Current.LocalSettings.Values["INSTANCE_ACTIVE"] = -Environment.ProcessId;
     }
 
-    public async Task HandleShareTargetActivation(ShareTargetActivatedEventArgs? args)
+    public static async Task HandleShareTargetActivation(ShareTargetActivatedEventArgs args)
     {
-        var shareOperation = args?.ShareOperation;
-        if (shareOperation == null) return;
+        var shareOperation = args.ShareOperation;
         var fileTransferService = Ioc.Default.GetRequiredService<IFileTransferService>();
-
-        await MainWindow!.DispatcherQueue.EnqueueAsync(async () =>
-        {
-            await fileTransferService.ProcessShareAsync(shareOperation);
-        });
+        var items = await shareOperation.Data.GetStorageItemsAsync();
+        shareOperation.ReportDataRetrieved();
+        shareOperation.ReportCompleted();
+        fileTransferService.SendFiles(items);
     }
 #endif
 

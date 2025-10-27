@@ -14,7 +14,7 @@ public sealed partial class ScreenMirrorSettingsPage : Page
 
     public ScreenMirrorSettingsPage()
     {
-        this.InitializeComponent();
+        InitializeComponent();
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)

@@ -7,10 +7,12 @@ using Sefirah.Services;
 namespace Sefirah.ViewModels;
 public sealed partial class MessagesViewModel : BaseViewModel
 {
-    private readonly SmsHandlerService smsHandlerService;
-    private readonly IDeviceManager deviceManager;
-    private readonly ILogger<MessagesViewModel> logger;
+    #region Services
+    private readonly SmsHandlerService smsHandlerService = Ioc.Default.GetRequiredService<SmsHandlerService>();
+    private readonly IDeviceManager deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
+    #endregion
 
+    #region Properties
     public ObservableCollection<Conversation>? Conversations { get; private set; }
     public ObservableCollection<Conversation> SearchResults { get; } = [];
     public ObservableCollection<Contact> SearchContactsResults { get; } = [];
@@ -63,35 +65,31 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
     public bool ShouldShowEmptyState => !IsNewConversation && SelectedConversation == null;
     public bool ShouldShowComposeUI => IsNewConversation || SelectedConversation != null;
+    #endregion
 
     public MessagesViewModel()
     {
-        smsHandlerService = Ioc.Default.GetRequiredService<SmsHandlerService>();
-        deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
-        logger = Ioc.Default.GetRequiredService<ILogger<MessagesViewModel>>();
-
         ((INotifyPropertyChanged)deviceManager).PropertyChanged += OnDeviceManagerPropertyChanged;
-
         smsHandlerService.ConversationsUpdated += OnConversationsUpdated;
 
-        _ = InitializeAsync();
+        InitializeAsync();
     }
 
-    private async Task InitializeAsync()
+    private async void InitializeAsync()
     {
-        if (ActiveDevice != null)
+        if (ActiveDevice is not null)
         {
             await LoadConversationsForActiveDevice();
             LoadPhoneNumbers();
         }
     }
 
-    private async void OnDeviceManagerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void OnDeviceManagerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(IDeviceManager.ActiveDevice))
+        if (e.PropertyName is nameof(IDeviceManager.ActiveDevice))
         {
             OnPropertyChanged(nameof(ActiveDevice));
-            await InitializeAsync();
+            InitializeAsync();
 
             SelectedConversation = null;
             IsNewConversation = false;
@@ -101,7 +99,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
     private void LoadPhoneNumbers()
     {
         PhoneNumbers.Clear();
-        if (ActiveDevice?.PhoneNumbers != null)
+        if (ActiveDevice?.PhoneNumbers is not null)
         {
             foreach (var phoneNumber in ActiveDevice.PhoneNumbers)
             {
@@ -138,7 +136,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error loading conversations for device: {DeviceId}", ActiveDevice?.Id);
+            Logger.LogError(ex, "Error loading conversations for device: {DeviceId}", ActiveDevice?.Id);
         }
     }
 
@@ -169,7 +167,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error loading messages for conversation: {ThreadId}", SelectedConversation.ThreadId);
+            Logger.LogError(ex, "Error loading messages for conversation: {ThreadId}", SelectedConversation.ThreadId);
         }
     }
 
@@ -222,7 +220,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error sending message");
+            Logger.LogError(ex, "Error sending message");
         }
     }
     public void StartNewConversation()
@@ -452,14 +450,14 @@ public sealed partial class MessagesViewModel : BaseViewModel
         return false;
     }
 
-    private bool CanGroupWith(Message message, MessageGroup group)
+    private static bool CanGroupWith(Message message, MessageGroup group)
     {
         return group.Sender.Address.Equals(message.Contact.Address, StringComparison.OrdinalIgnoreCase) &&
                group.IsReceived == (message.MessageType == 1) &&
                Math.Abs(message.Timestamp - GetClosestTimestamp(message, group)) <= groupingThreshold;
     }
 
-    private long GetClosestTimestamp(Message message, MessageGroup group)
+    private static long GetClosestTimestamp(Message message, MessageGroup group)
     {
         var firstTimestamp = group.Messages[0].Timestamp;
         var lastTimestamp = group.LatestTimestamp;

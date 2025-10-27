@@ -313,7 +313,7 @@
     <value>Réglages spécifiques à l'application</value>
   </data>
   <data name="FileTransferNotification.Title" xml:space="preserve">
-    <value>File transfer</value>
+    <value>Transfert de fichier</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>Envoyer</value>
@@ -322,10 +322,10 @@
     <value>Tapez une réponse</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
-    <value>Open file</value>
+    <value>Ouvrir le fichier</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
-    <value>Open folder</value>
+    <value>Ouvrir le dossier</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
     <value>Désactiver les notifications de {0}</value>
@@ -716,5 +716,35 @@ input text %pwd%</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
     <value>Cancel</value>
+  </data>
+  <data name="FileTransferNotification.Receiving" xml:space="preserve">
+    <value>Réception depuis {0}</value>
+  </data>
+  <data name="FileTransferNotification.Sending" xml:space="preserve">
+    <value>Envoi vers {0}</value>
+  </data>
+  <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
+    <value>Réception {0}/{1} depuis {2}</value>
+  </data>
+  <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
+    <value>Envoi {0}/{1} vers {2}</value>
+  </data>
+  <data name="FileTransferNotification.Completed" xml:space="preserve">
+    <value>Transfert de fichier terminé</value>
+  </data>
+  <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
+    <value>{0} reçu depuis {1}</value>
+  </data>
+  <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
+    <value>{0} fichiers reçus depuis {1}</value>
+  </data>
+  <data name="FileTransferNotification.SentSingle" xml:space="preserve">
+    <value>{0} envoyé vers {1}</value>
+  </data>
+  <data name="FileTransferNotification.SentBulk" xml:space="preserve">
+    <value>{0} fichiers envoyés vers {1}</value>
+  </data>
+  <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
+    <value>Annuler</value>
   </data>
 </root>

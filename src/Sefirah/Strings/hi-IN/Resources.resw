@@ -690,33 +690,33 @@ input text %pwd%</value>
     <value>Save</value>
   </data>
   <data name="FileTransferNotification.Receiving" xml:space="preserve">
-    <value>Receiving from {0}</value>
+    <value>{0} से प्राप्त कर रहे हैं</value>
   </data>
   <data name="FileTransferNotification.Sending" xml:space="preserve">
-    <value>Sending to {0}</value>
+    <value>{0} को भेज रहे हैं</value>
   </data>
   <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
-    <value>Receiving {0}/{1} from {2}</value>
+    <value>{2} से {0}/{1} प्राप्त कर रहे हैं</value>
   </data>
   <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
-    <value>Sending {0}/{1} to {2}</value>
+    <value>{2} को {0}/{1} भेज रहे हैं</value>
   </data>
   <data name="FileTransferNotification.Completed" xml:space="preserve">
-    <value>File transfer completed</value>
+    <value>फ़ाइल स्थानांतरण पूर्ण</value>
   </data>
   <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
-    <value>Received {0} from {1}</value>
+    <value>{1} से {0} प्राप्त किया</value>
   </data>
   <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
-    <value>Received {0} files from {1}</value>
+    <value>{1} से {0} फ़ाइलें प्राप्त कीं</value>
   </data>
   <data name="FileTransferNotification.SentSingle" xml:space="preserve">
-    <value>Sent {0} to {1}</value>
+    <value>{0} को {1} भेजा</value>
   </data>
   <data name="FileTransferNotification.SentBulk" xml:space="preserve">
-    <value>Sent {0} files to {1}</value>
+    <value>{0} फ़ाइलें {1} को भेजीं</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>रद्द करें</value>
   </data>
 </root>
