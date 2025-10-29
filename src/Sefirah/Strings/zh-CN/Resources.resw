@@ -689,36 +689,6 @@ input touchscreen swipe 540 1800 540 900</value>
     <value>保存</value>
   </data>
   <data name="FileTransferNotification.Receiving" xml:space="preserve">
-    <value>Receiving from {0}</value>
-  </data>
-  <data name="FileTransferNotification.Sending" xml:space="preserve">
-    <value>Sending to {0}</value>
-  </data>
-  <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
-    <value>Receiving {0}/{1} from {2}</value>
-  </data>
-  <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
-    <value>Sending {0}/{1} to {2}</value>
-  </data>
-  <data name="FileTransferNotification.Completed" xml:space="preserve">
-    <value>File transfer completed</value>
-  </data>
-  <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
-    <value>Received {0} from {1}</value>
-  </data>
-  <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
-    <value>Received {0} files from {1}</value>
-  </data>
-  <data name="FileTransferNotification.SentSingle" xml:space="preserve">
-    <value>Sent {0} to {1}</value>
-  </data>
-  <data name="FileTransferNotification.SentBulk" xml:space="preserve">
-    <value>Sent {0} files to {1}</value>
-  </data>
-  <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
-    <value>Cancel</value>
-  </data>
-  <data name="FileTransferNotification.Receiving" xml:space="preserve">
     <value>正在从 {0} 接收</value>
   </data>
   <data name="FileTransferNotification.Sending" xml:space="preserve">
