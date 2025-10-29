@@ -46,7 +46,6 @@
 ### Android App
 
 [<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" alt="Get it on IzzyOnDroid" width="220">](https://apt.izzysoft.de/fdroid/index/apk/com.castle.sefirah)
-[<img src="https://www.openapk.net/images/openapk-badge.png" alt="Get it on OpenApk" width="220">](https://www.openapk.net/sefirah/com.castle.sefirah/)
 
 
 ## How to Use
