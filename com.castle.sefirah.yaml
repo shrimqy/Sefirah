@@ -28,7 +28,7 @@ modules:
     buildsystem: simple
     sources:
       - type: dir
-        path: src/Sefirah/bin/Release/net9.0-desktop/linux-x64
+        path: src/Sefirah/bin/x64/Release/net9.0-desktop/linux-x64/publish
       - type: file
         path: flatpak/com.castle.sefirah.desktop
       - type: file
@@ -44,5 +44,3 @@ modules:
       - mkdir -p /app/share/icons/hicolor/256x256/apps
       - install -Dm644 com.castle.sefirah.png /app/share/icons/hicolor/48x48/apps/com.castle.sefirah.png
       - install -Dm644 com.castle.sefirah.png /app/share/icons/hicolor/256x256/apps/com.castle.sefirah.png
-
-
