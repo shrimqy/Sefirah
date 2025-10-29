@@ -10,8 +10,8 @@
         <!-- App Identifier -->
         <ApplicationId>com.sefirah.castle</ApplicationId>
         <!-- Versions -->
-        <ApplicationDisplayVersion>2.0.1</ApplicationDisplayVersion>
-        <ApplicationVersion>2</ApplicationVersion>
+        <ApplicationDisplayVersion>2.1.0</ApplicationDisplayVersion>
+        <ApplicationVersion>3</ApplicationVersion>
         <!-- Package Publisher -->
         <ApplicationPublisher>shrimqy</ApplicationPublisher>
         <!-- Package Description -->
