@@ -318,7 +318,7 @@ mobile (Make sure the pin matches)</value>
     <value>File transfer</value>
   </data>
   <data name="SendButton" xml:space="preserve">
-    <value>Send</value>
+    <value>Küldés</value>
   </data>
   <data name="ReplyPlaceholder" xml:space="preserve">
     <value>Type a reply</value>
@@ -690,33 +690,33 @@ input text %pwd%</value>
     <value>Save</value>
   </data>
   <data name="FileTransferNotification.Receiving" xml:space="preserve">
-    <value>Fogadás innen: {0}</value>
+    <value>Receiving from {0}</value>
   </data>
   <data name="FileTransferNotification.Sending" xml:space="preserve">
-    <value>Küldés ide: {0}</value>
+    <value>Sending to {0}</value>
   </data>
   <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
-    <value>Fogadás {0}/{1} innen: {2}</value>
+    <value>Receiving {0}/{1} from {2}</value>
   </data>
   <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
-    <value>Küldés {0}/{1} ide: {2}</value>
+    <value>Sending {0}/{1} to {2}</value>
   </data>
   <data name="FileTransferNotification.Completed" xml:space="preserve">
-    <value>Fájlátvitel befejezve</value>
+    <value>File transfer completed</value>
   </data>
   <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
-    <value>{0} fogadva innen: {1}</value>
+    <value>Received {0} from {1}</value>
   </data>
   <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
-    <value>{0} fájl fogadva innen: {1}</value>
+    <value>Received {0} files from {1}</value>
   </data>
   <data name="FileTransferNotification.SentSingle" xml:space="preserve">
-    <value>{0} elküldve ide: {1}</value>
+    <value>Sent {0} to {1}</value>
   </data>
   <data name="FileTransferNotification.SentBulk" xml:space="preserve">
-    <value>{0} fájl elküldve ide: {1}</value>
+    <value>Sent {0} files to {1}</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
-    <value>Mégse</value>
+    <value>Cancel</value>
   </data>
 </root>
