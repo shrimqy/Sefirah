@@ -124,37 +124,37 @@
     <value>General</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Settings</value>
+    <value>Beállítások</value>
   </data>
   <data name="PrivacyPolicy" xml:space="preserve">
     <value>Privacy policy</value>
   </data>
   <data name="SupportDevelopment" xml:space="preserve">
-    <value>Support Development</value>
+    <value>Fejlesztés támogatása</value>
   </data>
   <data name="OpenLogs" xml:space="preserve">
     <value>Open logs</value>
   </data>
   <data name="GitHubRepository" xml:space="preserve">
-    <value>GitHub Repository</value>
+    <value>GitHub repó</value>
   </data>
   <data name="AndroidGitHubRepository" xml:space="preserve">
-    <value>Android GitHub Repository</value>
+    <value>Android GitHub repó</value>
   </data>
   <data name="Clipboard" xml:space="preserve">
-    <value>Clipboard</value>
+    <value>Vagólap</value>
   </data>
   <data name="Feedback" xml:space="preserve">
-    <value>Feedback</value>
+    <value>Visszajelzés</value>
   </data>
   <data name="Notifications" xml:space="preserve">
-    <value>Notifications</value>
+    <value>Üzenetek</value>
   </data>
   <data name="ThirdPartyLibraries" xml:space="preserve">
-    <value>Third party libraries</value>
+    <value>Harmadik felű könyvtárak</value>
   </data>
   <data name="SaveLocation" xml:space="preserve">
-    <value>Save location</value>
+    <value>Mentési hely</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
     <value>Remote Storage Location</value>
@@ -181,77 +181,77 @@
     <value>Ignore remote notifications from active Windows apps</value>
   </data>
   <data name="NotificationFilterDisabled.Content" xml:space="preserve">
-    <value>Disabled</value>
+    <value>Ki</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Notification Feed</value>
+    <value>Üzenetek</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
     <value>Notification Feed + Toast</value>
   </data>
   <data name="PairedDevices.Title" xml:space="preserve">
-    <value>Paired devices</value>
+    <value>Párosított eszközök</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
-    <value>Available Devices</value>
+    <value>Elérhető eszközök</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
-    <value>Android devices that are running the app in the same network will show up below</value>
+    <value>Az ugyanazon a hálózaton futó Android eszközök alább fognak megjelenni</value>
   </data>
   <data name="StartupOption" xml:space="preserve">
-    <value>Startup option</value>
+    <value>Indítási opciók</value>
   </data>
   <data name="StartupOptionDescription" xml:space="preserve">
-    <value>Choose how the app starts when Windows boots</value>
+    <value>Válassza ki hogyan indul az alkalmazás amikor bejelentkezik</value>
   </data>
   <data name="StartupOptionMinimized.Content" xml:space="preserve">
-    <value>Start minimized</value>
+    <value>Indítás minimalizálva</value>
   </data>
   <data name="StartupOptionMaximized.Content" xml:space="preserve">
-    <value>Start maximized</value>
+    <value>Indítás maximalizálva</value>
   </data>
   <data name="StartupOptionSystemTray.Content" xml:space="preserve">
-    <value>Start in system tray</value>
+    <value>Indítás tárcában</value>
   </data>
   <data name="StartupOptionDisabled.Content" xml:space="preserve">
-    <value>Disabled</value>
+    <value>Ki</value>
   </data>
   <data name="Theme" xml:space="preserve">
-    <value>Theme</value>
+    <value>Téma</value>
   </data>
   <data name="ThemeDescription" xml:space="preserve">
-    <value>Choose your default app theme</value>
+    <value>Válassza ki az alapértelmezett témát</value>
   </data>
   <data name="Default" xml:space="preserve">
-    <value>Default</value>
+    <value>Alap</value>
   </data>
   <data name="ThemeLight.Content" xml:space="preserve">
-    <value>Light</value>
+    <value>Világos</value>
   </data>
   <data name="ThemeDark.Content" xml:space="preserve">
-    <value>Dark</value>
+    <value>Sötét</value>
   </data>
   <data name="RemoveDeviceDialogTitle" xml:space="preserve">
-    <value>Remove device</value>
+    <value>Eszköz eltávolítása</value>
   </data>
   <data name="Remove" xml:space="preserve">
-    <value>Remove</value>
+    <value>Eltávolítás</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>Mégse</value>
   </data>
   <data name="OnboardingWelcome.Title" xml:space="preserve">
-    <value>Welcome to Sefirah</value>
+    <value>Üdvözöljük a Sefirah-ban</value>
   </data>
   <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
     <value>To get started download and install the comapanion app through the corresponding github
 page.</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
-    <value>Get started</value>
+    <value>Kezdés</value>
   </data>
   <data name="OnboardingSkip" xml:space="preserve">
-    <value>Skip for now</value>
+    <value>Majd később</value>
   </data>
   <data name="OnboardingDevice.Title" xml:space="preserve">
     <value>Connect Your Device</value>
@@ -261,25 +261,25 @@ page.</value>
 mobile (Make sure the pin matches)</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>Device Connection Request</value>
+    <value>Eszköz csatlakozási kérelem</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
     <value>Verify the passkey matches on both devices:</value>
   </data>
   <data name="ConnectionRequestRejectButton" xml:space="preserve">
-    <value>Reject</value>
+    <value>Elutasítás</value>
   </data>
   <data name="NotificationsClearButton" xml:space="preserve">
-    <value>Clear all</value>
+    <value>Összes törlése</value>
   </data>
   <data name="ConnectionRequestAcceptButton" xml:space="preserve">
-    <value>Accept</value>
+    <value>Elfogadás</value>
   </data>
   <data name="NoDevicesFound" xml:space="preserve">
-    <value>No devices found</value>
+    <value>Nem található eszköz</value>
   </data>
   <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
-    <value>PASSKEY</value>
+    <value>JELSZÓ</value>
   </data>
   <data name="ClipboardDescription" xml:space="preserve">
     <value>Sync your clipboard across devices</value>
@@ -288,28 +288,28 @@ mobile (Make sure the pin matches)</value>
     <value>Choose how the app starts when Windows boots</value>
   </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
-    <value>Open links in browser</value>
+    <value>Linkek megnyitása böngészőben</value>
   </data>
   <data name="Connected.Text" xml:space="preserve">
-    <value>Connected</value>
+    <value>Csatlakozva</value>
   </data>
   <data name="Disconnected.Text" xml:space="preserve">
-    <value>Disconnected</value>
+    <value>Lecsatlakozva</value>
   </data>
   <data name="ShowHideWindow" xml:space="preserve">
-    <value>Show/Hide window</value>
+    <value>Ablak mutatása/rejtése</value>
   </data>
   <data name="Exit" xml:space="preserve">
-    <value>Exit</value>
+    <value>Kilépés</value>
   </data>
   <data name="Features" xml:space="preserve">
     <value>Features</value>
   </data>
   <data name="SelectLocation" xml:space="preserve">
-    <value>Select location</value>
+    <value>Hely kiválasztása</value>
   </data>
   <data name="RemoveDeviceDialogSubtitle" xml:space="preserve">
-    <value>Are you sure you want to remove '{0}'? This action cannot be undone.</value>
+    <value>Biztos hogy eltávolítja "{0}" eszközt? Ezt nem lehet visszavonni.</value>
   </data>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>App-specific Settings</value>
@@ -321,7 +321,7 @@ mobile (Make sure the pin matches)</value>
     <value>Küldés</value>
   </data>
   <data name="ReplyPlaceholder" xml:space="preserve">
-    <value>Type a reply</value>
+    <value>Írj egy választ</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
     <value>Open file</value>
@@ -333,7 +333,7 @@ mobile (Make sure the pin matches)</value>
     <value>Turn off notifications from {0}</value>
   </data>
   <data name="SubmitBugReport" xml:space="preserve">
-    <value>Report a bug</value>
+    <value>Bug bejelentés</value>
   </data>
   <data name="SubmitFeatureRequest" xml:space="preserve">
     <value>Feature request</value>
@@ -342,7 +342,7 @@ mobile (Make sure the pin matches)</value>
     <value>Do not show notification toast when phone is in DND</value>
   </data>
   <data name="Devices" xml:space="preserve">
-    <value>Devices</value>
+    <value>Eszközök</value>
   </data>
   <data name="RingerModeNormal.Content" xml:space="preserve">
     <value>Normal</value>
@@ -366,10 +366,10 @@ mobile (Make sure the pin matches)</value>
     <value>Video Settings</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>Audio Settings</value>
+    <value>Hang beállítások</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
-    <value>Open in app</value>
+    <value>Megnyitás alkalmazásban</value>
   </data>
   <data name="ScreenOff" xml:space="preserve">
     <value>Keep device screen off while mirroring</value>
@@ -378,10 +378,10 @@ mobile (Make sure the pin matches)</value>
     <value>Disable on-screen keyboard</value>
   </data>
   <data name="Bitrate" xml:space="preserve">
-    <value>Bitrate</value>
+    <value>Bitráta</value>
   </data>
   <data name="Resolution" xml:space="preserve">
-    <value>Resolution</value>
+    <value>Felbontás</value>
   </data>
   <data name="Buffer" xml:space="preserve">
     <value>Buffer</value>
@@ -411,19 +411,19 @@ mobile (Make sure the pin matches)</value>
     <value>Remove address</value>
   </data>
   <data name="CopyMessage" xml:space="preserve">
-    <value>Copy message</value>
+    <value>Üzenet mentése</value>
   </data>
   <data name="NoApps" xml:space="preserve">
-    <value>No apps found</value>
+    <value>Nem található alkalmazás</value>
   </data>
   <data name="AllApps" xml:space="preserve">
-    <value>All Apps</value>
+    <value>Minden alkalmazás</value>
   </data>
   <data name="AdditionalArguments" xml:space="preserve">
     <value>Additional arguments</value>
   </data>
   <data name="AdbDeviceOffline" xml:space="preserve">
-    <value>Adb device is offline</value>
+    <value>ADB eszköz offline</value>
   </data>
   <data name="AdbDeviceOfflineDescription" xml:space="preserve">
     <value>Connect your device through USB with USB Debugging enabled and then try again</value>
@@ -432,16 +432,16 @@ mobile (Make sure the pin matches)</value>
     <value>Dismiss</value>
   </data>
   <data name="ScrcpyNotFound" xml:space="preserve">
-    <value>Scrcpy not found</value>
+    <value>Scrcpy nem található</value>
   </data>
   <data name="ScrcpyNotFoundDescription" xml:space="preserve">
-    <value>Select the folder where scrcpy is located</value>
+    <value>Válassza ki a helyet, ahol található a scrcpy</value>
   </data>
   <data name="PreferTcpIp" xml:space="preserve">
     <value>Prefer wireless connection</value>
   </data>
   <data name="SearchApps" xml:space="preserve">
-    <value>Search apps</value>
+    <value>Alkalmazások keresése</value>
   </data>
   <data name="DisableVideoForwarding" xml:space="preserve">
     <value>Disable video forwarding</value>
