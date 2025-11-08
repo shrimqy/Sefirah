@@ -142,7 +142,7 @@
     <value>Android GitHub repó</value>
   </data>
   <data name="Clipboard" xml:space="preserve">
-    <value>Vagólap</value>
+    <value>Vágólap</value>
   </data>
   <data name="Feedback" xml:space="preserve">
     <value>Visszajelzés</value>
@@ -254,7 +254,7 @@ page.</value>
     <value>Majd később</value>
   </data>
   <data name="OnboardingDevice.Title" xml:space="preserve">
-    <value>Connect Your Device</value>
+    <value>Csatlakoztasd az eszközöd</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
     <value>Discovered devices in your network will appear below, and initiate the connection from your
@@ -354,16 +354,16 @@ mobile (Make sure the pin matches)</value>
     <value>Vibrate</value>
   </data>
   <data name="Pin" xml:space="preserve">
-    <value>Pin</value>
+    <value>Kitűzés</value>
   </data>
   <data name="Unpin" xml:space="preserve">
-    <value>Unpin</value>
+    <value>Letűzés</value>
   </data>
   <data name="ScreenMirror" xml:space="preserve">
     <value>Screen mirror</value>
   </data>
   <data name="VideoSettings" xml:space="preserve">
-    <value>Video Settings</value>
+    <value>Videó beállítások</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
     <value>Hang beállítások</value>
@@ -387,22 +387,22 @@ mobile (Make sure the pin matches)</value>
     <value>Buffer</value>
   </data>
   <data name="Messages" xml:space="preserve">
-    <value>Messages</value>
+    <value>Üzenetek</value>
   </data>
   <data name="EmptyMessages" xml:space="preserve">
-    <value>Start a new conversation or select one to reply</value>
+    <value>Kezdjen egy új beszélgetést vagy válasszon egyet a válaszoláshoz</value>
   </data>
   <data name="MessagePlaceholder" xml:space="preserve">
-    <value>Type a message</value>
+    <value>Írjon egy üzenetet</value>
   </data>
   <data name="Apps" xml:space="preserve">
-    <value>Apps</value>
+    <value>Alkalmazások</value>
   </data>
   <data name="NewMessage" xml:space="preserve">
-    <value>New message</value>
+    <value>Új üzenet</value>
   </data>
   <data name="SearchMessages" xml:space="preserve">
-    <value>Search messages</value>
+    <value>Üzenetek keresése</value>
   </data>
   <data name="AddressInputPlaceholder" xml:space="preserve">
     <value>To</value>
@@ -426,10 +426,10 @@ mobile (Make sure the pin matches)</value>
     <value>ADB eszköz offline</value>
   </data>
   <data name="AdbDeviceOfflineDescription" xml:space="preserve">
-    <value>Connect your device through USB with USB Debugging enabled and then try again</value>
+    <value>Kapcsolja össze az eszközét USB-n keresztül USB Hibakereséssel bekapcsolva, és próbálja újra.</value>
   </data>
   <data name="Dismiss" xml:space="preserve">
-    <value>Dismiss</value>
+    <value>Elrejtés</value>
   </data>
   <data name="ScrcpyNotFound" xml:space="preserve">
     <value>Scrcpy nem található</value>
@@ -447,7 +447,7 @@ mobile (Make sure the pin matches)</value>
     <value>Disable video forwarding</value>
   </data>
   <data name="VideoCodec" xml:space="preserve">
-    <value>Video codec</value>
+    <value>Videókódek</value>
   </data>
   <data name="FrameRate" xml:space="preserve">
     <value>Frame rate</value>
@@ -456,13 +456,13 @@ mobile (Make sure the pin matches)</value>
     <value>Crop</value>
   </data>
   <data name="Display" xml:space="preserve">
-    <value>Display</value>
+    <value>Kijelző</value>
   </data>
   <data name="VirtualDisplaySize" xml:space="preserve">
-    <value>Virtual display size</value>
+    <value>Virtuális kijelző mérete</value>
   </data>
   <data name="DisplayOrientation" xml:space="preserve">
-    <value>Display orientation</value>
+    <value>Kijelző iránya</value>
   </data>
   <data name="RotationAngle" xml:space="preserve">
     <value>Rotation angle</value>
@@ -471,52 +471,52 @@ mobile (Make sure the pin matches)</value>
     <value>Audio output</value>
   </data>
   <data name="ForwardMicrophone" xml:space="preserve">
-    <value>Forward microphone</value>
+    <value>Mikrofon továbbítása</value>
   </data>
   <data name="AudioOutputBuffer" xml:space="preserve">
     <value>Audio output buffer</value>
   </data>
   <data name="AudioCodec" xml:space="preserve">
-    <value>Audio codec</value>
+    <value>Hangkódek</value>
   </data>
   <data name="AdbSettings" xml:space="preserve">
-    <value>Adb Settings</value>
+    <value>ADB beállítások</value>
   </data>
   <data name="AutoConnect" xml:space="preserve">
-    <value>Auto connect</value>
+    <value>Automatikusan csatlakozás</value>
   </data>
   <data name="Both" xml:space="preserve">
-    <value>Both</value>
+    <value>Mindkettő</value>
   </data>
   <data name="DesktopDevice" xml:space="preserve">
-    <value>Desktop device</value>
+    <value>Asztali eszköz</value>
   </data>
   <data name="RemoteDevice" xml:space="preserve">
     <value>Remote device</value>
   </data>
   <data name="SelectDevice" xml:space="preserve">
-    <value>Select a device</value>
+    <value>Válasszon egy eszközt</value>
   </data>
   <data name="Start" xml:space="preserve">
-    <value>Start</value>
+    <value>Indítás</value>
   </data>
   <data name="ScrcpyDevicePreference" xml:space="preserve">
     <value>Device preference</value>
   </data>
   <data name="AskEverytime" xml:space="preserve">
-    <value>Ask every time</value>
+    <value>Mindig kérdezze</value>
   </data>
   <data name="Auto" xml:space="preserve">
-    <value>Auto</value>
+    <value>Automatikus</value>
   </data>
   <data name="ScrcpyErrorTitle" xml:space="preserve">
     <value>Scrcpy failed to start</value>
   </data>
   <data name="CopyError" xml:space="preserve">
-    <value>Copy error</value>
+    <value>Másolási hiba</value>
   </data>
   <data name="DeviceName" xml:space="preserve">
-    <value>Device name</value>
+    <value>Eszköz neve</value>
   </data>
   <data name="EnableVirtualDisplay" xml:space="preserve">
     <value>Enable virtual display</value>
@@ -528,7 +528,7 @@ mobile (Make sure the pin matches)</value>
     <value>Shell commands help</value>
   </data>
   <data name="UnlockDeviceHelpDescription" xml:space="preserve">
-    <value>The shell commands in the text box will be executed before launching scrcpy. Enter commands that work on your device, separated by line.</value>
+    <value>A szövegmezőben megadott shell parancsok a scrcpy indítása előtt lesznek végrehajtva. Írj be olyan parancsokat, amelyek működnek az eszközödön, soronként elválasztva. Használd a %pwd% helyőrzőt a jelszóhoz, ha azt később kell megadnod.</value>
   </data>
   <data name="UnlockDeviceHelpExample" xml:space="preserve">
     <value>Example:</value>
@@ -537,14 +537,15 @@ mobile (Make sure the pin matches)</value>
     <value>Useful information:</value>
   </data>
   <data name="UnlockDeviceHelpNote" xml:space="preserve">
-    <value>26 or POWER: Wakes or sleeps the device screen.
-66 or ENTER: Simulates the Enter key press.
-82 or MENU: Brings up the unlock interface, or prompts for fingerprint authentication.
-Some devices may also require a swipe gesture to bring up the unlock UI:
+    <value>26 vagy POWER: Felébreszti vagy elaltatja a készülék kijelzőjét.
+66 vagy ENTER: Az Enter billentyű lenyomását szimulálja.
+82 vagy MENU: Megjeleníti a feloldási felületet, vagy ujjlenyomat-hitelesítést kér.
+%pwd%: Helyőrző a jelszóhoz - meg fogsz jelenítve kapni egy kérdést a beírásához.
+Egyes eszközök esetében szükség lehet egy húzó mozdulatra is a feloldási felület megjelenítéséhez:
 input touchscreen swipe 540 1800 540 900</value>
   </data>
   <data name="PinnedApps" xml:space="preserve">
-    <value>Pinned apps</value>
+    <value>Kitűzött alkalmazások</value>
   </data>
   <data name="Actions" xml:space="preserve">
     <value>Actions</value>
@@ -556,16 +557,16 @@ input touchscreen swipe 540 1800 540 900</value>
     <value>No ADB devices connected</value>
   </data>
   <data name="AdbNoDeviceSubtitle" xml:space="preserve">
-    <value>Turn on ADB and connect your device via USB or Wi-Fi to see it here</value>
+    <value>Kapcsold be az USB Hibakeresést, és csatlakoztasd az eszközödet USB-n vagy Wi-Fi-n keresztül, hogy itt megjelenjen.</value>
   </data>
   <data name="ClipboardSettings" xml:space="preserve">
     <value>Clipboard settings</value>
   </data>
   <data name="DeviceSettings" xml:space="preserve">
-    <value>Device settings</value>
+    <value>Eszköz beállítások</value>
   </data>
   <data name="NotificationSettings" xml:space="preserve">
-    <value>Notification settings</value>
+    <value>Üzenet beállítások</value>
   </data>
   <data name="ScreenMirrorSettings" xml:space="preserve">
     <value>Screen mirror settings</value>
@@ -625,7 +626,7 @@ input touchscreen swipe 540 1800 540 900</value>
     <value>Add action</value>
   </data>
   <data name="Edit" xml:space="preserve">
-    <value>Edit</value>
+    <value>Szerkesztés</value>
   </data>
   <data name="NoActionsConfigured" xml:space="preserve">
     <value>No actions configured</value>
@@ -637,7 +638,7 @@ input touchscreen swipe 540 1800 540 900</value>
     <value>Executable path</value>
   </data>
   <data name="Arguments" xml:space="preserve">
-    <value>Arguments</value>
+    <value>Argumentumok</value>
   </data>
   <data name="StartInDirectory" xml:space="preserve">
     <value>Start In directory</value>
@@ -652,13 +653,13 @@ input touchscreen swipe 540 1800 540 900</value>
     <value>Command line arguments (optional)</value>
   </data>
   <data name="EnterPassword" xml:space="preserve">
-    <value>Enter password</value>
+    <value>Írja be a jelszót</value>
   </data>
   <data name="Reply" xml:space="preserve">
-    <value>Reply</value>
+    <value>Válasz</value>
   </data>
   <data name="Back" xml:space="preserve">
-    <value>Back</value>
+    <value>Vissza</value>
   </data>
   <data name="Browse" xml:space="preserve">
     <value>Browse</value>
@@ -687,13 +688,13 @@ input text %pwd%</value>
     <value>Drop files to send</value>
   </data>
   <data name="Save" xml:space="preserve">
-    <value>Save</value>
+    <value>Mentés</value>
   </data>
   <data name="FileTransferNotification.Receiving" xml:space="preserve">
     <value>Receiving from {0}</value>
   </data>
   <data name="FileTransferNotification.Sending" xml:space="preserve">
-    <value>Sending to {0}</value>
+    <value>Küldés a(z) {0} eszközre</value>
   </data>
   <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
     <value>Receiving {0}/{1} from {2}</value>
