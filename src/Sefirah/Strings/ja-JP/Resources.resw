@@ -313,7 +313,7 @@
     <value>アプリ固有の設定</value>
   </data>
   <data name="FileTransferNotification.Title" xml:space="preserve">
-    <value>ファイル転送</value>
+    <value>File transfer</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>送信</value>
@@ -322,10 +322,10 @@
     <value>返信を入力</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
-    <value>ファイルを開く</value>
+    <value>Open file</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
-    <value>フォルダーを開く</value>
+    <value>Open folder</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
     <value>「{0}」からの通知をオフにする</value>
@@ -339,8 +339,8 @@
   <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
     <value>デバイスがサイレント モード時はトースト通知を表示しない</value>
   </data>
-  <data name="Devices" xml:space="preserve">
-    <value>デバイス</value>
+  <data name="Devices.Title" xml:space="preserve">
+    <value>Devices</value>
   </data>
   <data name="RingerModeNormal.Content" xml:space="preserve">
     <value>通常</value>
@@ -688,33 +688,39 @@ input text %pwd%</value>
     <value>Save</value>
   </data>
   <data name="FileTransferNotification.Receiving" xml:space="preserve">
-    <value>{0} から受信中</value>
+    <value>Receiving from {0}</value>
   </data>
   <data name="FileTransferNotification.Sending" xml:space="preserve">
-    <value>{0} に送信中</value>
+    <value>Sending to {0}</value>
   </data>
   <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
-    <value>{2} から {0}/{1} を受信中</value>
+    <value>Receiving {0}/{1} from {2}</value>
   </data>
   <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
-    <value>{2} に {0}/{1} を送信中</value>
+    <value>Sending {0}/{1} to {2}</value>
   </data>
   <data name="FileTransferNotification.Completed" xml:space="preserve">
-    <value>ファイル転送完了</value>
+    <value>File transfer completed</value>
   </data>
   <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
-    <value>{1} から {0} を受信しました</value>
+    <value>Received {0} from {1}</value>
   </data>
   <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
-    <value>{1} から {0} 個のファイルを受信しました</value>
+    <value>Received {0} files from {1}</value>
   </data>
   <data name="FileTransferNotification.SentSingle" xml:space="preserve">
-    <value>{0} を {1} に送信しました</value>
+    <value>Sent {0} to {1}</value>
   </data>
   <data name="FileTransferNotification.SentBulk" xml:space="preserve">
-    <value>{0} 個のファイルを {1} に送信しました</value>
+    <value>Sent {0} files to {1}</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
-    <value>キャンセル</value>
+    <value>Cancel</value>
+  </data>
+  <data name="NoPairedDevices" xml:space="preserve">
+    <value>No paired devices</value>
+  </data>
+  <data name="Devices.Description" xml:space="preserve">
+    <value>Managed devices</value>
   </data>
 </root>
