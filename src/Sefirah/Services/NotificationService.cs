@@ -27,7 +27,6 @@ public class NotificationService(
     /// </summary>
     public ReadOnlyObservableCollection<Notification> NotificationHistory => new(activeNotifications);
 
-    // Initialize the service - call this after DI container creates the instance
     public void Initialize()
     {
         ClearBadge();
@@ -74,14 +73,14 @@ public class NotificationService(
                 var filter = remoteAppsRepository.GetAppNotificationFilterAsync(message.AppPackage, device.Id)
                 ?? await remoteAppsRepository.AddOrUpdateApplicationForDevice(device.Id, message.AppPackage, message.AppName!, message.AppIcon);
 
-                if (filter == NotificationFilter.Disabled) return;
+                if (filter is NotificationFilter.Disabled) return;
 
                 await dispatcher.EnqueueAsync(async () =>
                 {
                     var notifications = GetOrCreateNotificationCollection(device);
                     var notification = await Notification.FromMessage(message);
                     
-                    if (message.NotificationType == NotificationType.New && filter == NotificationFilter.ToastFeed)
+                    if (message.NotificationType is NotificationType.New && filter is NotificationFilter.ToastFeed)
                     {
                         // Check for existing notification in this device's collection
                         var existingNotification = notifications.FirstOrDefault(n => n.Key == notification.Key);
@@ -126,7 +125,7 @@ public class NotificationService(
                     }
                 });
             }
-            else if (message.NotificationType == NotificationType.Removed)
+            else if (message.NotificationType is NotificationType.Removed)
             {
                 if (!deviceNotifications.TryGetValue(device.Id, out var notifications)) return;
                 var notification = notifications.FirstOrDefault(n => n.Key == message.NotificationKey);
@@ -144,43 +143,6 @@ public class NotificationService(
         catch (Exception ex)
         {
             logger.LogError(ex, "Error handling notification message");
-        }
-    }
-
-    public void RemoveNotification(PairedDevice device, Notification notification)
-    {
-        try
-        {
-            if (!deviceNotifications.TryGetValue(device.Id, out var notifications)) return;
-                
-            if (!notification.Pinned)
-            {
-                dispatcher.EnqueueAsync(() => notifications.Remove(notification));
-                logger.LogDebug("Removed notification with key: {NotificationKey} from device {DeviceId}", notification, device.Id);
-
-                platformNotificationHandler.RemoveNotificationsByTagAndGroup(notification.Tag, notification.GroupKey);
-
-                // Update active notifications if this is for the active device
-                if (deviceManager.ActiveDevice?.Id == device.Id)
-                {   
-                    UpdateActiveNotifications(deviceManager.ActiveDevice);
-                }
-
-                var notificationToRemove = new NotificationMessage
-                {
-                    NotificationKey = notification.Key,
-                    NotificationType = NotificationType.Removed
-                };
-                string jsonMessage = SocketMessageSerializer.Serialize(notificationToRemove);
-                if (device.Session is not null)
-                {
-                    sessionManager.SendMessage(device.Session, jsonMessage);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error removing notification");
         }
     }
 
@@ -231,6 +193,10 @@ public class NotificationService(
             {
                 if (deviceNotifications.TryGetValue(device.Id, out var notifications))
                 {
+                    foreach (var notification in notifications)
+                    {
+                        platformNotificationHandler.RemoveNotificationsByTagAndGroup(notification.Tag, notification.GroupKey);
+                    }
                     notifications.Clear();
                     ClearBadge();
                 }
@@ -240,6 +206,43 @@ public class NotificationService(
                 logger.LogError(ex, "Error clearing history");
             }
         });
+    }
+
+    public void RemoveNotification(PairedDevice device, Notification notification)
+    {
+        try
+        {
+            if (!deviceNotifications.TryGetValue(device.Id, out var notifications)) return;
+
+            if (!notification.Pinned)
+            {
+                dispatcher.EnqueueAsync(() => notifications.Remove(notification));
+                logger.LogDebug("Removed notification with key: {NotificationKey} from device {DeviceId}", notification, device.Id);
+
+                platformNotificationHandler.RemoveNotificationsByTagAndGroup(notification.Tag, notification.GroupKey);
+
+                // Update active notifications if this is for the active device
+                if (deviceManager.ActiveDevice?.Id == device.Id)
+                {
+                    UpdateActiveNotifications(deviceManager.ActiveDevice);
+                }
+
+                var notificationToRemove = new NotificationMessage
+                {
+                    NotificationKey = notification.Key,
+                    NotificationType = NotificationType.Removed
+                };
+                string jsonMessage = SocketMessageSerializer.Serialize(notificationToRemove);
+                if (device.Session is not null)
+                {
+                    sessionManager.SendMessage(device.Session, jsonMessage);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error removing notification");
+        }
     }
 
     private void SortNotifications(string deviceId)

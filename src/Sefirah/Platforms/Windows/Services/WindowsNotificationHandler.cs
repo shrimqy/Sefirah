@@ -345,6 +345,12 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
     }
 
     /// <inheritdoc />
+    public async Task RemoveNotificationById(uint notificationId)
+    {
+        await AppNotificationManager.Default.RemoveByIdAsync(notificationId);
+    }
+
+    /// <inheritdoc />
     public async Task RemoveNotificationByTag(string? tag)
     {
         if (string.IsNullOrEmpty(tag)) return;
