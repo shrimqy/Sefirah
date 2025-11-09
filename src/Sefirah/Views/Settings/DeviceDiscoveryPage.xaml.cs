@@ -1,12 +1,14 @@
-using Microsoft.UI.Xaml.Media.Animation;
+using Sefirah.Data.Contracts;
 using Sefirah.Data.Items;
 using Sefirah.Extensions;
 
 namespace Sefirah.Views.Settings;
 
-public sealed partial class DevicesPage : Page
+public sealed partial class DeviceDiscoveryPage : Page
 {
-    public DevicesPage()
+    private IDiscoveryService DiscoveryService { get; } = Ioc.Default.GetRequiredService<IDiscoveryService>();
+
+    public DeviceDiscoveryPage()
     {
         InitializeComponent();
         SetupBreadcrumb();
@@ -16,7 +18,8 @@ public sealed partial class DevicesPage : Page
     {
         BreadcrumbBar.ItemsSource = new ObservableCollection<BreadcrumbBarItemModel>
         {
-            new("Devices".GetLocalizedResource(), typeof(DevicesPage))
+            new("Devices".GetLocalizedResource(), typeof(DevicesPage)),
+            new("AvailableDevices/Title".GetLocalizedResource(), typeof(DeviceDiscoveryPage))
         };
         BreadcrumbBar.ItemClicked += BreadcrumbBar_ItemClicked;
     }
@@ -26,7 +29,7 @@ public sealed partial class DevicesPage : Page
         var items = BreadcrumbBar.ItemsSource as ObservableCollection<BreadcrumbBarItemModel>;
         var clickedItem = items?[args.Index];
         
-        if (clickedItem?.PageType != null && clickedItem.PageType != typeof(DevicesPage))
+        if (clickedItem?.PageType != null && clickedItem.PageType != typeof(DeviceDiscoveryPage))
         {
             // Navigate back to devices page
             if (Frame.CanGoBack)
@@ -36,8 +39,16 @@ public sealed partial class DevicesPage : Page
         }
     }
 
-    private void OpenDeviceDiscovery(object sender, RoutedEventArgs e)
+    protected override void OnNavigatedTo(NavigationEventArgs e)
     {
-        Frame.Navigate(typeof(DeviceDiscoveryPage), null, new SuppressNavigationTransitionInfo());
+        base.OnNavigatedTo(e);
+        DiscoveryService.StartDiscoveryAsync();
+    }
+
+    protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+    {
+        base.OnNavigatingFrom(e);
+        DiscoveryService.StopDiscovery();
     }
 }
+

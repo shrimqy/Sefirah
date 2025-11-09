@@ -18,11 +18,10 @@ public class NetworkService(
     Func<IMessageHandler> messageHandlerFactory,
     ILogger<NetworkService> logger,
     IDeviceManager deviceManager,
-    IAdbService adbService,
-    IDiscoveryService discoveryService) : INetworkService, ISessionManager, ITcpServerProvider
+    IAdbService adbService) : INetworkService, ISessionManager, ITcpServerProvider
 {
     private Server? server;
-    private int serverPort;
+    public int ServerPort { get; private set; }
     private bool isRunning;
     private X509Certificate2? certificate;
     private readonly IEnumerable<int> PORT_RANGE = Enumerable.Range(5150, 20); // 5150 to 5169
@@ -63,9 +62,8 @@ public class NetworkService(
 
                     if (server.Start())
                     {
-                        serverPort = port;
+                        ServerPort = port;
                         isRunning = true;
-                        await discoveryService.StartDiscoveryAsync(port);
                         logger.Info($"Server started on port: {port}");
                         return true;
                     }
@@ -145,10 +143,10 @@ public class NetworkService(
         try
         {
             string newData = Encoding.UTF8.GetString(buffer, (int)offset, (int)size);
-            //logger.Debug($"Received raw data: {(newData.Length > 100 ? string.Concat(newData.AsSpan(0, Math.Min(100, newData.Length)), "...") : newData)}");
+
+            logger.Debug($"Processing message: {(newData.Length > 100 ? string.Concat(newData.AsSpan(0, Math.Min(100, newData.Length)), "...") : newData)}");
 
             bufferedData += newData;
-
             while (true)
             {
                 int newlineIndex = bufferedData.IndexOf('\n');
@@ -269,8 +267,6 @@ public class NetworkService(
     {
         try
         {
-            logger.Debug($"Processing message: {(message.Length > 100 ? string.Concat(message.AsSpan(0, Math.Min(100, message.Length)), "...") : message)}");
-
             // Check if this looks like a JSON message before attempting to deserialize
             if (message.TrimStart().StartsWith('{') || message.TrimStart().StartsWith('['))
             {

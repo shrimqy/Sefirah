@@ -1,0 +1,79 @@
+﻿<Page
+    x:Class="Sefirah.Views.Settings.DeviceDiscoveryPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:Sefirah.Converters"
+    xmlns:helpers="using:Sefirah.Helpers"
+    xmlns:items="using:Sefirah.Data.Items"
+    xmlns:models="using:Sefirah.Data.Models"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:wuc="using:CommunityToolkit.WinUI.Controls"
+    xmlns:vm="using:Sefirah.ViewModels.Settings"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <x:Double x:Key="BreadcrumbBarChevronFontSize">17</x:Double>
+        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
+        <converters:CountToVisibilityConverter x:Key="InverseCountToVisibilityConverter" Inverse="True" />
+    </Page.Resources>
+
+    <Page.DataContext>
+        <vm:DevicesViewModel x:Name="ViewModel" />
+    </Page.DataContext>
+
+    <ScrollViewer Padding="0,0,40,0">
+        <StackPanel Spacing="4">
+            <!--  Breadcrumb Navigation  -->
+            <BreadcrumbBar x:Name="BreadcrumbBar" Margin="0,0,0,8">
+                <BreadcrumbBar.ItemTemplate>
+                    <DataTemplate x:DataType="items:BreadcrumbBarItemModel">
+                        <BreadcrumbBarItem AutomationProperties.Name="{Binding Name}" Content="{Binding}">
+                            <BreadcrumbBarItem.ContentTemplate>
+                                <DataTemplate>
+                                    <TextBlock
+                                        FontSize="28"
+                                        FontWeight="SemiBold"
+                                        Text="{Binding Name}" />
+                                </DataTemplate>
+                            </BreadcrumbBarItem.ContentTemplate>
+                        </BreadcrumbBarItem>
+                    </DataTemplate>
+                </BreadcrumbBar.ItemTemplate>
+            </BreadcrumbBar>
+
+            <ItemsRepeater ItemsSource="{x:Bind ViewModel.DiscoveredDevices, Mode=OneWay}">
+                <ItemsRepeater.Layout>
+                    <StackLayout Orientation="Vertical" Spacing="8" />
+                </ItemsRepeater.Layout>
+                <ItemsRepeater.ItemTemplate>
+                    <DataTemplate x:DataType="models:DiscoveredDevice">
+                        <wuc:SettingsCard Description="{x:Bind FormattedKey}" Header="{x:Bind DeviceName}">
+                            <wuc:SettingsCard.HeaderIcon>
+                                <FontIcon Glyph="&#xE8EA;" />
+                            </wuc:SettingsCard.HeaderIcon>
+                        </wuc:SettingsCard>
+                    </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+            </ItemsRepeater>
+
+            <!--  Empty State  -->
+            <StackPanel
+                Margin="0,32"
+                HorizontalAlignment="Center"
+                Spacing="8"
+                Visibility="{x:Bind ViewModel.DiscoveredDevices.Count, Mode=OneWay, Converter={StaticResource InverseCountToVisibilityConverter}}">
+                <FontIcon
+                    FontSize="32"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Glyph="&#xE8EA;" />
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    FontSize="14"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Text="{helpers:ResourceString Name=NoDevicesFound}" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>
+

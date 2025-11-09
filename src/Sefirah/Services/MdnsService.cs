@@ -149,7 +149,6 @@ public class MdnsService(ILogger<MdnsService> logger) : IMdnsService
         catch (Exception ex)
         {
             logger.LogError("Failed to start discovery service: {ex}", ex);
-            throw;
         }
     }
 }

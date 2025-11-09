@@ -1,5 +1,7 @@
 namespace Sefirah.Data.Contracts;
-interface INetworkService
+
+public interface INetworkService
 {
     Task<bool> StartServerAsync();
+    int ServerPort { get; }
 }
