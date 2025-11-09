@@ -313,7 +313,7 @@
     <value>Réglages spécifiques à l'application</value>
   </data>
   <data name="FileTransferNotification.Title" xml:space="preserve">
-    <value>Transfert de fichier</value>
+    <value>File transfer</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>Envoyer</value>
@@ -322,10 +322,10 @@
     <value>Tapez une réponse</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
-    <value>Ouvrir le fichier</value>
+    <value>Open file</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
-    <value>Ouvrir le dossier</value>
+    <value>Open folder</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
     <value>Désactiver les notifications de {0}</value>
@@ -339,8 +339,8 @@
   <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
     <value>Ne pas afficher les notifications toast lorsque le téléphone est en mode NPD</value>
   </data>
-  <data name="Devices" xml:space="preserve">
-    <value>Appareils</value>
+  <data name="Devices.Title" xml:space="preserve">
+    <value>Devices</value>
   </data>
   <data name="RingerModeNormal.Content" xml:space="preserve">
     <value>Son</value>
@@ -688,33 +688,39 @@ input text %pwd%</value>
     <value>Sauvegarder</value>
   </data>
   <data name="FileTransferNotification.Receiving" xml:space="preserve">
-    <value>Réception depuis {0}</value>
+    <value>Receiving from {0}</value>
   </data>
   <data name="FileTransferNotification.Sending" xml:space="preserve">
-    <value>Envoi vers {0}</value>
+    <value>Sending to {0}</value>
   </data>
   <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
-    <value>Réception {0}/{1} depuis {2}</value>
+    <value>Receiving {0}/{1} from {2}</value>
   </data>
   <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
-    <value>Envoi {0}/{1} vers {2}</value>
+    <value>Sending {0}/{1} to {2}</value>
   </data>
   <data name="FileTransferNotification.Completed" xml:space="preserve">
-    <value>Transfert de fichier terminé</value>
+    <value>File transfer completed</value>
   </data>
   <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
-    <value>{0} reçu depuis {1}</value>
+    <value>Received {0} from {1}</value>
   </data>
   <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
-    <value>{0} fichiers reçus depuis {1}</value>
+    <value>Received {0} files from {1}</value>
   </data>
   <data name="FileTransferNotification.SentSingle" xml:space="preserve">
-    <value>{0} envoyé vers {1}</value>
+    <value>Sent {0} to {1}</value>
   </data>
   <data name="FileTransferNotification.SentBulk" xml:space="preserve">
-    <value>{0} fichiers envoyés vers {1}</value>
+    <value>Sent {0} files to {1}</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
-    <value>Annuler</value>
+    <value>Cancel</value>
+  </data>
+  <data name="NoPairedDevices" xml:space="preserve">
+    <value>No paired devices</value>
+  </data>
+  <data name="Devices.Description" xml:space="preserve">
+    <value>Managed devices</value>
   </data>
 </root>
