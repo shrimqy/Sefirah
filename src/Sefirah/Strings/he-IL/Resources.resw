@@ -313,7 +313,7 @@
     <value>הגדרות יישום ספציפיות</value>
   </data>
   <data name="FileTransferNotification.Title" xml:space="preserve">
-    <value>העברת קובץ</value>
+    <value>File transfer</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>שלח</value>
@@ -322,10 +322,10 @@
     <value>הקלד תגובה</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
-    <value>פתיחת קובץ</value>
+    <value>Open file</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
-    <value>פתיחת תיקייה</value>
+    <value>Open folder</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
     <value>כבה התראות מ{0}</value>
@@ -339,8 +339,8 @@
   <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
     <value>אל תציג התראות Windows כאשר הטלפון במצב 'נא לא להפריע'</value>
   </data>
-  <data name="Devices" xml:space="preserve">
-    <value>התקנים</value>
+  <data name="Devices.Title" xml:space="preserve">
+    <value>Devices</value>
   </data>
   <data name="RingerModeNormal.Content" xml:space="preserve">
     <value>רגיל</value>
@@ -688,33 +688,39 @@ input text %pwd%</value>
     <value>Save</value>
   </data>
   <data name="FileTransferNotification.Receiving" xml:space="preserve">
-    <value>מקבל מ-{0}</value>
+    <value>Receiving from {0}</value>
   </data>
   <data name="FileTransferNotification.Sending" xml:space="preserve">
-    <value>שולח ל-{0}</value>
+    <value>Sending to {0}</value>
   </data>
   <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
-    <value>מקבל {0}/{1} מ-{2}</value>
+    <value>Receiving {0}/{1} from {2}</value>
   </data>
   <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
-    <value>שולח {0}/{1} ל-{2}</value>
+    <value>Sending {0}/{1} to {2}</value>
   </data>
   <data name="FileTransferNotification.Completed" xml:space="preserve">
-    <value>העברת קבצים הושלמה</value>
+    <value>File transfer completed</value>
   </data>
   <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
-    <value>קיבל {0} מ-{1}</value>
+    <value>Received {0} from {1}</value>
   </data>
   <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
-    <value>קיבל {0} קבצים מ-{1}</value>
+    <value>Received {0} files from {1}</value>
   </data>
   <data name="FileTransferNotification.SentSingle" xml:space="preserve">
-    <value>שלח {0} ל-{1}</value>
+    <value>Sent {0} to {1}</value>
   </data>
   <data name="FileTransferNotification.SentBulk" xml:space="preserve">
-    <value>שלח {0} קבצים ל-{1}</value>
+    <value>Sent {0} files to {1}</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
-    <value>ביטול</value>
+    <value>Cancel</value>
+  </data>
+  <data name="NoPairedDevices" xml:space="preserve">
+    <value>No paired devices</value>
+  </data>
+  <data name="Devices.Description" xml:space="preserve">
+    <value>Managed devices</value>
   </data>
 </root>
