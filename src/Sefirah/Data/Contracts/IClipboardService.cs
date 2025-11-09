@@ -8,4 +8,6 @@ public interface IClipboardService
     /// Sets the content of the clipboard.
     /// </summary>
     Task SetContentAsync(object content, PairedDevice sourceDevice);
+
+    void Initialize();
 }

@@ -31,6 +31,7 @@ public static class AppLifecycleHelper
 
     public static async Task InitializeAppComponentsAsync()
     {
+        var clipboardService = Ioc.Default.GetRequiredService<IClipboardService>();
         var networkService = Ioc.Default.GetRequiredService<INetworkService>();
         var notificationService = Ioc.Default.GetRequiredService<INotificationService>();
         var deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
@@ -46,6 +47,7 @@ public static class AppLifecycleHelper
 #endif
 
         notificationService.Initialize();
+        clipboardService.Initialize();
         await deviceManager.Initialize();
 
         await Task.WhenAll(

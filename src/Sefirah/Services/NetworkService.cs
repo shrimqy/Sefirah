@@ -299,6 +299,7 @@ public class NetworkService(
                     device.Session = null;
                     logger.Info($"Device {device.Name} session disconnected, status updated");
                 });
+                ConnectionStatusChanged?.Invoke(this, (device, false));
             }
         }
         catch (Exception ex)

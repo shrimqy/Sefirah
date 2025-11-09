@@ -10,15 +10,15 @@ using DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue;
 
 namespace Sefirah.Services;
 
-public class ClipboardService : IClipboardService
+public class ClipboardService(
+    ILogger<ClipboardService> logger,
+    ISessionManager sessionManager,
+    IPlatformNotificationHandler platformNotificationHandler,
+    IDeviceManager deviceManager,
+    IFileTransferService fileTransferService) : IClipboardService
 {
-    private readonly ILogger<ClipboardService> logger;
-    private readonly ISessionManager sessionManager;
-    private readonly IPlatformNotificationHandler platformNotificationHandler;
-    private readonly IDeviceManager deviceManager;
-    private readonly DispatcherQueue dispatcher;
-    private readonly IFileTransferService fileTransferService;
-
+    private readonly DispatcherQueue dispatcher = App.MainWindow.DispatcherQueue;
+    private bool isMonitoring = false;
     private const int DirectTransferThreshold = 2 * 1024 * 1024; // 2MB threshold
 
     private static readonly Dictionary<string, string> SupportedImageFileTypes = new()
@@ -38,37 +38,45 @@ public class ClipboardService : IClipboardService
     
     private bool isInternalUpdate; // To track if the clipboard change came from the remote device
 
-    public ClipboardService(
-        ILogger<ClipboardService> logger,
-        ISessionManager sessionManager,
-        IPlatformNotificationHandler platformNotificationHandler,
-        IDeviceManager deviceManager,
-        IFileTransferService fileTransferService)
+    public void Initialize()
     {
-        this.logger = logger;
-        this.sessionManager = sessionManager;
-        this.platformNotificationHandler = platformNotificationHandler;
-        this.deviceManager = deviceManager;
-        this.fileTransferService = fileTransferService;
-        dispatcher = App.MainWindow.DispatcherQueue;
+        sessionManager.ConnectionStatusChanged += OnConnectionStatusChanged;
+        fileTransferService.FileReceived += OnFileReceived;
+    }
+
+    private async void OnFileReceived(object? sender, (PairedDevice device, StorageFile data) e)
+    {
+        await SetContentAsync(e.data, e.device);
+    }
+
+    private void OnConnectionStatusChanged(object? sender, (PairedDevice Device, bool IsConnected) e)
+    {
+        var devicesWithClipboardSync = deviceManager.PairedDevices
+            .Where(device => device.Session is not null &&
+                device.DeviceSettings.ClipboardSyncEnabled);
 
         dispatcher.EnqueueAsync(() =>
         {
             try
             {
-                Clipboard.ContentChanged += OnClipboardContentChanged;
-                logger.LogInformation("Clipboard monitoring started");
+                if (!devicesWithClipboardSync.Any() && isMonitoring)
+                {
+                    Clipboard.ContentChanged -= OnClipboardContentChanged;
+                    logger.LogInformation("Clipboard monitoring stopped");
+                    isMonitoring = false;
+                }
+                else if (!isMonitoring)
+                {
+                    Clipboard.ContentChanged += OnClipboardContentChanged;
+                    logger.LogInformation("Clipboard monitoring started");
+                    isMonitoring = true;
+                }
             }
             catch (Exception ex)
             {
                 logger.LogError("Failed to start clipboard monitoring {ex}", ex);
             }
         });
-
-        fileTransferService.FileReceived += async (sender, args) =>
-        {
-           await SetContentAsync(args.data, args.device);
-        };
     }
 
     private async void OnClipboardContentChanged(object? sender, object? e)
@@ -82,8 +90,8 @@ public class ClipboardService : IClipboardService
             {
                 // Check if any connected devices have clipboard sync enabled
                 var devicesWithClipboardSync = deviceManager.PairedDevices
-                    .Where(device => device.Session != null &&
-                                    device.DeviceSettings?.ClipboardSyncEnabled == true)
+                    .Where(device => device.Session is not null &&
+                        device.DeviceSettings.ClipboardSyncEnabled)
                     .ToList();
 
                 if (devicesWithClipboardSync.Count == 0) return;
@@ -100,57 +108,56 @@ public class ClipboardService : IClipboardService
 
                 // Check if any device has image clipboard enabled
                 var devicesWithImageSync = devicesWithClipboardSync
-                    .Where(d => d.DeviceSettings?.ImageToClipboardEnabled == true)
+                    .Where(d => d.DeviceSettings.ImageToClipboardEnabled)
                     .ToList();
 
-                if (devicesWithImageSync.Count !=0)
+                if (devicesWithImageSync.Count == 0) return; 
+
+                if (dataPackageView.Contains(StandardDataFormats.StorageItems))
                 {
-                    if (dataPackageView.Contains(StandardDataFormats.StorageItems))
+                    var storageItems = await dataPackageView.GetStorageItemsAsync();
+                    var file = storageItems.OfType<StorageFile>().FirstOrDefault();
+                    if (file is IStorageFile)
                     {
-                        var storageItems = await dataPackageView.GetStorageItemsAsync();
-                        var file = storageItems.OfType<StorageFile>().FirstOrDefault();
-                        if (file is IStorageFile)
+                        var mimeType = file.ContentType;
+                        var fileExtension = file.FileType[1..];
+
+                        // Validate that this is a supported image type and get MIME type
+                        if (!SupportedImageFileTypes.TryGetValue(fileExtension, out var detectedMimeType))
+                            return;
+
+                        // Content type from StorageFile can be unreliable
+                        if (string.IsNullOrEmpty(mimeType))
                         {
-                            var mimeType = file.ContentType;
-                            var fileExtension = file.FileType[1..];
-
-                            // Validate that this is a supported image type and get MIME type
-                            if (!SupportedImageFileTypes.TryGetValue(fileExtension, out var detectedMimeType))
-                                return;
-
-                            // Content type from StorageFile can be unreliable
-                            if (string.IsNullOrEmpty(mimeType))
-                            {
-                                mimeType = detectedMimeType;
-                            }
-
-                            logger.LogInformation("fileName: {fileName}, fileExtension: {fileExtension}, Mime type: {mimeType}", file.Name, fileExtension, mimeType);
-
-                            if ((long)(await file.GetBasicPropertiesAsync()).Size > DirectTransferThreshold)
-                                await HandleLargeImageTransfer(file, fileExtension, mimeType, devicesWithImageSync);
-                            else
-                                await HandleSmallImageTransfer(await file.OpenStreamForReadAsync(), mimeType, devicesWithImageSync);
+                            mimeType = detectedMimeType;
                         }
-                        return;
-                    }
 
-                    if (dataPackageView.Contains(StandardDataFormats.Bitmap))
-                    {
-                        var bitmapRef = await dataPackageView.GetBitmapAsync();  
-                        var bitmap = await bitmapRef.OpenReadAsync();
-#if WINDOWS
-                        var stream = new MemoryStream();
-                        var decoder = await BitmapDecoder.CreateAsync(bitmap);
-                        var softwareBitmap = await decoder.GetSoftwareBitmapAsync();
-                        var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream.AsRandomAccessStream());
-                        encoder.SetSoftwareBitmap(softwareBitmap);
-                        await encoder.FlushAsync();
-                        stream.Position = 0;
-#else
-                        var stream = bitmap.AsStream();
-#endif
-                        await HandleSmallImageTransfer(stream, "image/png", devicesWithImageSync);
+                        logger.LogInformation("fileName: {fileName}, fileExtension: {fileExtension}, Mime type: {mimeType}", file.Name, fileExtension, mimeType);
+
+                        if ((long)(await file.GetBasicPropertiesAsync()).Size > DirectTransferThreshold)
+                            await HandleLargeImageTransfer(file, fileExtension, mimeType, devicesWithImageSync);
+                        else
+                            await HandleSmallImageTransfer(await file.OpenStreamForReadAsync(), mimeType, devicesWithImageSync);
                     }
+                    return;
+                }
+
+                if (dataPackageView.Contains(StandardDataFormats.Bitmap))
+                {
+                    var bitmapRef = await dataPackageView.GetBitmapAsync();  
+                    using var bitmap = await bitmapRef.OpenReadAsync();
+#if WINDOWS
+                    var stream = new MemoryStream();
+                    var decoder = await BitmapDecoder.CreateAsync(bitmap);
+                    var softwareBitmap = await decoder.GetSoftwareBitmapAsync();
+                    var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream.AsRandomAccessStream());
+                    encoder.SetSoftwareBitmap(softwareBitmap);
+                    await encoder.FlushAsync();
+                    stream.Position = 0;
+#else
+                    var stream = bitmap.AsStream();
+#endif
+                    await HandleSmallImageTransfer(stream, "image/png", devicesWithImageSync);
                 }
             }
             catch (Exception ex)
@@ -277,7 +284,6 @@ public class ClipboardService : IClipboardService
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error setting clipboard content");
-                throw;
             }
             finally
             {
