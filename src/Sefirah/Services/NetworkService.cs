@@ -215,7 +215,6 @@ public class NetworkService(
                 
                 deviceManager.UpdateOrAddDevice(device, connectedDevice  =>
                 {
-
                     connectedDevice.ConnectionStatus = true;
                     connectedDevice.Session = session;
                     
@@ -228,11 +227,11 @@ public class NetworkService(
                     }
                 });
 
-                var (_, avatar) = await UserInformation.GetCurrentUserInfoAsync();
+                var avatar = await UserInformation.GetCurrentUserAvatarAsync();
                 var localDevice = await deviceManager.GetLocalDeviceAsync();
 
                 // Generate our authentication proof
-                var sharedSecret = EcdhHelper.DeriveKey(deviceInfo.PublicKey!, localDevice.PrivateKey);
+                var sharedSecret = EcdhHelper.DeriveKey(deviceInfo.PublicKey, localDevice.PrivateKey);
                 var nonce = EcdhHelper.GenerateNonce();
                 var proof = EcdhHelper.GenerateProof(sharedSecret, nonce);
 

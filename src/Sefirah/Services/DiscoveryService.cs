@@ -42,7 +42,7 @@ public class DiscoveryService(
 
             logger.LogInformation($"Address to advertise: {string.Join(", ", localAddresses)}");
 
-            var (name, avatar) = await UserInformation.GetCurrentUserInfoAsync();
+            var name = await UserInformation.GetCurrentUserNameAsync();
             var udpBroadcast = new UdpBroadcast
             {
                 DeviceId = localDevice.DeviceId,

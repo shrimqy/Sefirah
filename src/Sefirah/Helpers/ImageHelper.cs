@@ -32,7 +32,7 @@ public static class ImageHelper
         try
         {
             using var stream = await data.OpenReadAsync();
-            var reader = new DataReader(stream.GetInputStreamAt(0));
+            using var reader = new DataReader(stream);
             var bytes = new byte[stream.Size];
             await reader.LoadAsync((uint)stream.Size);
             reader.ReadBytes(bytes);

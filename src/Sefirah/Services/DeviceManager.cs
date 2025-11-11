@@ -203,7 +203,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
             var localDevice =  repository.GetLocalDevice();
             if (localDevice is null)
             {
-                var (name, _) = await UserInformation.GetCurrentUserInfoAsync();
+                var name = await UserInformation.GetCurrentUserNameAsync();
                 var keyPair = EcdhHelper.GetKeyPair();
                 localDevice = new LocalDeviceEntity
                 {
