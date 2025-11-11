@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.RegularExpressions;
 using CommunityToolkit.WinUI;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
@@ -7,7 +8,6 @@ using Sefirah.Dialogs;
 using Sefirah.Extensions;
 using Sefirah.Utils;
 using Sefirah.Views.Settings;
-using Uno.Logging;
 using Windows.ApplicationModel.DataTransfer;
 
 namespace Sefirah.Services;
@@ -21,7 +21,7 @@ public class ScreenMirrorService(
 
     private Dictionary<string, Process> scrcpyProcesses = [];
     private CancellationTokenSource? cts;
-    private readonly Microsoft.UI.Dispatching.DispatcherQueue? dispatcher = App.MainWindow?.DispatcherQueue;
+    private readonly Microsoft.UI.Dispatching.DispatcherQueue dispatcher = App.MainWindow.DispatcherQueue;
     
     // Password cache: deviceId -> (password, cachedTime, timeoutMinutes)
     private readonly Dictionary<string, (string Password, DateTime CachedAt, int TimeoutMinutes)> passwordCache = [];
@@ -62,131 +62,100 @@ public class ScreenMirrorService(
                 if (!result) return false;
             }
 
-            var devicePreferenceType = deviceSettings.ScrcpyDevicePreference;
-            string? selectedDeviceSerial = null;
-
             List<string> argBuilder = [];
             if (!string.IsNullOrEmpty(customArgs))
             {
                 argBuilder.Add(customArgs);
             }
 
-            var pairedDevices = devices.Where(d => d != null && d.Model == device.Model).ToList();
-            if (pairedDevices.Count > 0)
-            {
-                switch (devicePreferenceType)
-                {
-                    case ScrcpyDevicePreferenceType.Usb:
-                        selectedDeviceSerial = pairedDevices.FirstOrDefault(d => d.Type == DeviceType.USB)?.Serial;
-                        break;
-                    case ScrcpyDevicePreferenceType.Tcpip:
-                        selectedDeviceSerial = pairedDevices.FirstOrDefault(d => d.Type == DeviceType.WIFI)?.Serial;
-                        break;
-                    case ScrcpyDevicePreferenceType.Auto:
-                        if (pairedDevices.FirstOrDefault(d => d.Type == DeviceType.USB) != null)
-                        {
-                            if (deviceSettings.AdbTcpipModeEnabled) 
-                            {
-                                argBuilder.Add("--tcpip");
-                            }
-                            selectedDeviceSerial = pairedDevices.FirstOrDefault(d => d.Type == DeviceType.USB)?.Serial;
-                        }
-                        else
-                        {
-                            selectedDeviceSerial = pairedDevices.FirstOrDefault(d => d.Type == DeviceType.WIFI)?.Serial;
-                        }
-                        break;
-                    case ScrcpyDevicePreferenceType.AskEverytime:
-                        selectedDeviceSerial = await ShowDeviceSelectionDialog(pairedDevices);
-                        if (string.IsNullOrEmpty(selectedDeviceSerial))
-                        {
-                            logger.LogWarning("No device selected for scrcpy");
-                            return false;
-                        }
-                        break;
-                }
-                var commands = deviceSettings.UnlockCommands?.Trim()
-                    .Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries)
-                    .Select(c => c.Trim())
-                    .Where(c => !string.IsNullOrEmpty(c))
-                    .ToList();
-                var adbDevice = pairedDevices.FirstOrDefault(d => d.Serial == selectedDeviceSerial);
-                if (adbDevice is null || !adbDevice.DeviceData.HasValue) return false;
+            var preDefinedArgs = deviceSettings.CustomArguments;
+            string? selectedDeviceSerial = null;
 
-                if (commands?.Count > 0 && await adbService.IsLocked(adbDevice.DeviceData.Value))
+            // if preDefinedArgs contains -s, --serial, or --tcpip
+            if (!string.IsNullOrEmpty(preDefinedArgs))
+            {
+                // Check if preDefinedArgs contains any of the flags that specify a device serial
+                bool hasDeviceSerialFlag = Regex.IsMatch(preDefinedArgs, @"(?:^|\s)(?:-s|--serial|--tcpip)");
+                
+                if (hasDeviceSerialFlag)
                 {
-                    // Check if any command contains password placeholder
-                    var hasPasswordPlaceholder = commands.Any(c => c.Contains("%pwd%"));
-                    string? password = null;
-                    
-                    if (hasPasswordPlaceholder)
+                    // Extract serial from "-s VALUE" format
+                    var shortSerialPattern = @"(?:^|\s)-s\s+(\S+)";
+                    var shortMatch = Regex.Match(preDefinedArgs, shortSerialPattern);
+                    if (shortMatch.Success)
                     {
-                        // Only use password caching if timeout is greater than 0
-                        var timeoutSeconds = deviceSettings.UnlockTimeout;
-                        if (timeoutSeconds > 0)
-                        {
-                            // Try to get cached password first
-                            password = GetCachedPassword(device.Id, timeoutSeconds);
-                        }
-                        
-                        // If no cached password or caching is disabled, ask user for password
-                        if (password is null)
-                        {
-                            password = await ShowPasswordInputDialog();
-                            if (password is null) return false;
-                            
-                            // Only cache the password if timeout is greater than 0
-                            if (timeoutSeconds > 0)
-                            {
-                                CachePassword(device.Id, password, timeoutSeconds);
-                            }
-                        }
-                        
-                        // Replace password placeholders with actual password
-                        commands = commands.Select(c => c.Replace("%pwd%", password)).ToList();
+                        selectedDeviceSerial = shortMatch.Groups[1].Value;
+                        preDefinedArgs = Regex.Replace(preDefinedArgs, shortSerialPattern, "").Trim();
                     }
                     
-                    adbService.UnlockDevice(adbDevice.DeviceData.Value, commands);
-                }
-            }
-            else if(deviceSettings.AdbTcpipModeEnabled && device.Session != null)
-            {
-                var connectedSessionIpAddress = device.Session.Socket.RemoteEndPoint?.ToString()?.Split(':')[0];
-                if (await adbService.ConnectWireless(connectedSessionIpAddress))
-                {
-                    selectedDeviceSerial = $"{connectedSessionIpAddress}:5555";
-                }
-            }
-            else if (devices.Any(d => d.IsOnline && !string.IsNullOrEmpty(d.Serial)))
-            {
-                // If no paired devices found, show dialog to select from online devices
-                selectedDeviceSerial = await ShowDeviceSelectionDialog(devices.Where(d => d.IsOnline).ToList());
-            }
-            else
-            {
-                logger.LogWarning("No online devices found from adb");
-                dispatcher?.EnqueueAsync(async () =>
-                {
-                    var dialog = new ContentDialog
+                    // Extract serial from "--serial=VALUE" format
+                    var longSerialPattern = @"(?:^|\s)--serial=(\S+)";
+                    var longMatch = Regex.Match(preDefinedArgs, longSerialPattern);
+                    if (longMatch.Success)
                     {
-                        XamlRoot = App.MainWindow.Content!.XamlRoot,
-                        Title = "AdbDeviceOffline".GetLocalizedResource(),
-                        Content = "AdbDeviceOfflineDescription".GetLocalizedResource(),
-                        CloseButtonText = "Dismiss".GetLocalizedResource()
-                    };
-                    await dialog.ShowAsync();
-                });
-                return false;
+                        selectedDeviceSerial = longMatch.Groups[1].Value;
+                        preDefinedArgs = Regex.Replace(preDefinedArgs, longSerialPattern, "").Trim();
+                    }
+                    
+                    // Extract value from "--tcpip=VALUE" format
+                    var tcpipPattern = @"(?:^|\s)--tcpip=(\S+)";
+                    var tcpipMatch = Regex.Match(preDefinedArgs, tcpipPattern);
+                    if (tcpipMatch.Success)
+                    {
+                        selectedDeviceSerial = tcpipMatch.Groups[1].Value;
+                        preDefinedArgs = Regex.Replace(preDefinedArgs, tcpipPattern, "").Trim();
+                    }
+                }
+                
+                if (!string.IsNullOrWhiteSpace(preDefinedArgs))
+                {
+                    argBuilder.Add(preDefinedArgs);
+                }
             }
 
-            // Validate that we have a selected device
+            if (string.IsNullOrEmpty(selectedDeviceSerial))
+            {
+                selectedDeviceSerial = await DeviceSelection(deviceSettings, argBuilder, device);
+            }
+
             if (string.IsNullOrEmpty(selectedDeviceSerial)) return false;
             
             argBuilder.Add($"-s {selectedDeviceSerial}");
 
-            // Build arguments for scrcpy with the selected device
-            var (args, deviceSerial) = BuildScrcpyArguments(argBuilder, selectedDeviceSerial!, deviceSettings);
-            
+            argBuilder = BuildScrcpyArguments(argBuilder, deviceSettings, device.Model ?? "Unknown");
+
+            if (argBuilder[0].StartsWith("--start-app"))
+            {
+                if (!string.IsNullOrEmpty(deviceSettings.VirtualDisplaySize) && deviceSettings.IsVirtualDisplayEnabled)
+                {
+                    argBuilder.Add($"--new-display={deviceSettings.VirtualDisplaySize}");
+                }
+                else if (deviceSettings.IsVirtualDisplayEnabled)
+                {
+                    argBuilder.Add("--new-display");
+                }
+                else if (scrcpyProcesses.Count > 0)
+                {
+                    // Check for existing processes for this device and terminate them
+                    // when virtual display is not enabled
+                    if (scrcpyProcesses.TryGetValue(selectedDeviceSerial, out var existingProcess))
+                    {
+                        try
+                        {
+                            if (!existingProcess.HasExited)
+                            {
+                                existingProcess.Kill();
+                            }
+                            scrcpyProcesses.Remove(selectedDeviceSerial);
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError($"Failed to terminate existing process: {ex.Message}", ex);
+                        }
+                    }
+                }
+            }
+
             cts?.Cancel();
             cts?.Dispose();
             processCts = new CancellationTokenSource();
@@ -197,7 +166,7 @@ public class ScreenMirrorService(
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = scrcpyPath,
-                    Arguments = args,
+                    Arguments = string.Join(" ", argBuilder),
                     UseShellExecute = false,
                     CreateNoWindow = true,
                     RedirectStandardOutput = true,
@@ -209,7 +178,6 @@ public class ScreenMirrorService(
             if (!string.IsNullOrEmpty(iconPath))
             {
                 process.StartInfo.EnvironmentVariables["SCRCPY_ICON_PATH"] = iconPath;
-                logger.Info($"Using custom scrcpy icon: {iconPath}");
             }
 
             bool started;
@@ -235,7 +203,7 @@ public class ScreenMirrorService(
                 return false;
             }
 
-            StartProcessMonitoring(process, processCts, deviceSerial);
+            StartProcessMonitoring(process, processCts, selectedDeviceSerial);
             return true;
         }
         catch (Exception ex)
@@ -246,6 +214,229 @@ public class ScreenMirrorService(
             process?.Dispose();
             return false;
         }
+    }
+
+    private async Task<string?> DeviceSelection(IDeviceSettingsService deviceSettings, List<string> argBuilder, PairedDevice device)
+    {
+        string? selectedDeviceSerial = null;
+        var devicePreferenceType = deviceSettings.ScrcpyDevicePreference;
+
+        var pairedDevices = devices.Where(d => d is not null && d.Model == device.Model).ToList();
+        if (pairedDevices.Count > 0)
+        {
+            switch (devicePreferenceType)
+            {
+                case ScrcpyDevicePreferenceType.Usb:
+                    selectedDeviceSerial = pairedDevices.FirstOrDefault(d => d.Type is DeviceType.USB)?.Serial;
+                    break;
+                case ScrcpyDevicePreferenceType.Tcpip:
+                    selectedDeviceSerial = pairedDevices.FirstOrDefault(d => d.Type is DeviceType.WIFI)?.Serial;
+                    break;
+                case ScrcpyDevicePreferenceType.Auto:
+                    // prioritize USB first to check if the auto tcpip is enabled
+                    var usbDevice = pairedDevices.FirstOrDefault(d => d.Type is DeviceType.USB);
+                    if (usbDevice is not null)
+                    {
+                        if (deviceSettings.AdbTcpipModeEnabled)
+                        {
+                            argBuilder.Add("--tcpip");
+                        }
+                        selectedDeviceSerial = usbDevice.Serial;
+                    }
+                    else
+                    {
+                        selectedDeviceSerial = pairedDevices.FirstOrDefault(d => d.Type is DeviceType.WIFI)?.Serial;
+                    }
+                    break;
+                case ScrcpyDevicePreferenceType.AskEverytime:
+                    selectedDeviceSerial = await ShowDeviceSelectionDialog(pairedDevices);
+                    if (string.IsNullOrEmpty(selectedDeviceSerial))
+                    {
+                        logger.LogWarning("No device selected for scrcpy");
+                        return null;
+                    }
+                    break;
+            }
+            var commands = deviceSettings.UnlockCommands?.Trim()
+                .Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries)
+                .Select(c => c.Trim())
+                .Where(c => !string.IsNullOrEmpty(c))
+                .ToList();
+            var adbDevice = pairedDevices.FirstOrDefault(d => d.Serial == selectedDeviceSerial);
+            if (adbDevice is null || !adbDevice.DeviceData.HasValue) return null;
+
+            if (commands?.Count > 0 && await adbService.IsLocked(adbDevice.DeviceData.Value))
+            {
+                // Check if any command contains password placeholder
+                var hasPasswordPlaceholder = commands.Any(c => c.Contains("%pwd%"));
+                string? password = null;
+
+                if (hasPasswordPlaceholder)
+                {
+                    // Only use password caching if timeout is greater than 0
+                    var timeoutSeconds = deviceSettings.UnlockTimeout;
+                    if (timeoutSeconds > 0)
+                    {
+                        // Try to get cached password first
+                        password = GetCachedPassword(device.Id, timeoutSeconds);
+                    }
+
+                    // If no cached password or caching is disabled, ask user for password
+                    if (password is null)
+                    {
+                        password = await ShowPasswordInputDialog();
+                        if (password is null) return null;
+
+                        // Only cache the password if timeout is greater than 0
+                        if (timeoutSeconds > 0)
+                        {
+                            CachePassword(device.Id, password, timeoutSeconds);
+                        }
+                    }
+
+                    // Replace password placeholders with actual password
+                    commands = commands.Select(c => c.Replace("%pwd%", password)).ToList();
+                }
+                adbService.UnlockDevice(adbDevice.DeviceData.Value, commands);
+            }
+        }
+        else if (deviceSettings.AdbTcpipModeEnabled && device.Session is not null)
+        {
+            var connectedSessionIpAddress = device.Session.Socket.RemoteEndPoint?.ToString()?.Split(':')[0];
+            if (await adbService.ConnectWireless(connectedSessionIpAddress))
+            {
+                selectedDeviceSerial = $"{connectedSessionIpAddress}:5555";
+            }
+        }
+        else if (devices.Any(d => d.IsOnline && !string.IsNullOrEmpty(d.Serial)))
+        {
+            // If no paired devices found, show dialog to select from online devices
+            selectedDeviceSerial = await ShowDeviceSelectionDialog(devices.Where(d => d.IsOnline).ToList());
+        }
+        else
+        {
+            logger.LogWarning("No online devices found from adb");
+            dispatcher?.EnqueueAsync(async () =>
+            {
+                var dialog = new ContentDialog
+                {
+                    XamlRoot = App.MainWindow.Content!.XamlRoot,
+                    Title = "AdbDeviceOffline".GetLocalizedResource(),
+                    Content = "AdbDeviceOfflineDescription".GetLocalizedResource(),
+                    CloseButtonText = "Dismiss".GetLocalizedResource()
+                };
+                await dialog.ShowAsync();
+            });
+            return null;
+        }
+
+        return selectedDeviceSerial;
+    }
+
+    private List<string> BuildScrcpyArguments(List<string> argBuilder, IDeviceSettingsService deviceSettings, string deviceModel)
+    {
+        // General deviceSettings
+        if (deviceSettings.ScreenOff)
+        {
+            argBuilder.Add("--turn-screen-off");
+        }
+
+        if (deviceSettings.PhysicalKeyboard)
+        {
+            argBuilder.Add("--keyboard=uhid");
+        }
+
+        // Video deviceSettings
+        if (deviceSettings.DisableVideoForwarding)
+        {
+            argBuilder.Add("--no-video");
+        }
+
+        if (deviceSettings.VideoCodec != 0)
+        {
+            var videoOptions = adbService.GetVideoCodecOptions(deviceModel);
+            if (deviceSettings.VideoCodec < videoOptions.Count)
+            {
+                argBuilder.Add($"{videoOptions[deviceSettings.VideoCodec].Command}");
+            }
+        }
+
+        if (!string.IsNullOrEmpty(deviceSettings.VideoResolution))
+        {
+            argBuilder.Add($"--max-size={deviceSettings.VideoResolution}");
+        }
+
+        if (!string.IsNullOrEmpty(deviceSettings.VideoBitrate))
+        {
+            argBuilder.Add($"--video-bit-rate={deviceSettings.VideoBitrate}");
+        }
+
+        if (!string.IsNullOrEmpty(deviceSettings.VideoBuffer))
+        {
+            argBuilder.Add($"--video-buffer={deviceSettings.VideoBuffer}");
+        }
+
+        if (!string.IsNullOrEmpty(deviceSettings.FrameRate))
+        {
+            argBuilder.Add($"--max-fps={deviceSettings.FrameRate}");
+        }
+
+        if (!string.IsNullOrEmpty(deviceSettings.Crop))
+        {
+            argBuilder.Add($"--crop={deviceSettings.Crop}");
+        }
+
+        if (deviceSettings.DisplayOrientation != 0)
+        {
+            argBuilder.Add($"--orientation={adbService.DisplayOrientationOptions[deviceSettings.DisplayOrientation].Command}");
+        }
+
+        if (!string.IsNullOrEmpty(deviceSettings.Display))
+        {
+            argBuilder.Add($"--display-id={deviceSettings.Display}");
+        }
+
+        // Audio deviceSettings
+        if (!string.IsNullOrEmpty(deviceSettings.AudioBitrate))
+        {
+            argBuilder.Add($"--audio-bit-rate={deviceSettings.AudioBitrate}");
+        }
+
+        if (!string.IsNullOrEmpty(deviceSettings.AudioBuffer))
+        {
+            argBuilder.Add($"--audio-buffer={deviceSettings.AudioBuffer}");
+        }
+
+        if (!string.IsNullOrEmpty(deviceSettings.AudioOutputBuffer))
+        {
+            argBuilder.Add($"--audio-output-buffer={deviceSettings.AudioOutputBuffer}");
+        }
+
+        if (deviceSettings.ForwardMicrophone)
+        {
+            argBuilder.Add("--audio-source=mic");
+        }
+
+        switch (deviceSettings.AudioOutputMode)
+        {
+            case AudioOutputModeType.Remote:
+                argBuilder.Add("--no-audio");
+                break;
+            case AudioOutputModeType.Both:
+                argBuilder.Add("--audio-dup");
+                break;
+        }
+
+        if (deviceSettings.AudioCodec != 0)
+        {
+            var audioOptions = adbService.GetAudioCodecOptions(deviceModel);
+            if (deviceSettings.AudioCodec < audioOptions.Count)
+            {
+                argBuilder.Add($"{audioOptions[deviceSettings.AudioCodec].Command}");
+            }
+        }
+
+        return argBuilder;
     }
 
     private void StartProcessMonitoring(Process process, CancellationTokenSource processCts, string deviceSerial)
@@ -395,144 +586,6 @@ public class ScreenMirrorService(
         });
 
         return selectedDeviceSerial;
-    }
-
-    private (string, string) BuildScrcpyArguments(List<string> args, string deviceSerial, IDeviceSettingsService settings)
-    {
-
-        var preDefinedArgs = settings.CustomArguments;
-
-        if (!string.IsNullOrEmpty(preDefinedArgs))
-        {
-            args.Add(preDefinedArgs);
-        }
-        
-        // General settings
-        if (settings.ScreenOff)
-        {
-            args.Add("--turn-screen-off");
-        }
-        
-        if (settings.PhysicalKeyboard)
-        {
-            args.Add("--keyboard=uhid");
-        }
-        
-        // Video settings
-        if (settings.DisableVideoForwarding)
-        {
-            args.Add("--no-video");
-        }
-
-        if (settings.VideoCodec != 0)
-        {
-            args.Add($"{adbService.VideoCodecOptions[settings.VideoCodec].Command}");
-        }   
-        
-        if (!string.IsNullOrEmpty(settings.VideoResolution))
-        {
-            args.Add($"--max-size={settings.VideoResolution}");
-        }
-        
-        if (!string.IsNullOrEmpty(settings.VideoBitrate))
-        {
-            args.Add($"--video-bit-rate={settings.VideoBitrate}");
-        }
-        
-        if (!string.IsNullOrEmpty(settings.VideoBuffer))
-        {
-            args.Add($"--video-buffer={settings.VideoBuffer}");
-        }
-        
-        if (!string.IsNullOrEmpty(settings.FrameRate))
-        {
-            args.Add($"--max-fps={settings.FrameRate}");
-        }
-        
-        if (!string.IsNullOrEmpty(settings.Crop))
-        {
-            args.Add($"--crop={settings.Crop}");
-        }
-
-        if (settings.DisplayOrientation != 0)
-        {
-            args.Add($"--orientation={adbService.DisplayOrientationOptions[settings.DisplayOrientation].Command}");
-        }
-        
-        if (!string.IsNullOrEmpty(settings.Display))
-        {
-            args.Add($"--display-id={settings.Display}");
-        }
-
-        // Audio settings
-        if (!string.IsNullOrEmpty(settings.AudioBitrate))
-        {
-            args.Add($"--audio-bit-rate={settings.AudioBitrate}");
-        }
-
-        if (!string.IsNullOrEmpty(settings.AudioBuffer))
-        {
-            args.Add($"--audio-buffer={settings.AudioBuffer}");
-        }
-
-        if (!string.IsNullOrEmpty(settings.AudioOutputBuffer))
-        {
-            args.Add($"--audio-output-buffer={settings.AudioOutputBuffer}");
-        }
-        
-        if (settings.ForwardMicrophone)
-        {
-            args.Add("--audio-source=mic");
-        }
-
-        switch (settings.AudioOutputMode)
-        {
-            case AudioOutputModeType.Remote:
-                args.Add("--no-audio");
-                break;
-            case AudioOutputModeType.Both:
-                args.Add("--audio-dup");
-                break;
-        }
-
-        if (settings.AudioCodec != 0)
-        {
-            args.Add($"{adbService.AudioCodecOptions[settings.AudioCodec].Command}");
-        }
-
-        if (args[0].StartsWith ("--start-app"))
-        {
-            if (!string.IsNullOrEmpty(settings.VirtualDisplaySize) && settings.IsVirtualDisplayEnabled)
-            {
-                args.Add($"--new-display={settings.VirtualDisplaySize}");
-            }
-            else if (settings.IsVirtualDisplayEnabled)
-            {
-                args.Add("--new-display");
-            }
-            else if (scrcpyProcesses.Count > 0)
-            {
-                // Check for existing processes for this device and terminate them
-                // when virtual display is not enabled
-                if (scrcpyProcesses.TryGetValue(deviceSerial, out var existingProcess))
-                {
-                    try
-                    {
-                        if (!existingProcess.HasExited)
-                        {
-                            existingProcess.Kill();
-                        }
-                        scrcpyProcesses.Remove(deviceSerial);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError($"Failed to terminate existing process: {ex.Message}", ex);
-                    }
-                }
-            }
-        }
-
-        return (string.Join(" ", args), deviceSerial);
     }
 
     public async Task<string> SelectScrcpyLocationClick()
