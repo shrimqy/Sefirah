@@ -8,8 +8,8 @@ public interface IAdbService
 {
     ObservableCollection<AdbDevice> AdbDevices { get; }
     ObservableCollection<ScrcpyPreferenceItem> DisplayOrientationOptions { get; }
-    ObservableCollection<ScrcpyPreferenceItem> VideoCodecOptions { get; }
-    ObservableCollection<ScrcpyPreferenceItem> AudioCodecOptions { get; }
+    ObservableCollection<ScrcpyPreferenceItem> GetVideoCodecOptions(string deviceModel);
+    ObservableCollection<ScrcpyPreferenceItem> GetAudioCodecOptions(string deviceModel);
     Task StartAsync();
     Task<bool> ConnectWireless(string? host, int port = 5555);
     Task StopAsync();
