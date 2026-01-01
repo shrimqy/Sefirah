@@ -168,9 +168,6 @@
   <data name="ClipboardFiles" xml:space="preserve">
     <value>Добавить полученные файлы в буфер обмена</value>
   </data>
-  <data name="NotificationsDescription" xml:space="preserve">
-    <value>Получать уведомления с удаленного устройства</value>
-  </data>
   <data name="GeneralSettings" xml:space="preserve">
     <value>Общие Настройки</value>
   </data>
@@ -188,9 +185,6 @@
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
     <value>Лента уведомлений + Всплывающие уведомления</value>
-  </data>
-  <data name="PairedDevices.Title" xml:space="preserve">
-    <value>Сопряженные устройства</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>Доступные устройства</value>
@@ -256,7 +250,7 @@
     <value>Подключите свое устройство</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>Обнаруженные устройства в вашей сети появятся ниже и инициируют соединение с вашего мобильного телефона (убедитесь, что пин-код совпадает)</value>
+    <value>Scan the QR code or pair directly from the discovered devices below</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
     <value>Запрос на подключение устройства</value>
@@ -279,12 +273,6 @@
   <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
     <value>Ключ доступа</value>
   </data>
-  <data name="ClipboardDescription" xml:space="preserve">
-    <value>Синхронизировать буфер обмена между устройствами</value>
-  </data>
-  <data name="StartupOptionsDescription" xml:space="preserve">
-    <value>Выберите, как запускается приложение при загрузке Windows</value>
-  </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
     <value>Открывать ссылки в браузере</value>
   </data>
@@ -299,9 +287,6 @@
   </data>
   <data name="Exit" xml:space="preserve">
     <value>Выход</value>
-  </data>
-  <data name="Features" xml:space="preserve">
-    <value>Функции</value>
   </data>
   <data name="SelectLocation" xml:space="preserve">
     <value>Выберите местоположение</value>
@@ -414,9 +399,6 @@
   <data name="NoApps" xml:space="preserve">
     <value>Не найдено приложений</value>
   </data>
-  <data name="AllApps" xml:space="preserve">
-    <value>Все приложения</value>
-  </data>
   <data name="AdditionalArguments" xml:space="preserve">
     <value>Дополнительные аргументы</value>
   </data>
@@ -434,9 +416,6 @@
   </data>
   <data name="ScrcpyNotFoundDescription" xml:space="preserve">
     <value>Выберите папку, в которой находится scrcpy</value>
-  </data>
-  <data name="PreferTcpIp" xml:space="preserve">
-    <value>Предпочитать беспроводное подключение</value>
   </data>
   <data name="SearchApps" xml:space="preserve">
     <value>Поиск приложений</value>
@@ -530,16 +509,6 @@
   </data>
   <data name="UnlockDeviceHelpExample" xml:space="preserve">
     <value>Пример:</value>
-  </data>
-  <data name="UnlockDeviceHelpUsefulInfo" xml:space="preserve">
-    <value>Полезная информация:</value>
-  </data>
-  <data name="UnlockDeviceHelpNote" xml:space="preserve">
-    <value>26 or POWER: Wakes or sleeps the device screen.
-66 or ENTER: Simulates the Enter key press.
-82 or MENU: Brings up the unlock interface, or prompts for fingerprint authentication.
-Some devices may also require a swipe gesture to bring up the unlock UI:
-input touchscreen swipe 540 1800 540 900</value>
   </data>
   <data name="PinnedApps" xml:space="preserve">
     <value>Закрепленные приложения</value>
@@ -676,14 +645,6 @@ input touchscreen swipe 540 1800 540 900</value>
   <data name="UnlockDeviceBeforeLaunch" xml:space="preserve">
     <value>Разблокируйте устройство перед запуском scrcpy</value>
   </data>
-  <data name="UnlockCommandsPlaceholder" xml:space="preserve">
-    <value>ввод ключевого события 26
-ввод ключевого события 66
-ввод текста %pwd%</value>
-  </data>
-  <data name="FileDropCaption" xml:space="preserve">
-    <value>Перетащите файл для отправки</value>
-  </data>
   <data name="Save" xml:space="preserve">
     <value>Сохранить</value>
   </data>
@@ -722,5 +683,28 @@ input touchscreen swipe 540 1800 540 900</value>
   </data>
   <data name="Devices.Description" xml:space="preserve">
     <value>Управляемые устройства</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="HostnamePlaceholder" xml:space="preserve">
+    <value>Enter hostname or IP address</value>
+  </data>
+  <data name="UnlockCommandsPlaceholder" xml:space="preserve">
+    <value>ввод ключевого события 26
+ввод ключевого события 66
+ввод текста %pwd%</value>
+  </data>
+  <data name="FileDropCaption" xml:space="preserve">
+    <value>Перетащите файл для отправки</value>
+  </data>
+  <data name="DeviceAddresses" xml:space="preserve">
+    <value>Device Addresses</value>
+  </data>
+  <data name="ManageAddressesAndPriority" xml:space="preserve">
+    <value>Manage addresses and connection priority</value>
+  </data>
+  <data name="SendFiles" xml:space="preserve">
+    <value>Send files</value>
   </data>
 </root>
