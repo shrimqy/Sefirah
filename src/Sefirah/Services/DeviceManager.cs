@@ -4,15 +4,17 @@ using Sefirah.Data.AppDatabase.Models;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
-using Sefirah.Dialogs;
+using Sefirah.Data.Models.Messages;
 using Sefirah.Helpers;
 using Sefirah.Utils;
+using System.Runtime.InteropServices;
 
 namespace Sefirah.Services;
 
 public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceRepository repository) : ObservableObject, IDeviceManager
 {
     public ObservableCollection<PairedDevice> PairedDevices { get; set; } = [];
+    public ObservableCollection<DiscoveredDevice> DiscoveredDevices { get; } = [];
 
     [ObservableProperty]
     public partial PairedDevice? ActiveDevice { get; set; }
@@ -25,40 +27,15 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
     /// <summary>
     /// Finds a device session by device ID
     /// </summary>
-    public PairedDevice? FindDeviceById(string deviceId)
-    {
-        return PairedDevices.FirstOrDefault(device => device.Id == deviceId);
-    }
-
-    /// <summary>
-    /// Updates an existing device in the collection or adds it if it doesn't exist.
-    /// </summary>
-    public void UpdateOrAddDevice(PairedDevice device, Action<PairedDevice>? updateAction = null)
-    {
-        App.MainWindow?.DispatcherQueue.EnqueueAsync(() =>
-        {
-            var existingDevice = PairedDevices.FirstOrDefault(d => d.Id == device.Id);
-            if (existingDevice is not null)
-            {
-                existingDevice.Name = device.Name;
-                existingDevice.Model = device.Model;
-                existingDevice.IpAddresses = device.IpAddresses;
-                existingDevice.PhoneNumbers = device.PhoneNumbers;
-                existingDevice.Wallpaper = device.Wallpaper;
-                existingDevice.Session = device.Session;
-                updateAction?.Invoke(existingDevice);
-            }
-            else
-            {
-                PairedDevices.Add(device);
-                updateAction?.Invoke(device);
-            }
-        });
-    }
-
+    public PairedDevice? FindDeviceById(string deviceId) => PairedDevices.FirstOrDefault(device => device.Id == deviceId);
+    
     public Task<RemoteDeviceEntity> GetDeviceInfoAsync(string deviceId)
     {
-        throw new NotImplementedException();
+        if (repository.HasDevice(deviceId, out var device))
+        {
+            return Task.FromResult(device);
+        }
+        throw new InvalidOperationException($"Device with ID {deviceId} not found");
     }   
 
     public List<string> GetRemoteDeviceIpAddresses()
@@ -71,17 +48,32 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
         return await repository.GetLastConnectedDevice();
     }
 
-    public void RemoveDevice(PairedDevice device)
+    public async Task RemoveDevice(PairedDevice device)
     {
-        App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+        try
         {
-            PairedDevices.Remove(device);
-            repository.DeletePairedDevice(device.Id);
-            if (ActiveDevice?.Id == device.Id)
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
             {
-                ActiveDevice = PairedDevices.FirstOrDefault();
-            }
-        });
+                try
+                {
+                    ActiveDevice = null;
+                    var result = PairedDevices.Remove(device);
+                    repository.DeletePairedDevice(device.Id);
+                    if (ActiveDevice?.Id == device.Id)
+                    {
+                        ActiveDevice = PairedDevices.FirstOrDefault();
+                    }
+                }
+                catch (Exception ex)
+                {
+                }
+            });
+        }
+        catch (COMException ex)
+        {
+            logger.LogError(ex, "COMException occurred while removing device {DeviceId}", device.Id);
+            throw;
+        }
     }
 
     public Task UpdateDevice(RemoteDeviceEntity device)
@@ -89,112 +81,21 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
         throw new NotImplementedException();
     }
 
-    public void UpdateDeviceStatus(PairedDevice device, DeviceStatus deviceStatus)
+    private static RemoteDeviceEntity CreateDeviceEntity(DiscoveredDevice device)
     {
-        var pairedDevice = PairedDevices.First(d => d.Id == device.Id);
-        App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+        return new RemoteDeviceEntity
         {
-            pairedDevice.Status = deviceStatus;
-        });
+            DeviceId = device.Id,
+            Name = device.Name,
+            LastConnected = DateTime.Now,
+            Model = device.Model,
+            SharedSecret = device.SharedSecret,
+            WallpaperBytes = null,
+            IpAddresses = [new IpAddressEntry { IpAddress = device.IpAddress, IsEnabled = true, Priority = 0 }],
+            PhoneNumbers = []
+        };
     }
 
-    public async Task<PairedDevice?> VerifyDevice(DeviceInfo device, string? ipAddress)
-    {
-        try
-        {
-            // If device exists and we've already verified it before, validate the proof
-            if (repository.HasDevice(device.DeviceId, out var existingDevice))
-            {
-                if (!EcdhHelper.VerifyProof(existingDevice.SharedSecret!, device.Nonce!, device.Proof!)) { return null; }
-
-                // Update device info
-                existingDevice.LastConnected = DateTime.Now;
-                existingDevice.Name = device.DeviceName;
-                existingDevice.Model = device.Model!;
-
-                if (!string.IsNullOrEmpty(device.Avatar))
-                {
-                    existingDevice.WallpaperBytes = Convert.FromBase64String(device.Avatar);
-                }
-                if (ipAddress is not null && !existingDevice.IpAddresses.Contains(ipAddress))
-                {
-                    List<string> updatedIpAddresses =
-                    [
-                        ..existingDevice.IpAddresses, ipAddress
-                    ];
-                    existingDevice.IpAddresses = updatedIpAddresses;
-                }
-
-                if (device.PhoneNumbers is not null && existingDevice.PhoneNumbers?.Count != device.PhoneNumbers.Count)
-                {
-                    existingDevice.PhoneNumbers = device.PhoneNumbers ?? [];
-                }
-
-                repository.AddOrUpdateRemoteDevice(existingDevice);
-                
-                var pairedDevice = await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
-                    existingDevice.ToPairedDevice());
-                return pairedDevice;
-            }
-
-            // For new devices, show connection request dialog
-            var tcs = new TaskCompletionSource<PairedDevice?>();
-            var localDevice = await GetLocalDeviceAsync();
-
-            var sharedSecret = EcdhHelper.DeriveKey(device.PublicKey!, localDevice.PrivateKey);
-
-            if (!EcdhHelper.VerifyProof(sharedSecret, device.Nonce!, device.Proof!)) { return null; }
-
-            await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
-            {
-                try
-                {
-                    var frame = (Frame)App.MainWindow.Content!;
-                    var dialog = new ConnectionRequestDialog(device.DeviceName, sharedSecret, frame)
-                    {
-                        XamlRoot = App.MainWindow.Content!.XamlRoot
-                    };
-
-                    var result = await dialog.ShowAsync();
-
-                    if (result is not ContentDialogResult.Primary)
-                    {
-                        logger.LogInformation("User declined device verification");
-                        tcs.SetResult(null);
-                        return;
-                    }
-
-                    var newDevice = new RemoteDeviceEntity
-                    {
-                        DeviceId = device.DeviceId,
-                        Name = device.DeviceName,
-                        LastConnected = DateTime.Now,
-                        Model = device.Model!,
-                        SharedSecret = sharedSecret,
-                        WallpaperBytes = !string.IsNullOrEmpty(device.Avatar)
-                            ? Convert.FromBase64String(device.Avatar)
-                            : null,
-                        IpAddresses = ipAddress is not null ? [ipAddress] : [],
-                        PhoneNumbers = device.PhoneNumbers ?? []
-                    };
-
-                    repository.AddOrUpdateRemoteDevice(newDevice);
-                    tcs.SetResult(await newDevice.ToPairedDevice());
-                }
-                catch (Exception ex)
-                {
-                    tcs.SetException(ex);
-                }
-            });
-
-            return await tcs.Task;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error verifying device");
-            return null;
-        }
-    }
 
     public async Task<LocalDeviceEntity> GetLocalDeviceAsync()
     {
@@ -241,5 +142,40 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
         var pairedDevicesList = await repository.GetPairedDevices();
         PairedDevices = pairedDevicesList.ToObservableCollection();
         ActiveDevice = PairedDevices.FirstOrDefault();
+    }
+
+    public async Task UpdateDeviceInfo(PairedDevice device, DeviceInfo deviceInfo)
+    {
+        var existingDevice = repository.GetRemoteDevice(device.Id);
+        existingDevice.Name = deviceInfo.DeviceName;
+        existingDevice.PhoneNumbers = deviceInfo.PhoneNumbers;
+        if (!string.IsNullOrEmpty(deviceInfo.Avatar))
+        {
+            existingDevice.WallpaperBytes = Convert.FromBase64String(deviceInfo.Avatar);
+        }
+
+        await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
+        {
+            device.Name = deviceInfo.DeviceName;
+            device.PhoneNumbers = deviceInfo.PhoneNumbers;
+            device.Wallpaper = await existingDevice.WallpaperBytes.ToBitmapAsync();
+        });
+
+        repository.AddOrUpdateRemoteDevice(existingDevice);
+        
+    }
+
+    public async Task<PairedDevice> AddDevice(DiscoveredDevice device)
+    {
+        var newDeviceEntity = CreateDeviceEntity(device);
+        repository.AddOrUpdateRemoteDevice(newDeviceEntity);
+        return await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
+        {
+            var pairedDevice = device.ToPairedDevice();
+            PairedDevices.Add(pairedDevice);
+            ActiveDevice = pairedDevice;
+            DiscoveredDevices.Remove(device);
+            return pairedDevice;
+        });
     }
 }

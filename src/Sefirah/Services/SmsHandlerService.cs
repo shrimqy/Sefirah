@@ -2,16 +2,12 @@ using CommunityToolkit.WinUI;
 using Microsoft.UI.Dispatching;
 using Sefirah.Data.AppDatabase.Models;
 using Sefirah.Data.AppDatabase.Repository;
-using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
-using Sefirah.Services.Socket;
-using Sefirah.Utils.Serialization;
 
 namespace Sefirah.Services;
 public class SmsHandlerService(
-    ISessionManager sessionManager,
     SmsRepository smsRepository,
     ILogger<SmsHandlerService> logger)
 {
@@ -87,7 +83,7 @@ public class SmsHandlerService(
                     break;
             }
 
-            ConversationsUpdated?.Invoke(this, (deviceId, textConversation.ThreadId));
+            await dispatcher.EnqueueAsync(() => ConversationsUpdated?.Invoke(this, (deviceId, textConversation.ThreadId)));
         }
         finally
         {
@@ -133,12 +129,12 @@ public class SmsHandlerService(
                     await existingConversation.UpdateFromTextConversationAsync(textConversation, smsRepository, deviceId);
 
                     // Move conversation to correct position based on new timestamp
-                    SmsHandlerService.InsertOrMoveConversation(existingConversation, conversations);
+                    InsertOrMoveConversation(existingConversation, conversations);
                 }
                 else
                 {
                     var newConversation = await conversationEntity.ToConversationAsync(smsRepository);
-                    SmsHandlerService.InsertOrMoveConversation(newConversation, conversations);
+                    InsertOrMoveConversation(newConversation, conversations);
                 }
             });
         }
@@ -179,14 +175,14 @@ public class SmsHandlerService(
                     await existingConversation.NewMessageFromConversationAsync(textConversation, smsRepository, deviceId);
 
                     // Move conversation to correct position based on new timestamp
-                    SmsHandlerService.InsertOrMoveConversation(existingConversation, conversations);
+                    InsertOrMoveConversation(existingConversation, conversations);
                 }
                 else
                 {
                     logger.LogInformation("Updated conversation not found in UI, creating new: {ThreadId}", textConversation.ThreadId);
                     var conversationEntity = SmsRepository.ToEntity(textConversation, deviceId);
                     var newConversation = await conversationEntity.ToConversationAsync(smsRepository);
-                    SmsHandlerService.InsertOrMoveConversation(newConversation, conversations);
+                    InsertOrMoveConversation(newConversation, conversations);
                 }
             });
         }
@@ -260,7 +256,7 @@ public class SmsHandlerService(
         }
     }
 
-    public void RequestThreadHistory(ServerSession session, long threadId, long rangeStartTimestamp = -1, long numberToRequest = -1)
+    public static async Task RequestThreadHistory(PairedDevice device, long threadId, long rangeStartTimestamp = -1, long numberToRequest = -1)
     {
         var threadRequest = new ThreadRequest
         {
@@ -268,12 +264,8 @@ public class SmsHandlerService(
             RangeStartTimestamp = rangeStartTimestamp,
             NumberToRequest = numberToRequest
         };
-        sessionManager.SendMessage(session, SocketMessageSerializer.Serialize(threadRequest));
-    }
 
-    public void SendTextMessage(ServerSession session, TextMessage textMessage)
-    {
-        sessionManager.SendMessage(session, SocketMessageSerializer.Serialize(textMessage));
+        device.SendMessage(threadRequest);
     }
 
     public async Task HandleContactMessage(string deviceId, ContactMessage contactMessage)

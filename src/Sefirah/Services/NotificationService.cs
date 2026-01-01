@@ -3,7 +3,6 @@ using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
-using Sefirah.Utils.Serialization;
 using Windows.Data.Xml.Dom;
 using Windows.System;
 using Windows.UI.Notifications;
@@ -27,7 +26,7 @@ public class NotificationService(
     /// </summary>
     public ReadOnlyObservableCollection<Notification> NotificationHistory => new(activeNotifications);
 
-    public void Initialize()
+    public async Task Initialize()
     {
         ClearBadge();
         // Listen to device connection status changes
@@ -53,11 +52,11 @@ public class NotificationService(
         return notifications;
     }
 
-    private void OnConnectionStatusChanged(object? sender, (PairedDevice Device, bool IsConnected) e)
+    private void OnConnectionStatusChanged(object? sender, PairedDevice device)
     {
-        if (e.IsConnected)
+        if (device.IsConnected)
         {
-            ClearHistory(e.Device);
+            ClearHistory(device);
         }
     }
 
@@ -172,11 +171,10 @@ public class NotificationService(
         {
             ClearHistory(activeDevice);
             activeNotifications.Clear();
-            if (activeDevice.Session is null) return;
+            if (activeDevice.IsConnected) return;
 
             var command = new CommandMessage { CommandType = CommandType.ClearNotifications };
-            string jsonMessage = SocketMessageSerializer.Serialize(command);
-            sessionManager.SendMessage(activeDevice.Session, jsonMessage);
+            activeDevice.SendMessage(command);
             logger.LogInformation("Cleared all notifications for device {DeviceId}", activeDevice.Id);
         }
         catch (Exception ex)
@@ -232,10 +230,9 @@ public class NotificationService(
                     NotificationKey = notification.Key,
                     NotificationType = NotificationType.Removed
                 };
-                string jsonMessage = SocketMessageSerializer.Serialize(notificationToRemove);
-                if (device.Session is not null)
+                if (device.IsConnected)
                 {
-                    sessionManager.SendMessage(device.Session, jsonMessage);
+                    device.SendMessage(notificationToRemove);
                 }
             }
         }
@@ -272,12 +269,12 @@ public class NotificationService(
         {
             NotificationKey = notificationKey,
             ReplyResultKey = ReplyResultKey,
-            ReplyText = replyText,
+            ReplyText = replyText
         };
 
-        if (device.Session is null) return;
+        if (!device.IsConnected) return;
 
-        sessionManager.SendMessage(device.Session, SocketMessageSerializer.Serialize(replyAction));
+        device.SendMessage(replyAction);
         logger.LogDebug("Sent reply action for notification {NotificationKey} to device {DeviceId}", notificationKey, device.Id);
     }
 
@@ -290,9 +287,9 @@ public class NotificationService(
             IsReplyAction = false
         };
 
-        if (device.Session is null) return;
+        if (!device.IsConnected) return;
 
-        sessionManager.SendMessage(device.Session, SocketMessageSerializer.Serialize(notificationAction));
+        device.SendMessage(notificationAction);
         logger.LogDebug("Sent click action for notification {NotificationKey} to device {DeviceId}", notificationKey, device.Id);
     }
 
@@ -334,11 +331,11 @@ public class NotificationService(
     /// <summary>
     /// Clears the badge number on the app tile
     /// </summary>
-    private void ClearBadge()
+    private async void ClearBadge()
     {
         try
         {
-            dispatcher.EnqueueAsync(() =>
+            await dispatcher.EnqueueAsync(() =>
             {
                 BadgeUpdater badgeUpdater = BadgeUpdateManager.CreateBadgeUpdaterForApplication();
                 badgeUpdater.Clear();

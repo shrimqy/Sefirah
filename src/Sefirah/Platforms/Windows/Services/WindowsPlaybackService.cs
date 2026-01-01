@@ -9,7 +9,6 @@ using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Helpers;
 using Sefirah.Platforms.Windows.Interop;
-using Sefirah.Utils.Serialization;
 using Windows.Media;
 using Windows.Media.Control;
 
@@ -46,19 +45,18 @@ public class WindowsPlaybackService(
 
             manager.SessionsChanged += SessionsChanged;
 
-            sessionManager.ConnectionStatusChanged += async (sender, args) =>
+            sessionManager.ConnectionStatusChanged += async (sender, device) =>
             {
-                if (args.IsConnected && args.Device.Session != null && args.Device.DeviceSettings?.MediaSessionSyncEnabled == true)
+                if (device.IsConnected && device.DeviceSettings.MediaSessionSyncEnabled)
                 {
                     foreach (var session in activeSessions.Values)
                     {
                         await UpdatePlaybackDataAsync(session);
                     }
-                    foreach (var device in AudioDevices)
+                    foreach (var audioDevice in AudioDevices)
                     {
-                        device.AudioDeviceType = AudioMessageType.New;
-                        string jsonMessage = SocketMessageSerializer.Serialize(device);
-                        sessionManager.SendMessage(args.Device.Session, jsonMessage);
+                        audioDevice.AudioDeviceType = AudioMessageType.New;
+                        device.SendMessage(audioDevice);
                     }
                 }
             };
@@ -362,10 +360,9 @@ public class WindowsPlaybackService(
         {
             foreach (var device in deviceManager.PairedDevices)
             {
-                if (device.Session is not null && device.DeviceSettings.MediaSessionSyncEnabled)
+                if (device.IsConnected && device.DeviceSettings.MediaSessionSyncEnabled)
                 {
-                    string jsonMessage = SocketMessageSerializer.Serialize(playbackSession);
-                    sessionManager.SendMessage(device.Session, jsonMessage);
+                    device.SendMessage(playbackSession);
                 }
             }
         }

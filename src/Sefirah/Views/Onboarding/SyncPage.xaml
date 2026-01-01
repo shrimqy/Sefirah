@@ -28,11 +28,15 @@
                 Style="{ThemeResource TitleLargeTextBlockStyle}"
                 Text="{helpers:ResourceString Name=OnboardingDevice/Title}" />
 
-            <!--  Description  -->
+            <!--  Subtitle  -->
             <TextBlock
-                Style="{ThemeResource BodyTextBlockStyle}"
-                Text="{helpers:ResourceString Name=OnboardingDevice/Subtitle}"
+                HorizontalAlignment="Center"
+                FontSize="14"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                 TextAlignment="Center"
+                TextWrapping="Wrap"
+                Text="{helpers:ResourceString Name=OnboardingDevice/Subtitle}" />
+
                 TextWrapping="Wrap" />
 
             <!--  Devices List  -->
@@ -46,7 +50,9 @@
                             Width="250"
                             Height="60"
                             Padding="12,8"
+                            Click="ConnectButton_Click"
                             HorizontalAlignment="Stretch"
+                            Tag="{x:Bind}"
                             HorizontalContentAlignment="Center"
                             Style="{ThemeResource AccentButtonStyle}">
                             <Grid Margin="0,0,20,0">
@@ -67,13 +73,13 @@
                                     <TextBlock
                                         HorizontalAlignment="Left"
                                         FontWeight="SemiBold"
-                                        Text="{x:Bind DeviceName}"
+                                        Text="{x:Bind Name}"
                                         TextTrimming="CharacterEllipsis" />
                                     <TextBlock
                                         HorizontalAlignment="Left"
                                         FontSize="12"
                                         Opacity="0.7"
-                                        Text="{x:Bind FormattedKey}"
+                                        Text="{x:Bind VerificationKey}"
                                         TextTrimming="CharacterEllipsis" />
                                 </StackPanel>
                             </Grid>

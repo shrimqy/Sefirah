@@ -1,4 +1,4 @@
-<Page
+﻿<Page
     x:Class="Sefirah.Views.Settings.DevicesPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -108,9 +108,8 @@
                                     </Grid>
                                     <StackPanel Margin="15,0,0,0" VerticalAlignment="Center">
                                         <TextBlock Text="{x:Bind Name, Mode=OneWay}" />
-                                        <TextBlock Text="{x:Bind ConnectionStatus, Converter={StaticResource BoolToConnectionButtonTextConverter}, Mode=OneWay}" />
+                                        <TextBlock Text="{x:Bind ConnectionStatusText, Mode=OneWay}" />
                                     </StackPanel>
-
                                 </StackPanel>
                             </wuc:SettingsExpander.Header>
                             <wuc:SettingsExpander.Resources>

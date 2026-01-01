@@ -1,12 +1,15 @@
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Items;
-using Sefirah.Extensions;
+using Sefirah.Data.Models;
+using Sefirah.Helpers;
+using Sefirah.Utils.Serialization;
 
 namespace Sefirah.Views.Settings;
 
 public sealed partial class DeviceDiscoveryPage : Page
 {
-    private IDiscoveryService DiscoveryService { get; } = Ioc.Default.GetRequiredService<IDiscoveryService>();
+    private readonly ISessionManager SessionManager = Ioc.Default.GetRequiredService<ISessionManager>();
+    private readonly IDiscoveryService DiscoveryService = Ioc.Default.GetRequiredService<IDiscoveryService>();
 
     public DeviceDiscoveryPage()
     {
@@ -29,7 +32,7 @@ public sealed partial class DeviceDiscoveryPage : Page
         var items = BreadcrumbBar.ItemsSource as ObservableCollection<BreadcrumbBarItemModel>;
         var clickedItem = items?[args.Index];
         
-        if (clickedItem?.PageType != null && clickedItem.PageType != typeof(DeviceDiscoveryPage))
+        if (clickedItem?.PageType is not null && clickedItem.PageType != typeof(DeviceDiscoveryPage))
         {
             // Navigate back to devices page
             if (Frame.CanGoBack)
@@ -45,10 +48,19 @@ public sealed partial class DeviceDiscoveryPage : Page
         DiscoveryService.StartDiscoveryAsync();
     }
 
-    protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+    private async void ConnectButton_Click(object sender, RoutedEventArgs e)
     {
-        base.OnNavigatingFrom(e);
-        DiscoveryService.StopDiscovery();
+        if (sender is Button button && button.Tag is DiscoveredDevice device)
+        {
+            try
+            {
+                await SessionManager.Pair(device);
+            }
+            catch (Exception)
+            {
+            }
+        }
     }
+
 }
 

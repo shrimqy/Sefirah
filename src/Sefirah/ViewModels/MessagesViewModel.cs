@@ -160,10 +160,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
             }
 
             // Request thread history from device
-            if (ActiveDevice.Session != null)
-            {
-                smsHandlerService.RequestThreadHistory(ActiveDevice.Session, SelectedConversation.ThreadId);
-            }
+            await SmsHandlerService.RequestThreadHistory(ActiveDevice, SelectedConversation.ThreadId);
         }
         catch (Exception ex)
         {
@@ -173,11 +170,9 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
     public void SendMessage(string messageText)
     {
-        if (string.IsNullOrWhiteSpace(messageText) || ActiveDevice?.Session == null)
-        {
+        if (string.IsNullOrWhiteSpace(messageText) || !ActiveDevice!.IsConnected)
             return;
-        }
-
+        
         try
         {
             List<string> recipients = [];
@@ -208,7 +203,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
                 SubscriptionId = SelectedSubscriptionId
             };
 
-            smsHandlerService.SendTextMessage(ActiveDevice.Session, textMessage);
+            ActiveDevice?.SendMessage(textMessage);
             
             MessageText = string.Empty;
             

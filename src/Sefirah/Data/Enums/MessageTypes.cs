@@ -72,9 +72,3 @@ public enum ConversationType
     New
 }
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
-public enum FileTransferType
-{
-    Clipboard,
-    File
-}

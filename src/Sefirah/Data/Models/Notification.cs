@@ -15,7 +15,7 @@ public class Notification
     public string? AppPackage { get; set; }
     public string? Title { get; set; }
     public string? Text { get; set; }
-    public List<NotificationGroup>? GroupedMessages { get; set; }
+    public List<NotificationGroup> GroupedMessages { get; set; } = [];
     public bool HasGroupedMessages => GroupedMessages?.Count > 0;
     public string? Tag { get; set; }
     public string? GroupKey { get; set; }
@@ -28,7 +28,7 @@ public class Notification
     {
         get
         {
-            if (GroupedMessages != null && GroupedMessages.Count != 0)
+            if (GroupedMessages.Count != 0)
             {
                 return !string.Equals(Title, GroupedMessages.First().Sender, StringComparison.OrdinalIgnoreCase);
             }
@@ -54,25 +54,30 @@ public class Notification
             GroupedMessages = GroupBySender(message.Messages),
             Tag = message.Tag,
             GroupKey = message.GroupKey,
-            Actions = message.Actions.Where(a => a != null).ToList()!,
+            Actions = message.Actions,
             ReplyResultKey = message.ReplyResultKey
         };
 
         // Handle icon conversion
-        if (!string.IsNullOrEmpty(message.LargeIcon))
+        try
         {
-            notification.Icon = await Convert.FromBase64String(message.LargeIcon).ToBitmapAsync();
+            if (!string.IsNullOrEmpty(message.LargeIcon))
+            {
+                notification.Icon = await Convert.FromBase64String(message.LargeIcon).ToBitmapAsync();
+            }
+            else if (!string.IsNullOrEmpty(message.AppIcon))
+            {
+                notification.Icon = await Convert.FromBase64String(message.AppIcon).ToBitmapAsync();
+            }
         }
-        else if (!string.IsNullOrEmpty(message.AppIcon))
-        {
-            notification.Icon = await Convert.FromBase64String(message.AppIcon).ToBitmapAsync();
-        }
+        catch { }
+
         return notification;
     }
 
-    internal static List<NotificationGroup> GroupBySender(List<NotificationTextMessage>? messages)
+    internal static List<NotificationGroup> GroupBySender(List<NotificationTextMessage> messages)
     {
-        if (messages == null || messages.Count == 0) return [];
+        if (messages.Count == 0) return [];
 
         List<NotificationGroup> result = [];
         NotificationGroup? currentGroup = null;

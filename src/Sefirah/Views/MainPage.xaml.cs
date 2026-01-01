@@ -1,9 +1,13 @@
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
+using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
+using Sefirah.Utils;
 using Sefirah.ViewModels;
 using Sefirah.ViewModels.Settings;
+using Sefirah.Views;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
 using Windows.System;
 
 namespace Sefirah.Views;
@@ -11,6 +15,7 @@ public sealed partial class MainPage : Page
 {
     public MainPageViewModel ViewModel { get; }
     public DevicesViewModel DevicesViewModel { get; }
+    private readonly ISessionManager SessionManager = Ioc.Default.GetRequiredService<ISessionManager>();
 
     public MainPage()
     {
@@ -207,6 +212,18 @@ public sealed partial class MainPage : Page
         }
     }
 
+    private async void DiscoveredDeviceButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is DiscoveredDevice device)
+        {
+            try
+            {
+                await SessionManager.Pair(device);
+            }
+            catch (Exception) {}
+        }
+    }
+
     private async void Page_Drop(object sender, DragEventArgs e)
     {
         // Check if the dropped data contains files
@@ -221,9 +238,24 @@ public sealed partial class MainPage : Page
         if (ViewModel.PairedDevices.Count == 0) return;
 
         e.AcceptedOperation = DataPackageOperation.Copy;
-        if (ViewModel.PairedDevices.Count == 1)
+        e.DragUIOverride.Caption = "FileDropCaption".GetLocalizedResource();
+    }
+
+    private async void SendFilesMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel.Device is null) return;
+
+        var files = await PickerHelper.PickMultipleFilesAsync();
+        if (files.Count > 0)
         {
-            e.DragUIOverride.Caption = $"Send to {ViewModel.Device?.Name}";
+            ViewModel.SendFiles(files);
         }
+    }
+
+    private void DeviceSettingsMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel.Device is null) return;
+
+        ViewModel.OpenDeviceSettings();
     }
 }

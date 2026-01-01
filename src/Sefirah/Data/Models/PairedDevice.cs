@@ -1,26 +1,29 @@
 using System.Collections.Specialized;
 using CommunityToolkit.WinUI;
 using Sefirah.Data.Contracts;
-using Sefirah.Services.Socket;
+using Sefirah.Data.Models.Messages;
 
 namespace Sefirah.Data.Models;
 
-public partial class PairedDevice : ObservableObject
+public partial class PairedDevice : BaseRemoteDevice
 {
-    public string Id { get; private set; }
+    public List<IpAddressEntry> IpAddresses { get; set; } = [];
 
-    private string name = string.Empty;
-    public string Name
+    /// <summary>
+    /// Gets enabled IP addresses sorted by priority (0 = highest priority)
+    /// </summary>
+    public List<string> GetEnabledIpAddresses()
     {
-        get => name;
-        set => SetProperty(ref name, value);
+        return IpAddresses
+            .Where(ip => ip.IsEnabled)
+            .OrderBy(ip => ip.Priority)
+            .Select(ip => ip.IpAddress)
+            .ToList();
     }
 
-    public string Model { get; set; } = string.Empty;
+    public int Port { get; set; } = 5150;
 
-    public List<string>? IpAddresses { get; set; } = [];
-
-    public List<PhoneNumber>? PhoneNumbers { get; set; } = [];
+    public List<PhoneNumber> PhoneNumbers { get; set; } = [];
 
     private ImageSource? wallpaper;
     public ImageSource? Wallpaper
@@ -29,12 +32,39 @@ public partial class PairedDevice : ObservableObject
         set => SetProperty(ref wallpaper, value);
     }
 
-    private bool connectionStatus;
-    public bool ConnectionStatus 
+    private ConnectionStatus connectionStatus = new Disconnected();
+    public ConnectionStatus ConnectionStatus 
     {
         get => connectionStatus;
-        set => SetProperty(ref connectionStatus, value);
+        set
+        {
+            if (SetProperty(ref connectionStatus, value))
+            {
+                OnPropertyChanged(nameof(ConnectionStatusText));
+                OnPropertyChanged(nameof(IsConnected));
+                OnPropertyChanged(nameof(IsForcedDisconnect));
+                OnPropertyChanged(nameof(IsConnectedOrConnecting));
+            }
+        }
     }
+
+    public string ConnectionStatusText
+    {
+        get
+        {
+            return ConnectionStatus switch
+            {
+                Connected => "Connected.Text".GetLocalizedResource(),
+                Connecting => "Connecting",
+                Disconnected => "Disconnected.Text".GetLocalizedResource(),
+                _ => "Unknown"
+            };
+        }
+    }
+    public bool IsDisconnected => ConnectionStatus.IsDisconnected;
+    public bool IsConnected => ConnectionStatus.IsConnected;
+    public bool IsForcedDisconnect => ConnectionStatus.IsForcedDisconnect;
+    public bool IsConnectedOrConnecting => ConnectionStatus.IsConnectedOrConnecting;
 
     private DeviceStatus? status;
     public DeviceStatus? Status
@@ -43,15 +73,10 @@ public partial class PairedDevice : ObservableObject
         set => SetProperty(ref status, value);
     }
 
-    private ServerSession? session;
-    public ServerSession? Session
-    {
-        get => session;
-        set => SetProperty(ref session, value);
-    }
+    public ObservableCollection<AdbDevice> ConnectedAdbDevices { get; set; } = [];
 
-    private readonly IAdbService adbService;
-    private readonly IUserSettingsService userSettingsService;
+    private readonly IAdbService adbService = Ioc.Default.GetRequiredService<IAdbService>();
+    private readonly IUserSettingsService userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
 
     private IDeviceSettingsService deviceSettings;
     public IDeviceSettingsService DeviceSettings
@@ -60,17 +85,12 @@ public partial class PairedDevice : ObservableObject
         private set => SetProperty(ref deviceSettings, value);
     }
 
-
-    public PairedDevice(string Id)
+    public PairedDevice(string deviceId)
     {
-        this.Id = Id;
-        userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
-        adbService = Ioc.Default.GetRequiredService<IAdbService>();
+        Id = deviceId;
         adbService.AdbDevices.CollectionChanged += OnAdbDevicesChanged;
-        deviceSettings = userSettingsService.GetDeviceSettings(Id);
+        deviceSettings = userSettingsService.GetDeviceSettings(deviceId);
     }
-
-    public ObservableCollection<AdbDevice> ConnectedAdbDevices { get; set; } = [];
 
     public bool HasAdbConnection
     {
@@ -107,7 +127,6 @@ public partial class PairedDevice : ObservableObject
     {
         try
         {
-            // Use UI thread if available
             await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
             {
                 ConnectedAdbDevices.Clear();

@@ -45,8 +45,6 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
             // Handle actions
             foreach (var action in message.Actions)
             {
-                if (action is null) continue;
-
                 if (action.IsReplyAction)
                 {
                     builder
@@ -80,32 +78,39 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
         }
     }
 
-    public async void ShowFileTransferNotification(string subtitle, string fileName, string transferId, uint notificationSequence, double? progress = null)
+    public async void ShowFileTransferNotification(
+        string notificationTitle,
+        string progressTitle,
+        string status,
+        string transferId,
+        uint notificationSequence,
+        double progress)
     {
         try
         {
             // if transfer is in progress, update existing notification
-            if (progress.HasValue && progress > 0 && progress < 100)
+            if (progress > 0 && progress < 100)
             {
                 var progressData = new AppNotificationProgressData(notificationSequence)
                 {
-                    Title = fileName,
-                    Value = progress.Value / 100,
-                    ValueStringOverride = $"{progress.Value:F0}%",
-                    Status = subtitle 
+                    Title = progressTitle,
+                    Value = progress / 100,
+                    ValueStringOverride = $"{progress:F0}%",
+                    Status = status
                 };
                 await AppNotificationManager.Default.UpdateAsync(progressData, transferId, Constants.Notification.FileTransferGroup);
             }
             else
             {
                 var builder = new AppNotificationBuilder()
-                    .AddText("FileTransferNotification.Title".GetLocalizedResource())
+                    .AddText(notificationTitle)
                     .SetTag(transferId)
                     .SetGroup(Constants.Notification.FileTransferGroup)
                     .MuteAudio()
                     .AddButton(new AppNotificationButton("FileTransferNotificationAction.Cancel".GetLocalizedResource())
                         .AddArgument("notificationType", ToastNotificationType.FileTransfer)
-                        .AddArgument("action", "cancel"))
+                        .AddArgument("action", "cancel")
+                        .AddArgument("tag", transferId))
                     .AddProgressBar(new AppNotificationProgressBar()
                         .BindTitle()
                         .BindValue()
@@ -118,10 +123,10 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
                 // Set initial progress data
                 notification.Progress = new AppNotificationProgressData(notificationSequence)
                 {
-                    Title = fileName,
+                    Title = progressTitle,
                     Value = 0,
-                    ValueStringOverride = "0%",
-                    Status = subtitle
+                    ValueStringOverride = $"{progress:F0}%",
+                    Status = status
                 };
 
                 AppNotificationManager.Default.Show(notification);
@@ -309,7 +314,11 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
                     break;
                 case "cancel":
                     var fileTransferService = Ioc.Default.GetRequiredService<IFileTransferService>();
-                    fileTransferService.CancelTransfer();
+                    // Get transferId from notification tag
+                    if (args.Arguments.TryGetValue("tag", out string? transferIdStr) && Guid.TryParse(transferIdStr, out Guid transferId))
+                    {
+                        fileTransferService.CancelTransfer(transferId);
+                    }
                     break;
             }
         }
@@ -332,13 +341,13 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
             case "Reply" when args.UserInput.TryGetValue("textBox", out var replyText):
                 if (args.Arguments.TryGetValue("replyResultKey", out var replyResultKey))
                 {
-                    NotificationActionUtils.ProcessReplyAction(sessionManager, logger, device, notificationKey, replyResultKey, replyText);
+                    NotificationActionUtils.ProcessReplyAction(logger, device, notificationKey, replyResultKey, replyText);
                 }
                 break;
             case "Click":
                 if (args.Arguments.TryGetValue("actionIndex", out var actionIndexStr))
                 {
-                    NotificationActionUtils.ProcessClickAction(sessionManager, logger, device, notificationKey, int.Parse(actionIndexStr));
+                    NotificationActionUtils.ProcessClickAction(logger, device, notificationKey, int.Parse(actionIndexStr));
                 }
                 break;
         }

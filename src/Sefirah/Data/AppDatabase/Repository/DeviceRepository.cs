@@ -2,6 +2,7 @@ using Sefirah.Data.AppDatabase.Models;
 using Sefirah.Data.Models;
 
 namespace Sefirah.Data.AppDatabase.Repository;
+
 public class DeviceRepository(DatabaseContext context, ILogger logger)
 {
     public LocalDeviceEntity? GetLocalDevice()
@@ -38,6 +39,11 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
     {
         device = context.Database.Find<RemoteDeviceEntity>(deviceId);
         return device != null;
+    }
+
+    public RemoteDeviceEntity GetRemoteDevice(string deviceId)
+    {
+        return context.Database.Find<RemoteDeviceEntity>(deviceId);
     }
 
     public async Task<PairedDevice?> GetLastConnectedDevice()
@@ -83,7 +89,11 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
 
     public List<string> GetRemoteDeviceIpAddresses()
     {
-        return context.Database.Table<RemoteDeviceEntity>().SelectMany(d => d.IpAddresses).ToList();
+        return context.Database.Table<RemoteDeviceEntity>()
+            .SelectMany(d => d.IpAddresses)
+            .Where(ip => ip.IsEnabled)
+            .Select(ip => ip.IpAddress)
+            .ToList();
     }
 }
  

@@ -1,6 +1,7 @@
 using Sefirah.Data.Models;
 
 namespace Sefirah.Data.Contracts;
+
 public interface INotificationService
 {
     /// <summary>
@@ -11,7 +12,7 @@ public interface INotificationService
     /// <summary>
     /// Initializes the notification service
     /// </summary>  
-    void Initialize();
+    Task Initialize();
 
     Task HandleNotificationMessage(PairedDevice device, NotificationMessage notificationMessage);
     void RemoveNotification(PairedDevice device, Notification notification);

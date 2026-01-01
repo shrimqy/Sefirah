@@ -1,10 +1,14 @@
 using CommunityToolkit.WinUI;
+using Sefirah.Data.AppDatabase.Models;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Items;
 using Sefirah.Data.Models;
+using Sefirah.Data.Models.Messages;
 using Sefirah.Extensions;
+using Microsoft.UI.Xaml.Controls;
+using System.Collections.Specialized;
 
 namespace Sefirah.ViewModels.Settings;
 
@@ -29,7 +33,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
             if (Device?.IpAddresses == null || Device.IpAddresses.Count == 0)
                 return "No IP addresses";
 
-            return string.Join(", ", Device.IpAddresses);
+            return string.Join(", ", Device.IpAddresses.Where(ip => ip.IsEnabled).Select(ip => ip.IpAddress));
         }
     }
     #endregion

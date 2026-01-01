@@ -1,6 +1,8 @@
+using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Models;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
+using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 
 namespace Sefirah.Services;
@@ -14,9 +16,10 @@ public class MessageHandler(
     IPlaybackService playbackService,
     IActionService actionService,
     ISftpService sftpService,
+    ISessionManager sessionManager,
     ILogger<MessageHandler> logger) : IMessageHandler
 {
-    public async Task HandleMessageAsync(PairedDevice device, SocketMessage message)
+    public async void HandleMessageAsync(PairedDevice device, SocketMessage message)
     {
         try
         {
@@ -39,7 +42,7 @@ public class MessageHandler(
                     break;
 
                 case DeviceStatus deviceStatus:
-                    deviceManager.UpdateDeviceStatus(device, deviceStatus);
+                    await App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.Status = deviceStatus);
                     break;
 
                 case ClipboardMessage clipboardMessage:
@@ -62,11 +65,17 @@ public class MessageHandler(
                     await sftpService.InitializeAsync(device, sftpServerInfo);
                     break;
 
-                case FileTransfer fileTransfer:
-                    await fileTransferService.ReceiveFile(fileTransfer, device);
+                case FileTransferMessage fileTransfer:
+                    await fileTransferService.ReceiveFiles(fileTransfer, device);
                     break;
-                case BulkFileTransfer fileTransfer:
-                    await fileTransferService.ReceiveBulkFiles(fileTransfer, device);
+                case DeviceInfo deviceInfo:
+                    await deviceManager.UpdateDeviceInfo(device, deviceInfo);
+                    break;
+                case CommandMessage commandMessage:
+                    if (commandMessage.CommandType is CommandType.Disconnect)
+                    {
+                        sessionManager.DisconnectDevice(device);
+                    }
                     break;
                 default:
                     logger.LogWarning("Unknown message type received: {type}", message.GetType().Name);

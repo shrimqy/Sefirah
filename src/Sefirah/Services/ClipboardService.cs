@@ -1,8 +1,6 @@
 using CommunityToolkit.WinUI;
 using Sefirah.Data.Contracts;
-using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
-using Sefirah.Utils.Serialization;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Graphics.Imaging;
 using Windows.System;
@@ -38,7 +36,7 @@ public class ClipboardService(
     
     private bool isInternalUpdate; // To track if the clipboard change came from the remote device
 
-    public void Initialize()
+    public async Task Initialize()
     {
         sessionManager.ConnectionStatusChanged += OnConnectionStatusChanged;
         fileTransferService.FileReceived += OnFileReceived;
@@ -49,10 +47,10 @@ public class ClipboardService(
         await SetContentAsync(e.data, e.device);
     }
 
-    private void OnConnectionStatusChanged(object? sender, (PairedDevice Device, bool IsConnected) e)
+    private void OnConnectionStatusChanged(object? sender, PairedDevice device)
     {
         var devicesWithClipboardSync = deviceManager.PairedDevices
-            .Where(device => device.Session is not null &&
+            .Where(device => device.IsConnected &&
                 device.DeviceSettings.ClipboardSyncEnabled);
 
         dispatcher.EnqueueAsync(() =>
@@ -90,7 +88,7 @@ public class ClipboardService(
             {
                 // Check if any connected devices have clipboard sync enabled
                 var devicesWithClipboardSync = deviceManager.PairedDevices
-                    .Where(device => device.Session is not null &&
+                    .Where(device => device.IsConnected &&
                         device.DeviceSettings.ClipboardSyncEnabled)
                     .ToList();
 
@@ -168,7 +166,7 @@ public class ClipboardService(
     }
     
 
-    private async Task TryHandleTextContent(DataPackageView dataPackageView, List<PairedDevice> devices)
+    private static async Task TryHandleTextContent(DataPackageView dataPackageView, List<PairedDevice> devices)
     {
         if (!dataPackageView.Contains(StandardDataFormats.Text)) return;
 
@@ -178,16 +176,11 @@ public class ClipboardService(
         // Convert Windows CRLF to Unix LF 
         text = text.Replace("\r\n", "\n");
         
-        var message = new ClipboardMessage
-        {
-            Content = text,
-            ClipboardType = "text/plain"
-        };
+        var message = new ClipboardMessage { Content = text, ClipboardType = "text/plain" };
 
-        var serializedMessage = SocketMessageSerializer.Serialize(message);
         foreach (var device in devices)
         {
-            sessionManager.SendMessage(device.Session!, serializedMessage);
+            device.SendMessage(message);
         }
         return;
     }
@@ -205,7 +198,7 @@ public class ClipboardService(
         {
             foreach (var device in devices)
             {
-                await fileTransferService.SendFile(file, metadata, device, FileTransferType.Clipboard);
+                await fileTransferService.SendFiles([file], device, isClipboard: true);
             }
         });
     }
@@ -216,16 +209,10 @@ public class ClipboardService(
         byte[] buffer = new byte[stream.Length];
         await stream.ReadExactlyAsync(buffer);
 
-        var message = new ClipboardMessage
-        {
-            Content = Convert.ToBase64String(buffer),
-            ClipboardType = mimeType
-        };
-        var serializedMessage = SocketMessageSerializer.Serialize(message);
-
+        var message = new ClipboardMessage { Content = Convert.ToBase64String(buffer), ClipboardType = mimeType };
         foreach (var device in devices)
         {
-            sessionManager.SendMessage(device.Session!, serializedMessage);
+            device.SendMessage(message);
         }
     }
 

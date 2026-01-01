@@ -2,7 +2,6 @@ using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Models;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
-using Sefirah.Extensions;
 using Sefirah.Helpers;
 
 namespace Sefirah.ViewModels.Settings;

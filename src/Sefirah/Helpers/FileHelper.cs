@@ -10,7 +10,7 @@ public static class FileHelper
         {
             FileName = file.Name,
             MimeType = file.ContentType,
-            FileSize = (long)(await file.GetBasicPropertiesAsync()).Size,
+            FileSize = (long)(await file.GetBasicPropertiesAsync()).Size
         };
     }
 }

@@ -1,3 +1,4 @@
+using System.Net.Sockets;
 using MeaMod.DNS.Model;
 using MeaMod.DNS.Multicast;
 using Sefirah.Data.Contracts;
@@ -6,8 +7,13 @@ using Sefirah.Data.Models;
 
 namespace Sefirah.Services;
 
-public class MdnsService(ILogger<MdnsService> logger) : IMdnsService
+public class MdnsService(ILogger logger) : IMdnsService
 {
+    private const string ServiceType = "_sefirah._udp";
+    private const string DeviceNameProperty = "deviceName";
+    private const string PublicKeyProperty = "publicKey";
+    private const string ServerPortProperty = "serverPort";
+
     private MulticastService? multicastService;
     private ServiceProfile? serviceProfile;
     private ServiceDiscovery? serviceDiscovery;
@@ -21,7 +27,7 @@ public class MdnsService(ILogger<MdnsService> logger) : IMdnsService
         try
         {
             // Set up the service profile
-            serviceProfile = new ServiceProfile(broadcast.DeviceId, "_sefirah._udp", ((ushort)port));
+            serviceProfile = new ServiceProfile(broadcast.DeviceId, ServiceType, (ushort)port);
             serviceProfile.AddProperty("deviceName", broadcast.DeviceName);
             serviceProfile.AddProperty("publicKey", broadcast.PublicKey);
             serviceProfile.AddProperty("serverPort", broadcast.Port.ToString());
@@ -36,7 +42,6 @@ public class MdnsService(ILogger<MdnsService> logger) : IMdnsService
         catch (Exception ex)
         {
             logger.LogError("Failed to advertise service {ex}", ex);
-            throw;
         }
     }
 
@@ -71,11 +76,6 @@ public class MdnsService(ILogger<MdnsService> logger) : IMdnsService
             multicastService = null;
             serviceProfile = null;
         }
-
-        if (serviceDiscovery is null)
-        {
-            logger.LogWarning("Service already unadvertised or not initialized");
-        }
     }
 
 
@@ -92,8 +92,7 @@ public class MdnsService(ILogger<MdnsService> logger) : IMdnsService
                 if (serviceProfile is not null && args.ServiceInstanceName == serviceProfile.FullyQualifiedName) return;
                 
                 // Only process _sefirah._udp services
-                if (!args.ServiceInstanceName.ToCanonical().ToString().Contains("_sefirah._udp")) return;
-
+                if (!args.ServiceInstanceName.ToCanonical().ToString().Contains(ServiceType)) return;
                 // Queries
                 multicastService.SendQuery(args.ServiceInstanceName, type: DnsType.TXT);
                 multicastService.SendQuery(args.ServiceInstanceName, type: DnsType.SRV);
@@ -104,13 +103,23 @@ public class MdnsService(ILogger<MdnsService> logger) : IMdnsService
             // Add handler for answers
             multicastService.AnswerReceived += (sender, args) => {
                 var txtRecords = args.Message.Answers.OfType<TXTRecord>();
+                var srvRecords = args.Message.Answers.OfType<SRVRecord>()
+                    .Concat(args.Message.AdditionalRecords.OfType<SRVRecord>())
+                    .ToList();
+                var aRecords = args.Message.Answers.OfType<AddressRecord>()
+                    .Concat(args.Message.AdditionalRecords.OfType<AddressRecord>())
+                    .Where(a => a.Address is not null && a.Address.AddressFamily is AddressFamily.InterNetwork)
+                    .ToList();
+                
+                // Process TXT records to get device information
                 foreach (var txtRecord in txtRecords)
                 {
                     string? deviceName = null;
                     string? publicKey = null;
+                    int? port = null;
 
                     // Only process _sefirah._udp services
-                    if (!txtRecord.CanonicalName.Contains("_sefirah._udp")) continue;
+                    if (!txtRecord.CanonicalName.Contains(ServiceType)) continue;
 
                     foreach (var txtData in txtRecord.Strings)
                     {
@@ -118,23 +127,35 @@ public class MdnsService(ILogger<MdnsService> logger) : IMdnsService
                         var parts = cleanTxtData.Split(['='], 2); // Split at first '=' 
                         if (parts.Length == 2)
                         {
-                            if (parts[0] == "deviceName")
-                            {
+                            if (parts[0] == DeviceNameProperty)
                                 deviceName = parts[1];
-                            }
-                            else if (parts[0] == "publicKey")
-                            {
+                            else if (parts[0] == PublicKeyProperty)
                                 publicKey = parts[1];
-                            }
+                            else if (parts[0] == ServerPortProperty && int.TryParse(parts[1], out var parsedPort))
+                                port = parsedPort;
                         }
                     }
 
                     if (!string.IsNullOrEmpty(deviceName) && !string.IsNullOrEmpty(publicKey) && txtRecord.CanonicalName != serviceProfile!.FullyQualifiedName)
                     {
-                        var deviceId = txtRecord.CanonicalName.Split('.')[0]; // Split on first dot to get device ID
-                        DiscoveredMdnsService?.Invoke(this, new(deviceId, deviceName, publicKey));
+                        var deviceId = txtRecord.CanonicalName.Split('.')[0];
+                        
+                        // Get hostname from SRV record, then find matching A record
+                        var srvRecord = srvRecords.FirstOrDefault(s => s.CanonicalName.Contains(deviceId));
+                        if (srvRecord?.Target is not null)
+                        {
+                            var hostname = srvRecord.Target.ToString();
+                            var aRecord = aRecords.FirstOrDefault(a => 
+                                a.CanonicalName.ToString().Equals(hostname.ToString(), StringComparison.OrdinalIgnoreCase));
+                            if (aRecord?.Address is not null)
+                            {
+                                var ipAddress = aRecord.Address.ToString();
+                                // Use SRV port as fallback if serverPort not in TXT
+                                var finalPort = port ?? srvRecord.Port;
+                                DiscoveredMdnsService?.Invoke(this, new(deviceId, deviceName, publicKey, ipAddress, finalPort));
+                            }
+                        }
                     }
-
                 }
             };
 

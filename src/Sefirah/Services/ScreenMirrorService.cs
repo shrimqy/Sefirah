@@ -5,7 +5,6 @@ using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Dialogs;
-using Sefirah.Extensions;
 using Sefirah.Utils;
 using Sefirah.Views.Settings;
 using Windows.ApplicationModel.DataTransfer;
@@ -38,7 +37,7 @@ public class ScreenMirrorService(
             if (!File.Exists(scrcpyPath))
             {
                 logger.LogError("Scrcpy not found at {ScrcpyPath}", scrcpyPath);
-                var result = await dispatcher!.EnqueueAsync(async () =>
+                var result = await dispatcher.EnqueueAsync(async () =>
                 {
                     var dialog = new ContentDialog
                     {
@@ -302,10 +301,9 @@ public class ScreenMirrorService(
         }
         else if (deviceSettings.AdbTcpipModeEnabled && device.Session is not null)
         {
-            var connectedSessionIpAddress = device.Session.Socket.RemoteEndPoint?.ToString()?.Split(':')[0];
-            if (await adbService.ConnectWireless(connectedSessionIpAddress))
+            if (await adbService.TryConnectTcp(device.IpAddress, device.Model))
             {
-                selectedDeviceSerial = $"{connectedSessionIpAddress}:5555";
+                selectedDeviceSerial = $"{device.IpAddress}:5555";
             }
         }
         else if (devices.Any(d => d.IsOnline && !string.IsNullOrEmpty(d.Serial)))
@@ -316,7 +314,7 @@ public class ScreenMirrorService(
         else
         {
             logger.LogWarning("No online devices found from adb");
-            dispatcher?.EnqueueAsync(async () =>
+            dispatcher.EnqueueAsync(async () =>
             {
                 var dialog = new ContentDialog
                 {
@@ -486,7 +484,7 @@ public class ScreenMirrorService(
                     }
                     logger.LogError("Scrcpy failed: {error}", errorMessage);
 
-                    await dispatcher!.EnqueueAsync(async () =>
+                    await dispatcher.EnqueueAsync(async () =>
                     {
                         var scrollViewer = new ScrollViewer
                         {
@@ -546,7 +544,7 @@ public class ScreenMirrorService(
     {
         string? selectedDeviceSerial = null;
         
-        await dispatcher!.EnqueueAsync(async () =>
+        await dispatcher.EnqueueAsync(async () =>
         {
             var deviceOptions = new List<ComboBoxItem>();
             foreach (var device in onlineDevices)
@@ -605,7 +603,7 @@ public class ScreenMirrorService(
     {
         string? password = null;
         
-        await dispatcher!.EnqueueAsync(async () =>
+        await dispatcher.EnqueueAsync(async () =>
         {
             var dialog = new PasswordInputDialog
             {

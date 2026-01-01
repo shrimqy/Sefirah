@@ -175,6 +175,8 @@ public partial class App : Application
             switch (activatedEventArgs.Data)
             {
                 case ShareTargetActivatedEventArgs shareArgs:
+                    MainWindow.AppWindow.Show();
+                    MainWindow.Activate();
                     await HandleShareTargetActivation(shareArgs);
                     break;
                 default:
@@ -208,11 +210,11 @@ public partial class App : Application
 
     private void Window_Activated(object sender, WindowActivatedEventArgs args)
     {
-        if (args.WindowActivationState == WindowActivationState.CodeActivated ||
-            args.WindowActivationState == WindowActivationState.PointerActivated)
+        if (args.WindowActivationState is WindowActivationState.CodeActivated ||
+            args.WindowActivationState is WindowActivationState.PointerActivated)
             return;
 
-            ApplicationData.Current.LocalSettings.Values["INSTANCE_ACTIVE"] = -Environment.ProcessId;
+        ApplicationData.Current.LocalSettings.Values["INSTANCE_ACTIVE"] = -Environment.ProcessId;
     }
 
     public static async Task HandleShareTargetActivation(ShareTargetActivatedEventArgs args)
@@ -222,7 +224,7 @@ public partial class App : Application
         var items = await shareOperation.Data.GetStorageItemsAsync();
         shareOperation.ReportDataRetrieved();
         shareOperation.ReportCompleted();
-        fileTransferService.SendFiles(items);
+        fileTransferService.SendFilesWithPicker(items);
     }
 #endif
 

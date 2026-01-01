@@ -3,7 +3,6 @@ using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
-using Sefirah.Utils.Serialization;
 using static Sefirah.Utils.IconUtils;
 
 namespace Sefirah.ViewModels;
@@ -41,7 +40,7 @@ public sealed partial class AppsViewModel : BaseViewModel
 
         IsLoading = true;
         var message = new CommandMessage { CommandType = CommandType.RequestAppList };
-        SessionManager.SendMessage(DeviceManager.ActiveDevice!.Session!, SocketMessageSerializer.Serialize(message));
+        DeviceManager.ActiveDevice.SendMessage(message);
     }
 
     public void PinApp(ApplicationInfo app)

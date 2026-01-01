@@ -1,10 +1,11 @@
 using Sefirah.Data.Models;
+using Sefirah.Data.Models.Messages;
 using Sefirah.Helpers;
 using SQLite;
 
 namespace Sefirah.Data.AppDatabase.Models;
 
-public partial class RemoteDeviceEntity
+public class RemoteDeviceEntity
 {
     [PrimaryKey]
     public string DeviceId { get; set; } = string.Empty;
@@ -13,7 +14,7 @@ public partial class RemoteDeviceEntity
 
     public string Model { get; set; } = string.Empty;
 
-    public byte[]? SharedSecret { get; set; }
+    public byte[] SharedSecret { get; set; } = null!;
 
     public byte[]? WallpaperBytes { get; set; }
 
@@ -23,9 +24,18 @@ public partial class RemoteDeviceEntity
     public string? IpAddressesJson { get; set; }
     
     [Ignore]
-    public List<string> IpAddresses
+    public List<IpAddressEntry> IpAddresses
     {
-        get => string.IsNullOrEmpty(IpAddressesJson) ? [] : JsonSerializer.Deserialize<List<string>>(IpAddressesJson) ?? [];
+        get
+        {
+            if (string.IsNullOrEmpty(IpAddressesJson)) return [];
+
+            var entries = JsonSerializer.Deserialize<List<IpAddressEntry>>(IpAddressesJson);
+            if (entries is not null)
+                return entries;
+
+            return [];
+        }
         set => IpAddressesJson = value is null ? null : JsonSerializer.Serialize(value);
     }
 

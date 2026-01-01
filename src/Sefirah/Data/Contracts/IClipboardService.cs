@@ -9,5 +9,5 @@ public interface IClipboardService
     /// </summary>
     Task SetContentAsync(object content, PairedDevice sourceDevice);
 
-    void Initialize();
+    Task Initialize();
 }

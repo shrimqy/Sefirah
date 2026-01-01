@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -27,12 +26,14 @@ public class AdbService(
     public ObservableCollection<AdbDevice> AdbDevices { get; } = [];
     public bool IsMonitoring => deviceMonitor is not null && !(cts?.IsCancellationRequested ?? true);
 
+    private static readonly string DEFAULT = "Default".GetLocalizedResource();
+
     public AdbClient AdbClient => adbClient;
 
     // Initialize the codec option collections
     public ObservableCollection<ScrcpyPreferenceItem> DisplayOrientationOptions { get; } =
     [
-        new("", "Default"),
+        new("", DEFAULT),
         new("0", "0°"),
         new("90", "90°"),
         new("180", "180°"),
@@ -52,7 +53,7 @@ public class AdbService(
         {
             value =
             [
-                new("", "Default")
+                new("", DEFAULT)
             ];
             VideoCodecOptions[deviceModel] = value;
         }
@@ -65,7 +66,7 @@ public class AdbService(
         {
             value =
             [
-                new("", "Default")
+                new("", DEFAULT)
             ];
             AudioCodecOptions[deviceModel] = value;
         }
@@ -111,8 +112,6 @@ public class AdbService(
             deviceMonitor.DeviceConnected += DeviceConnected;
             deviceMonitor.DeviceDisconnected += DeviceDisconnected;
             deviceMonitor.DeviceChanged += DeviceChanged;
-
-            await Task.Delay(50);
             
             await deviceMonitor.StartAsync();
             logger.LogInformation("ADB device monitoring started successfully");
@@ -194,12 +193,15 @@ public class AdbService(
         }
     }
 
+
+    private static readonly char[] separator = ['\r', '\n'];
+
     private void ParseEncoderOutput(string output, string deviceModel)
     {
         if (string.IsNullOrWhiteSpace(output))
             return;
 
-        var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
         foreach (var line in lines)
         {
@@ -540,7 +542,7 @@ public class AdbService(
         }
     }
 
-    public async Task<bool> ConnectWireless(string? host, int port=5555)
+    public async Task<bool> ConnectWireless(string host, int port=5555)
     {
         if (string.IsNullOrEmpty(host)) return false;
 
@@ -567,7 +569,7 @@ public class AdbService(
         try
         {
             var result = await adbClient.PairAsync(host, port, pairingCode);
-            logger.LogInformation($"{result}");
+            logger.LogInformation(result);
             if (result.Contains("failed") || result.Contains("refused"))
             {
                 return false;
@@ -614,16 +616,64 @@ public class AdbService(
         logger.LogInformation("Uninstalling app {appPackage} from {deviceId}", appPackage, deviceId);
 
         var adbDevice = AdbDevices.FirstOrDefault(d => d.AndroidId == deviceId);
-        if (adbDevice?.DeviceData == null) return;
+        if (adbDevice?.DeviceData is null) return;
         
         var deviceData = adbDevice.DeviceData.Value;
         await adbClient.UninstallPackageAsync(deviceData, appPackage);
     }
 
     /// <summary>
+    /// Tries to connect to the dev
+    /// </summary>
+    /// <param name="host">The host to connect to</param>
+    /// <param name="model">The model of the device to connect to</param>
+    public async Task<bool> TryConnectTcp(string host, string model)
+    {
+        try
+        {
+            logger.Info($"Trying to connect to adb device: {host}");
+            var result = await ConnectWireless(host);
+            if (result)
+            {
+                logger.LogInformation("Connected to adb device: {Host}", host);
+                return true;
+            }
+
+            var usbDevice = AdbDevices.FirstOrDefault(d => d.Type is DeviceType.USB && d.IsOnline && d.Model == model);
+            if (usbDevice is null) return false;
+            
+            // If connection failed, try to enable TCP/IP mode using ADB if USB is connected
+            var tcpipEnabled = await EnableTcpipMode(usbDevice.Serial);
+            if (!tcpipEnabled)
+            {
+                logger.LogError("Failed to enable TCP/IP mode");
+                return false;
+            }
+
+            await Task.Delay(200);
+
+            // Retry the connection after enabling TCP/IP mode
+            result = await ConnectWireless(host);
+            if (result)
+            {
+                logger.LogInformation("Successfully connected to {Host} after enabling TCP/IP mode", host);
+                return true;
+            }
+
+            logger.LogError("TCP/IP connection still failed after enabling TCP/IP mode");
+            return false;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error in TryConnectTcp for {Host}", host);
+            return false;
+        }
+    }
+
+    /// <summary>
     /// Enables TCP/IP mode by restarting ADB with tcpip 5555 command
     /// </summary>
-    private async Task<bool> EnableTcpipMode()
+    private async Task<bool> EnableTcpipMode(string serialId)
     {
         try
         {
@@ -636,11 +686,11 @@ public class AdbService(
 
             logger.LogInformation("Enabling TCP/IP mode using ADB at: {AdbPath}", adbPath);
             
-            // Run "adb tcpip 5555" to enable TCP/IP mode
+            // Runs "adb -s <serial> tcpip 5555" to enable TCP/IP mode on the specified device
             var processInfo = new ProcessStartInfo
             {
                 FileName = adbPath,
-                Arguments = "tcpip 5555",
+                Arguments = $"-s {serialId} tcpip 5555",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -648,7 +698,7 @@ public class AdbService(
             };
 
             using var process = Process.Start(processInfo);
-            if (process == null)
+            if (process is null)
             {
                 logger.LogError("Failed to start ADB process");
                 return false;
@@ -702,43 +752,5 @@ public class AdbService(
         }
     }
 
-    public async void TryConnectTcp(string host)
-    {
-        try
-        {
-            var result = await ConnectWireless(host);
-            if (result)
-            {
-                logger.LogInformation("Connected to adb device: {Host}", host);
-            }
 
-            if (AdbDevices.FirstOrDefault(d => d.Type is DeviceType.USB) is null) return;
-            
-            // If connection failed, try to enable TCP/IP mode using ADB if USB is connected
-            var tcpipEnabled = await EnableTcpipMode();
-            if (!tcpipEnabled)
-            {
-                logger.LogError("Failed to enable TCP/IP mode");
-                return;
-            }
-
-            await Task.Delay(200);
-
-            // Retry the connection after enabling TCP/IP mode
-            result = await ConnectWireless(host);
-            if (result)
-            {
-                logger.LogInformation("Successfully connected to {Host} after enabling TCP/IP mode", host);
-                return;
-            }
-
-            logger.LogError("TCP/IP connection still failed after enabling TCP/IP mode");
-            return;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error in TryConnectTcp for {Host}", host);
-            return;
-        }
-    }
 }
