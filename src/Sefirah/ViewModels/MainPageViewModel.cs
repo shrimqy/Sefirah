@@ -179,6 +179,12 @@ public sealed partial class MainPageViewModel : BaseViewModel
         NotificationService.ProcessReplyAction(Device!, notification.Key, notification.ReplyResultKey!, replyText);
     }
 
+    public void OpenDeviceSettings()
+    {
+        if (Device is null) return;
+        App.OpenDeviceSettingsWindow(Device);
+    }
+
     #endregion
 
     public MainPageViewModel()

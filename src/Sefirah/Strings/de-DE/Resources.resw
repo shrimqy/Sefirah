@@ -725,4 +725,7 @@ Eingabe Text %pwd%</value>
   <data name="Devices.Description" xml:space="preserve">
     <value>Managed devices</value>
   </data>
+  <data name="SendFiles" xml:space="preserve">
+    <value>Send files</value>
+  </data>
 </root>
