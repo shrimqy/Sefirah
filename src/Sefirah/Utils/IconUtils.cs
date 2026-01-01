@@ -100,4 +100,23 @@ public static class IconUtils
         {
         }
     }
+
+    /// <summary>
+    /// Deletes an app icon file from the AppIcons folder
+    /// </summary>
+    /// <param name="appPackage">Package name of the app</param>
+    public static void DeleteAppIcon(string appPackage)
+    {
+        try
+        {
+            var filePath = GetAppIconFilePath(appPackage);
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+        }
+        catch (Exception)
+        {
+        }
+    }
 } 

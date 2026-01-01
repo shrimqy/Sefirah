@@ -30,7 +30,7 @@ public class MessageHandler(
                     break;
 
                 case ApplicationList applicationList:
-                    remoteAppRepository.UpdateApplicationList(device, applicationList);
+                    await remoteAppRepository.UpdateApplicationList(device, applicationList);
                     break;
 
                 case NotificationMessage notificationMessage:

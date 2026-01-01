@@ -38,6 +38,7 @@ public sealed partial class AppsViewModel : BaseViewModel
     {
         if (DeviceManager.ActiveDevice is null) return;
 
+        Apps.Clear();
         IsLoading = true;
         var message = new CommandMessage { CommandType = CommandType.RequestAppList };
         DeviceManager.ActiveDevice.SendMessage(message);
@@ -72,11 +73,14 @@ public sealed partial class AppsViewModel : BaseViewModel
         try
         {
             await AdbService.UninstallApp(DeviceManager.ActiveDevice!.Id, app.PackageName);
-            Apps.Remove(app);
-            PinnedApps.Remove(app);
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+            {
+                Apps.Remove(app);
+                PinnedApps.Remove(app);
+                OnPropertyChanged(nameof(IsEmpty));
+                OnPropertyChanged(nameof(HasPinnedApps));
+            });
             await RemoteAppsRepository.RemoveDeviceFromApplication(app.PackageName, DeviceManager.ActiveDevice!.Id);
-            OnPropertyChanged(nameof(IsEmpty));
-            OnPropertyChanged(nameof(HasPinnedApps));
         }
         catch (Exception ex)
         {
@@ -120,9 +124,12 @@ public sealed partial class AppsViewModel : BaseViewModel
 
     private void OnApplicationListUpdated(object? sender, string deviceId)
     {
-        App.MainWindow.DispatcherQueue.EnqueueAsync(() => IsLoading = false);
-        OnPropertyChanged(nameof(IsEmpty));
-        OnPropertyChanged(nameof(HasPinnedApps));
+        App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+        {
+            IsLoading = false;
+            OnPropertyChanged(nameof(IsEmpty));
+            OnPropertyChanged(nameof(HasPinnedApps));
+        });
     }
 
     public async Task OpenApp(ApplicationInfo app)

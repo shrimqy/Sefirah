@@ -2,6 +2,7 @@ using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Models;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
+using Sefirah.Utils;
 
 namespace Sefirah.Data.AppDatabase.Repository;
 
@@ -44,7 +45,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
     public async Task AddOrUpdateApplicationForDevice(ApplicationInfoEntity application, string deviceId)
     {
         var existingApp = context.Database.Find<ApplicationInfoEntity>(application.PackageName);
-        if (existingApp != null)
+        if (existingApp is not null)
         {
             // Update app info (icon, name might be different)
             existingApp.AppName = application.AppName;
@@ -62,7 +63,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
             await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
             {
                 var appToUpdate = Applications.FirstOrDefault(a => a.PackageName == existingApp.PackageName);
-                if (appToUpdate != null)
+                if (appToUpdate is not null)
                 {
                     var updatedAppInfo = existingApp.ToApplicationInfo(deviceId);
                     appToUpdate.PackageName = updatedAppInfo.PackageName;
@@ -85,12 +86,12 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
     {
         NotificationFilter filter = NotificationFilter.ToastFeed;
         var app = context.Database.Find<ApplicationInfoEntity>(appPackage);
-        if (app != null)
+        if (app is not null)
         {
             var deviceInfoList = app.AppDeviceInfoList;
             var deviceInfo = deviceInfoList.FirstOrDefault(d => d.DeviceId == deviceId);
             // Add device to app if not already present
-            if (deviceInfo == null)
+            if (deviceInfo is null)
             {
                 deviceInfoList.Add(new AppDeviceInfo(deviceId, filter));
                 app.AppDeviceInfoJson = JsonSerializer.Serialize(deviceInfoList);
@@ -108,7 +109,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
             {
                 PackageName = appPackage,
                 AppName = appName ?? appPackage,
-                AppIcon = appIcon ?? null,
+                AppIcon = appIcon
             };
 
             var appEntity = await ApplicationInfoEntity.FromApplicationInfoMessage(newAppInfo, deviceId);
@@ -140,7 +141,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
     public async Task RemoveDeviceFromApplication(string appPackage, string deviceId)
     {
         var app = context.Database.Find<ApplicationInfoEntity>(appPackage);
-        if (app != null)
+        if (app is not null)
         {
             var deviceInfoList = app.AppDeviceInfoList;
             deviceInfoList.RemoveAll(d => d.DeviceId == deviceId);
@@ -150,10 +151,12 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
             {
                 // No more devices have this app, delete it
                 context.Database.Delete(app);
+                // delete the icon file
+                IconUtils.DeleteAppIcon(appPackage);
                 await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
                 {
                     var appToRemove = Applications.FirstOrDefault(a => a.PackageName == appPackage);
-                    if (appToRemove != null)
+                    if (appToRemove is not null)
                     {
                         Applications.Remove(appToRemove);
                     }
@@ -166,7 +169,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
                 await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
                 {
                     var appToUpdate = Applications.FirstOrDefault(a => a.PackageName == appPackage);
-                    if (appToUpdate != null)
+                    if (appToUpdate is not null)
                     {
                         var updatedAppInfo = app.ToApplicationInfo(deviceId);
                         appToUpdate.PackageName = updatedAppInfo.PackageName;
@@ -179,16 +182,21 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
         }
     }
 
-    public async void UpdateApplicationList(PairedDevice pairedDevice, ApplicationList applicationList)
+    public async Task UpdateApplicationList(PairedDevice pairedDevice, ApplicationList applicationList)
     {
         try
         {
+            // Remove all apps for this device from the database before adding the new list
+            RemoveAllAppsForDeviceAsync(pairedDevice.Id);
+
+            // Process all apps and save their icons
             foreach (var appInfo in applicationList.AppList)
             {
                 var appEntity = await ApplicationInfoEntity.FromApplicationInfoMessage(appInfo, pairedDevice.Id);
                 await AddOrUpdateApplicationForDevice(appEntity, pairedDevice.Id);
             }
 
+            // Reload applications from database now that icons are saved
             await LoadApplicationsFromDevice(pairedDevice.Id);
             ApplicationListUpdated?.Invoke(this, pairedDevice.Id);
         }
@@ -225,6 +233,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
         foreach (var app in appsToDelete)
         {
             context.Database.Delete(app);
+            IconUtils.DeleteAppIcon(app.PackageName);
         }
     }
 

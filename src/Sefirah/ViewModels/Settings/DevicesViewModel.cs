@@ -35,7 +35,7 @@ public partial class DevicesViewModel : ObservableObject
     [RelayCommand]
     public async Task RemoveDevice(PairedDevice? device)
     {
-        if (device == null)
+        if (device is null)
         {
             return;
         }
@@ -63,7 +63,9 @@ public partial class DevicesViewModel : ObservableObject
 
                 SftpService.Remove(device.Id);
 
-                DeviceManager.RemoveDevice(device);
+                RemoteAppRepository.RemoveAllAppsForDeviceAsync(device.Id);
+
+                await DeviceManager.RemoveDevice(device);
             }
             catch (Exception ex)
             {
