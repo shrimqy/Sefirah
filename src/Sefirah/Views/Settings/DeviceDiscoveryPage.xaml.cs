@@ -42,11 +42,6 @@ public sealed partial class DeviceDiscoveryPage : Page
         }
     }
 
-    protected override void OnNavigatedTo(NavigationEventArgs e)
-    {
-        base.OnNavigatedTo(e);
-        DiscoveryService.StartDiscoveryAsync();
-    }
 
     private async void ConnectButton_Click(object sender, RoutedEventArgs e)
     {
@@ -60,6 +55,20 @@ public sealed partial class DeviceDiscoveryPage : Page
             {
             }
         }
+    }
+
+        private async void QrCodeButton_Click(object sender, RoutedEventArgs e)
+    {
+        var bitmapImage = await DiscoveryService.GenerateQrCodeAsync();
+        
+        if (bitmapImage is null)
+        {
+            QrCodeImage.Source = null;
+            return;
+        }
+
+        QrCodeImage.Source = bitmapImage;
+        QrCodeStatusText.Text = $"Scan this QR code to connect";
     }
 
 }

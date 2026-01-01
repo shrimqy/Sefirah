@@ -24,23 +24,60 @@
 
     <ScrollViewer Padding="0,0,40,0">
         <StackPanel Spacing="4">
-            <!--  Breadcrumb Navigation  -->
-            <BreadcrumbBar x:Name="BreadcrumbBar" Margin="0,0,0,8">
-                <BreadcrumbBar.ItemTemplate>
-                    <DataTemplate x:DataType="items:BreadcrumbBarItemModel">
-                        <BreadcrumbBarItem AutomationProperties.Name="{Binding Name}" Content="{Binding}">
-                            <BreadcrumbBarItem.ContentTemplate>
-                                <DataTemplate>
-                                    <TextBlock
-                                        FontSize="28"
-                                        FontWeight="SemiBold"
-                                        Text="{Binding Name}" />
-                                </DataTemplate>
-                            </BreadcrumbBarItem.ContentTemplate>
-                        </BreadcrumbBarItem>
-                    </DataTemplate>
-                </BreadcrumbBar.ItemTemplate>
-            </BreadcrumbBar>
+            <!--  Breadcrumb Navigation with QR Code Button  -->
+            <Grid Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <BreadcrumbBar x:Name="BreadcrumbBar" Grid.Column="0">
+                    <BreadcrumbBar.ItemTemplate>
+                        <DataTemplate x:DataType="items:BreadcrumbBarItemModel">
+                            <BreadcrumbBarItem AutomationProperties.Name="{Binding Name}" Content="{Binding}">
+                                <BreadcrumbBarItem.ContentTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            FontSize="28"
+                                            FontWeight="SemiBold"
+                                            Text="{Binding Name}" />
+                                    </DataTemplate>
+                                </BreadcrumbBarItem.ContentTemplate>
+                            </BreadcrumbBarItem>
+                        </DataTemplate>
+                    </BreadcrumbBar.ItemTemplate>
+                </BreadcrumbBar>
+                <Button
+                    x:Name="QrCodeButton"
+                    Grid.Column="1"
+                    Click="QrCodeButton_Click"
+                    BorderThickness="0"
+                    Padding="8">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon FontSize="14" Glyph="&#xED14;" />
+                        <TextBlock Text="Scan QR Code" />
+                    </StackPanel>
+
+                    <Button.Flyout>
+                        <Flyout x:Name="QrCodeFlyout">
+                            <StackPanel Spacing="12" Padding="16" MinWidth="300">
+                                <Image
+                                    x:Name="QrCodeImage"
+                                    Width="256"
+                                    Height="256"
+                                    HorizontalAlignment="Center"
+                                    Stretch="Uniform" />
+                                <TextBlock
+                                    x:Name="QrCodeStatusText"
+                                    HorizontalAlignment="Center"
+                                    FontSize="12"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    TextWrapping="Wrap"
+                                    TextAlignment="Center" />
+                            </StackPanel>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
+            </Grid>
 
             <ItemsRepeater ItemsSource="{x:Bind ViewModel.DiscoveredDevices, Mode=OneWay}">
                 <ItemsRepeater.Layout>

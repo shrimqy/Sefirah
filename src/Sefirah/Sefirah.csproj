@@ -111,7 +111,9 @@
         <PackageReference Include="Vanara.PInvoke.CldApi" />
         <PackageReference Include="Vanara.PInvoke.Ole" />
         <PackageReference Include="Vanara.PInvoke.Shell32" />
+        <PackageReference Include="QRCoder" />
     </ItemGroup>
+    
     <ItemGroup>
         <UnoSplashScreen Update="Assets\Splash\splash_screen.svg">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

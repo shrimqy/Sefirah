@@ -29,5 +29,6 @@
     <PackageVersion Include="Vanara.PInvoke.Ole" Version="4.1.6" />
     <PackageVersion Include="Vanara.PInvoke.Shell32" Version="4.1.3" />
     <PackageVersion Include="WinUIEx" Version="2.5.1" />
+    <PackageVersion Include="QRCoder" Version="1.6.0" />
   </ItemGroup>
 </Project>

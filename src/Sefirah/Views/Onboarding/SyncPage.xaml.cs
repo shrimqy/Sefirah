@@ -23,6 +23,7 @@ public sealed partial class SyncPage : Page
 
     private async void SyncPage_Loaded(object sender, RoutedEventArgs e)
     {
+        await GenerateQrCodeAsync();
     }
 
     private void SkipButton_Click(object sender, RoutedEventArgs e)
@@ -30,6 +31,29 @@ public sealed partial class SyncPage : Page
         // Mark onboarding as completed
         ApplicationData.Current.LocalSettings.Values["HasCompletedOnboarding"] = true;
         Frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+    }
+
+    private async Task GenerateQrCodeAsync()
+    {
+        try
+        {
+            var bitmapImage = await DiscoveryService.GenerateQrCodeAsync();
+            if (bitmapImage is not null)
+            {
+                QrCodeImage.Source = bitmapImage;
+                QrCodeImage.Visibility = Visibility.Visible;    
+            }
+            else
+            {
+                QrCodeImage.Source = null;
+                QrCodeImage.Visibility = Visibility.Collapsed;
+            }
+        }
+        catch (Exception ex)
+        {
+            QrCodeImage.Source = null;
+            QrCodeImage.Visibility = Visibility.Collapsed;
+        }
     }
 
     private async void ConnectButton_Click(object sender, RoutedEventArgs e)

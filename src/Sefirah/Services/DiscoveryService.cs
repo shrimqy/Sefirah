@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Sefirah.Data.AppDatabase.Models;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.EventArguments;
@@ -149,6 +150,45 @@ public class DiscoveryService(
         catch (Exception ex)
         {
             logger.LogError("Error disposing default UDP client: {message}", ex.Message);
+        }
+    }
+
+    public async Task<BitmapImage?> GenerateQrCodeAsync()
+    {
+        try
+        {
+            var broadcast = BroadcastMessage;
+            if (broadcast is null)
+            {
+                return null;
+            }
+
+            var localAddresses = NetworkHelper.GetAllValidAddresses();
+            var ipAddresses = localAddresses.Select(ip => ip.Address.ToString()).ToList();
+
+            var connectionInfo = new
+            {
+                IpAddresses = ipAddresses,
+                broadcast.Port,
+                broadcast.DeviceId,
+                broadcast.DeviceName,
+                broadcast.PublicKey
+            };
+
+            var jsonData = JsonMessageSerializer.Serialize(connectionInfo);
+
+            var qrCodeBytes = ImageHelper.GenerateQrCode(jsonData);
+            if (qrCodeBytes is null)
+            {
+                return null;
+            }
+
+            return await qrCodeBytes.ToBitmapAsync(256);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning("Error generating QR code: {message}", ex.Message);
+            return null;
         }
     }
 

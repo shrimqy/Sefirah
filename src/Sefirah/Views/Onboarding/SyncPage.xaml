@@ -37,7 +37,13 @@
                 TextWrapping="Wrap"
                 Text="{helpers:ResourceString Name=OnboardingDevice/Subtitle}" />
 
-                TextWrapping="Wrap" />
+            <!--  QR Code  -->
+            <Image
+                x:Name="QrCodeImage"
+                Width="256"
+                Height="256"
+                HorizontalAlignment="Center"
+                Stretch="Uniform" />
 
             <!--  Devices List  -->
             <ItemsRepeater ItemsSource="{x:Bind ViewModel.DiscoveredDevices, Mode=OneWay}">
