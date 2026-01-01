@@ -4,51 +4,55 @@ using Microsoft.UI.Windowing;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 using Sefirah.Views.DevicePreferences;
+using Windows.Graphics;
 using Rect = Windows.Foundation.Rect;
 
 namespace Sefirah.Views;
 public sealed partial class DeviceSettingsWindow : Window
 {
     public PairedDevice Device { get; }
-    private readonly IUserSettingsService UserSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
+
+    private readonly IUserSettingsService userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
+
     public DeviceSettingsWindow(PairedDevice device)
     {
-        Device = device ?? throw new ArgumentNullException(nameof(device));
+        Device = device;
         
-        this.InitializeComponent();
+        InitializeComponent();
         Title = device.Name;
         this.SetWindowIcon();
         OverlappedPresenter overlappedPresenter = (AppWindow.Presenter as OverlappedPresenter) ?? OverlappedPresenter.Create();
         overlappedPresenter.IsMaximizable = false;
         overlappedPresenter.IsMinimizable = false;
 
-        AppWindow.Resize(new Windows.Graphics.SizeInt32 { Width = 600, Height = 900 });
+        AppWindow.Resize(new SizeInt32 { Width = 600, Height = 900 });
 #if WINDOWS
         ExtendsContentIntoTitleBar = true;
         SystemBackdrop = new MicaBackdrop();
         
-        // Setup for back button regions
         BackButton.Loaded += (s, e) => SetRegionsForCustomTitleBar();
 #endif
         var rootFrame = EnsureWindowIsInitialized();
         rootFrame.Navigate(typeof(DeviceSettingsPage), device);
         InitializeThemeService();
+
+        AppWindow.Closing += (s, e) => App.RemoveDeviceSettingsWindow(Device.Id);
     }
 
     private void InitializeThemeService()
     {
         // Get the user settings service if available
-        UserSettingsService.GeneralSettingsService.ThemeChanged += AppThemeChanged;
-        UserSettingsService.GeneralSettingsService.ApplyTheme(this, AppWindow.TitleBar, UserSettingsService.GeneralSettingsService.Theme);
+        userSettingsService.GeneralSettingsService.ThemeChanged += AppThemeChanged;
+        userSettingsService.GeneralSettingsService.ApplyTheme(this, AppWindow.TitleBar, userSettingsService.GeneralSettingsService.Theme);
     }
 
     private async void AppThemeChanged(object? sender, EventArgs e)
     {
-        if (AppWindow == null) return;
+        if (AppWindow is null) return;
 
         await DispatcherQueue.EnqueueAsync(() =>
         {
-            UserSettingsService?.GeneralSettingsService.ApplyTheme(this, AppWindow.TitleBar, UserSettingsService.GeneralSettingsService.Theme, false);
+            userSettingsService.GeneralSettingsService.ApplyTheme(this, AppWindow.TitleBar, userSettingsService.GeneralSettingsService.Theme, false);
         });
     }
 
@@ -92,9 +96,9 @@ public sealed partial class DeviceSettingsWindow : Window
     }
 
 #if WINDOWS
-    private Windows.Graphics.RectInt32 GetRect(Rect bounds, double scale)
+    private static RectInt32 GetRect(Rect bounds, double scale)
     {
-        return new Windows.Graphics.RectInt32(
+        return new RectInt32(
             _X: (int)Math.Round(bounds.X * scale),
             _Y: (int)Math.Round(bounds.Y * scale),
             _Width: (int)Math.Round(bounds.Width * scale),

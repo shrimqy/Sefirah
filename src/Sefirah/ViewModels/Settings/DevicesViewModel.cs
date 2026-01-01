@@ -27,9 +27,8 @@ public partial class DevicesViewModel : ObservableObject
     [RelayCommand]
     public void OpenDeviceSettings(PairedDevice? device)
     {
-        if (device == null) return;
-        var settingsWindow = new DeviceSettingsWindow(device);
-        settingsWindow.Activate();
+        if (device is null) return;
+        App.OpenDeviceSettingsWindow(device);
     }
 
     [RelayCommand]
