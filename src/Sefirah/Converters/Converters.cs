@@ -458,28 +458,6 @@ internal sealed partial class UnixTimestampConverter : IValueConverter
     }
 }
 
-internal sealed partial class IndexConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, string language)
-    {
-        if (value is int intValue)
-        {
-            // Convert from 1-based to 0-based index
-            return intValue - 1;
-        }
-        return 0;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        if (value is int intValue)
-        {
-            return intValue + 1;
-        }
-        return 1;
-    }
-}
-
 internal sealed partial class GreaterThanOneToBooleanConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)

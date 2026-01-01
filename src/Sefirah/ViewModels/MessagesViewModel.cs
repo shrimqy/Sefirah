@@ -1,4 +1,3 @@
-using CommunityToolkit.WinUI;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
@@ -56,15 +55,13 @@ public sealed partial class MessagesViewModel : BaseViewModel
     [ObservableProperty]
     public partial string MessageText { get; set; } = string.Empty;
 
-    public ObservableCollection<PhoneNumber> PhoneNumbers { get; } = [];
-
     [ObservableProperty]
-    public partial int SelectedSubscriptionId { get; set; }
+    public partial PhoneNumber? SelectedPhoneNumber { get; set; } = null;
 
     public PairedDevice? ActiveDevice => deviceManager.ActiveDevice;
 
-    public bool ShouldShowEmptyState => !IsNewConversation && SelectedConversation == null;
-    public bool ShouldShowComposeUI => IsNewConversation || SelectedConversation != null;
+    public bool ShouldShowEmptyState => !IsNewConversation && SelectedConversation is null;
+    public bool ShouldShowComposeUI => IsNewConversation || SelectedConversation is not null;
     #endregion
 
     public MessagesViewModel()
@@ -80,7 +77,6 @@ public sealed partial class MessagesViewModel : BaseViewModel
         if (ActiveDevice is not null)
         {
             await LoadConversationsForActiveDevice();
-            LoadPhoneNumbers();
         }
     }
 
@@ -96,23 +92,6 @@ public sealed partial class MessagesViewModel : BaseViewModel
         }
     }
 
-    private void LoadPhoneNumbers()
-    {
-        PhoneNumbers.Clear();
-        if (ActiveDevice?.PhoneNumbers is not null)
-        {
-            foreach (var phoneNumber in ActiveDevice.PhoneNumbers)
-            {
-                PhoneNumbers.Add(phoneNumber);
-            }
-            
-            if (PhoneNumbers.Count > 0)
-            {
-                SelectedSubscriptionId = PhoneNumbers[0].SubscriptionId;
-            }
-        }
-    }
-
     private async void LoadContacts()
     {
         Contacts = await smsHandlerService.GetAllContactsAsync();
@@ -120,7 +99,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
     private async Task LoadConversationsForActiveDevice()
     {
-        if (ActiveDevice == null)
+        if (ActiveDevice is null)
         {
             Conversations = null;
             OnPropertyChanged(nameof(Conversations));
@@ -142,7 +121,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
     private async void LoadMessagesForSelectedConversation()
     {
-        if (SelectedConversation == null || ActiveDevice == null) return;
+        if (SelectedConversation is null || ActiveDevice is null) return;
 
         try
         {
@@ -182,7 +161,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
                 recipients = NewConversationRecipients.Select(c => c.Address).ToList();
                 if (recipients.Count == 0) return;
             }
-            else if (SelectedConversation != null)
+            else if (SelectedConversation is not null)
             {
                 recipients = SelectedConversation.Contacts.Select(s => s.Address).ToList();
             }
@@ -193,14 +172,14 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
             var textMessage = new TextMessage
             {
-                ThreadId = SelectedConversation?.ThreadId,
                 Body = messageText.Trim(),
-                Addresses = recipients,
+                ThreadId = SelectedConversation?.ThreadId,
                 Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                UniqueId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 MessageType = 2, // SENT
                 Read = true,
-                SubscriptionId = SelectedSubscriptionId
+                UniqueId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                SubscriptionId = SelectedPhoneNumber?.SubscriptionId ?? -1,
+                Addresses = recipients
             };
 
             ActiveDevice?.SendMessage(textMessage);
@@ -248,7 +227,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
     {
         SearchResults.Clear();
         
-        if (string.IsNullOrWhiteSpace(searchText) || Conversations == null)
+        if (string.IsNullOrWhiteSpace(searchText) || Conversations is null)
             return;
 
         if (searchText.Length < 2)
@@ -278,7 +257,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
         }
 
         var filtered = Contacts
-            .Where(c => c.DisplayName != null && c.DisplayName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+            .Where(c => c.DisplayName is not null && c.DisplayName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
                        c.Address.Contains(searchText, StringComparison.OrdinalIgnoreCase))
             .OrderBy(c => c.DisplayName)
             .Take(10)
@@ -291,20 +270,16 @@ public sealed partial class MessagesViewModel : BaseViewModel
     {
         if (ActiveDevice?.Id == args.DeviceId)
         {
-            dispatcher.EnqueueAsync(() =>
+            var updatedConversation = Conversations?.FirstOrDefault(c => c.ThreadId == args.ThreadId);
+            if (updatedConversation is not null && SelectedConversation is not null && args.ThreadId == SelectedConversation.ThreadId)
             {
-                var updatedConversation = Conversations?.FirstOrDefault(c => c.ThreadId == args.ThreadId);
-                if (updatedConversation != null && SelectedConversation != null && args.ThreadId == SelectedConversation.ThreadId)
-                {
-                    var newMessages = updatedConversation.Messages
-                        .Where(m => !MessageIds.Contains(m.UniqueId))
-                        .OrderBy(m => m.Timestamp)
-                        .ToList();
-                    HandleNewMessages(newMessages);
-                }
-                OnPropertyChanged(nameof(Conversations));
-                return Task.CompletedTask;
-            });
+                var newMessages = updatedConversation.Messages
+                    .Where(m => !MessageIds.Contains(m.UniqueId))
+                    .OrderBy(m => m.Timestamp)
+                    .ToList();
+                HandleNewMessages(newMessages);
+            }
+            OnPropertyChanged(nameof(Conversations));
         }
     }
 
@@ -315,7 +290,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
         foreach (var message in messages)
         {
-            bool shouldStartNewGroup = currentGroup == null || !currentGroup.Sender.Address.Equals(message.Contact.Address, StringComparison.OrdinalIgnoreCase) ||
+            bool shouldStartNewGroup = currentGroup is null || !currentGroup.Sender.Address.Equals(message.Contact.Address, StringComparison.OrdinalIgnoreCase) ||
                 currentGroup.IsReceived != (message.MessageType == 1) || (message.Timestamp - currentGroup.LatestTimestamp) > (groupingThreshold);
 
             if (shouldStartNewGroup)

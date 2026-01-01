@@ -23,7 +23,6 @@
         <converters:MessageTypeToVisibilityConverter x:Key="MessageTypeToVisibilityConverter" />
         <converters:InverseMessageTypeToVisibilityConverter x:Key="InverseMessageTypeToVisibilityConverter" />
         <converters:UnixTimestampConverter x:Key="UnixTimestampConverter" />
-        <converters:IndexConverter x:Key="IndexConverter" />
         <converters:GreaterThanOneToBooleanConverter x:Key="GreaterThanOneToBooleanConverter" />
         <converters:SubscriptionToIconConverter x:Key="SubscriptionToIconConverter" />
 
@@ -220,7 +219,6 @@
                     ItemTemplate="{StaticResource MessageItemTemplate}"
                     ItemsSource="{x:Bind ViewModel.Conversations, Mode=OneWay}"
                     SelectionMode="None" />
-
             </Grid>
         </SplitView.Pane>
 
@@ -709,16 +707,15 @@
                 <ComboBox
                     x:Name="TheComboBox"
                     Grid.Column="0"
-                    x:Load="{x:Bind ViewModel.PhoneNumbers.Count, Mode=OneWay, Converter={StaticResource GreaterThanOneToBooleanConverter}}"
-                    ItemsSource="{x:Bind ViewModel.PhoneNumbers, Mode=OneWay}"
-                    SelectedIndex="{x:Bind ViewModel.SelectedSubscriptionId, Mode=TwoWay, Converter={StaticResource IndexConverter}}">
+                    x:Load="{x:Bind ViewModel.ActiveDevice.PhoneNumbers.Count, Mode=OneWay, Converter={StaticResource GreaterThanOneToBooleanConverter}}"
+                    ItemsSource="{x:Bind ViewModel.ActiveDevice.PhoneNumbers, Mode=OneWay}"
+                    SelectedItem="{x:Bind ViewModel.SelectedPhoneNumber, Mode=TwoWay}">
 
-                    <!--  Template for dropdown items  -->
                     <ComboBox.ItemTemplate>
-                        <DataTemplate>
+                        <DataTemplate x:DataType="models:PhoneNumber">
                             <StackPanel Orientation="Horizontal">
                                 <Grid>
-                                    <FontIcon FontSize="14" Glyph="{Binding SubscriptionId, Converter={StaticResource SubscriptionToIconConverter}}" />
+                                    <FontIcon FontSize="14" Glyph="{x:Bind SubscriptionId, Converter={StaticResource SubscriptionToIconConverter}}" />
                                     <FontIcon
                                         Margin="6,0,0,0"
                                         FontSize="14"
@@ -727,7 +724,7 @@
                                 <TextBlock
                                     Margin="6,0,0,0"
                                     FontSize="14"
-                                    Text="{Binding Number}"
+                                    Text="{x:Bind Number}"
                                     Visibility="{Binding IsDropDownOpen, ElementName=TheComboBox, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             </StackPanel>
                         </DataTemplate>
