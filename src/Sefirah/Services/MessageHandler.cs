@@ -74,7 +74,7 @@ public class MessageHandler(
                 case CommandMessage commandMessage:
                     if (commandMessage.CommandType is CommandType.Disconnect)
                     {
-                        sessionManager.DisconnectDevice(device);
+                        sessionManager.DisconnectDevice(device, true);
                     }
                     break;
                 default:

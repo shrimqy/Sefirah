@@ -31,6 +31,7 @@ public class NetworkService(
     private readonly ConcurrentDictionary<Guid, string> connectionBuffers = [];
     private readonly HashSet<string> connectingDeviceIds = [];
     private readonly ConcurrentDictionary<Guid, TaskCompletionSource<bool>> handshakeCompletion = [];
+    private readonly ConcurrentDictionary<string, CancellationTokenSource> connectionCancellationTokens = [];
     
     private ObservableCollection<PairedDevice> PairedDevices => deviceManager.PairedDevices;
     private ObservableCollection<DiscoveredDevice> DiscoveredDevices => deviceManager.DiscoveredDevices;
@@ -173,7 +174,6 @@ public class NetworkService(
     {
         if (!connectionBuffers.ContainsKey(session.Id)) return;
 
-        logger.Debug($"Session disconnected");
         DisconnectSession(session);
     }
 
@@ -582,60 +582,97 @@ public class NetworkService(
 
     public async Task ConnectTo(PairedDevice device)
     {
+        if (connectionCancellationTokens.TryRemove(device.Id, out var removedCts))
+        {
+            removedCts.Cancel();
+            removedCts.Dispose();
+            device.ConnectionStatus = new Disconnected();
+            return;
+        }
+
         logger.Info($"Connecting to paired device {device.Name}");
 
-        var remoteDevice = await deviceManager.GetDeviceInfoAsync(device.Id);
-        var localDevice = await deviceManager.GetLocalDeviceAsync();
+        var cts = new CancellationTokenSource();
+        connectionCancellationTokens[device.Id] = cts;
 
-        var nonce = EcdhHelper.GenerateNonce();
-        var proof = EcdhHelper.GenerateProof(remoteDevice.SharedSecret, nonce);
-
-        var authMessage = new AuthenticationMessage
+        try
         {
-            DeviceId = localDevice.DeviceId,
-            DeviceName = localDevice.DeviceName,
-            PublicKey = Convert.ToBase64String(localDevice.PublicKey),
-            Nonce = nonce,
-            Proof = proof,
-            Model = Environment.MachineName
-        };
+            var remoteDevice = await deviceManager.GetDeviceInfoAsync(device.Id);
+            var localDevice = await deviceManager.GetLocalDeviceAsync();
+            var nonce = EcdhHelper.GenerateNonce();
+            var proof = EcdhHelper.GenerateProof(remoteDevice.SharedSecret, nonce);
 
-        foreach (var address in device.GetEnabledAddresses())
-        {
-            logger.Info($"Connecting to {address}:{device.Port}");
-            var client = new Client(SslContext, address, device.Port, this);
-            device.ConnectionStatus = new Connecting();
-
-            try
+            var authMessage = new AuthenticationMessage
             {
-                if (client.ConnectAsync())
+                DeviceId = localDevice.DeviceId,
+                DeviceName = localDevice.DeviceName,
+                PublicKey = Convert.ToBase64String(localDevice.PublicKey),
+                Nonce = nonce,
+                Proof = proof,
+                Model = Environment.MachineName
+            };
+
+            foreach (var address in device.GetEnabledAddresses())
+            {
+                cts.Token.ThrowIfCancellationRequested();
+
+                logger.Info($"Connecting to {address}:{device.Port}");
+                var client = new Client(SslContext, address, device.Port, this);
+                device.ConnectionStatus = new Connecting();
+
+                try
                 {
-                    // Wait for TLS handshake, then send auth
-                    if (!client.IsHandshaked)
+                    if (client.ConnectAsync())
                     {
-                        var tcs = new TaskCompletionSource<bool>();
-                        handshakeCompletion[client.Id] = tcs;
-                        try
+                        // Wait for TLS handshake, then send auth
+                        if (!client.IsHandshaked)
                         {
-                            await tcs.Task.WaitAsync(TimeSpan.FromSeconds(10));
+                            var tcs = new TaskCompletionSource<bool>();
+                            handshakeCompletion[client.Id] = tcs;
+                            try
+                            {
+                                using (cts.Token.Register(() => tcs.TrySetCanceled()))
+                                {
+                                    await tcs.Task.WaitAsync(TimeSpan.FromSeconds(10), cts.Token);
+                                }
+                            }
+                            finally
+                            {
+                                handshakeCompletion.TryRemove(client.Id, out _);
+                            }
                         }
-                        finally
-                        {
-                            handshakeCompletion.TryRemove(client.Id, out _);
-                        }
+                        
+                        cts.Token.ThrowIfCancellationRequested();
+                        
+                        SendMessage(client, authMessage);
+                        device.Client = client;
+                        return;
                     }
-                    SendMessage(client, authMessage);
-                    device.Client = client;
-                    return;
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    logger.Debug($"Failed to connect to {address}:{device.Port}: {ex.Message}");
                 }
             }
-            catch (Exception ex)
+            logger.Warn($"Failed to connect to device {device.Name} on any IP address/port combination");
+        }
+        catch (OperationCanceledException)
+        {
+            logger.Info($"Connection attempt cancelled for device {device.Name}");
+        }
+        finally
+        {
+            device.ConnectionStatus = new Disconnected();
+
+            if (connectionCancellationTokens.TryRemove(device.Id, out var cancellationTokenSource))
             {
-                logger.Debug($"Failed to connect to {address}:{device.Port}: {ex.Message}");
+                cancellationTokenSource.Dispose();
             }
         }
-        logger.Warn($"Failed to connect to device {device.Name} on any IP address/port combination");
-        device.ConnectionStatus = new Disconnected();
     }
 
     public async Task Pair(DiscoveredDevice device)

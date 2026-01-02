@@ -3,7 +3,6 @@ using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Utils;
-using Sefirah.Views;
 
 namespace Sefirah.ViewModels;
 
@@ -34,18 +33,15 @@ public sealed partial class MainPageViewModel : BaseViewModel
 
 
     [RelayCommand]
-    public async Task ToggleConnection(PairedDevice? device)
+    public void ToggleConnection()
     {
-
-        if (Device!.IsConnectedOrConnecting)
+        if (Device!.IsConnected)
         {
-            // Disconnect
             SessionManager.DisconnectDevice(Device, true);
         }
         else
         {
-            // Connect as client
-            await SessionManager.ConnectTo(Device);
+            SessionManager.ConnectTo(Device);
         }
     }
 
