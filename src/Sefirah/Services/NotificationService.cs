@@ -69,8 +69,7 @@ public class NotificationService(
         { 
             if (message.Title is not null && message.AppPackage is not null)
             {
-                var filter = remoteAppsRepository.GetAppNotificationFilterAsync(message.AppPackage, device.Id)
-                ?? await remoteAppsRepository.AddOrUpdateApplicationForDevice(device.Id, message.AppPackage, message.AppName!, message.AppIcon);
+                var filter = await remoteAppsRepository.GetOrCreateAppNotificationFilter(device.Id, message.AppPackage, message.AppName, message.AppIcon);
 
                 if (filter is NotificationFilter.Disabled) return;
 

@@ -17,8 +17,8 @@ public sealed partial class AppsViewModel : BaseViewModel
     #endregion
 
     #region Properties
-    public ObservableCollection<ApplicationInfo> Apps => RemoteAppsRepository.Applications;
-    public ObservableCollection<ApplicationInfo> PinnedApps { get; } = [];
+    public ObservableCollection<ApplicationInfo> Apps { get; set; } = [];
+    public ObservableCollection<ApplicationInfo> PinnedApps { get; set; } = [];
 
     [ObservableProperty]
     public partial bool IsLoading { get; set; }
@@ -36,9 +36,10 @@ public sealed partial class AppsViewModel : BaseViewModel
     [RelayCommand]
     public void RefreshApps()
     {
-        if (DeviceManager.ActiveDevice is null) return;
-
         Apps.Clear();
+        PinnedApps.Clear();
+
+        if (DeviceManager.ActiveDevice is null) return;
         IsLoading = true;
         var message = new CommandMessage { CommandType = CommandType.RequestAppList };
         DeviceManager.ActiveDevice.SendMessage(message);
@@ -96,37 +97,96 @@ public sealed partial class AppsViewModel : BaseViewModel
     {
         try
         {
-            Logger.LogInformation("Loading apps");
-            IsLoading = true;
-
-            if (DeviceManager.ActiveDevice is null) return;
-
-            await RemoteAppsRepository.LoadApplicationsFromDevice(DeviceManager.ActiveDevice.Id);
-            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(async() =>
             {
+                Apps.Clear();
                 PinnedApps.Clear();
-                foreach (var app in Apps.Where(a => a.DeviceInfo.Pinned))
-                {
-                    PinnedApps.Add(app);
-                }
+
+                if (DeviceManager.ActiveDevice is null) return;
+                IsLoading = true;
+
+                Apps = RemoteAppsRepository.GetApplicationsForDevice(DeviceManager.ActiveDevice.Id);
+                PinnedApps = Apps.Where(a => a.DeviceInfo.Pinned).ToObservableCollection();
+
                 OnPropertyChanged(nameof(HasPinnedApps));
+                IsLoading = false;
             });
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error loading apps");
         }
-        finally
-        {
-            await App.MainWindow.DispatcherQueue.EnqueueAsync(() => IsLoading = false);
-        }
     }
 
     private void OnApplicationListUpdated(object? sender, string deviceId)
-    {
+    {   
+        if (DeviceManager.ActiveDevice?.Id != deviceId)
+            return;
+
         App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {
+            Apps = RemoteAppsRepository.GetApplicationsForDevice(deviceId);
+            PinnedApps = Apps.Where(a => a.DeviceInfo.Pinned).ToObservableCollection();
+            
             IsLoading = false;
+            OnPropertyChanged(nameof(IsEmpty));
+            OnPropertyChanged(nameof(HasPinnedApps));
+        });
+    }
+
+    private void OnApplicationItemUpdated(object? sender, (string deviceId, ApplicationInfo? appInfo, string? packageName) args)
+    {
+        var (deviceId, appInfo, packageName) = args;
+        
+        // Only update if this is for the active device
+        if (DeviceManager.ActiveDevice?.Id != deviceId)
+            return;
+
+        App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+        {
+            if (appInfo is null && packageName is not null)
+            {
+                // App was removed - remove it from collection
+                var appToRemove = Apps.FirstOrDefault(a => a.PackageName == packageName);
+                if (appToRemove is not null)
+                {
+                    Apps.Remove(appToRemove);
+                    PinnedApps.Remove(appToRemove);
+                }
+            }
+            else if (appInfo is not null)
+            {
+                var existingApp = Apps.FirstOrDefault(a => a.PackageName == appInfo.PackageName);
+                
+                if (existingApp is not null)
+                {
+                    // Update existing app
+                    existingApp.PackageName = appInfo.PackageName;
+                    existingApp.AppName = appInfo.AppName;
+                    existingApp.IconPath = appInfo.IconPath;
+                    existingApp.DeviceInfo = appInfo.DeviceInfo;
+                    
+                    // Update pinned apps
+                    if (appInfo.DeviceInfo.Pinned && !PinnedApps.Contains(existingApp))
+                    {
+                        PinnedApps.Add(existingApp);
+                    }
+                    else if (!appInfo.DeviceInfo.Pinned && PinnedApps.Contains(existingApp))
+                    {
+                        PinnedApps.Remove(existingApp);
+                    }
+                }
+                else
+                {
+                    // Add new app if it doesn't exist
+                    Apps.Add(appInfo);
+                    if (appInfo.DeviceInfo.Pinned)
+                    {
+                        PinnedApps.Add(appInfo);
+                    }
+                }
+            }
+            
             OnPropertyChanged(nameof(IsEmpty));
             OnPropertyChanged(nameof(HasPinnedApps));
         });
@@ -160,6 +220,7 @@ public sealed partial class AppsViewModel : BaseViewModel
         LoadApps();
         
         RemoteAppsRepository.ApplicationListUpdated += OnApplicationListUpdated;
+        RemoteAppsRepository.ApplicationItemUpdated += OnApplicationItemUpdated;
         ((INotifyPropertyChanged)DeviceManager).PropertyChanged += (s, e) =>
         {
             if (e.PropertyName is nameof(IDeviceManager.ActiveDevice))
