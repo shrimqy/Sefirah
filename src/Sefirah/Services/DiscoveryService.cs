@@ -61,8 +61,8 @@ public class DiscoveryService(
             // Always include default broadcast as fallback
             broadcastEndpoints.Add(new IPEndPoint(IPAddress.Parse(DEFAULT_BROADCAST), DiscoveryPort));
 
-            var ipAddresses = deviceManager.GetRemoteDeviceIpAddresses();
-            broadcastEndpoints.AddRange(ipAddresses.Select(ip => new IPEndPoint(IPAddress.Parse(ip), DiscoveryPort)));
+            var addresses = deviceManager.GetRemoteDeviceAddresses();
+            broadcastEndpoints.AddRange(addresses.Select(address => new IPEndPoint(IPAddress.Parse(address), DiscoveryPort)));
 
             logger.LogInformation("Active broadcast endpoints: {endpoints}", string.Join(", ", broadcastEndpoints));
 
@@ -117,7 +117,7 @@ public class DiscoveryService(
 
     private async void OnDiscoveredMdnsService(object? sender, DiscoveredMdnsServiceArgs service)
     {        
-        await sessionManager.ConnectTo(service.DeviceId, service.IpAddress, service.Port, service.PublicKey);
+        await sessionManager.ConnectTo(service.DeviceId, service.Address, service.Port, service.PublicKey);
     }
 
     public async void OnReceived(EndPoint endpoint, byte[] buffer, long offset, long size)
@@ -126,12 +126,12 @@ public class DiscoveryService(
         {
             var message = Encoding.UTF8.GetString(buffer, (int)offset, (int)size);
 
-            var ipAddress = ((IPEndPoint)endpoint).Address;
+            var address = ((IPEndPoint)endpoint).Address;
             if (JsonMessageSerializer.DeserializeMessage(message) is not UdpBroadcast broadcast) return;
 
-            if (broadcast.DeviceId == localDevice?.DeviceId || ipAddress is null) return;
+            if (broadcast.DeviceId == localDevice?.DeviceId || address is null) return;
 
-            await sessionManager.ConnectTo(broadcast.DeviceId, ipAddress.ToString(), broadcast.Port, broadcast.PublicKey);
+            await sessionManager.ConnectTo(broadcast.DeviceId, address.ToString(), broadcast.Port, broadcast.PublicKey);
         }
         catch (Exception ex)
         {
@@ -164,11 +164,11 @@ public class DiscoveryService(
             }
 
             var localAddresses = NetworkHelper.GetAllValidAddresses();
-            var ipAddresses = localAddresses.Select(ip => ip.Address.ToString()).ToList();
+            var addresses = localAddresses.Select(addr => addr.Address.ToString()).ToList();
 
             var connectionInfo = new
             {
-                IpAddresses = ipAddresses,
+                Addresses = addresses,
                 broadcast.Port,
                 broadcast.DeviceId,
                 broadcast.DeviceName,

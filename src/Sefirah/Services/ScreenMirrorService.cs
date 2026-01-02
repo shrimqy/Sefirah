@@ -301,9 +301,9 @@ public class ScreenMirrorService(
         }
         else if (deviceSettings.AdbTcpipModeEnabled && device.Session is not null)
         {
-            if (await adbService.TryConnectTcp(device.IpAddress, device.Model))
+            if (await adbService.TryConnectTcp(device.Address, device.Model))
             {
-                selectedDeviceSerial = $"{device.IpAddress}:5555";
+                selectedDeviceSerial = $"{device.Address}:5555";
             }
         }
         else if (devices.Any(d => d.IsOnline && !string.IsNullOrEmpty(d.Serial)))

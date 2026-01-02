@@ -85,7 +85,7 @@
                             <TextBlock
                                 FontSize="12"
                                 Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                Text="{x:Bind ViewModel.DisplayIpAddresses, Mode=OneWay}" />
+                                Text="{x:Bind ViewModel.DisplayAddresses, Mode=OneWay}" />
                         </StackPanel>
                     </Grid>
                 </StackPanel>
@@ -150,6 +150,20 @@
                     IsClickEnabled="True">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEC7A;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <wuc:SettingsCard.ActionIcon>
+                        <FontIcon FontSize="11" Glyph="&#xE76C;" />
+                    </wuc:SettingsCard.ActionIcon>
+                </wuc:SettingsCard>
+
+                <!--  Address Settings  -->
+                <wuc:SettingsCard
+                    Click="OpenAddressSettings"
+                    Description="{helpers:ResourceString Name=ManageAddressesAndPriority}"
+                    Header="{helpers:ResourceString Name=DeviceAddresses}"
+                    IsClickEnabled="True">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE8F7;" />
                     </wuc:SettingsCard.HeaderIcon>
                     <wuc:SettingsCard.ActionIcon>
                         <FontIcon FontSize="11" Glyph="&#xE76C;" />

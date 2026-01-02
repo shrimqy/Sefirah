@@ -27,7 +27,7 @@ public abstract partial class BaseRemoteDevice : ObservableObject
         set => SetProperty(ref model, value);
     }
 
-    public string IpAddress { get; set; } = string.Empty;
+    public string Address { get; set; } = string.Empty;
 
     private ServerSession? session;
     public ServerSession? Session

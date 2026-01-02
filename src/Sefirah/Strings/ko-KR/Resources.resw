@@ -724,6 +724,18 @@ input touchscreen swipe 540 1800 540 900</value>
   <data name="Devices.Description" xml:space="preserve">
     <value>Managed devices</value>
   </data>
+  <data name="Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="HostnamePlaceholder" xml:space="preserve">
+    <value>Enter hostname or IP address</value>
+  </data>
+  <data name="DeviceAddresses" xml:space="preserve">
+    <value>Device Addresses</value>
+  </data>
+  <data name="ManageAddressesAndPriority" xml:space="preserve">
+    <value>Manage addresses and connection priority</value>
+  </data>
   <data name="SendFiles" xml:space="preserve">
     <value>Send files</value>
   </data>

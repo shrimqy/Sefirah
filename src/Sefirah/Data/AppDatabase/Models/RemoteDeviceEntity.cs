@@ -20,32 +20,24 @@ public class RemoteDeviceEntity
 
     public DateTime? LastConnected { get; set; }
 
-    [Column("IpAddresses")]
-    public string? IpAddressesJson { get; set; }
+    [Column("Addresses")]
+    public string? AddressesJson { get; set; }
     
     [Ignore]
-    public List<IpAddressEntry> IpAddresses
+    public List<AddressEntry> Addresses
     {
-        get
-        {
-            if (string.IsNullOrEmpty(IpAddressesJson)) return [];
+        get => string.IsNullOrEmpty(AddressesJson) ? [] : JsonSerializer.Deserialize<List<AddressEntry>>(AddressesJson) ?? [];
 
-            var entries = JsonSerializer.Deserialize<List<IpAddressEntry>>(IpAddressesJson);
-            if (entries is not null)
-                return entries;
-
-            return [];
-        }
-        set => IpAddressesJson = value is null ? null : JsonSerializer.Serialize(value);
+        set => AddressesJson = value is null ? null : JsonSerializer.Serialize(value);
     }
 
     [Column("PhoneNumbers")]
     public string? PhoneNumbersJson { get; set; }
 
     [Ignore]
-    public List<PhoneNumber>? PhoneNumbers
+    public List<PhoneNumber> PhoneNumbers
     {
-        get => string.IsNullOrEmpty(PhoneNumbersJson) ? null : JsonSerializer.Deserialize<List<PhoneNumber>>(PhoneNumbersJson);
+        get => string.IsNullOrEmpty(PhoneNumbersJson) ? [] : JsonSerializer.Deserialize<List<PhoneNumber>>(PhoneNumbersJson) ?? [];
         set => PhoneNumbersJson = value is null ? null : JsonSerializer.Serialize(value);
     }
 
@@ -56,7 +48,7 @@ public class RemoteDeviceEntity
         {
             Name = Name,
             Model = Model,
-            IpAddresses = IpAddresses,
+            Addresses = Addresses,
             PhoneNumbers = PhoneNumbers,
             Wallpaper = await ImageHelper.ToBitmapAsync(WallpaperBytes),
         };

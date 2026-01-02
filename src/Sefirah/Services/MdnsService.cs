@@ -149,10 +149,10 @@ public class MdnsService(ILogger logger) : IMdnsService
                                 a.CanonicalName.ToString().Equals(hostname.ToString(), StringComparison.OrdinalIgnoreCase));
                             if (aRecord?.Address is not null)
                             {
-                                var ipAddress = aRecord.Address.ToString();
+                                var address = aRecord.Address.ToString();
                                 // Use SRV port as fallback if serverPort not in TXT
                                 var finalPort = port ?? srvRecord.Port;
-                                DiscoveredMdnsService?.Invoke(this, new(deviceId, deviceName, publicKey, ipAddress, finalPort));
+                                DiscoveredMdnsService?.Invoke(this, new(deviceId, deviceName, publicKey, address, finalPort));
                             }
                         }
                     }

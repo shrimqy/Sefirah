@@ -7,18 +7,28 @@ namespace Sefirah.Data.Models;
 
 public partial class PairedDevice : BaseRemoteDevice
 {
-    public List<IpAddressEntry> IpAddresses { get; set; } = [];
+    public List<AddressEntry> Addresses { get; set; } = [];
 
     /// <summary>
-    /// Gets enabled IP addresses sorted by priority (0 = highest priority)
+    /// Gets enabled addresses sorted by priority.
     /// </summary>
-    public List<string> GetEnabledIpAddresses()
+    public List<string> GetEnabledAddresses()
     {
-        return IpAddresses
+        var enabledAddresses = Addresses
             .Where(ip => ip.IsEnabled)
             .OrderBy(ip => ip.Priority)
-            .Select(ip => ip.IpAddress)
-            .ToList();
+            .Select(ip => ip.Address);
+        
+        // If no addresses are enabled, return all addresses
+        if (!enabledAddresses.Any())
+        {
+            return Addresses
+                .OrderBy(ip => ip.Priority)
+                .Select(ip => ip.Address)
+                .ToList();
+        }
+        
+        return enabledAddresses.ToList();
     }
 
     public int Port { get; set; } = 5150;
@@ -64,6 +74,7 @@ public partial class PairedDevice : BaseRemoteDevice
     public bool IsDisconnected => ConnectionStatus.IsDisconnected;
     public bool IsConnected => ConnectionStatus.IsConnected;
     public bool IsForcedDisconnect => ConnectionStatus.IsForcedDisconnect;
+    public bool IsConnecting => ConnectionStatus.IsConnecting;
     public bool IsConnectedOrConnecting => ConnectionStatus.IsConnectedOrConnecting;
 
     private DeviceStatus? status;
@@ -153,3 +164,4 @@ public partial class PairedDevice : BaseRemoteDevice
         }
     }
 }
+

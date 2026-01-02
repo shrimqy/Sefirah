@@ -22,7 +22,7 @@ public partial class DiscoveredDevice : BaseRemoteDevice
             Model = Model,
             Session = Session,
             Client = Client,
-            IpAddresses = [new IpAddressEntry { IpAddress = IpAddress, IsEnabled = true, Priority = 0 }],
+            Addresses = [new AddressEntry { Address = Address, IsEnabled = true, Priority = 0 }],
             ConnectionStatus = new Connected(),
         };
     }
@@ -37,7 +37,7 @@ public partial class DiscoveredDevice : BaseRemoteDevice
             Model = Model,
             SharedSecret = SharedSecret,
             WallpaperBytes = null,
-            IpAddresses = [new IpAddressEntry { IpAddress = IpAddress, IsEnabled = true, Priority = 0 }],
+            Addresses = [new AddressEntry { Address = Address, IsEnabled = true, Priority = 0 }],
             PhoneNumbers = []
         };
     }

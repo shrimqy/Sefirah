@@ -52,7 +52,7 @@ public interface IDeviceManager
     void UpdateLocalDevice(LocalDeviceEntity localDevice);
     Task Initialize();
 
-    List<string> GetRemoteDeviceIpAddresses();
+    List<string> GetRemoteDeviceAddresses();
 
     Task UpdateDeviceInfo(PairedDevice device, DeviceInfo deviceInfo);
     Task<PairedDevice> AddDevice(DiscoveredDevice device);

@@ -38,7 +38,7 @@ public partial class ReceiveFileHandler(
     /// <returns>The transfer ID for tracking this transfer.</returns>
     public async Task<Guid> ConnectAsync()
     {
-        client = new Client(CertificateHelper.SslContext, device.IpAddress, serverInfo.Port, this);
+        client = new Client(CertificateHelper.SslContext, device.Address, serverInfo.Port, this);
         TransferId = client.Id;
 
         if (!client.ConnectAsync())

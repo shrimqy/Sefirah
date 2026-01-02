@@ -87,12 +87,12 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
         }
     }
 
-    public List<string> GetRemoteDeviceIpAddresses()
+    public List<string> GetRemoteDeviceAddresses()
     {
         return context.Database.Table<RemoteDeviceEntity>()
-            .SelectMany(d => d.IpAddresses)
+            .SelectMany(d => d.Addresses)
             .Where(ip => ip.IsEnabled)
-            .Select(ip => ip.IpAddress)
+            .Select(ip => ip.Address)
             .ToList();
     }
 }

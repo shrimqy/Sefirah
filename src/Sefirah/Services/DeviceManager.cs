@@ -38,9 +38,9 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
         throw new InvalidOperationException($"Device with ID {deviceId} not found");
     }   
 
-    public List<string> GetRemoteDeviceIpAddresses()
+    public List<string> GetRemoteDeviceAddresses()
     {
-        return repository.GetRemoteDeviceIpAddresses();
+        return repository.GetRemoteDeviceAddresses();
     }
 
     public async Task<PairedDevice?> GetLastConnectedDevice()
@@ -91,7 +91,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
             Model = device.Model,
             SharedSecret = device.SharedSecret,
             WallpaperBytes = null,
-            IpAddresses = [new IpAddressEntry { IpAddress = device.IpAddress, IsEnabled = true, Priority = 0 }],
+            Addresses = [new AddressEntry { Address = device.Address, IsEnabled = true, Priority = 0 }],
             PhoneNumbers = []
         };
     }

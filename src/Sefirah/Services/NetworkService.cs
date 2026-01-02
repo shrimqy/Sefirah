@@ -87,7 +87,7 @@ public class NetworkService(
         if (device.IsConnected)
         {
             await SendDeviceInfo(device);
-            await adbService.TryConnectTcp(device.IpAddress, device.Model);
+            await adbService.TryConnectTcp(device.Address, device.Model);
         }
     }
 
@@ -278,8 +278,8 @@ public class NetworkService(
         {
             if (session.Socket.RemoteEndPoint is not IPEndPoint endPoint) return;
 
-            var ipAddress = endPoint.Address.ToString();
-            logger.Info($"Received connection from {ipAddress}");
+            var address = endPoint.Address.ToString();
+            logger.Info($"Received connection from {address}");
 
             var localDevice = await deviceManager.GetLocalDeviceAsync();
             var pairedDevice = PairedDevices.FirstOrDefault(d => d.Id == authMessage.DeviceId);
@@ -309,10 +309,10 @@ public class NetworkService(
 
             if (pairedDevice is not null)
             {
-                await AuthenticatePairedDeviceClient(session, pairedDevice, ipAddress, authResponse);
+                await AuthenticatePairedDeviceClient(session, pairedDevice, address, authResponse);
                 return;
             }
-            await AuthenticateNewDeviceClient(session, authMessage, ipAddress, sharedSecret, authResponse);
+            await AuthenticateNewDeviceClient(session, authMessage, address, sharedSecret, authResponse);
         }
         catch (Exception ex)
         {
@@ -321,7 +321,7 @@ public class NetworkService(
         }
     }
 
-    private async Task AuthenticatePairedDeviceClient(ServerSession session, PairedDevice pairedDevice, string ipAddress, AuthenticationMessage authResponse)
+    private async Task AuthenticatePairedDeviceClient(ServerSession session, PairedDevice pairedDevice, string address, AuthenticationMessage authResponse)
     {
         logger.Info($"Paired device {pairedDevice.Name} verified, updating connection");
 
@@ -335,16 +335,16 @@ public class NetworkService(
         {
             pairedDevice.Session = session;
             pairedDevice.ConnectionStatus = new Connected();
-            pairedDevice.IpAddress = ipAddress;
-            if (!pairedDevice.IpAddresses.Any(ip => ip.IpAddress == ipAddress))
+            pairedDevice.Address = address;
+            if (!pairedDevice.Addresses.Any(a => a.Address == address))
             {
-                var newEntry = new IpAddressEntry
+                var newEntry = new AddressEntry
                 {
-                    IpAddress = ipAddress,
+                    Address = address,
                     IsEnabled = true,
-                    Priority = pairedDevice.IpAddresses.Count
+                    Priority = pairedDevice.Addresses.Count
                 };
-                pairedDevice.IpAddresses.Add(newEntry);
+                pairedDevice.Addresses.Add(newEntry);
             }
             deviceManager.ActiveDevice = pairedDevice;
         });
@@ -358,7 +358,7 @@ public class NetworkService(
         ConnectionStatusChanged?.Invoke(this, pairedDevice);
     }
 
-    private async Task AuthenticateNewDeviceClient(ServerSession session, AuthenticationMessage authMessage, string ipAddress, byte[] sharedSecret, AuthenticationMessage authResponse)
+    private async Task AuthenticateNewDeviceClient(ServerSession session, AuthenticationMessage authMessage, string address, byte[] sharedSecret, AuthenticationMessage authResponse)
     {
         await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {
@@ -368,7 +368,7 @@ public class NetworkService(
                 logger.Info("Device already in DiscoveredDevices, updating session");
                 existingDiscovered.Name = authMessage.DeviceName;
                 existingDiscovered.Model = authMessage.Model;
-                existingDiscovered.IpAddress = ipAddress;
+                existingDiscovered.Address = address;
                 existingDiscovered.SharedSecret = sharedSecret;
                 existingDiscovered.Session = session;
             }
@@ -380,7 +380,7 @@ public class NetworkService(
                     Id = authMessage.DeviceId,
                     Name = authMessage.DeviceName,
                     Model = authMessage.Model,
-                    IpAddress = ipAddress,
+                    Address = address,
                     SharedSecret = sharedSecret,
                     Session = session
                 });
@@ -507,7 +507,7 @@ public class NetworkService(
 
     #region Client
 
-    public async Task ConnectTo(string deviceId, string ipAddress, int port, string publicKey)
+    public async Task ConnectTo(string deviceId, string address, int port, string publicKey)
     {
         // Skip if already connected/connecting or if device was force-disconnected
         var existingDevice = PairedDevices.FirstOrDefault(d => d.Id == deviceId);
@@ -525,9 +525,9 @@ public class NetworkService(
 
         try
         {
-            logger.Info($"Connecting to {ipAddress}:{port}");
+            logger.Info($"Connecting to {address}:{port}");
 
-            var client = new Client(SslContext, ipAddress, port, this);
+            var client = new Client(SslContext, address, port, this);
 
             var localDevice = await deviceManager.GetLocalDeviceAsync();
 
@@ -568,7 +568,7 @@ public class NetworkService(
             }
             catch (Exception ex)
             {
-                logger.Warn($"Error connecting to {ipAddress}:{port}: {ex.Message}");
+                logger.Warn($"Error connecting to {address}:{port}: {ex.Message}");
             }
         }
         finally
@@ -600,10 +600,10 @@ public class NetworkService(
             Model = Environment.MachineName
         };
 
-        foreach (var ipAddress in device.GetEnabledIpAddresses())
+        foreach (var address in device.GetEnabledAddresses())
         {
-            logger.Info($"Connecting to {ipAddress}:{device.Port}");
-            var client = new Client(SslContext, ipAddress, device.Port, this);
+            logger.Info($"Connecting to {address}:{device.Port}");
+            var client = new Client(SslContext, address, device.Port, this);
             device.ConnectionStatus = new Connecting();
 
             try
@@ -631,7 +631,7 @@ public class NetworkService(
             }
             catch (Exception ex)
             {
-                logger.Debug($"Failed to connect to {ipAddress}:{device.Port}: {ex.Message}");
+                logger.Debug($"Failed to connect to {address}:{device.Port}: {ex.Message}");
             }
         }
         logger.Warn($"Failed to connect to device {device.Name} on any IP address/port combination");
@@ -727,20 +727,20 @@ public class NetworkService(
         try
         {
             IPEndPoint? endPoint = client.Socket.RemoteEndPoint as IPEndPoint;
-            var ipAddress = endPoint?.Address.ToString();
+            var address = endPoint?.Address.ToString();
 
-            if (string.IsNullOrEmpty(ipAddress)) return;
+            if (string.IsNullOrEmpty(address)) return;
 
-            logger.Info($"Received AuthenticationMessage from server at {ipAddress}");
+            logger.Info($"Received AuthenticationMessage from server at {address}");
 
             var pairedDevice = PairedDevices.FirstOrDefault(d => d.Id == authMessage.DeviceId);
             if (pairedDevice is not null)
             {
-                await AuthenticatePairedDeviceServer(client, pairedDevice, ipAddress, authMessage);
+                await AuthenticatePairedDeviceServer(client, pairedDevice, address, authMessage);
             }
             else
             {
-                await AuthenticateNewDeviceServer(client, authMessage, ipAddress, endPoint?.Port ?? 5150);
+                await AuthenticateNewDeviceServer(client, authMessage, address, endPoint?.Port ?? 5150);
             }
         }
         catch (Exception ex)
@@ -750,7 +750,7 @@ public class NetworkService(
         }
     }
 
-    private async Task AuthenticatePairedDeviceServer(Client client, PairedDevice pairedDevice, string ipAddress, AuthenticationMessage authMessage)
+    private async Task AuthenticatePairedDeviceServer(Client client, PairedDevice pairedDevice, string address, AuthenticationMessage authMessage)
     {
         var remoteDevice = await deviceManager.GetDeviceInfoAsync(pairedDevice.Id);
 
@@ -769,7 +769,7 @@ public class NetworkService(
         await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {
             pairedDevice.Client = client;
-            pairedDevice.IpAddress = ipAddress;
+            pairedDevice.Address = address;
             pairedDevice.ConnectionStatus = new Connected();
             deviceManager.ActiveDevice = pairedDevice;
         });
@@ -778,7 +778,7 @@ public class NetworkService(
         logger.Info($"Paired device {pairedDevice.Name} connected successfully");
     }
 
-    private async Task AuthenticateNewDeviceServer(Client client, AuthenticationMessage authMessage, string ipAddress, int port)
+    private async Task AuthenticateNewDeviceServer(Client client, AuthenticationMessage authMessage, string address, int port)
     {
         var localDevice = await deviceManager.GetLocalDeviceAsync();
         var sharedSecret = EcdhHelper.DeriveKey(authMessage.PublicKey, localDevice.PrivateKey);
@@ -792,14 +792,14 @@ public class NetworkService(
 
         await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {
-            var existingDiscovered = DiscoveredDevices.FirstOrDefault(d => d.IpAddress == ipAddress);
+            var existingDiscovered = DiscoveredDevices.FirstOrDefault(d => d.Address == address);
             if (existingDiscovered is not null)
             {
-                logger.Info($"Device with IP {ipAddress} already in DiscoveredDevices, updating client");
+                logger.Info($"Device with address {address} already in DiscoveredDevices, updating client");
                 existingDiscovered.Id = authMessage.DeviceId;
                 existingDiscovered.Name = authMessage.DeviceName;
                 existingDiscovered.Model = authMessage.Model;
-                existingDiscovered.IpAddress = ipAddress;
+                existingDiscovered.Address = address;
                 existingDiscovered.Port = port;
                 existingDiscovered.SharedSecret = sharedSecret;
                 existingDiscovered.Client = client;
@@ -812,7 +812,7 @@ public class NetworkService(
                     Id = authMessage.DeviceId,
                     Name = authMessage.DeviceName,
                     Model = authMessage.Model,
-                    IpAddress = ipAddress,
+                    Address = address,
                     Port = port,
                     SharedSecret = sharedSecret,
                     Client = client
