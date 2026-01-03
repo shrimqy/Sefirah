@@ -91,6 +91,9 @@ public partial class ReceiveFileHandler(
                 currentFileMetadata = fileMetadata;
                 fileStream = new FileStream(fullPath, FileMode.Create);
 
+                var startMessage = Encoding.UTF8.GetBytes(FileTransferService.StartMessage + "\n");
+                client?.Send(startMessage);
+
                 // Wait for this file transfer to complete
                 await transferCompletionSource.Task;
 
@@ -269,9 +272,9 @@ public partial class ReceiveFileHandler(
             if (bytesTransferred >= currentFileMetadata.FileSize)
             {
                 logger.Info($"File {currentFileMetadata.FileName} received successfully");
-                transferCompletionSource?.TrySetResult(true);
                 client.Send(Encoding.UTF8.GetBytes(FileTransferService.CompleteMessage + "\n"));
                 bytesTransferred = 0;
+                transferCompletionSource?.TrySetResult(true);
             }
         }
         catch (Exception ex)

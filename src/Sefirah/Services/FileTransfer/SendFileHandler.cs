@@ -26,6 +26,7 @@ public partial class SendFileHandler(
     private uint notificationSequence = 1;
     private TaskCompletionSource<ServerSession>? connectionSource;
     private TaskCompletionSource<bool>? transferCompletionSource;
+    private TaskCompletionSource<bool>? startMessageSource;
     private readonly CancellationTokenSource cancellationTokenSource = new();
     private bool disposed;
 
@@ -69,8 +70,12 @@ public partial class SendFileHandler(
                 cancellationTokenSource.Token.ThrowIfCancellationRequested();
 
                 logger.Debug($"Sending file: {files[i].FileName}");
+                
+                // Wait for client to send "start" message indicating readiness to receive
+                startMessageSource = new TaskCompletionSource<bool>();
+                await startMessageSource.Task;
+                
                 transferCompletionSource = new TaskCompletionSource<bool>();
-
                 await SendFileData(files[i], await storageFiles[i].OpenStreamForReadAsync());
                 await transferCompletionSource.Task;
 
@@ -242,6 +247,13 @@ public partial class SendFileHandler(
             return;
         }
 
+        // Check for start message
+        if (message == FileTransferService.StartMessage && startMessageSource?.Task.IsCompleted is false)
+        {
+            startMessageSource.TrySetResult(true);
+            return;
+        }
+
         // Check for completion message
         if (message == FileTransferService.CompleteMessage)
         {
@@ -268,6 +280,7 @@ public partial class SendFileHandler(
         serverInfo = null;
         connectionSource = null;
         transferCompletionSource = null;
+        startMessageSource = null;
         cancellationTokenSource.Dispose();
         
         GC.SuppressFinalize(this);

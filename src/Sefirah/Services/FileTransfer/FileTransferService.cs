@@ -14,7 +14,8 @@ public class FileTransferService(
     IPlatformNotificationHandler notificationHandler
     ) : IFileTransferService
 {
-    public const string CompleteMessage = "Complete";
+    public const string CompleteMessage = "complete";
+    public const string StartMessage = "start";
     public const int ChunkSize = 524288; // 512KB
     public static readonly IEnumerable<int> PortRange = Enumerable.Range(5152, 18);
 
