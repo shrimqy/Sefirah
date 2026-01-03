@@ -1,3 +1,4 @@
+using CommunityToolkit.WinUI;
 using Microsoft.UI.Dispatching;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
@@ -61,7 +62,6 @@ public partial class DevicesViewModel : ObservableObject
                 }
 
                 SftpService.Remove(device.Id);
-
                 RemoteAppRepository.RemoveAllAppsForDeviceAsync(device.Id);
 
                 await DeviceManager.RemoveDevice(device);

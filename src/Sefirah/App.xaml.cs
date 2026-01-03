@@ -9,11 +9,9 @@ using LaunchActivatedEventArgs = Microsoft.UI.Xaml.LaunchActivatedEventArgs;
 using H.NotifyIcon;
 using Sefirah.Data.Contracts;
 using System.Runtime.InteropServices;
-using Sefirah.Extensions;
 using Sefirah.Data.Enums;
 using Microsoft.UI.Windowing;
 using WinRT.Interop;
-using Serilog;
 using Sefirah.Data.Models;
 
 

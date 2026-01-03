@@ -1,14 +1,10 @@
-using CommunityToolkit.WinUI;
-using Sefirah.Data.AppDatabase.Models;
+using System.Collections.Specialized;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Items;
 using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
-using Sefirah.Extensions;
-using Microsoft.UI.Xaml.Controls;
-using System.Collections.Specialized;
 
 namespace Sefirah.ViewModels.Settings;
 
@@ -602,7 +598,6 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
     private readonly RemoteAppRepository RemoteAppsRepository = Ioc.Default.GetRequiredService<RemoteAppRepository>();
     public ObservableCollection<ApplicationInfo> RemoteApps { get; set; } = [];
 
-    private readonly IDeviceManager DeviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
     private readonly DeviceRepository DeviceRepository = Ioc.Default.GetRequiredService<DeviceRepository>();
 
     private bool isDragging = true;
