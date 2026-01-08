@@ -305,10 +305,10 @@ page.</value>
     <value>답장 입력</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
-    <value>Open file</value>
+    <value>파일 열기</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
-    <value>Open folder</value>
+    <value>폴더 열기</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
     <value>{0}에 의한 알림 끄기</value>
