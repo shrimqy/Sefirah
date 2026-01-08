@@ -297,9 +297,6 @@
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>应用特定设置</value>
   </data>
-  <data name="FileTransferNotification.Title" xml:space="preserve">
-    <value>File transfer</value>
-  </data>
   <data name="SendButton" xml:space="preserve">
     <value>发送</value>
   </data>
@@ -681,9 +678,6 @@
   </data>
   <data name="NoPairedDevices" xml:space="preserve">
     <value>No paired devices</value>
-  </data>
-  <data name="Devices.Description" xml:space="preserve">
-    <value>Managed devices</value>
   </data>
   <data name="Add" xml:space="preserve">
     <value>Add</value>
