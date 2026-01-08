@@ -653,10 +653,10 @@
     <value>Sending to {0}</value>
   </data>
   <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
-    <value>Receiving {0}/{1} from {2}</value>
+    <value>Receiving {0} files from {1}</value>
   </data>
   <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
-    <value>Sending {0}/{1} to {2}</value>
+    <value>Sending {0} files to {1}</value>
   </data>
   <data name="FileTransferNotification.Completed" xml:space="preserve">
     <value>File transfer completed</value>
