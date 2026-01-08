@@ -686,9 +686,9 @@
     <value>Enter hostname or IP address</value>
   </data>
   <data name="UnlockCommandsPlaceholder" xml:space="preserve">
-    <value>输入关键事件 26
-输入关键事件 66
-输入文本 %pwd%</value>
+    <value>input keyevent 26
+input keyevent 66
+input text %pwd%</value>
   </data>
   <data name="FileDropCaption" xml:space="preserve">
     <value>拖动要发送文件</value>
