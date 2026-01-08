@@ -23,6 +23,7 @@ public class WindowsPlaybackService(
     private GlobalSystemMediaTransportControlsSessionManager? manager;
     public List<AudioDevice> AudioDevices { get; private set; } = [];
     private readonly MMDeviceEnumerator enumerator = new();
+    private readonly Dictionary<string, DeviceVolumeNotificationHandler> deviceHandlers = [];
 
     private readonly Dictionary<string, double> lastTimelinePosition = [];
 
@@ -112,11 +113,11 @@ public class WindowsPlaybackService(
                         {
                             if (mediaAction.Value == 1.0)
                             {
-                                await session?.TryChangeAutoRepeatModeAsync(MediaPlaybackAutoRepeatMode.Track);
+                                await session?.TryChangeAutoRepeatModeAsync(MediaPlaybackAutoRepeatMode.List);
                             }
                             else if (mediaAction.Value == 2.0)
                             {
-                                await session?.TryChangeAutoRepeatModeAsync(MediaPlaybackAutoRepeatMode.List);
+                                await session?.TryChangeAutoRepeatModeAsync(MediaPlaybackAutoRepeatMode.Track);
                             }
                         }
                         break;
@@ -231,13 +232,13 @@ public class WindowsPlaybackService(
 
                 lastTimelinePosition[sender.SourceAppUserModelId] = currentPosition;
 
-                var message = new PlaybackSession
+                var playbackSession = new PlaybackSession
                 {
                     SessionType = SessionType.TimelineUpdate,
                     Source = sender.SourceAppUserModelId,
                     Position = currentPosition
                 };
-                SendPlaybackData(message);
+                SendPlaybackData(playbackSession);
             }
         }
         catch (Exception ex)
@@ -253,25 +254,25 @@ public class WindowsPlaybackService(
         session.TimelinePropertiesChanged -= Session_TimelinePropertiesChanged;
         lastTimelinePosition.Remove(session.SourceAppUserModelId);
 
-        var message = new PlaybackSession
+        var playbackSession = new PlaybackSession
         {
             SessionType = SessionType.RemovedSession,
             Source = session.SourceAppUserModelId
         };
-        SendPlaybackData(message);
+        SendPlaybackData(playbackSession);
     }
 
-    private async void Session_MediaPropertiesChanged(GlobalSystemMediaTransportControlsSession sender, MediaPropertiesChangedEventArgs args)
+    private async void Session_MediaPropertiesChanged(GlobalSystemMediaTransportControlsSession session, MediaPropertiesChangedEventArgs args)
     {
         try
         {
-            logger.LogInformation("Media properties changed for {SourceAppUserModelId}", sender.SourceAppUserModelId);
-            await UpdatePlaybackDataAsync(sender);
+            logger.LogInformation("Media properties changed for {SourceAppUserModelId}", session.SourceAppUserModelId);
+            await UpdatePlaybackDataAsync(session);
 
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error updating playback data for {SourceAppUserModelId}", sender.SourceAppUserModelId);
+            logger.LogError(ex, "Error updating playback data for {SourceAppUserModelId}", session.SourceAppUserModelId);
         }
     }
 
@@ -280,16 +281,16 @@ public class WindowsPlaybackService(
         try
         {
             var playbackInfo = sender.GetPlaybackInfo();
-            var message = new PlaybackSession
+            var playbackSession = new PlaybackSession
             {
-                SessionType = SessionType.PlaybackInfoUpdate,
+                SessionType = SessionType.PlaybackUpdate,
                 Source = sender.SourceAppUserModelId,
-                IsPlaying = playbackInfo.PlaybackStatus == GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing,
+                IsPlaying = playbackInfo.PlaybackStatus is GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing,
                 PlaybackRate = playbackInfo.PlaybackRate,
                 IsShuffleActive = playbackInfo.IsShuffleActive,
             };
 
-            SendPlaybackData(message);
+            SendPlaybackData(playbackSession);
         }
         catch (Exception ex)
         {
@@ -330,10 +331,11 @@ public class WindowsPlaybackService(
 
             var playbackSession = new PlaybackSession
             {
+                SessionType = SessionType.PlaybackInfo,
                 Source = session.SourceAppUserModelId,
                 TrackTitle = mediaProperties.Title,
                 Artist = mediaProperties.Artist ?? "Unknown Artist",
-                IsPlaying = playbackInfo.PlaybackStatus == GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing,
+                IsPlaying = playbackInfo.PlaybackStatus is GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing,
                 IsShuffleActive = playbackInfo.IsShuffleActive,
                 PlaybackRate = playbackInfo.PlaybackRate,
                 Position = timelineProperties?.Position.TotalMilliseconds,
@@ -398,6 +400,11 @@ public class WindowsPlaybackService(
                         IsSelected = device.ID == defaultDevice
                     }
                 );
+
+                var handler = new DeviceVolumeNotificationHandler(device.ID, device);
+                handler.SetHandleAction(OnDeviceVolumeChanged);
+                device.AudioEndpointVolume.OnVolumeNotification += handler.Handle;
+                deviceHandlers[device.ID] = handler;
             }
         }
         catch (Exception ex)
@@ -406,12 +413,49 @@ public class WindowsPlaybackService(
         }
     }
 
+    private void OnDeviceVolumeChanged(string deviceId, AudioVolumeNotificationData data)
+    {
+        try
+        {
+            var audioDevice = AudioDevices.FirstOrDefault(d => d.DeviceId == deviceId);
+            if (audioDevice is null) return;
+
+            audioDevice.Volume = data.MasterVolume;
+            audioDevice.IsMuted = data.Muted;
+            audioDevice.AudioDeviceType = AudioMessageType.Active;
+
+            SendAudioDeviceUpdate(audioDevice);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error handling volume change for device {DeviceId}", deviceId);
+        }
+    }
+
+    private void SendAudioDeviceUpdate(AudioDevice audioDevice)
+    {
+        try
+        {
+            foreach (var device in deviceManager.PairedDevices)
+            {
+                if (device.IsConnected && device.DeviceSettings.MediaSessionSyncEnabled)
+                {
+                    device.SendMessage(audioDevice);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error sending audio device update");
+        }
+    }
+
     public void ToggleMute(string deviceId)
     {
         try
         {
             var endpoint = enumerator.GetDevice(deviceId);
-            if (endpoint is null || endpoint.State != DeviceState.Active) return;
+            if (endpoint is null || endpoint.State is not DeviceState.Active) return;
 
             try
             {
@@ -468,7 +512,7 @@ public class WindowsPlaybackService(
             int result2 = policyConfig.SetDefaultEndpoint(deviceId, ERole.eCommunications);
             int result3 = policyConfig.SetDefaultEndpoint(deviceId, ERole.eConsole);
 
-            if (result1 != HResult.S_OK || result2 != HResult.S_OK || result3 != HResult.S_OK)
+            if (result1 is not HResult.S_OK || result2 is not HResult.S_OK || result3 is not HResult.S_OK)
             {
                 logger.LogError("SetDefaultEndpoint returned error codes: {Result1}, {Result2}, {Result3}", result1, result2, result3);
                 return;
@@ -503,41 +547,114 @@ public class WindowsPlaybackService(
 
     public void OnDeviceAdded(string pwstrDeviceId)
     {
-        AudioDevices.Add(
-            new AudioDevice
+        try
+        {
+            var device = enumerator.GetDevice(pwstrDeviceId);
+            if (device is null || device.State is not DeviceState.Active) return;
+
+            var audioDevice = new AudioDevice
             {
                 AudioDeviceType = AudioMessageType.New,
                 DeviceId = pwstrDeviceId,
-                DeviceName = enumerator.GetDevice(pwstrDeviceId).FriendlyName,
-                Volume = enumerator.GetDevice(pwstrDeviceId).AudioEndpointVolume.MasterVolumeLevelScalar,
-                IsMuted = enumerator.GetDevice(pwstrDeviceId).AudioEndpointVolume.Mute,
+                DeviceName = device.FriendlyName,
+                Volume = device.AudioEndpointVolume.MasterVolumeLevelScalar,
+                IsMuted = device.AudioEndpointVolume.Mute,
                 IsSelected = false
+            };
+
+            AudioDevices.Add(audioDevice);
+
+            // Subscribe to volume change notifications
+            var handler = new DeviceVolumeNotificationHandler(device.ID, device);
+            handler.SetHandleAction(OnDeviceVolumeChanged);
+            device.AudioEndpointVolume.OnVolumeNotification += handler.Handle;
+
+            if (deviceHandlers.TryGetValue(device.ID, out var existingHandler))
+            {
+                existingHandler.Unsubscribe();
             }
-        );
-        logger.LogInformation("Device added: {DeviceId}", pwstrDeviceId);
+            deviceHandlers[device.ID] = handler;
+
+            SendAudioDeviceUpdate(audioDevice);
+
+            logger.LogInformation("Device added: {DeviceId}", pwstrDeviceId);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error adding device {DeviceId}", pwstrDeviceId);
+        }
     }
 
     public void OnDeviceRemoved(string deviceId)
     {
+        if (deviceHandlers.TryGetValue(deviceId, out var handler))
+        {
+            handler.Unsubscribe();
+            deviceHandlers.Remove(deviceId);
+        }
+
+        var audioDevice = AudioDevices.FirstOrDefault(d => d.DeviceId == deviceId);
+        if (audioDevice is not null)
+        {
+            audioDevice.AudioDeviceType = AudioMessageType.Removed;
+            SendAudioDeviceUpdate(audioDevice);
+        }
+
         AudioDevices.RemoveAll(d => d.DeviceId == deviceId);
     }
 
     public void OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId)
     {
+        if (flow is not DataFlow.Render || (role is not Role.Multimedia && role is not Role.Console)) return;
+
         var index = AudioDevices.FindIndex(d => d.DeviceId == defaultDeviceId);
 
         if (index != -1)
         {
             var selectedIndex = AudioDevices.FindIndex(d => d.IsSelected == true);
-            AudioDevices[selectedIndex].IsSelected = false;
+            if (selectedIndex != -1)
+            {
+                AudioDevices[selectedIndex].IsSelected = false;
+                AudioDevices[selectedIndex].AudioDeviceType = AudioMessageType.Active;
+                SendAudioDeviceUpdate(AudioDevices[selectedIndex]);
+            }
+
             AudioDevices[index].IsSelected = true;
+            AudioDevices[index].AudioDeviceType = AudioMessageType.Active;
+            SendAudioDeviceUpdate(AudioDevices[index]);
+
             logger.LogInformation("Default device changed: {DefaultDeviceId}", defaultDeviceId);
         }
     }
 
     public void OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key)
     {
-        AudioDevice? device = AudioDevices.FirstOrDefault(d => d.DeviceId == pwstrDeviceId);
-        device?.Volume = enumerator.GetDevice(pwstrDeviceId).AudioEndpointVolume.MasterVolumeLevelScalar;
+    }
+}
+
+public class DeviceVolumeNotificationHandler(string deviceId, MMDevice device)
+{
+    private Action<string, AudioVolumeNotificationData>? handleAction;
+
+    public void Handle(AudioVolumeNotificationData data)
+    {
+        handleAction?.Invoke(deviceId, data);
+    }
+
+    public void SetHandleAction(Action<string, AudioVolumeNotificationData> action)
+    {
+        handleAction = action;
+    }
+
+    public void Unsubscribe()
+    {
+        try
+        {
+            device.AudioEndpointVolume.OnVolumeNotification -= Handle;
+        }
+        catch
+        {
+            // Device may already be disposed
+        }
     }
 }
