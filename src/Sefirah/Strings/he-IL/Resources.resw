@@ -304,10 +304,10 @@
     <value>הקלד תגובה</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
-    <value>Open file</value>
+    <value>פתיחת קובץ</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
-    <value>Open folder</value>
+    <value>פתיחת תיקייה</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
     <value>כבה התראות מ{0}</value>
