@@ -1,3 +1,4 @@
+using Windows.Storage;
 using Windows.Storage.Pickers;
 
 namespace Sefirah.Utils;
@@ -45,6 +46,32 @@ public static class PickerHelper
         catch (Exception)
         {
             return null;
+        }
+    }
+
+    public static async Task<IReadOnlyList<StorageFile>> PickMultipleFilesAsync(List<string>? fileTypes = null)
+    {
+        try
+        {
+            var picker = new FileOpenPicker();
+            if (fileTypes is not null)
+            {
+                foreach (var type in fileTypes)
+                {
+                    picker.FileTypeFilter.Add(type);
+                }
+            }
+            else
+            {
+                picker.FileTypeFilter.Add("*");
+            }
+
+            InitializePicker(picker);
+            return await picker.PickMultipleFilesAsync();
+        }
+        catch (Exception)
+        {
+            return Array.Empty<StorageFile>();
         }
     }
 

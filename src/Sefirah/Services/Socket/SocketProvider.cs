@@ -47,22 +47,27 @@ public partial class Client(SslContext context, string address, int port, ITcpCl
 {
     protected override void OnConnected()
     {
-        socketProvider.OnConnected();
+        socketProvider.OnConnected(this);
     }
 
     protected override void OnDisconnected()
     {
-        socketProvider.OnDisconnected();
+        socketProvider.OnDisconnected(this);
     }
 
     protected override void OnReceived(byte[] buffer, long offset, long size)
     {
-        socketProvider.OnReceived(buffer, offset, size);
+        socketProvider.OnReceived(this, buffer, offset, size);
     }
 
     protected override void OnError(SocketError error)
     {
-        socketProvider.OnError(error);
+        socketProvider.OnError(this, error);
+    }
+
+    protected override void OnHandshaked()
+    {
+        socketProvider.OnHandshaked(this);
     }
 }
 

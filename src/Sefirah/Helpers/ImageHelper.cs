@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Media.Imaging;
+using QRCoder;
 using Windows.Storage.Streams;
 
 namespace Sefirah.Helpers;
@@ -32,7 +33,7 @@ public static class ImageHelper
         try
         {
             using var stream = await data.OpenReadAsync();
-            var reader = new DataReader(stream.GetInputStreamAt(0));
+            using var reader = new DataReader(stream);
             var bytes = new byte[stream.Size];
             await reader.LoadAsync((uint)stream.Size);
             reader.ReadBytes(bytes);
@@ -41,6 +42,21 @@ public static class ImageHelper
         catch (Exception)
         {
             return string.Empty;
+        }
+    }
+
+    public static byte[]? GenerateQrCode(string data, int pixelsPerModule = 10)
+    {
+        try
+        {
+            using var qrGenerator = new QRCodeGenerator();
+            var qrCodeData = qrGenerator.CreateQrCode(data, QRCodeGenerator.ECCLevel.Q);
+            using var qrCode = new PngByteQRCode(qrCodeData);
+            return qrCode.GetGraphic(pixelsPerModule);
+        }
+        catch (Exception)
+        {
+            return null;
         }
     }
 }

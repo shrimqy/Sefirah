@@ -1,34 +1,46 @@
-using Sefirah.Data.Enums;
+using Sefirah.Data.AppDatabase.Models;
+using Sefirah.Data.Models.Messages;
+using Sefirah.Helpers;
 
 namespace Sefirah.Data.Models;
 
-public class DiscoveredDevice(
-    string deviceId, 
-    string publicKey, 
-    string deviceName, 
-    byte[]? hashedKey, 
-    DateTimeOffset lastSeen, 
-    DeviceOrigin origin)
+public partial class DiscoveredDevice : BaseRemoteDevice
 {
-    public string DeviceId { get; } = deviceId;
-    public string PublicKey { get; } = publicKey;
-    public string DeviceName { get; } = deviceName;
-    public byte[]? HashedKey { get; } = hashedKey;
-    public DateTimeOffset LastSeen { get; } = lastSeen;
-    public DeviceOrigin Origin { get; } = origin;
+    public int Port { get; set; }
 
-    public string? FormattedKey
+    public bool IsPairing { get; set; }
+
+    public byte[] SharedSecret { get; set; } = [];
+    
+    public string VerificationKey => EcdhHelper.FormatSharedSecret(SharedSecret);
+
+    internal PairedDevice ToPairedDevice()
     {
-        get
+        return new PairedDevice(Id)
         {
-            if (HashedKey is null)
-            {
-                return "000000";
-            }
-            var derivedKeyInt = BitConverter.ToInt32(HashedKey, 0);
-            derivedKeyInt = Math.Abs(derivedKeyInt) % 1_000_000;
-            return derivedKeyInt.ToString().PadLeft(6, '0');
-        }
+            Name = Name,
+            Model = Model,
+            Session = Session,
+            Client = Client,
+            Addresses = [new AddressEntry { Address = Address, IsEnabled = true, Priority = 0 }],
+            ConnectionStatus = new Connected(),
+        };
     }
+
+    internal RemoteDeviceEntity ToDeviceEntity()
+    {
+        return new RemoteDeviceEntity
+        {
+            DeviceId = Id,
+            Name = Name,
+            LastConnected = DateTime.Now,
+            Model = Model,
+            SharedSecret = SharedSecret,
+            WallpaperBytes = null,
+            Addresses = [new AddressEntry { Address = Address, IsEnabled = true, Priority = 0 }],
+            PhoneNumbers = []
+        };
+    }
+
 }
 

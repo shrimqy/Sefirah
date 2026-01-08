@@ -3,9 +3,9 @@ using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Utils;
-using Sefirah.Utils.Serialization;
 
 namespace Sefirah.ViewModels;
+
 public sealed partial class MainPageViewModel : BaseViewModel
 {
     #region Services
@@ -31,19 +31,17 @@ public sealed partial class MainPageViewModel : BaseViewModel
 
     #region Commands
 
+
     [RelayCommand]
-    public async Task ToggleConnection(PairedDevice? device)
+    public void ToggleConnection()
     {
-        if (Device!.ConnectionStatus)
+        if (Device!.IsConnected)
         {
-            var message = new CommandMessage { CommandType = CommandType.Disconnect };
-            SessionManager.SendMessage(Device.Session!, SocketMessageSerializer.Serialize(message));
-            await Task.Delay(50);
-            if (Device.Session is not null)
-            {
-                SessionManager.DisconnectSession(Device.Session);
-            }
-            Device.ConnectionStatus = false;
+            SessionManager.DisconnectDevice(Device, true);
+        }
+        else
+        {
+            SessionManager.ConnectTo(Device);
         }
     }
 
@@ -102,7 +100,7 @@ public sealed partial class MainPageViewModel : BaseViewModel
         if (int.TryParse(modeStr, out int mode))
         {
             var message = new DeviceRingerMode { RingerMode = mode };
-            SessionManager.SendMessage(Device!.Session!, SocketMessageSerializer.Serialize(message));
+            Device!.SendMessage(message);
         }
     }
 
@@ -138,8 +136,8 @@ public sealed partial class MainPageViewModel : BaseViewModel
     {
         var notificationToInvoke = new NotificationMessage
         {
-            NotificationType = NotificationType.Invoke,
             NotificationKey = notification.Key,
+            NotificationType = NotificationType.Invoke
         };
         string? appIcon = string.Empty;
         if (!string.IsNullOrEmpty(notification.AppPackage))
@@ -150,10 +148,10 @@ public sealed partial class MainPageViewModel : BaseViewModel
 
         // Scrcpy doesn't have a way of opening notifications afaik, so we will just have the notification listener on Android to open it for us
         // Plus we have to wait (2s will do ig?) until the app is actually launched to send the intent for launching the notification since Google added a lot more restrictions in this particular case
-        if (started && Device!.Session is not null)
+        if (started && Device!.IsConnected)
         {
             await Task.Delay(2000);
-            SessionManager.SendMessage(Device.Session, SocketMessageSerializer.Serialize(notificationToInvoke));
+            Device.SendMessage(notificationToInvoke);
         }
     }
 
@@ -169,12 +167,18 @@ public sealed partial class MainPageViewModel : BaseViewModel
 
     public void SendFiles(IReadOnlyList<IStorageItem> storageItems)
     {
-        FileTransferService.SendFiles(storageItems);
+        FileTransferService.SendFilesWithPicker(storageItems);
     }
 
     public void HandleNotificationReply(Notification notification, string replyText)
     {
         NotificationService.ProcessReplyAction(Device!, notification.Key, notification.ReplyResultKey!, replyText);
+    }
+
+    public void OpenDeviceSettings()
+    {
+        if (Device is null) return;
+        App.OpenDeviceSettingsWindow(Device);
     }
 
     #endregion

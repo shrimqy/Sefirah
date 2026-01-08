@@ -1,81 +1,67 @@
-using System.Diagnostics;
+using Sefirah.Helpers;
+using Windows.System;
 
 namespace Sefirah.Utils;
 
 public static class UserInformation
 {
     /// <summary>
-    /// Gets information about the current user
+    /// Gets the current user's name
     /// </summary>
-    /// <returns>Tuple containing (name, avatar base64 string)</returns>
-    public static async Task<(string name, string? avatar)> GetCurrentUserInfoAsync()
+    /// <returns>The user's name</returns>
+    public static async Task<string> GetCurrentUserNameAsync()
     {
 #if WINDOWS
         try
         {
-            string name = string.Empty;
-            string? avatarBase64 = null;
-            
-            // Windows-specific code
-            var users = await Windows.System.User.FindAllAsync();
-            if (!users.Any())
-            {
-                return (GetFallbackUserName(), null);
-            }
-            var currentUser = users[0];
+            var currentUser = await GetCurrentUserAsync();
             if (currentUser is null)
             {
-                return (GetFallbackUserName(), null);
+                return GetFallbackUserName();
             }
 
-            // Try to get the avatar
-            try
-            {
-                var picture = await currentUser.GetPictureAsync(Windows.System.UserPictureSize.Size1080x1080);
-                if (picture is not null)
-                {
-                    using var stream = await picture.OpenReadAsync();
-                    using var reader = new Windows.Storage.Streams.DataReader(stream);
-
-                    await reader.LoadAsync((uint)stream.Size);
-                    byte[] buffer = new byte[stream.Size];
-                    reader.ReadBytes(buffer);
-
-                    avatarBase64 = Convert.ToBase64String(buffer);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error getting user avatar: {ex}");
-            }
+            string name = string.Empty;
 
             // Try to get the name using properties
-            var properties = await currentUser.GetPropertiesAsync(["FirstName", "DisplayName", "AccountName"]);
-
-            if (properties.Any())
+            try
             {
-                if (properties.TryGetValue("FirstName", out object? value) && 
-                    value is string firstNameProperty &&
-                    !string.IsNullOrEmpty(firstNameProperty))
+                var properties = await currentUser.GetPropertiesAsync(["FirstName", "DisplayName", "AccountName"]);
+
+                if (properties.Any())
                 {
-                    name = firstNameProperty;
+                    if (properties.TryGetValue("FirstName", out object? value) && 
+                        value is string firstNameProperty &&
+                        !string.IsNullOrEmpty(firstNameProperty))
+                    {
+                        name = firstNameProperty;
+                    }
+                    else
+                    {
+                        name = properties["DisplayName"] as string
+                            ?? properties["AccountName"] as string
+                            ?? Environment.UserName;
+                    }
                 }
-                else
-                {
-                    name = properties["DisplayName"] as string
-                        ?? properties["AccountName"] as string
-                        ?? Environment.UserName;
-                }
+            }
+            catch (Exception)
+            {
             }
 
             if (string.IsNullOrEmpty(name))
             {
                 // Try to get name from WindowsIdentity
-                using var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
-                var identityName = identity.Name;
-                if (!string.IsNullOrEmpty(identityName))
+                try
                 {
-                    name = identityName.Split('\\').Last().Split(' ').First();
+                    using var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
+                    var identityName = identity.Name;
+                    if (!string.IsNullOrEmpty(identityName))
+                    {
+                        name = identityName.Split('\\').Last().Split(' ').First();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error getting WindowsIdentity: {ex}");
                 }
             }
             
@@ -85,12 +71,22 @@ public static class UserInformation
                 name = GetFallbackUserName();
             }
             
-            return (name, avatarBase64);
+            return name;
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            Debug.WriteLine($"Unauthorized access when getting user name: {ex}");
+            return GetFallbackUserName();
+        }
+        catch (System.Runtime.InteropServices.COMException ex)
+        {
+            Debug.WriteLine($"COM exception accessing user name (may be related to Windows credential vault): {ex.Message}");
+            return GetFallbackUserName();
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Error getting user info: {ex}");
-            return (GetFallbackUserName(), null);
+            Debug.WriteLine($"Error getting user name: {ex}");
+            return GetFallbackUserName();
         }
 #else
         // For other platforms (Linux/Skia, etc.)
@@ -104,10 +100,81 @@ public static class UserInformation
                       "User";
         }
         
-        // We don't have a way to get the avatar in other platforms
-        return (username, null);
+        return username;
 #endif
     }
+
+    /// <summary>
+    /// Gets the current user's avatar as a base64 string
+    /// </summary>
+    /// <returns>The user's avatar as a base64 string, or null if unavailable</returns>
+    public static async Task<string?> GetCurrentUserAvatarAsync()
+    {
+#if WINDOWS
+        try
+        {
+            var currentUser = await GetCurrentUserAsync();
+            if (currentUser is null)
+            {
+                return null;
+            }
+
+            // Try to get the avatar
+            try
+            {
+                var picture = await currentUser.GetPictureAsync(UserPictureSize.Size1080x1080);
+                if (picture is not null)
+                {
+                    return await picture.ToBase64Async();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error getting user avatar: {ex}");
+            }
+
+            return null;
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            Debug.WriteLine($"Unauthorized access when getting user avatar: {ex}");
+            return null;
+        }
+        catch (System.Runtime.InteropServices.COMException ex)
+        {
+            Debug.WriteLine($"COM exception accessing user avatar (may be related to Windows credential vault): {ex.Message}");
+            return null;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error getting user avatar: {ex}");
+            return null;
+        }
+#else
+        // We don't have a way to get the avatar in other platforms
+        return null;
+#endif
+    }
+
+#if WINDOWS
+    private static async Task<User?> GetCurrentUserAsync()
+    {
+        try
+        {
+            var users = await User.FindAllAsync();
+            if (users.Any())
+            {
+                return users[0];
+            }
+        }
+        catch (Exception)
+        {
+            Debug.WriteLine("error accessing user information, using fallback");
+        }
+        
+        return null;
+    }
+#endif
 
     private static string GetFallbackUserName()
         => Environment.UserName.Split('\\').Last().Split(' ').First();

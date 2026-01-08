@@ -1,5 +1,4 @@
 using Sefirah.Data.Enums;
-using Sefirah.Extensions;
 
 namespace Sefirah.Data.Models;
 

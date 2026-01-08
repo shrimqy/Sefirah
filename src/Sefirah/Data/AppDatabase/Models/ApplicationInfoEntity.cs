@@ -32,7 +32,7 @@ public partial class ApplicationInfoEntity
     internal static async Task<ApplicationInfoEntity> FromApplicationInfoMessage(ApplicationInfoMessage info, string deviceId)
     {
         List<AppDeviceInfo> appDeviceInfoList = [new(deviceId, NotificationFilter.ToastFeed)];
-        IconUtils.SaveAppIconToPathAsync(info.AppIcon, info.PackageName);
+        await IconUtils.SaveAppIconToPathAsync(info.AppIcon, info.PackageName);
         return new ApplicationInfoEntity
         {
             PackageName = info.PackageName,

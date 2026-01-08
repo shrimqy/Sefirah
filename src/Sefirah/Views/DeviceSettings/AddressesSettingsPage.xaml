@@ -1,0 +1,89 @@
+﻿<Page
+    x:Class="Sefirah.Views.DeviceSettings.AddressesSettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Sefirah.UserControls"
+    xmlns:converters="using:Sefirah.Converters"
+    xmlns:wctconverters="using:CommunityToolkit.WinUI.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:Sefirah.Helpers"
+    xmlns:local="using:Sefirah.Views.DeviceSettings"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:Sefirah.Data.Models.Messages"
+    xmlns:wuc="using:CommunityToolkit.WinUI.Controls"
+    x:Name="PageRoot"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Page.Resources>
+
+    <ScrollViewer>
+        <StackPanel Margin="20" Spacing="16">
+            <TextBlock
+                FontSize="16"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Text="{helpers:ResourceString Name=DeviceAddresses}" />
+
+            <!--  Add Address Input  -->
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox
+                    x:Name="AddressTextBox"
+                    Grid.Column="0"
+                    PlaceholderText="{helpers:ResourceString Name=HostnamePlaceholder}"
+                    Text="{x:Bind ViewModel.NewAddress, Mode=TwoWay}" />
+                <Button
+                    Grid.Column="1"
+                    Command="{x:Bind ViewModel.AddAddressCommand}"
+                    Content="{helpers:ResourceString Name=Add}" />
+            </Grid>
+
+            <!--  Addresses List  -->
+            <ListView
+                AllowDrop="True"
+                CanReorderItems="True"
+                ItemsSource="{x:Bind ViewModel.Addresses, Mode=OneWay}"
+                SelectionMode="None">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListViewItem">
+                                    <ListViewItemPresenter
+                                        Padding="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        ContentMargin="0" />
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="models:AddressEntry">
+                        <wuc:SettingsCard HorizontalAlignment="Stretch">
+                            <wuc:SettingsCard.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox
+                                        IsChecked="{x:Bind IsEnabled, Mode=TwoWay}"
+                                        Click="OnAddressEnabledChanged" />
+                                    <TextBlock Margin="-80,0" VerticalAlignment="Center" Text="{x:Bind Address}" />
+                                </StackPanel>
+                            </wuc:SettingsCard.Header>
+                            <Button
+                                Command="{Binding DataContext.RemoveAddressCommand, ElementName=PageRoot}"
+                                CommandParameter="{x:Bind}"
+                                Content="{helpers:ResourceString Name=Remove}"
+                                Visibility="{Binding ElementName=PageRoot, Path=ViewModel.CanRemoveAddress, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        </wuc:SettingsCard>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackPanel>
+    </ScrollViewer>
+</Page>
+

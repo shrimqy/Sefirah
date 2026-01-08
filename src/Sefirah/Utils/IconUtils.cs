@@ -79,10 +79,10 @@ public static class IconUtils
     /// <summary>
     /// Saves app icon bytes to the AppIcons folder and returns the file system path
     /// </summary>
-    /// <param name="bytes">App icon bytes to save</param>
-    /// <param name="fileName">Name of the app icon file</param>
-    /// <returns>File system path to the saved app icon file</returns>
-    public static async void SaveAppIconToPathAsync(string? appIconBase64, string appPackage)
+    /// <param name="appIconBase64">Base64 encoded app icon data</param>
+    /// <param name="appPackage">Package name of the app</param>
+    /// <returns>Task representing the async operation</returns>
+    public static async Task SaveAppIconToPathAsync(string? appIconBase64, string appPackage)
     {
         try
         {
@@ -95,6 +95,25 @@ public static class IconUtils
             using var dataWriter = new DataWriter(stream);
             dataWriter.WriteBytes(bytes);
             await dataWriter.StoreAsync();
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    /// <summary>
+    /// Deletes an app icon file from the AppIcons folder
+    /// </summary>
+    /// <param name="appPackage">Package name of the app</param>
+    public static void DeleteAppIcon(string appPackage)
+    {
+        try
+        {
+            var filePath = GetAppIconFilePath(appPackage);
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
         }
         catch (Exception)
         {

@@ -5,7 +5,6 @@ using Sefirah.Platforms.Windows.RemoteStorage.Commands;
 using Sefirah.Platforms.Windows.RemoteStorage.Sftp;
 using Sefirah.Platforms.Windows.RemoteStorage.Worker;
 using Windows.Storage.Provider;
-using Windows.System.Profile;
 
 namespace Sefirah.Platforms.Windows.Services;
 
@@ -25,26 +24,6 @@ public class WindowsSftpService(
         try
         {
             if (!StorageProviderSyncRootManager.IsSupported()) return;
-
-            // Retrieve and parse the OS version from the device family version string.
-            string deviceFamilyVersion = AnalyticsInfo.VersionInfo.DeviceFamilyVersion;
-            ulong version = ulong.Parse(deviceFamilyVersion);
-            ulong major = (version & 0xFFFF000000000000L) >> 48;
-            ulong minor = (version & 0x0000FFFF00000000L) >> 32;
-            ulong build = (version & 0x00000000FFFF0000L) >> 16;
-            ulong revision = version & 0x000000000000FFFFL;
-
-            var currentOsVersion = new Version((int)major, (int)minor, (int)build, (int)revision);
-            var requiredOsVersion = new Version(10, 0, 19624, 1000);
-
-            // If the current OS version is lower than the threshold version, skip the sync root registration.
-            if (currentOsVersion < requiredOsVersion)
-            {
-                logger.LogWarning(
-                    "OS version {0} is lower than the required threshold {1}. Skipping sync root registration.",
-                    currentOsVersion, requiredOsVersion);
-                return;
-            }
 
             logger.LogInformation("Initializing SFTP service, IP: {ip}, Port: {port}, Password: {pass}, Username: {name}",
                 info.IpAddress, info.Port, info.Password, info.Username);

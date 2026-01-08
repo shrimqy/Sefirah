@@ -1,10 +1,10 @@
-using CommunityToolkit.WinUI;
+using System.Collections.Specialized;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Items;
 using Sefirah.Data.Models;
-using Sefirah.Extensions;
+using Sefirah.Data.Models.Messages;
 
 namespace Sefirah.ViewModels.Settings;
 
@@ -22,14 +22,14 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         }
     }
 
-    public string DisplayIpAddresses
+    public string DisplayAddresses
     {
         get
         {
-            if (Device?.IpAddresses == null || Device.IpAddresses.Count == 0)
-                return "No IP addresses";
+            if (Device?.Addresses is null || Device.Addresses.Count == 0)
+                return "No addresses";
 
-            return string.Join(", ", Device.IpAddresses);
+            return string.Join(", ", Device.Addresses.Where(a => a.IsEnabled).Select(a => a.Address));
         }
     }
     #endregion
@@ -175,8 +175,8 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
     #region General Settings
 
     public ObservableCollection<ScrcpyPreferenceItem> DisplayOrientationOptions => AdbService.DisplayOrientationOptions;
-    public ObservableCollection<ScrcpyPreferenceItem> VideoCodecOptions => AdbService.VideoCodecOptions;
-    public ObservableCollection<ScrcpyPreferenceItem> AudioCodecOptions => AdbService.AudioCodecOptions;
+    public ObservableCollection<ScrcpyPreferenceItem> VideoCodecOptions => AdbService.GetVideoCodecOptions(Device?.Model ?? "Unknown");
+    public ObservableCollection<ScrcpyPreferenceItem> AudioCodecOptions => AdbService.GetAudioCodecOptions(Device?.Model ?? "Unknown");
 
     public Dictionary<ScrcpyDevicePreferenceType, string> ScrcpyDevicePreferenceOptions { get; } = new()
     {
@@ -598,6 +598,22 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
     private readonly RemoteAppRepository RemoteAppsRepository = Ioc.Default.GetRequiredService<RemoteAppRepository>();
     public ObservableCollection<ApplicationInfo> RemoteApps { get; set; } = [];
 
+    private readonly DeviceRepository DeviceRepository = Ioc.Default.GetRequiredService<DeviceRepository>();
+
+    private bool isDragging = true;
+    private bool isBulkOperation;
+
+    public ObservableCollection<AddressEntry> Addresses { get; set; } = [];
+
+    private string newAddress = string.Empty;
+    public string NewAddress
+    {
+        get => newAddress;
+        set => SetProperty(ref newAddress, value);
+    }
+
+    public bool CanRemoveAddress => Addresses.Count > 1;
+
 
     public DeviceSettingsViewModel(PairedDevice device)
     {
@@ -611,6 +627,87 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         OnPropertyChanged(nameof(SelectedAudioOutputMode));
         OnPropertyChanged(nameof(SelectedScrcpyDevicePreference));
         LoadApps(device.Id);
+        LoadAddresses();
+        
+        Addresses.CollectionChanged += Addresses_CollectionChanged;
+    }
+
+    private void LoadAddresses()
+    {
+        isBulkOperation = true;
+        Addresses = Device.Addresses.ToObservableCollection();        
+        isBulkOperation = false;
+    }
+
+    private void Addresses_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (isBulkOperation) return;
+        // Reordering ListView has no events, but its collection is updated twice,
+        if (isDragging)
+        {
+            isDragging = false;
+            return;
+        }
+        isDragging = true;
+        
+        OnPropertyChanged(nameof(CanRemoveAddress));
+        SaveAddresses();
+    }
+
+    public void SaveAddresses()
+    {
+        // Update priorities based on current order
+        for (int i = 0; i < Addresses.Count; i++)
+        {
+            Addresses[i].Priority = i;
+        }
+
+        // Update device's addresses
+        Device.Addresses = Addresses.ToList();
+
+        // Save to database
+        var deviceEntity = DeviceRepository.GetRemoteDevice(Device.Id);
+        if (deviceEntity is not null)
+        {
+            deviceEntity.Addresses = Addresses.ToList();
+            DeviceRepository.AddOrUpdateRemoteDevice(deviceEntity);
+        }
+
+        OnPropertyChanged(nameof(DisplayAddresses));
+    }
+
+    [RelayCommand]
+    private void AddAddress()
+    {
+        if (string.IsNullOrWhiteSpace(NewAddress))
+            return;
+
+        var address = NewAddress.Trim();
+        
+        isBulkOperation = true;
+        var newEntry = new AddressEntry
+        {
+            Address = address,
+            IsEnabled = true,
+            Priority = Addresses.Count
+        };
+
+        Addresses.Add(newEntry);
+        isBulkOperation = false;
+        NewAddress = string.Empty;
+        OnPropertyChanged(nameof(CanRemoveAddress));
+        SaveAddresses();
+    }
+        
+
+    [RelayCommand]
+    private void RemoveAddress(AddressEntry entry)
+    {
+        isBulkOperation = true;
+        Addresses.Remove(entry);
+        isBulkOperation = false;
+        OnPropertyChanged(nameof(CanRemoveAddress));
+        SaveAddresses();
     }
 
     public void LoadApps(string id)

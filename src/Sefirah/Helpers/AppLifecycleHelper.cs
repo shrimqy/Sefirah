@@ -9,6 +9,7 @@ using Sefirah.Platforms.Windows.Services;
 using Sefirah.Platforms.Desktop;
 #endif
 using Sefirah.Services;
+using Sefirah.Services.FileTransfer;
 using Sefirah.Services.Settings;
 using Sefirah.Services.Socket;
 using Sefirah.ViewModels;
@@ -31,33 +32,40 @@ public static class AppLifecycleHelper
 
     public static async Task InitializeAppComponentsAsync()
     {
+        var discoveryService = Ioc.Default.GetRequiredService<IDiscoveryService>();
+        var clipboardService = Ioc.Default.GetRequiredService<IClipboardService>();
         var networkService = Ioc.Default.GetRequiredService<INetworkService>();
         var notificationService = Ioc.Default.GetRequiredService<INotificationService>();
         var deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
         var adbService = Ioc.Default.GetRequiredService<IAdbService>();
         var playbackService = Ioc.Default.GetRequiredService<IPlaybackService>();
         var actionService = Ioc.Default.GetRequiredService<IActionService>();
-
         var updateService = Ioc.Default.GetRequiredService<IUpdateService>();
+        var generalSettingsService = Ioc.Default.GetRequiredService<IGeneralSettingsService>();
 
 #if WINDOWS
         var windowsNotificationHandler = Ioc.Default.GetRequiredService<IPlatformNotificationHandler>();
         await windowsNotificationHandler.RegisterForNotifications();
 #endif
 
-        notificationService.Initialize();
-        await deviceManager.Initialize();
-
         await Task.WhenAll(
-            networkService.StartServerAsync(),
+            deviceManager.Initialize(),
+            networkService.StartServerAsync()
+        );
+        
+        await discoveryService.StartDiscoveryAsync();
+        
+        await Task.WhenAll(
             playbackService.InitializeAsync(),
             actionService.InitializeAsync(),
             adbService.StartAsync(),
-            updateService.CheckForUpdatesAsync()
-        ); 
+            updateService.CheckForUpdatesAsync(),
+            notificationService.Initialize(),
+            clipboardService.Initialize()
+        );
 
         App.SplashScreenLoadingTCS?.TrySetResult();
-    } 
+    }
 
     public static IApplicationBuilder ConfigureApp(this App app, LaunchActivatedEventArgs args)
     {
@@ -131,7 +139,7 @@ public static class AppLifecycleHelper
                 .AddSingleton<SmsHandlerService>()
 
                 .AddSingleton<IMessageHandler, MessageHandler>()
-                .AddSingleton<Func<IMessageHandler>>(sp => () => sp.GetRequiredService<IMessageHandler>())
+                .AddSingleton<Lazy<IMessageHandler>>(sp => new Lazy<IMessageHandler>(() => sp.GetRequiredService<IMessageHandler>()))
                 .AddSingleton<IAdbService, AdbService>()
                 .AddSingleton<IScreenMirrorService, ScreenMirrorService>()
                 .AddSingleton<IFileTransferService, FileTransferService>()

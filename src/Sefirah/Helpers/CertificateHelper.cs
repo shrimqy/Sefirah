@@ -1,12 +1,18 @@
+using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using NetCoreServer;
 
 namespace Sefirah.Helpers;
 
+/// <summary>
+/// Manages SSL/TLS certificates and provides SslContext
+/// </summary>
 public class CertificateHelper
 {
     private static string CertificateFileName { get; } = "Sefirah.pfx";
-    public static async Task<X509Certificate2> CreateECDSACertificate()
+    
+    private static X509Certificate2 CreateECDSACertificate()
     {
         // Create ECDSA with NIST P-256 curve
         using var ecdsa = ECDsa.Create(ECCurve.NamedCurves.nistP256);
@@ -36,12 +42,12 @@ public class CertificateHelper
             ApplicationData.Current.LocalFolder.Path,
             CertificateFileName);
 
-        await File.WriteAllBytesAsync(certPath, exportedData);
+        File.WriteAllBytes(certPath, exportedData);
         
         return certificate;
     }
 
-    public static async Task<X509Certificate2> GetOrCreateCertificateAsync()
+    public static X509Certificate2 GetOrCreateCertificate()
     {
         string certPath = Path.Combine(ApplicationData.Current.LocalFolder.Path, CertificateFileName);
 
@@ -57,7 +63,21 @@ public class CertificateHelper
             }
         }
 
-        return await CreateECDSACertificate();
+        return CreateECDSACertificate();
+    }
+
+    /// <summary>
+    /// Cached SslContext for TLS connections (created once, reused everywhere)
+    /// </summary>
+    public static SslContext SslContext { get; } = CreateSslContext();
+
+    private static SslContext CreateSslContext()
+    {
+        var certificate = GetOrCreateCertificate();
+        return new SslContext(
+            SslProtocols.Tls12 | SslProtocols.Tls13, 
+            certificate, 
+            (sender, cert, chain, errors) => true);
     }
 }
 

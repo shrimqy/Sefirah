@@ -28,30 +28,35 @@
 
     <ScrollViewer Padding="0,0,40,0">
         <StackPanel Spacing="4">
-            <!--  Breadcrumb Navigation  -->
-            <BreadcrumbBar x:Name="BreadcrumbBar" Margin="0,0,0,8">
-                <BreadcrumbBar.ItemTemplate>
-                    <DataTemplate x:DataType="items:BreadcrumbBarItemModel">
-                        <BreadcrumbBarItem AutomationProperties.Name="{Binding Name}" Content="{Binding}">
-                            <BreadcrumbBarItem.ContentTemplate>
-                                <DataTemplate>
-                                    <TextBlock
-                                        FontSize="28"
-                                        FontWeight="SemiBold"
-                                        Text="{Binding Name}" />
-                                </DataTemplate>
-                            </BreadcrumbBarItem.ContentTemplate>
-                        </BreadcrumbBarItem>
-                    </DataTemplate>
-                </BreadcrumbBar.ItemTemplate>
-            </BreadcrumbBar>
-
-            <!--  Add Action Button  -->
-            <Button
-                Margin="12,0,0,16"
-                Command="{x:Bind ViewModel.AddActionCommand}"
-                Content="{helpers:ResourceString Name=AddAction}"
-                Style="{ThemeResource AccentButtonStyle}" />
+            <!--  Breadcrumb Navigation with Button  -->
+            <Grid Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <BreadcrumbBar x:Name="BreadcrumbBar" Grid.Column="0">
+                    <BreadcrumbBar.ItemTemplate>
+                        <DataTemplate x:DataType="items:BreadcrumbBarItemModel">
+                            <BreadcrumbBarItem AutomationProperties.Name="{Binding Name}" Content="{Binding}">
+                                <BreadcrumbBarItem.ContentTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            FontSize="28"
+                                            FontWeight="SemiBold"
+                                            Text="{Binding Name}" />
+                                    </DataTemplate>
+                                </BreadcrumbBarItem.ContentTemplate>
+                            </BreadcrumbBarItem>
+                        </DataTemplate>
+                    </BreadcrumbBar.ItemTemplate>
+                </BreadcrumbBar>
+                <Button
+                    Grid.Column="1"
+                    Command="{x:Bind ViewModel.AddActionCommand}"
+                    Style="{ThemeResource AccentButtonStyle}">
+                    <TextBlock Text="{helpers:ResourceString Name=AddAction}" />
+                </Button>
+            </Grid>
 
             <!--  Actions List  -->
             <ListView

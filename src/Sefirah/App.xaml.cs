@@ -9,10 +9,11 @@ using LaunchActivatedEventArgs = Microsoft.UI.Xaml.LaunchActivatedEventArgs;
 using H.NotifyIcon;
 using Sefirah.Data.Contracts;
 using System.Runtime.InteropServices;
-using Sefirah.Extensions;
 using Sefirah.Data.Enums;
 using Microsoft.UI.Windowing;
 using WinRT.Interop;
+using Sefirah.Data.Models;
+
 
 #if WINDOWS
 using Sefirah.Platforms.Windows.Helpers;
@@ -26,6 +27,9 @@ public partial class App : Application
     public static nint WindowHandle { get; private set; }
     public static Window MainWindow { get; private set; } = null!;
     protected IHost? Host { get; private set; }
+    
+    // Track open DeviceSettingsWindow instances
+    private static readonly Dictionary<string, DeviceSettingsWindow> DeviceSettingsWindows = [];
 
     public App()
     {
@@ -175,6 +179,8 @@ public partial class App : Application
             switch (activatedEventArgs.Data)
             {
                 case ShareTargetActivatedEventArgs shareArgs:
+                    MainWindow.AppWindow.Show();
+                    MainWindow.Activate();
                     await HandleShareTargetActivation(shareArgs);
                     break;
                 default:
@@ -208,11 +214,11 @@ public partial class App : Application
 
     private void Window_Activated(object sender, WindowActivatedEventArgs args)
     {
-        if (args.WindowActivationState == WindowActivationState.CodeActivated ||
-            args.WindowActivationState == WindowActivationState.PointerActivated)
+        if (args.WindowActivationState is WindowActivationState.CodeActivated ||
+            args.WindowActivationState is WindowActivationState.PointerActivated)
             return;
 
-            ApplicationData.Current.LocalSettings.Values["INSTANCE_ACTIVE"] = -Environment.ProcessId;
+        ApplicationData.Current.LocalSettings.Values["INSTANCE_ACTIVE"] = -Environment.ProcessId;
     }
 
     public static async Task HandleShareTargetActivation(ShareTargetActivatedEventArgs args)
@@ -222,10 +228,37 @@ public partial class App : Application
         var items = await shareOperation.Data.GetStorageItemsAsync();
         shareOperation.ReportDataRetrieved();
         shareOperation.ReportCompleted();
-        fileTransferService.SendFiles(items);
+        fileTransferService.SendFilesWithPicker(items);
     }
 #endif
 
     private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         => new Exception("Failed to load Page " + e.SourcePageType.FullName);
+
+    /// <summary>
+    /// Opens DeviceSettingsWindow for the specified device.
+    /// </summary>
+    public static DeviceSettingsWindow OpenDeviceSettingsWindow(PairedDevice device)
+    {
+        if (DeviceSettingsWindows.TryGetValue(device.Id, out var existingWindow))
+        {
+            // Window exists, activate it
+            existingWindow.Activate();
+            return existingWindow;
+        }
+
+        // Create new window
+        var newWindow = new DeviceSettingsWindow(device);
+        DeviceSettingsWindows[device.Id] = newWindow;
+        newWindow.Activate();
+        return newWindow;
+    }
+
+    /// <summary>
+    /// Removes DeviceSettingsWindow when it is closed.
+    /// </summary>
+    public static void RemoveDeviceSettingsWindow(string deviceId)
+    {
+        DeviceSettingsWindows.Remove(deviceId);
+    }
 }

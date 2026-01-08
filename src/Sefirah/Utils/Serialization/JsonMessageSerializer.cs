@@ -2,7 +2,7 @@ using Sefirah.Data.Models;
 
 namespace Sefirah.Utils.Serialization;
 
-public static class SocketMessageSerializer
+public static class JsonMessageSerializer
 {
     private static readonly JsonSerializerOptions options = new()
     {
@@ -13,9 +13,6 @@ public static class SocketMessageSerializer
 
     public static string Serialize(object message) => 
         JsonSerializer.Serialize(message, options);
-
-    public static T? Deserialize<T>(string json) => 
-        JsonSerializer.Deserialize<T>(json, options);
 
     public static SocketMessage? DeserializeMessage(string json) => 
         JsonSerializer.Deserialize<SocketMessage>(json, options);

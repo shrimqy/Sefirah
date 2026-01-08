@@ -281,9 +281,16 @@ public class DesktopNotificationHandler(
         }
     }
 
-    public void ShowFileTransferNotification(string subtitle, string fileName, string transferId, uint notificationSequence, double? progress = null)
+    public void ShowFileTransferNotification(
+        string notificationTitle,
+        string progressTitle,
+        string status,
+        string transferId,
+        uint notificationSequence,
+        double progress)
     {
-        return; // Not implemented for D-Bus notifications
+        // Not implemented for D-Bus notifications
+        return;
     }
 
     public async Task RegisterForNotifications()
@@ -405,14 +412,14 @@ public class DesktopNotificationHandler(
 
         // Find the device by ID
         var device = deviceManager.FindDeviceById(actionData.DeviceId);
-        if (device == null)
+        if (device is null)
         {
             logger.LogWarning("Could not find device with ID: {DeviceId}", actionData.DeviceId);
             return;
         }
 
         // Process the click action using the static utility
-        NotificationActionUtils.ProcessClickAction(sessionManager, logger, device, actionData.NotificationKey, action.ActionIndex);
+        NotificationActionUtils.ProcessClickAction(logger, device, actionData.NotificationKey, action.ActionIndex);
         logger.LogDebug("Processed remote notification action for device {DeviceId}, action index: {ActionIndex}", 
             actionData.DeviceId, action.ActionIndex);
     }

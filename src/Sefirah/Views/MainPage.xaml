@@ -102,6 +102,26 @@
                         PointerEntered="PhoneFrame_PointerEntered"
                         PointerExited="PhoneFrame_PointerExited"
                         PointerWheelChanged="PhoneFrame_PointerWheelChanged">
+                        <Grid.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem
+                                    x:Name="SendFilesMenuItem"
+                                    Click="SendFilesMenuItem_Click"
+                                    Text="{helpers:ResourceString Name=SendFiles}">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE8A5;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem
+                                    x:Name="DeviceSettingsMenuItem"
+                                    Click="DeviceSettingsMenuItem_Click"
+                                    Text="{helpers:ResourceString Name=DeviceSettings}">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE713;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                            </MenuFlyout>
+                        </Grid.ContextFlyout>
                         <!--  Phone frame border  -->
                         <Rectangle
                             Opacity="0.5"
@@ -177,7 +197,7 @@
                         <StackPanel
                             Orientation="Horizontal"
                             Spacing="5"
-                            Visibility="{x:Bind ViewModel.Device.ConnectionStatus, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
+                            Visibility="{x:Bind ViewModel.Device.IsConnected, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
 
                             <!--  Audio Mode Button  -->
                             <Button
@@ -232,7 +252,7 @@
                         <Button
                             HorizontalAlignment="Left"
                             Command="{x:Bind ViewModel.ToggleConnectionCommand}"
-                            Content="{x:Bind ViewModel.Device.ConnectionStatus, Converter={StaticResource BoolToConnectionButtonTextConverter}, Mode=OneWay}"
+                            Content="{x:Bind ViewModel.Device.ConnectionStatusText, Mode=OneWay}"
                             Visibility="{x:Bind ViewModel.Device.Name, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}" />
                     </StackPanel>
                 </Grid>
@@ -242,7 +262,7 @@
                     Grid.Row="0"
                     Grid.RowSpan="3"
                     Margin="18,20,10,10"
-                    Visibility="{x:Bind ViewModel.Device.Name, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}, Mode=OneWay}">
+                    Visibility="{x:Bind ViewModel.Device, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}, Mode=OneWay}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -276,7 +296,9 @@
                                             Margin="0,0,0,4"
                                             Padding="12"
                                             HorizontalAlignment="Stretch"
-                                            HorizontalContentAlignment="Left">
+                                            HorizontalContentAlignment="Left"
+                                            Click="DiscoveredDeviceButton_Click"
+                                            Tag="{x:Bind}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto" />
@@ -288,11 +310,11 @@
                                                     VerticalAlignment="Center"
                                                     Glyph="&#xE8EA;" />
                                                 <StackPanel Grid.Column="1" Spacing="4">
-                                                    <TextBlock FontWeight="SemiBold" Text="{x:Bind DeviceName}" />
+                                                    <TextBlock FontWeight="SemiBold" Text="{x:Bind Name}" />
                                                     <TextBlock
                                                         FontSize="12"
                                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                        Text="{x:Bind FormattedKey}" />
+                                                        Text="{x:Bind VerificationKey}" />
                                                 </StackPanel>
                                             </Grid>
                                         </Button>

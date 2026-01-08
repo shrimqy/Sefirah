@@ -44,4 +44,9 @@ public sealed partial class DeviceSettingsPage : Page
     {
         Frame.Navigate(typeof(AdbSettingsPage), ViewModel, new DrillInNavigationTransitionInfo());
     }
+
+    private void OpenAddressSettings(object sender, RoutedEventArgs e)
+    {
+        Frame.Navigate(typeof(AddressesSettingsPage), ViewModel, new DrillInNavigationTransitionInfo());
+    }
 }

@@ -3,9 +3,9 @@ namespace Sefirah.Data.Enums;
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum SessionType
 {
-    Session,
+    PlaybackInfo,
+    PlaybackUpdate,
     TimelineUpdate,
-    PlaybackInfoUpdate,
     RemovedSession
 }
 
@@ -30,7 +30,8 @@ public enum PlaybackActionType
 public enum AudioMessageType
 {
     New,
-    Removed
+    Removed,
+    Active
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -72,9 +73,3 @@ public enum ConversationType
     New
 }
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
-public enum FileTransferType
-{
-    Clipboard,
-    File
-}

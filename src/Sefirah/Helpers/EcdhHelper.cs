@@ -76,6 +76,16 @@ public class EcdhHelper
     }
 
     /// <summary>
+    /// Formats a shared secret into a 6-digit verification code
+    /// </summary>
+    public static string FormatSharedSecret(byte[] sharedSecret)
+    {
+        var derivedKeyInt = BitConverter.ToInt32(sharedSecret, 0);
+        derivedKeyInt = Math.Abs(derivedKeyInt) % 1_000_000;
+        return derivedKeyInt.ToString().PadLeft(6, '0');
+    }
+
+    /// <summary>
     /// Generates a random password with 12 characters containing uppercase letters, 
     /// lowercase letters, numbers, and special characters
     /// </summary>

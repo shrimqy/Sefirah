@@ -39,7 +39,7 @@
                 IsSelected="True"
                 Tag="GeneralPage" />
             <NavigationViewItem
-                Content="{helpers:ResourceString Name=Devices}"
+                Content="{helpers:ResourceString Name=Devices/Title}"
                 Icon="CellPhone"
                 Tag="DevicesPage" />
             <NavigationViewItem Content="{helpers:ResourceString Name=About}" Tag="AboutPage">

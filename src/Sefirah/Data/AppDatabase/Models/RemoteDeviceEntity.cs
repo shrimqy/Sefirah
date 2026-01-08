@@ -1,10 +1,11 @@
 using Sefirah.Data.Models;
+using Sefirah.Data.Models.Messages;
 using Sefirah.Helpers;
 using SQLite;
 
 namespace Sefirah.Data.AppDatabase.Models;
 
-public partial class RemoteDeviceEntity
+public class RemoteDeviceEntity
 {
     [PrimaryKey]
     public string DeviceId { get; set; } = string.Empty;
@@ -13,29 +14,30 @@ public partial class RemoteDeviceEntity
 
     public string Model { get; set; } = string.Empty;
 
-    public byte[]? SharedSecret { get; set; }
+    public byte[] SharedSecret { get; set; } = null!;
 
     public byte[]? WallpaperBytes { get; set; }
 
     public DateTime? LastConnected { get; set; }
 
-    [Column("IpAddresses")]
-    public string? IpAddressesJson { get; set; }
+    [Column("Addresses")]
+    public string? AddressesJson { get; set; }
     
     [Ignore]
-    public List<string> IpAddresses
+    public List<AddressEntry> Addresses
     {
-        get => string.IsNullOrEmpty(IpAddressesJson) ? [] : JsonSerializer.Deserialize<List<string>>(IpAddressesJson) ?? [];
-        set => IpAddressesJson = value is null ? null : JsonSerializer.Serialize(value);
+        get => string.IsNullOrEmpty(AddressesJson) ? [] : JsonSerializer.Deserialize<List<AddressEntry>>(AddressesJson) ?? [];
+
+        set => AddressesJson = value is null ? null : JsonSerializer.Serialize(value);
     }
 
     [Column("PhoneNumbers")]
     public string? PhoneNumbersJson { get; set; }
 
     [Ignore]
-    public List<PhoneNumber>? PhoneNumbers
+    public List<PhoneNumber> PhoneNumbers
     {
-        get => string.IsNullOrEmpty(PhoneNumbersJson) ? null : JsonSerializer.Deserialize<List<PhoneNumber>>(PhoneNumbersJson);
+        get => string.IsNullOrEmpty(PhoneNumbersJson) ? [] : JsonSerializer.Deserialize<List<PhoneNumber>>(PhoneNumbersJson) ?? [];
         set => PhoneNumbersJson = value is null ? null : JsonSerializer.Serialize(value);
     }
 
@@ -46,7 +48,7 @@ public partial class RemoteDeviceEntity
         {
             Name = Name,
             Model = Model,
-            IpAddresses = IpAddresses,
+            Addresses = Addresses,
             PhoneNumbers = PhoneNumbers,
             Wallpaper = await ImageHelper.ToBitmapAsync(WallpaperBytes),
         };

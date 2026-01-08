@@ -1,79 +1,72 @@
+using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
-using System.Security.Authentication;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using CommunityToolkit.WinUI;
 using NetCoreServer;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
+using Sefirah.Data.Models.Messages;
+using Sefirah.Dialogs;
 using Sefirah.Helpers;
 using Sefirah.Services.Socket;
 using Sefirah.Utils;
 using Sefirah.Utils.Serialization;
-using Uno.Logging;
 
 namespace Sefirah.Services;
+
 public class NetworkService(
-    Func<IMessageHandler> messageHandlerFactory,
+    Lazy<IMessageHandler> messageHandler,
     ILogger<NetworkService> logger,
     IDeviceManager deviceManager,
-    IAdbService adbService,
-    IDiscoveryService discoveryService) : INetworkService, ISessionManager, ITcpServerProvider
+    IAdbService adbService) : INetworkService, ISessionManager, ITcpServerProvider, ITcpClientProvider
 {
+    public static int ServerPort { get; private set; }
+
     private Server? server;
-    private int serverPort;
     private bool isRunning;
-    private X509Certificate2? certificate;
-    private readonly IEnumerable<int> PORT_RANGE = Enumerable.Range(5150, 20); // 5150 to 5169
+    private static SslContext SslContext => CertificateHelper.SslContext;
+    private static readonly IEnumerable<int> PORT_RANGE = Enumerable.Range(5150, 20); // 5150 to 5169
 
-    private readonly Lazy<IMessageHandler> messageHandler = new(messageHandlerFactory);
-
-    private string bufferedData = string.Empty;
+    private readonly ConcurrentDictionary<Guid, string> connectionBuffers = [];
+    private readonly HashSet<string> connectingDeviceIds = [];
+    private readonly ConcurrentDictionary<Guid, TaskCompletionSource<bool>> handshakeCompletion = [];
+    private readonly ConcurrentDictionary<string, CancellationTokenSource> connectionCancellationTokens = [];
     
     private ObservableCollection<PairedDevice> PairedDevices => deviceManager.PairedDevices;
+    private ObservableCollection<DiscoveredDevice> DiscoveredDevices => deviceManager.DiscoveredDevices;
 
     /// <summary>
     /// Event fired when a device connection status changes
     /// </summary>
-    public event EventHandler<(PairedDevice Device, bool IsConnected)>? ConnectionStatusChanged;
+    public event EventHandler<PairedDevice>? ConnectionStatusChanged;
 
-    public async Task<bool> StartServerAsync()
+    public async Task StartServerAsync()
     {
-        if (isRunning)
-        {
-            logger.LogWarning("Server is already running");
-            return false;
-        }
+        if (isRunning) return;
+
         try
         {
-
-            certificate = await CertificateHelper.GetOrCreateCertificateAsync();
-
-            var context = new SslContext(SslProtocols.Tls12 | SslProtocols.Tls13, certificate, (sender, cert, chain, errors) => true);
+            ConnectionStatusChanged += ConnectionStatusChangedEvent;
 
             foreach (int port in PORT_RANGE)
             {
                 try
                 {
-                    server = new Server(context, IPAddress.Any, port, this, logger)
+                    server = new Server(SslContext, IPAddress.Any, port, this, logger)
                     {
                         OptionReuseAddress = true,
                     };
 
                     if (server.Start())
                     {
-                        serverPort = port;
+                        ServerPort = port;
                         isRunning = true;
-                        await discoveryService.StartDiscoveryAsync(port);
                         logger.Info($"Server started on port: {port}");
-                        return true;
+                        return;
                     }
-                    else
-                    {
-                        server.Dispose();
-                        server = null;
-                    }
+                    server.Dispose();
+                    server = null;
                 }
                 catch (Exception ex)
                 {
@@ -82,25 +75,56 @@ public class NetworkService(
                     server = null;
                 }
             }
-
             logger.LogError("Failed to start server");
-            return false;
         }
         catch (Exception ex)
         {
             logger.LogError("Error starting server {ex}", ex);
-            return false;
         }
     }
 
-    public void SendMessage(ServerSession session, string message)
+    private async void ConnectionStatusChangedEvent(object? sender, PairedDevice device)
+    {
+        if (device.IsConnected)
+        {
+            await SendDeviceInfo(device);
+            await adbService.TryConnectTcp(device.Address, device.Model);
+        }
+    }
+
+    private async Task SendDeviceInfo(PairedDevice device)
     {
         try
         {
-            string messageWithNewline = message + "\n";
-            byte[] messageBytes = Encoding.UTF8.GetBytes(messageWithNewline);
+            logger.Info("Sending deviceInfo");
+            var localDevice = await deviceManager.GetLocalDeviceAsync();
+            var avatar = await UserInformation.GetCurrentUserAvatarAsync();
+            device.SendMessage(new DeviceInfo { DeviceName = localDevice.DeviceName, Avatar = avatar });
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Excetpion occured while sending device info", ex);
+        }
+    }
 
-            session.Send(messageBytes, 0, messageBytes.Length);
+    public void DisconnectDevice(PairedDevice device, bool forcedDisconnect = false)
+    {
+        if (device.Session is not null)
+        {
+            DisconnectSession(device.Session, true);
+        }
+        else if (device.Client is not null)
+        {
+            DisconnectClient(device.Client, true);
+        }
+    }
+
+    public void SendMessage(ServerSession session, SocketMessage message)
+    {
+        try
+        {
+            var bytes = EncodeMessage(message);
+            session.SendAsync(bytes);
         }
         catch (Exception ex)
         {
@@ -108,14 +132,30 @@ public class NetworkService(
         }
     }
 
-    public void BroadcastMessage(string message)
+    public void SendMessage(Client client, SocketMessage message)
+    {
+        try
+        {
+            var bytes = EncodeMessage(message);
+            client.SendAsync(bytes);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("Error sending message to client {ex}", ex);
+        }
+    }
+
+    private static byte[] EncodeMessage(SocketMessage message) =>
+        Encoding.UTF8.GetBytes(JsonMessageSerializer.Serialize(message) + "\n");
+
+    public void BroadcastMessage(SocketMessage message)
     {
         if (PairedDevices.Count == 0) return;
         try
         {
-            foreach (var device in PairedDevices.Where(d => d.Session != null))
+            foreach (var device in PairedDevices.Where(d => d.IsConnected))
             {
-                SendMessage(device.Session!, message);
+                device.SendMessage(message);
             }
         }
         catch (Exception ex)
@@ -124,14 +164,16 @@ public class NetworkService(
         }
     }
 
-    // Server side methods
-    public void OnConnected(ServerSession session)
+    #region Server events
+    public void OnConnected(ServerSession session) 
     {
-
+        connectionBuffers[session.Id] = string.Empty;
     }
 
     public void OnDisconnected(ServerSession session)
     {
+        if (!connectionBuffers.ContainsKey(session.Id)) return;
+
         DisconnectSession(session);
     }
 
@@ -140,169 +182,291 @@ public class NetworkService(
         logger.LogError("Error on socket {error}", error);
     }
 
-    public async void OnReceived(ServerSession session, byte[] buffer, long offset, long size)
+    public void OnReceived(ServerSession session, byte[] buffer, long offset, long size)
     {
         try
         {
             string newData = Encoding.UTF8.GetString(buffer, (int)offset, (int)size);
-            //logger.Debug($"Received raw data: {(newData.Length > 100 ? string.Concat(newData.AsSpan(0, Math.Min(100, newData.Length)), "...") : newData)}");
-
-            bufferedData += newData;
-
-            while (true)
+            if (!connectionBuffers.TryGetValue(session.Id, out var buffered))
             {
-                int newlineIndex = bufferedData.IndexOf('\n');
-                if (newlineIndex == -1)
-                {
-                    break;
-                }
+                buffered = string.Empty;
+            }
 
-                string message = bufferedData[..newlineIndex].Trim();
+            buffered += newData;
+            
+            while (buffered.IndexOf('\n') is var newlineIndex && newlineIndex != -1)
+            {
+                string messageString = buffered[..newlineIndex].Trim();
+                buffered = newlineIndex + 1 >= buffered.Length ? string.Empty : buffered[(newlineIndex + 1)..];
 
-                // Check if newlineIndex is at the end of the string
-                if (newlineIndex + 1 >= bufferedData.Length)
-                {
-                    bufferedData = string.Empty;
-                }
-                else
-                {
-                    bufferedData = bufferedData[(newlineIndex + 1)..];
-                }
+                if (string.IsNullOrEmpty(messageString)) continue;
 
-                if (string.IsNullOrEmpty(message)) continue;
-        
-                var device = PairedDevices.FirstOrDefault(d => d.Session?.Id == session.Id);
-                if (device is null)
+                logger.Debug($"Processing message: {(messageString.Length > 100 ? string.Concat(messageString.AsSpan(0, Math.Min(100, messageString.Length)), "...") : messageString)}");
+
+                var socketMessage = JsonMessageSerializer.DeserializeMessage(messageString);
+                if (socketMessage is null) continue;
+
+                logger.Debug($"Received message: {socketMessage.GetType().Name}");
+
+                if (socketMessage is AuthenticationMessage authMessage)
                 {
-                    await HandleVerification(session, message);
+                    HandleServerSessionAuthentication(session, authMessage);
                     return;
                 }
-                ProcessMessage(device, message);
+
+                RouteMessage(session.Id, socketMessage);
             }
+
+            connectionBuffers[session.Id] = buffered;
         }
         catch (Exception ex)
         {
             logger.LogError("Error in OnReceived for session {id}: {ex}", session.Id, ex);
-            DisconnectSession(session);
         }
     }
 
-    private async Task HandleVerification(ServerSession session, string message)
+
+
+    /// <summary>
+    /// Routes a deserialized message from a client and server to the appropriate handler
+    /// </summary>
+    private async void RouteMessage(Guid guid, SocketMessage message)
     {
         try
         {
-            if (SocketMessageSerializer.DeserializeMessage(message) is not DeviceInfo deviceInfo)
+            // Check if this is from a connected paired device
+            var pairedDevice = PairedDevices.FirstOrDefault(d => (d.Client?.Id == guid || d.Session?.Id == guid) && d.IsConnected);
+            if (pairedDevice is not null)
             {
-                logger.Warn("Invalid device info or first message wasn't deviceInfo");
-                DisconnectSession(session);
+                messageHandler.Value.HandleMessageAsync(pairedDevice, message);
                 return;
             }
 
-
-            if (string.IsNullOrEmpty(deviceInfo.Nonce) || string.IsNullOrEmpty(deviceInfo.Proof))
+            var discoveredDevice = DiscoveredDevices.FirstOrDefault(d => d.Client?.Id == guid || d.Session?.Id == guid);
+            if (discoveredDevice is not null && message is PairMessage pairMessage)
             {
-                logger.Warn("Missing authentication data");
-                DisconnectSession(session);
-                return;
+                HandlePairMessage(discoveredDevice, pairMessage);
             }
 
-            var connectedSessionIpAddress = session.Socket.RemoteEndPoint?.ToString()?.Split(':')[0];
-            logger.Info($"Received connection from {connectedSessionIpAddress}");
-
-            var device = await deviceManager.VerifyDevice(deviceInfo, connectedSessionIpAddress);
-
-            if (device is not null)
-            {
-                logger.Info($"Device {device.Id} connected");
-                
-                deviceManager.UpdateOrAddDevice(device, connectedDevice  =>
-                {
-
-                    connectedDevice.ConnectionStatus = true;
-                    connectedDevice.Session = session;
-                    
-                    deviceManager.ActiveDevice = connectedDevice;
-                    device = connectedDevice;
-
-                    if (device.DeviceSettings.AdbAutoConnect && !string.IsNullOrEmpty(connectedSessionIpAddress))
-                    {
-                        adbService.TryConnectTcp(connectedSessionIpAddress);
-                    }
-                });
-
-                var (_, avatar) = await UserInformation.GetCurrentUserInfoAsync();
-                var localDevice = await deviceManager.GetLocalDeviceAsync();
-
-                // Generate our authentication proof
-                var sharedSecret = EcdhHelper.DeriveKey(deviceInfo.PublicKey!, localDevice.PrivateKey);
-                var nonce = EcdhHelper.GenerateNonce();
-                var proof = EcdhHelper.GenerateProof(sharedSecret, nonce);
-
-                SendMessage(session, SocketMessageSerializer.Serialize(new DeviceInfo
-                {
-                    DeviceId = localDevice.DeviceId,
-                    DeviceName = localDevice.DeviceName,
-                    Avatar = avatar,
-                    PublicKey = Convert.ToBase64String(localDevice.PublicKey),
-                    Nonce = nonce,
-                    Proof = proof
-                }));
-
-                ConnectionStatusChanged?.Invoke(this, (device, true));
-            }
-            else
-            {
-                SendMessage(session, "Rejected");
-                await Task.Delay(50);
-                logger.Info("Device verification failed or was declined");
-                DisconnectSession(session);
-            }
+            logger.Warn("Received message from unknown client");
         }
         catch (Exception ex)
         {
-            logger.Error($"Error processing first message for session {session.Id}: {ex}");
+            logger.Error($"Error routing client message: {ex}");
+        }
+    }
+
+    private async void HandlePairMessage(DiscoveredDevice device, PairMessage pairMessage)
+    {
+        if (device.IsPairing)
+        {
+            await HandlePairResponse(device, pairMessage);
+        }
+        else if (pairMessage.Pair)
+        {
+            await HandlePairRequest(device);
+        }
+    }
+
+    #endregion
+
+    #region Server Authentication
+
+    private async void HandleServerSessionAuthentication(ServerSession session, AuthenticationMessage authMessage)
+    {
+        try
+        {
+            if (session.Socket.RemoteEndPoint is not IPEndPoint endPoint) return;
+
+            var address = endPoint.Address.ToString();
+            logger.Info($"Received connection from {address}");
+
+            var localDevice = await deviceManager.GetLocalDeviceAsync();
+            var pairedDevice = PairedDevices.FirstOrDefault(d => d.Id == authMessage.DeviceId);
+            
+            // Determine shared secret based on whether device is paired
+            byte[] sharedSecret = pairedDevice is not null
+                ? (await deviceManager.GetDeviceInfoAsync(pairedDevice.Id)).SharedSecret
+                : EcdhHelper.DeriveKey(authMessage.PublicKey, localDevice.PrivateKey);
+
+            if (!EcdhHelper.VerifyProof(sharedSecret, authMessage.Nonce, authMessage.Proof))
+            {
+                throw new Exception("Device proof verification failed");
+            }
+
+            // Generate response
+            var nonceForResponse = EcdhHelper.GenerateNonce();
+            var proofForResponse = EcdhHelper.GenerateProof(sharedSecret, nonceForResponse);
+            var authResponse = new AuthenticationMessage
+            {
+                DeviceId = localDevice.DeviceId,
+                DeviceName = localDevice.DeviceName,
+                PublicKey = Convert.ToBase64String(localDevice.PublicKey),
+                Nonce = nonceForResponse,
+                Proof = proofForResponse,
+                Model = Environment.MachineName
+            };
+
+            if (pairedDevice is not null)
+            {
+                await AuthenticatePairedDeviceClient(session, pairedDevice, address, authResponse);
+                return;
+            }
+            await AuthenticateNewDeviceClient(session, authMessage, address, sharedSecret, authResponse);
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"Error in session authentication: {ex}");
             DisconnectSession(session);
         }
     }
 
-    private async void ProcessMessage(PairedDevice device, string message)
+    private async Task AuthenticatePairedDeviceClient(ServerSession session, PairedDevice pairedDevice, string address, AuthenticationMessage authResponse)
     {
-        try
-        {
-            logger.Debug($"Processing message: {(message.Length > 100 ? string.Concat(message.AsSpan(0, Math.Min(100, message.Length)), "...") : message)}");
+        logger.Info($"Paired device {pairedDevice.Name} verified, updating connection");
 
-            // Check if this looks like a JSON message before attempting to deserialize
-            if (message.TrimStart().StartsWith('{') || message.TrimStart().StartsWith('['))
-            {
-                var socketMessage = SocketMessageSerializer.DeserializeMessage(message);
-                if (socketMessage is null) return;
-                await messageHandler.Value.HandleMessageAsync(device, socketMessage);
-                return;
-            }
-            logger.Debug("Received non-JSON data, skipping JSON parsing");
-        }
-        catch (JsonException jsonEx)
+        // Reject if already connected with a different session
+        if (pairedDevice.IsConnected)
         {
-            logger.Error($"Error parsing JSON message: {jsonEx.Message}");
+            DisconnectDevice(pairedDevice);
+        }
+
+        await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+        {
+            pairedDevice.Session = session;
+            pairedDevice.ConnectionStatus = new Connected();
+            pairedDevice.Address = address;
+            if (!pairedDevice.Addresses.Any(a => a.Address == address))
+            {
+                var newEntry = new AddressEntry
+                {
+                    Address = address,
+                    IsEnabled = true,
+                    Priority = pairedDevice.Addresses.Count
+                };
+                pairedDevice.Addresses.Add(newEntry);
+            }
+            deviceManager.ActiveDevice = pairedDevice;
+        });
+
+        logger.Debug("Sending auth response");
+        SendMessage(session, authResponse);
+
+        // wait a bit after sending auth response
+        await Task.Delay(100);
+
+        ConnectionStatusChanged?.Invoke(this, pairedDevice);
+    }
+
+    private async Task AuthenticateNewDeviceClient(ServerSession session, AuthenticationMessage authMessage, string address, byte[] sharedSecret, AuthenticationMessage authResponse)
+    {
+        await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+        {
+            var existingDiscovered = DiscoveredDevices.FirstOrDefault(d => d.Id == authMessage.DeviceId);
+            if (existingDiscovered is not null)
+            {
+                logger.Info("Device already in DiscoveredDevices, updating session");
+                existingDiscovered.Name = authMessage.DeviceName;
+                existingDiscovered.Model = authMessage.Model;
+                existingDiscovered.Address = address;
+                existingDiscovered.SharedSecret = sharedSecret;
+                existingDiscovered.Session = session;
+            }
+            else
+            {
+                logger.Info($"Adding device {authMessage.DeviceId} as DiscoveredDevice");
+                DiscoveredDevices.Add(new DiscoveredDevice
+                {
+                    Id = authMessage.DeviceId,
+                    Name = authMessage.DeviceName,
+                    Model = authMessage.Model,
+                    Address = address,
+                    SharedSecret = sharedSecret,
+                    Session = session
+                });
+            }
+        });
+        SendMessage(session, authResponse);
+    }
+
+    private async Task HandlePairRequest(DiscoveredDevice device)
+    {
+        logger.Info($"Received pairing request from {device.Name}");
+
+        var tcs = new TaskCompletionSource<bool>();
+        await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
+        {
+            try
+            {
+                var frame = (Frame)App.MainWindow.Content!;
+                var dialog = new ConnectionRequestDialog(device.Name, device.SharedSecret, frame)
+                {
+                    XamlRoot = App.MainWindow.Content!.XamlRoot
+                };
+
+                var result = await dialog.ShowAsync();
+                tcs.SetResult(result is ContentDialogResult.Primary);
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Error showing connection request dialog: {ex}");
+                tcs.SetResult(false);
+            }
+        });
+
+        var accepted = await tcs.Task;
+
+
+        device.SendMessage(new PairMessage { Pair = accepted });
+        if (accepted)
+        {
+            var pairedDevice = await deviceManager.AddDevice(device);
+            // wait a bit after sending pair responses
+            await Task.Delay(100); 
+            ConnectionStatusChanged?.Invoke(this, pairedDevice);
         }
     }
 
-    public void DisconnectSession(ServerSession session)
+    private async Task HandlePairResponse(DiscoveredDevice device, PairMessage pairMessage)
     {
+        if (!pairMessage.Pair)
+        {
+            logger.Info($"Device {device.Name} rejected pairing request");
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.IsPairing = false);
+            return;
+        }
+
+        logger.Info($"Device {device.Name} accepted pairing request");
+        var pairedDevice = await deviceManager.AddDevice(device);
+        ConnectionStatusChanged?.Invoke(this, pairedDevice);
+    }
+    #endregion
+
+    public void DisconnectSession(ServerSession session, bool forcedDisconnect = false)
+    {
+        logger.Debug($"disconnecing session: {forcedDisconnect}");
         try
         {
-            bufferedData = string.Empty;
+            connectionBuffers.TryRemove(session.Id, out _);
             session.Disconnect();
             session.Dispose();
-            var device = PairedDevices.FirstOrDefault(d => d.Session == session);   
-            if (device is not null)
+            
+            var pairedDevice = PairedDevices.FirstOrDefault(d => d.Session == session);   
+            if (pairedDevice is not null)
             {
-                App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+                pairedDevice.Session = null;
+                App.MainWindow.DispatcherQueue.EnqueueAsync(() => pairedDevice.ConnectionStatus = new Disconnected(forcedDisconnect));
+
+                logger.Info($"Device {pairedDevice.Name} session disconnected, status updated");
+                ConnectionStatusChanged?.Invoke(this, pairedDevice);
+            }
+            else
+            {
+                var discoveredDevice = DiscoveredDevices.FirstOrDefault(d => d.Session == session);
+                if (discoveredDevice is not null)
                 {
-                    device.ConnectionStatus = false;
-                    device.Session = null;
-                    logger.Info($"Device {device.Name} session disconnected, status updated");
-                });
+                    App.MainWindow.DispatcherQueue.EnqueueAsync(() => DiscoveredDevices.Remove(discoveredDevice));
+                }
             }
         }
         catch (Exception ex)
@@ -310,4 +474,390 @@ public class NetworkService(
             logger.Error($"Error in Disconnecting: {ex.Message}");
         }
     }
+
+    public void DisconnectClient(Client client, bool forcedDisconnect = false)
+    {
+        try
+        {
+            logger.Debug($"disconnecing session, forcedDisconnect: {forcedDisconnect}");
+            connectionBuffers.TryRemove(client.Id, out _);
+
+            client.Disconnect();
+            client.Dispose();
+
+            var device = PairedDevices.FirstOrDefault(d => d.Client == client);
+            if (device is not null)
+            {
+                device.Client = null;
+                App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.ConnectionStatus = new Disconnected(forcedDisconnect));
+                ConnectionStatusChanged?.Invoke(this, device);
+            }
+
+            var discoveredDevice = DiscoveredDevices.FirstOrDefault(d => d.Client == client);
+            if (discoveredDevice is not null)
+            {
+                App.MainWindow.DispatcherQueue.EnqueueAsync(() => DiscoveredDevices.Remove(discoveredDevice));
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"Error disconnecting client: {ex.Message}");
+        }
+    }
+
+    #region Client
+
+    public async Task ConnectTo(string deviceId, string address, int port, string publicKey)
+    {
+        // Skip if already connected/connecting or if device was force-disconnected
+        var existingDevice = PairedDevices.FirstOrDefault(d => d.Id == deviceId);
+        if (existingDevice is not null && (existingDevice.IsConnectedOrConnecting || existingDevice.IsForcedDisconnect))
+            return;
+        
+        
+        if (DiscoveredDevices.Any(d => d.Id == deviceId)) return;
+
+        lock (connectingDeviceIds)
+        {
+            if (connectingDeviceIds.Contains(deviceId)) return;
+            connectingDeviceIds.Add(deviceId);
+        }
+
+        try
+        {
+            logger.Info($"Connecting to {address}:{port}");
+
+            var client = new Client(SslContext, address, port, this);
+
+            var localDevice = await deviceManager.GetLocalDeviceAsync();
+
+            var sharedSecret = EcdhHelper.DeriveKey(publicKey, localDevice.PrivateKey);
+            var nonce = EcdhHelper.GenerateNonce();
+            var proof = EcdhHelper.GenerateProof(sharedSecret, nonce);
+
+            var authMessage = new AuthenticationMessage
+            {
+                DeviceId = localDevice.DeviceId,
+                DeviceName = localDevice.DeviceName,
+                PublicKey = Convert.ToBase64String(localDevice.PublicKey),
+                Nonce = nonce,
+                Proof = proof,
+                Model = Environment.MachineName
+            };
+
+            try
+            {
+                if (client.ConnectAsync())
+                {
+                    // Wait for TLS handshake, then send auth
+                    if (!client.IsHandshaked)
+                    {
+                        var tcs = new TaskCompletionSource<bool>();
+                        handshakeCompletion[client.Id] = tcs;
+                        try
+                        {
+                            await tcs.Task.WaitAsync(TimeSpan.FromSeconds(10));
+                        }
+                        finally
+                        {
+                            handshakeCompletion.TryRemove(client.Id, out _);
+                        }
+                    }
+                    SendMessage(client, authMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Warn($"Error connecting to {address}:{port}: {ex.Message}");
+            }
+        }
+        finally
+        {
+            lock (connectingDeviceIds)
+            {
+                connectingDeviceIds.Remove(deviceId);
+            }
+        }
+    }
+
+    public async Task ConnectTo(PairedDevice device)
+    {
+        if (connectionCancellationTokens.TryRemove(device.Id, out var removedCts))
+        {
+            removedCts.Cancel();
+            removedCts.Dispose();
+            device.ConnectionStatus = new Disconnected();
+            return;
+        }
+
+        logger.Info($"Connecting to paired device {device.Name}");
+
+        var cts = new CancellationTokenSource();
+        connectionCancellationTokens[device.Id] = cts;
+
+        try
+        {
+            var remoteDevice = await deviceManager.GetDeviceInfoAsync(device.Id);
+            var localDevice = await deviceManager.GetLocalDeviceAsync();
+            var nonce = EcdhHelper.GenerateNonce();
+            var proof = EcdhHelper.GenerateProof(remoteDevice.SharedSecret, nonce);
+
+            var authMessage = new AuthenticationMessage
+            {
+                DeviceId = localDevice.DeviceId,
+                DeviceName = localDevice.DeviceName,
+                PublicKey = Convert.ToBase64String(localDevice.PublicKey),
+                Nonce = nonce,
+                Proof = proof,
+                Model = Environment.MachineName
+            };
+
+            foreach (var address in device.GetEnabledAddresses())
+            {
+                cts.Token.ThrowIfCancellationRequested();
+
+                logger.Info($"Connecting to {address}:{device.Port}");
+                var client = new Client(SslContext, address, device.Port, this);
+                device.ConnectionStatus = new Connecting();
+
+                try
+                {
+                    if (client.ConnectAsync())
+                    {
+                        // Wait for TLS handshake, then send auth
+                        if (!client.IsHandshaked)
+                        {
+                            var tcs = new TaskCompletionSource<bool>();
+                            handshakeCompletion[client.Id] = tcs;
+                            try
+                            {
+                                using (cts.Token.Register(() => tcs.TrySetCanceled()))
+                                {
+                                    await tcs.Task.WaitAsync(TimeSpan.FromSeconds(10), cts.Token);
+                                }
+                            }
+                            finally
+                            {
+                                handshakeCompletion.TryRemove(client.Id, out _);
+                            }
+                        }
+                        
+                        cts.Token.ThrowIfCancellationRequested();
+                        
+                        SendMessage(client, authMessage);
+                        device.Client = client;
+                        return;
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    logger.Debug($"Failed to connect to {address}:{device.Port}: {ex.Message}");
+                }
+            }
+            logger.Warn($"Failed to connect to device {device.Name} on any IP address/port combination");
+        }
+        catch (OperationCanceledException)
+        {
+            logger.Info($"Connection attempt cancelled for device {device.Name}");
+        }
+        finally
+        {
+            device.ConnectionStatus = new Disconnected();
+
+            if (connectionCancellationTokens.TryRemove(device.Id, out var cancellationTokenSource))
+            {
+                cancellationTokenSource.Dispose();
+            }
+        }
+    }
+
+    public async Task Pair(DiscoveredDevice device)
+    {
+        var pairMessage = new PairMessage { Pair = true };
+
+        device.SendMessage(pairMessage);
+        device.IsPairing = true;
+    }
+
+    #region Client events
+    public void OnConnected(Client client)
+    {
+        logger.Info($"OnConnected for client {client.Id}");
+        connectionBuffers[client.Id] = string.Empty;
+    }
+
+    public void OnHandshaked(Client client)
+    {
+        if (handshakeCompletion.TryGetValue(client.Id, out var tcs))
+            tcs.TrySetResult(true);
+    }
+
+    public void OnDisconnected(Client client)
+    {
+        if (handshakeCompletion.TryRemove(client.Id, out var tcs))
+            tcs.TrySetException(new IOException("Disconnected before TLS handshake completed"));
+        if (!connectionBuffers.ContainsKey(client.Id))
+        {
+            return;
+        }
+        
+        DisconnectClient(client);
+    }
+
+    public void OnError(Client client, SocketError error)
+    {
+        if (handshakeCompletion.TryRemove(client.Id, out var tcs))
+            tcs.TrySetException(new IOException($"Socket error before TLS handshake completed: {error}"));
+        logger.LogError("Error on client socket {error}", error);
+        DisconnectClient(client);
+    }
+
+    public void OnReceived(Client client, byte[] buffer, long offset, long size)
+    {
+        try
+        {
+            string newData = Encoding.UTF8.GetString(buffer, (int)offset, (int)size);
+            if (!connectionBuffers.TryGetValue(client.Id, out var buffered))
+            {
+                buffered = string.Empty;
+            }
+
+            buffered += newData;
+
+            while (buffered.IndexOf('\n') is var newlineIndex && newlineIndex != -1)
+            {
+                string messageString = buffered[..newlineIndex].Trim();
+                buffered = newlineIndex + 1 >= buffered.Length ? string.Empty : buffered[(newlineIndex + 1)..];
+
+                if (string.IsNullOrEmpty(messageString)) continue;
+
+                logger.Debug($"Processing client message: {(messageString.Length > 100 ? string.Concat(messageString.AsSpan(0, Math.Min(100, messageString.Length)), "...") : messageString)}");
+
+                var socketMessage = JsonMessageSerializer.DeserializeMessage(messageString);
+                if (socketMessage is null) continue;
+
+                if (socketMessage is AuthenticationMessage authMessage)
+                {
+                    HandleServerAuthentication(client, authMessage);
+                    return;
+                }
+                RouteMessage(client.Id, socketMessage);
+            }
+
+            connectionBuffers[client.Id] = buffered;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("Error in OnReceived for client: {ex}", ex);
+        }
+    }
+    #endregion
+
+    #region Client Authentication
+
+    private async void HandleServerAuthentication(Client client, AuthenticationMessage authMessage)
+    {
+        try
+        {
+            IPEndPoint? endPoint = client.Socket.RemoteEndPoint as IPEndPoint;
+            var address = endPoint?.Address.ToString();
+
+            if (string.IsNullOrEmpty(address)) return;
+
+            logger.Info($"Received AuthenticationMessage from server at {address}");
+
+            var pairedDevice = PairedDevices.FirstOrDefault(d => d.Id == authMessage.DeviceId);
+            if (pairedDevice is not null)
+            {
+                await AuthenticatePairedDeviceServer(client, pairedDevice, address, authMessage);
+            }
+            else
+            {
+                await AuthenticateNewDeviceServer(client, authMessage, address, endPoint?.Port ?? 5150);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"Error in client authentication: {ex}");
+            DisconnectClient(client);
+        }
+    }
+
+    private async Task AuthenticatePairedDeviceServer(Client client, PairedDevice pairedDevice, string address, AuthenticationMessage authMessage)
+    {
+        var remoteDevice = await deviceManager.GetDeviceInfoAsync(pairedDevice.Id);
+
+        if (!EcdhHelper.VerifyProof(remoteDevice.SharedSecret, authMessage.Nonce, authMessage.Proof))
+        {
+            throw new Exception("Device proof verification failed for client");
+        }
+
+        if (pairedDevice.IsConnected && pairedDevice.Client is not null)
+        {
+            logger.Warn($"Device {pairedDevice.Name} is already connected, declining new connection");
+            DisconnectClient(client);
+            return;
+        }
+
+        await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+        {
+            pairedDevice.Client = client;
+            pairedDevice.Address = address;
+            pairedDevice.ConnectionStatus = new Connected();
+            deviceManager.ActiveDevice = pairedDevice;
+        });
+
+        ConnectionStatusChanged?.Invoke(this, pairedDevice);
+        logger.Info($"Paired device {pairedDevice.Name} connected successfully");
+    }
+
+    private async Task AuthenticateNewDeviceServer(Client client, AuthenticationMessage authMessage, string address, int port)
+    {
+        var localDevice = await deviceManager.GetLocalDeviceAsync();
+        var sharedSecret = EcdhHelper.DeriveKey(authMessage.PublicKey, localDevice.PrivateKey);
+
+        if (!EcdhHelper.VerifyProof(sharedSecret, authMessage.Nonce, authMessage.Proof))
+        {
+            logger.Warn("Device proof verification failed for client");
+            DisconnectClient(client);
+            return;
+        }
+
+        await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+        {
+            var existingDiscovered = DiscoveredDevices.FirstOrDefault(d => d.Address == address);
+            if (existingDiscovered is not null)
+            {
+                logger.Info($"Device with address {address} already in DiscoveredDevices, updating client");
+                existingDiscovered.Id = authMessage.DeviceId;
+                existingDiscovered.Name = authMessage.DeviceName;
+                existingDiscovered.Model = authMessage.Model;
+                existingDiscovered.Address = address;
+                existingDiscovered.Port = port;
+                existingDiscovered.SharedSecret = sharedSecret;
+                existingDiscovered.Client = client;
+            }
+            else
+            {
+                logger.Info($"Adding device {authMessage.DeviceId} as DiscoveredDevice");
+                DiscoveredDevices.Add(new DiscoveredDevice
+                {
+                    Id = authMessage.DeviceId,
+                    Name = authMessage.DeviceName,
+                    Model = authMessage.Model,
+                    Address = address,
+                    Port = port,
+                    SharedSecret = sharedSecret,
+                    Client = client
+                });
+            }
+        });
+    }
+    #endregion
+
+    #endregion
 }

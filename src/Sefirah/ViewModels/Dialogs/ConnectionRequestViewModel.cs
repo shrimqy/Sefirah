@@ -1,6 +1,5 @@
 using Microsoft.UI.Xaml.Media.Animation;
 using Sefirah.Views;
-using Sefirah.Views.Onboarding;
 
 namespace Sefirah.ViewModels.Dialogs;
 public partial class ConnectionRequestViewModel : ObservableObject

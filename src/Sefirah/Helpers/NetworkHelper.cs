@@ -16,8 +16,7 @@ public static class NetworkHelper
                 ni.OperationalStatus is OperationalStatus.Up)
             {
                 var gateway = ni.GetIPProperties().GatewayAddresses
-                    .FirstOrDefault(g => g.Address?.AddressFamily == AddressFamily.InterNetwork)?
-                    .Address;
+                    .FirstOrDefault(g => g.Address.AddressFamily is AddressFamily.InterNetwork)?.Address;
 
                 foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
                 {

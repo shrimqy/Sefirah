@@ -1,7 +1,6 @@
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 using Sefirah.Data.Models.Actions;
-using Sefirah.Utils.Serialization;
 
 namespace Sefirah.Services;
 
@@ -14,7 +13,7 @@ public abstract class BaseActionService(
     public virtual Task InitializeAsync()
     {
         sessionManager.ConnectionStatusChanged += OnConnectionStatusChanged;
-        if (ApplicationData.Current.LocalSettings.Values["DefaultActionsLoaded"] == null)
+        if (ApplicationData.Current.LocalSettings.Values["DefaultActionsLoaded"] is null)
         {
             ApplicationData.Current.LocalSettings.Values["DefaultActionsLoaded"] = true;
             var defaultActions = DefaultActionsProvider.GetDefaultActions();
@@ -24,19 +23,15 @@ public abstract class BaseActionService(
         return Task.CompletedTask;
     }
 
-    private void OnConnectionStatusChanged(object? sender, (PairedDevice Device, bool IsConnected) args)
+    private void OnConnectionStatusChanged(object? sender, PairedDevice device)
     {
-        if (args.IsConnected && args.Device.Session is not null)
+        if (device.IsConnected)
         {
             var actions = generalSettingsService.Actions;
             foreach (var action in actions)
             {
-                var actionMessage = new ActionMessage 
-                { 
-                    ActionId = action.Id, 
-                    ActionName = action.Name 
-                };
-                sessionManager.SendMessage(args.Device.Session, SocketMessageSerializer.Serialize(actionMessage));
+                var actionMessage = new ActionMessage { ActionId = action.Id, ActionName = action.Name };
+                device.SendMessage(actionMessage);
             }
         }
     }

@@ -11,6 +11,11 @@ public interface IDeviceManager
     ObservableCollection<PairedDevice> PairedDevices { get; }
 
     /// <summary>
+    /// The list of discovered devices.
+    /// </summary>
+    ObservableCollection<DiscoveredDevice> DiscoveredDevices { get; }
+
+    /// <summary>
     /// Gets or sets the currently active device session
     /// </summary>
     PairedDevice? ActiveDevice { get; set; }
@@ -19,12 +24,6 @@ public interface IDeviceManager
     /// Finds a device session by device ID
     /// </summary>
     PairedDevice? FindDeviceById(string deviceId);
-
-    /// <summary>
-    /// Updates an existing device in the collection or adds it if it doesn't exist.
-    /// This method is thread-safe and handles UI thread dispatching internally.
-    /// </summary>
-    void UpdateOrAddDevice(PairedDevice device, Action<PairedDevice>? updateAction = null);
 
     /// <summary>
     /// Gets the device info.
@@ -39,22 +38,12 @@ public interface IDeviceManager
     /// <summary>
     /// Removes the device from the database.
     /// </summary>
-    void RemoveDevice(PairedDevice device);
+    Task RemoveDevice(PairedDevice device);
 
     /// <summary>
     /// Updates the device in the database.
     /// </summary>
     Task UpdateDevice(RemoteDeviceEntity device);
-
-    /// <summary>
-    /// Updates the device properties (battery..)
-    /// </summary>
-    void UpdateDeviceStatus(PairedDevice device, DeviceStatus deviceStatus);
-
-    /// <summary>
-    /// Returns the device if it get's successfully verified and added to the database.
-    /// </summary>
-    Task<PairedDevice?> VerifyDevice(DeviceInfo device, string? ipAddress);
 
     /// <summary>
     /// Gets the local device.
@@ -63,5 +52,8 @@ public interface IDeviceManager
     void UpdateLocalDevice(LocalDeviceEntity localDevice);
     Task Initialize();
 
-    List<string> GetRemoteDeviceIpAddresses();
+    List<string> GetRemoteDeviceAddresses();
+
+    Task UpdateDeviceInfo(PairedDevice device, DeviceInfo deviceInfo);
+    Task<PairedDevice> AddDevice(DiscoveredDevice device);
 }
