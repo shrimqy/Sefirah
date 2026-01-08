@@ -685,9 +685,9 @@
     <value>Enter hostname or IP address</value>
   </data>
   <data name="UnlockCommandsPlaceholder" xml:space="preserve">
-    <value>ввод ключевого события 26
-ввод ключевого события 66
-ввод текста %pwd%</value>
+    <value>input keyevent 26
+input keyevent 66
+input text %pwd%</value>
   </data>
   <data name="FileDropCaption" xml:space="preserve">
     <value>Перетащите файл для отправки</value>
