@@ -262,9 +262,9 @@ public class ScreenMirrorService(
                 .Where(c => !string.IsNullOrEmpty(c))
                 .ToList();
             var adbDevice = pairedDevices.FirstOrDefault(d => d.Serial == selectedDeviceSerial);
-            if (adbDevice is null || !adbDevice.DeviceData.HasValue) return null;
+            if (adbDevice is null || adbDevice.DeviceData is null) return null;
 
-            if (commands?.Count > 0 && await adbService.IsLocked(adbDevice.DeviceData.Value))
+            if (commands?.Count > 0 && await adbService.IsLocked(adbDevice.DeviceData))
             {
                 // Check if any command contains password placeholder
                 var hasPasswordPlaceholder = commands.Any(c => c.Contains("%pwd%"));
@@ -296,7 +296,7 @@ public class ScreenMirrorService(
                     // Replace password placeholders with actual password
                     commands = commands.Select(c => c.Replace("%pwd%", password)).ToList();
                 }
-                adbService.UnlockDevice(adbDevice.DeviceData.Value, commands);
+                adbService.UnlockDevice(adbDevice.DeviceData, commands);
             }
         }
         else if (deviceSettings.AdbTcpipModeEnabled && device.Session is not null)
@@ -314,7 +314,7 @@ public class ScreenMirrorService(
         else
         {
             logger.LogWarning("No online devices found from adb");
-            dispatcher.EnqueueAsync(async () =>
+            await dispatcher.EnqueueAsync(async () =>
             {
                 var dialog = new ContentDialog
                 {

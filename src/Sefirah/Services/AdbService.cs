@@ -140,14 +140,13 @@ public class AdbService(
                 return;
             }
 
-            var deviceData = device.DeviceData.Value;
             var deviceModel = device.Model ?? "Unknown";
 
             // Run scrcpy --list-encoders
             var processInfo = new ProcessStartInfo
             {
                 FileName = scrcpyPath,
-                Arguments = $"--list-encoders -s {deviceData.Serial}",
+                Arguments = $"--list-encoders -s {device.DeviceData.Serial}",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -468,7 +467,9 @@ public class AdbService(
         {
             // Get full device information including model
             var devices = await adbClient.GetDevicesAsync();
-            var fullDeviceData = devices.FirstOrDefault(d => d.Serial == deviceData.Serial);
+            var fullDeviceData = devices.FirstOrDefault(d => d.Serial == deviceData.Serial) 
+                ?? throw new Exception($"Device {deviceData.Serial} not found in device list");
+
             string androidId = string.Empty;
             try
             {
@@ -490,7 +491,7 @@ public class AdbService(
             }
 
             // Look for paired devices with matching model
-            if (string.IsNullOrEmpty(androidId) && fullDeviceData.Model is not null)
+            if (string.IsNullOrEmpty(androidId))
             {
                 var deviceModel = fullDeviceData.Model;
 
@@ -618,8 +619,7 @@ public class AdbService(
         var adbDevice = AdbDevices.FirstOrDefault(d => d.AndroidId == deviceId);
         if (adbDevice?.DeviceData is null) return;
         
-        var deviceData = adbDevice.DeviceData.Value;
-        await adbClient.UninstallPackageAsync(deviceData, appPackage);
+        await adbClient.UninstallPackageAsync(adbDevice.DeviceData, appPackage);
     }
 
     /// <summary>

@@ -8,7 +8,7 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
-    <PackageVersion Include="AdvancedSharpAdbClient" Version="3.4.14" />
+    <PackageVersion Include="AdvancedSharpAdbClient" Version="3.5.15" />
     <PackageVersion Include="BouncyCastle.Cryptography" Version="2.5.1" />
     <PackageVersion Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.250402" />
     <PackageVersion Include="CommunityToolkit.WinUI.Converters" Version="8.2.250402" />
