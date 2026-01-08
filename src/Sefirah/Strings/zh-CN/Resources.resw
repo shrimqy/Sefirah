@@ -304,10 +304,10 @@
     <value>输入回复</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
-    <value>Open file</value>
+    <value>打开文件</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
-    <value>Open folder</value>
+    <value>打开文件夹</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
     <value>关闭从 {0} 的通知</value>
@@ -323,7 +323,7 @@
     <value>当手机处于勿扰模式时，不显示通知弹窗</value>
   </data>
   <data name="Devices.Title" xml:space="preserve">
-    <value>Devices</value>
+    <value>设备</value>
   </data>
   <data name="RingerModeNormal.Content" xml:space="preserve">
     <value>普通</value>
@@ -674,7 +674,7 @@
     <value>Sent {0} files to {1}</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>取消</value>
   </data>
   <data name="NoPairedDevices" xml:space="preserve">
     <value>No paired devices</value>
