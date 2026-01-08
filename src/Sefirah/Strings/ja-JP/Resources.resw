@@ -304,10 +304,10 @@
     <value>返信を入力</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
-    <value>Open file</value>
+    <value>ファイルを開く</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
-    <value>Open folder</value>
+    <value>フォルダーを開く</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
     <value>「{0}」からの通知をオフにする</value>
