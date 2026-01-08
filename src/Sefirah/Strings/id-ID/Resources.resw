@@ -686,9 +686,7 @@ page.</value>
     <value>Enter hostname or IP address</value>
   </data>
   <data name="UnlockCommandsPlaceholder" xml:space="preserve">
-    <value>input keyevent 26
-input keyevent 66
-input text %pwd%</value>
+    <value/>
   </data>
   <data name="FileDropCaption" xml:space="preserve">
     <value>Drop files to send</value>
