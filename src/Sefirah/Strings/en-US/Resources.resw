@@ -168,9 +168,6 @@
   <data name="ClipboardFiles" xml:space="preserve">
     <value>Add received files to clipboard</value>
   </data>
-  <data name="NotificationsDescription" xml:space="preserve">
-    <value>Receive notifications from remote device</value>
-  </data>
   <data name="GeneralSettings" xml:space="preserve">
     <value>General Settings</value>
   </data>
@@ -188,9 +185,6 @@
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
     <value>Notification Feed + Toast</value>
-  </data>
-  <data name="PairedDevices.Title" xml:space="preserve">
-    <value>Paired devices</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>Available Devices</value>
@@ -257,8 +251,7 @@ page.</value>
     <value>Connect your device</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>Discovered devices in your network will appear below, and initiate the connection from your
-mobile (Make sure the pin matches)</value>
+    <value>Scan the QR code or pair directly from the discovered devices below</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
     <value>Device Connection Request</value>
@@ -281,12 +274,6 @@ mobile (Make sure the pin matches)</value>
   <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
     <value>PASSKEY</value>
   </data>
-  <data name="ClipboardDescription" xml:space="preserve">
-    <value>Sync your clipboard across devices</value>
-  </data>
-  <data name="StartupOptionsDescription" xml:space="preserve">
-    <value>Choose how the app starts when Windows boots</value>
-  </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
     <value>Open links in browser</value>
   </data>
@@ -301,9 +288,6 @@ mobile (Make sure the pin matches)</value>
   </data>
   <data name="Exit" xml:space="preserve">
     <value>Exit</value>
-  </data>
-  <data name="Features" xml:space="preserve">
-    <value>Features</value>
   </data>
   <data name="SelectLocation" xml:space="preserve">
     <value>Select location</value>
@@ -416,9 +400,6 @@ mobile (Make sure the pin matches)</value>
   <data name="NoApps" xml:space="preserve">
     <value>No apps found</value>
   </data>
-  <data name="AllApps" xml:space="preserve">
-    <value>All Apps</value>
-  </data>
   <data name="AdditionalArguments" xml:space="preserve">
     <value>Additional arguments</value>
   </data>
@@ -436,9 +417,6 @@ mobile (Make sure the pin matches)</value>
   </data>
   <data name="ScrcpyNotFoundDescription" xml:space="preserve">
     <value>Select the folder where scrcpy is located</value>
-  </data>
-  <data name="PreferTcpIp" xml:space="preserve">
-    <value>Prefer wireless connection</value>
   </data>
   <data name="SearchApps" xml:space="preserve">
     <value>Search apps</value>
@@ -532,17 +510,6 @@ mobile (Make sure the pin matches)</value>
   </data>
   <data name="UnlockDeviceHelpExample" xml:space="preserve">
     <value>Example:</value>
-  </data>
-  <data name="UnlockDeviceHelpUsefulInfo" xml:space="preserve">
-    <value>Useful information:</value>
-  </data>
-  <data name="UnlockDeviceHelpNote" xml:space="preserve">
-    <value>26 or POWER: Wakes or sleeps the device screen.
-66 or ENTER: Simulates the Enter key press.
-82 or MENU: Brings up the unlock interface or prompts for fingerprint authentication.
-%pwd%: Placeholder for password - you'll be prompted to enter it.
-Some devices may also require a swipe gesture to bring up the unlock UI:
-input touchscreen swipe 540 1800 540 900</value>
   </data>
   <data name="PinnedApps" xml:space="preserve">
     <value>Pinned apps</value>
@@ -679,14 +646,6 @@ input touchscreen swipe 540 1800 540 900</value>
   <data name="UnlockDeviceBeforeLaunch" xml:space="preserve">
     <value>Unlock device before launching scrcpy</value>
   </data>
-  <data name="UnlockCommandsPlaceholder" xml:space="preserve">
-    <value>input keyevent 26
-input keyevent 66
-input text %pwd%</value>
-  </data>
-  <data name="FileDropCaption" xml:space="preserve">
-    <value>Drop files to send</value>
-  </data>
   <data name="Save" xml:space="preserve">
     <value>Save</value>
   </data>
@@ -731,6 +690,14 @@ input text %pwd%</value>
   </data>
   <data name="HostnamePlaceholder" xml:space="preserve">
     <value>Enter hostname or IP address</value>
+  </data>
+  <data name="UnlockCommandsPlaceholder" xml:space="preserve">
+    <value>input keyevent 26
+input keyevent 66
+input text %pwd%</value>
+  </data>
+  <data name="FileDropCaption" xml:space="preserve">
+    <value>Drop files to send</value>
   </data>
   <data name="DeviceAddresses" xml:space="preserve">
     <value>Device Addresses</value>
