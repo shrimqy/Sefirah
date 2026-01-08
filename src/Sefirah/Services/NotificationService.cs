@@ -69,7 +69,7 @@ public class NotificationService(
         { 
             if (message.Title is not null && message.AppPackage is not null)
             {
-                var filter = await remoteAppsRepository.GetOrCreateAppNotificationFilter(device.Id, message.AppPackage, message.AppName, message.AppIcon);
+                var filter = await remoteAppsRepository.GetOrCreateAppNotificationFilter(device.Id, message.AppPackage, message.AppName!, message.AppIcon);
 
                 if (filter is NotificationFilter.Disabled) return;
 
@@ -98,11 +98,12 @@ public class NotificationService(
                             // Add new notification
                             notifications.Insert(0, notification);
                         }
-#if WINDOWS
+
                         // Check if the app is active before showing the notification
-                        if (device.DeviceSettings.IgnoreWindowsApps && await IsAppActiveAsync(message.AppName!)) return;
-#endif
-                        await platformNotificationHandler.ShowRemoteNotification(message, device.Id);
+                        if (!device.DeviceSettings.IgnoreWindowsApps && !await IsAppActiveAsync(message.AppName!))
+                        {
+                            await platformNotificationHandler.ShowRemoteNotification(message, device.Id);
+                        }
                     }
                     else if ((message.NotificationType is NotificationType.Active || message.NotificationType is NotificationType.New)
                         && (filter is NotificationFilter.Feed || filter is NotificationFilter.ToastFeed))
@@ -346,16 +347,20 @@ public class NotificationService(
         }
     }
 
-#if WINDOWS
+
     private async Task<bool> IsAppActiveAsync(string appName)
     {
         try
         {
+#if WINDOWS
             // Get all running apps
             var diagnosticInfo = await AppDiagnosticInfo.RequestInfoAsync();
             var isAppActive = diagnosticInfo.Any(info =>
                 info.AppInfo.DisplayInfo.DisplayName.Equals(appName, StringComparison.OrdinalIgnoreCase));
             return isAppActive;
+#else
+            return false;
+#endif
         }
         catch (Exception ex)
         {
@@ -363,5 +368,5 @@ public class NotificationService(
             return false;
         }
     }
-#endif
+
 }
