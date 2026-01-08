@@ -168,9 +168,6 @@
   <data name="ClipboardFiles" xml:space="preserve">
     <value>שמירת קבצים שנשלחים מהטלפון בלוח העתקה באופן אוטומטי</value>
   </data>
-  <data name="NotificationsDescription" xml:space="preserve">
-    <value>קבלת התראות מהתקן מרוחק</value>
-  </data>
   <data name="GeneralSettings" xml:space="preserve">
     <value>הגדרות כלליות</value>
   </data>
@@ -188,9 +185,6 @@
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
     <value>הצג בפיד ההתראות וכהתראת Windows</value>
-  </data>
-  <data name="PairedDevices.Title" xml:space="preserve">
-    <value>התקנים מוצמדים</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>התקנים זמינים</value>
@@ -279,12 +273,6 @@
   <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
     <value>קוד</value>
   </data>
-  <data name="ClipboardDescription" xml:space="preserve">
-    <value>סנכרן את לוח העתקה בין התקנים</value>
-  </data>
-  <data name="StartupOptionsDescription" xml:space="preserve">
-    <value>בחר כיצד התוכנה תפעל כאשר הWindows עולה</value>
-  </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
     <value>פתח קישורים בדפדפן באופן אוטומטי</value>
   </data>
@@ -300,9 +288,6 @@
   <data name="Exit" xml:space="preserve">
     <value>יציאה</value>
   </data>
-  <data name="Features" xml:space="preserve">
-    <value>תכונות</value>
-  </data>
   <data name="SelectLocation" xml:space="preserve">
     <value>בחר נתיב</value>
   </data>
@@ -311,9 +296,6 @@
   </data>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>הגדרות יישום ספציפיות</value>
-  </data>
-  <data name="FileTransferNotification.Title" xml:space="preserve">
-    <value>העברת קובץ</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>שלח</value>
@@ -414,9 +396,6 @@
   <data name="NoApps" xml:space="preserve">
     <value>לא נמצאו יישומים</value>
   </data>
-  <data name="AllApps" xml:space="preserve">
-    <value>כל היישומים</value>
-  </data>
   <data name="AdditionalArguments" xml:space="preserve">
     <value>פרמטרים נוספים</value>
   </data>
@@ -434,9 +413,6 @@
   </data>
   <data name="ScrcpyNotFoundDescription" xml:space="preserve">
     <value>בחר את הנתיב שבו scrcpy מותקן</value>
-  </data>
-  <data name="PreferTcpIp" xml:space="preserve">
-    <value>העדף חיבוריות אלחוטית</value>
   </data>
   <data name="SearchApps" xml:space="preserve">
     <value>חיפוש יישומים</value>
@@ -530,16 +506,6 @@
   </data>
   <data name="UnlockDeviceHelpExample" xml:space="preserve">
     <value>Example:</value>
-  </data>
-  <data name="UnlockDeviceHelpUsefulInfo" xml:space="preserve">
-    <value>Useful information:</value>
-  </data>
-  <data name="UnlockDeviceHelpNote" xml:space="preserve">
-    <value>26 or POWER: Wakes or sleeps the device screen.
-66 or ENTER: Simulates the Enter key press.
-82 or MENU: Brings up the unlock interface, or prompts for fingerprint authentication.
-Some devices may also require a swipe gesture to bring up the unlock UI:
-input touchscreen swipe 540 1800 540 900</value>
   </data>
   <data name="PinnedApps" xml:space="preserve">
     <value>Pinned apps</value>
@@ -676,14 +642,6 @@ input touchscreen swipe 540 1800 540 900</value>
   <data name="UnlockDeviceBeforeLaunch" xml:space="preserve">
     <value>Unlock device before launching scrcpy</value>
   </data>
-  <data name="UnlockCommandsPlaceholder" xml:space="preserve">
-    <value>input keyevent 26
-input keyevent 66
-input text %pwd%</value>
-  </data>
-  <data name="FileDropCaption" xml:space="preserve">
-    <value>Drop files to send</value>
-  </data>
   <data name="Save" xml:space="preserve">
     <value>Save</value>
   </data>
@@ -720,14 +678,19 @@ input text %pwd%</value>
   <data name="NoPairedDevices" xml:space="preserve">
     <value>No paired devices</value>
   </data>
-  <data name="Devices.Description" xml:space="preserve">
-    <value>Managed devices</value>
-  </data>
   <data name="Add" xml:space="preserve">
     <value>Add</value>
   </data>
   <data name="HostnamePlaceholder" xml:space="preserve">
     <value>Enter hostname or IP address</value>
+  </data>
+  <data name="UnlockCommandsPlaceholder" xml:space="preserve">
+    <value>input keyevent 26
+input keyevent 66
+input text %pwd%</value>
+  </data>
+  <data name="FileDropCaption" xml:space="preserve">
+    <value>Drop files to send</value>
   </data>
   <data name="DeviceAddresses" xml:space="preserve">
     <value>Device Addresses</value>

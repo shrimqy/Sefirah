@@ -168,9 +168,6 @@
   <data name="ClipboardFiles" xml:space="preserve">
     <value>将收到的文件添加到剪贴板</value>
   </data>
-  <data name="NotificationsDescription" xml:space="preserve">
-    <value>从远程设备接收通知</value>
-  </data>
   <data name="GeneralSettings" xml:space="preserve">
     <value>常规设置</value>
   </data>
@@ -188,9 +185,6 @@
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
     <value>通知订阅 + Toast</value>
-  </data>
-  <data name="PairedDevices.Title" xml:space="preserve">
-    <value>已配对设备</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>可用设备</value>
@@ -279,12 +273,6 @@
   <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
     <value>密码</value>
   </data>
-  <data name="ClipboardDescription" xml:space="preserve">
-    <value>在不同设备之间同步剪贴板</value>
-  </data>
-  <data name="StartupOptionsDescription" xml:space="preserve">
-    <value>选择当 Windows 启动时应用程序的启动方式</value>
-  </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
     <value>在浏览器中打开链接</value>
   </data>
@@ -300,9 +288,6 @@
   <data name="Exit" xml:space="preserve">
     <value>退出</value>
   </data>
-  <data name="Features" xml:space="preserve">
-    <value>功能</value>
-  </data>
   <data name="SelectLocation" xml:space="preserve">
     <value>选择位置</value>
   </data>
@@ -311,9 +296,6 @@
   </data>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>应用特定设置</value>
-  </data>
-  <data name="FileTransferNotification.Title" xml:space="preserve">
-    <value>文件传输</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>发送</value>
@@ -415,9 +397,6 @@
   <data name="NoApps" xml:space="preserve">
     <value>未找到应用</value>
   </data>
-  <data name="AllApps" xml:space="preserve">
-    <value>所有应用</value>
-  </data>
   <data name="AdditionalArguments" xml:space="preserve">
     <value>额外参数</value>
   </data>
@@ -435,9 +414,6 @@
   </data>
   <data name="ScrcpyNotFoundDescription" xml:space="preserve">
     <value>选择 Scrcpy 所在文件夹</value>
-  </data>
-  <data name="PreferTcpIp" xml:space="preserve">
-    <value>偏好远程连接</value>
   </data>
   <data name="SearchApps" xml:space="preserve">
     <value>搜索应用</value>
@@ -531,16 +507,6 @@
   </data>
   <data name="UnlockDeviceHelpExample" xml:space="preserve">
     <value>例子：</value>
-  </data>
-  <data name="UnlockDeviceHelpUsefulInfo" xml:space="preserve">
-    <value>有用的信息：</value>
-  </data>
-  <data name="UnlockDeviceHelpNote" xml:space="preserve">
-    <value>26 or POWER: Wakes or sleeps the device screen.
-66 or ENTER: Simulates the Enter key press.
-82 or MENU: Brings up the unlock interface, or prompts for fingerprint authentication.
-Some devices may also require a swipe gesture to bring up the unlock UI:
-input touchscreen swipe 540 1800 540 900</value>
   </data>
   <data name="PinnedApps" xml:space="preserve">
     <value>固定的应用</value>
@@ -677,14 +643,6 @@ input touchscreen swipe 540 1800 540 900</value>
   <data name="UnlockDeviceBeforeLaunch" xml:space="preserve">
     <value>启动 scrcpy 前解锁设备</value>
   </data>
-  <data name="UnlockCommandsPlaceholder" xml:space="preserve">
-    <value>输入关键事件 26
-输入关键事件 66
-输入文本 %pwd%</value>
-  </data>
-  <data name="FileDropCaption" xml:space="preserve">
-    <value>拖动要发送文件</value>
-  </data>
   <data name="Save" xml:space="preserve">
     <value>保存</value>
   </data>
@@ -721,14 +679,19 @@ input touchscreen swipe 540 1800 540 900</value>
   <data name="NoPairedDevices" xml:space="preserve">
     <value>No paired devices</value>
   </data>
-  <data name="Devices.Description" xml:space="preserve">
-    <value>Managed devices</value>
-  </data>
   <data name="Add" xml:space="preserve">
     <value>Add</value>
   </data>
   <data name="HostnamePlaceholder" xml:space="preserve">
     <value>Enter hostname or IP address</value>
+  </data>
+  <data name="UnlockCommandsPlaceholder" xml:space="preserve">
+    <value>输入关键事件 26
+输入关键事件 66
+输入文本 %pwd%</value>
+  </data>
+  <data name="FileDropCaption" xml:space="preserve">
+    <value>拖动要发送文件</value>
   </data>
   <data name="DeviceAddresses" xml:space="preserve">
     <value>Device Addresses</value>

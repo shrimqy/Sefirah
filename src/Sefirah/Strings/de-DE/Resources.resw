@@ -168,9 +168,6 @@
   <data name="ClipboardFiles" xml:space="preserve">
     <value>Empfangene Benachrichtigungen zur Zwischenablage hinzufügen</value>
   </data>
-  <data name="NotificationsDescription" xml:space="preserve">
-    <value>Erhalte Benachrichtigungen vom Remote-Gerät</value>
-  </data>
   <data name="GeneralSettings" xml:space="preserve">
     <value>Allgemeine Einstellungen</value>
   </data>
@@ -188,9 +185,6 @@
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
     <value>Benachrichtigungs-Feed + Pop-up</value>
-  </data>
-  <data name="PairedDevices.Title" xml:space="preserve">
-    <value>Gekoppelte Geräte</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>Verfügbare Geräte</value>
@@ -280,12 +274,6 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
   <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
     <value>SCHLÜSSEL</value>
   </data>
-  <data name="ClipboardDescription" xml:space="preserve">
-    <value>Zwischenablage zwischen Geräten synchronisieren</value>
-  </data>
-  <data name="StartupOptionsDescription" xml:space="preserve">
-    <value>Wählen Sie, wie die App startet, wenn Windows startet</value>
-  </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
     <value>Links im Browser öffnen</value>
   </data>
@@ -301,9 +289,6 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
   <data name="Exit" xml:space="preserve">
     <value>Beenden</value>
   </data>
-  <data name="Features" xml:space="preserve">
-    <value>Features</value>
-  </data>
   <data name="SelectLocation" xml:space="preserve">
     <value>Speicherort auswählen</value>
   </data>
@@ -312,9 +297,6 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
   </data>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>App-spezifische Einstellungen</value>
-  </data>
-  <data name="FileTransferNotification.Title" xml:space="preserve">
-    <value>Dateiübertragung</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>Senden</value>
@@ -415,9 +397,6 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
   <data name="NoApps" xml:space="preserve">
     <value>Keine Apps gefunden</value>
   </data>
-  <data name="AllApps" xml:space="preserve">
-    <value>Alle Apps</value>
-  </data>
   <data name="AdditionalArguments" xml:space="preserve">
     <value>Zusätzliche Argumente</value>
   </data>
@@ -435,9 +414,6 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
   </data>
   <data name="ScrcpyNotFoundDescription" xml:space="preserve">
     <value>Wählen Sie den Ordner, in dem sich scrcpy befindet</value>
-  </data>
-  <data name="PreferTcpIp" xml:space="preserve">
-    <value>Drahtlose Verbindung bevorzugen</value>
   </data>
   <data name="SearchApps" xml:space="preserve">
     <value>Apps durchsuchen</value>
@@ -531,17 +507,6 @@ Handy initiiert (Vergewissern Sie sich, dass der PIN übereinstimmt)</value>
   </data>
   <data name="UnlockDeviceHelpExample" xml:space="preserve">
     <value>Beispiel:</value>
-  </data>
-  <data name="UnlockDeviceHelpUsefulInfo" xml:space="preserve">
-    <value>Nützliche Informationen:</value>
-  </data>
-  <data name="UnlockDeviceHelpNote" xml:space="preserve">
-    <value>26 oder POWER: Weckt oder schläft den Bildschirm des Geräts.
-66 oder ENTER: Simuliert die Enter-Taste.
-82 oder MENU: Stellt das Entsperr-Interface zur Verfügung oder fragt nach Fingerabdruck-Authentifizierung.
-%pwd%: Platzhalter für Passwort - Sie werden aufgefordert, es einzugeben.
-Einige Geräte können auch eine Wischgeste benötigen, um die Entsperr-UI zu öffnen:
-Input Touchscreen-Wischen 540 1800 540 900</value>
   </data>
   <data name="PinnedApps" xml:space="preserve">
     <value>Angeheftete Apps</value>
@@ -678,14 +643,6 @@ Input Touchscreen-Wischen 540 1800 540 900</value>
   <data name="UnlockDeviceBeforeLaunch" xml:space="preserve">
     <value>Gerät entsperren, bevor scrcpy gestartet wird</value>
   </data>
-  <data name="UnlockCommandsPlaceholder" xml:space="preserve">
-    <value>Eingabe Tastennummer 26
-Eingabe Tastennummer 66
-Eingabe Text %pwd%</value>
-  </data>
-  <data name="FileDropCaption" xml:space="preserve">
-    <value>Zu sendende Dateien ablegen</value>
-  </data>
   <data name="Save" xml:space="preserve">
     <value>Speichern</value>
   </data>
@@ -722,14 +679,19 @@ Eingabe Text %pwd%</value>
   <data name="NoPairedDevices" xml:space="preserve">
     <value>No paired devices</value>
   </data>
-  <data name="Devices.Description" xml:space="preserve">
-    <value>Managed devices</value>
-  </data>
   <data name="Add" xml:space="preserve">
     <value>Add</value>
   </data>
   <data name="HostnamePlaceholder" xml:space="preserve">
     <value>Enter hostname or IP address</value>
+  </data>
+  <data name="UnlockCommandsPlaceholder" xml:space="preserve">
+    <value>input keyevent 26
+input keyevent 66
+input text %pwd%</value>
+  </data>
+  <data name="FileDropCaption" xml:space="preserve">
+    <value>Drop files to send</value>
   </data>
   <data name="DeviceAddresses" xml:space="preserve">
     <value>Device Addresses</value>
