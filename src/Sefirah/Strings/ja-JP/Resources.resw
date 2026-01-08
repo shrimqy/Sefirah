@@ -250,7 +250,7 @@
     <value>デバイスを接続</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>ネットワーク内で検出された Android デバイスが下に表示されます (パスキーが一致しているか確認してください)</value>
+    <value>Scan the QR code or pair directly from the discovered devices below</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
     <value>デバイス接続要求</value>
@@ -304,10 +304,10 @@
     <value>返信を入力</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
-    <value>ファイルを開く</value>
+    <value>Open file</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
-    <value>フォルダーを開く</value>
+    <value>Open folder</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
     <value>「{0}」からの通知をオフにする</value>
@@ -646,34 +646,60 @@
     <value>Save</value>
   </data>
   <data name="FileTransferNotification.Receiving" xml:space="preserve">
-    <value>{0} から受信中</value>
+    <value>Receiving from {0}</value>
   </data>
   <data name="FileTransferNotification.Sending" xml:space="preserve">
-    <value>{0} に送信中</value>
+    <value>Sending to {0}</value>
   </data>
   <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
-    <value>{2} から {0}/{1} を受信中</value>
+    <value>Receiving {0}/{1} from {2}</value>
   </data>
   <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
-    <value>{2} に {0}/{1} を送信中</value>
+    <value>Sending {0}/{1} to {2}</value>
   </data>
   <data name="FileTransferNotification.Completed" xml:space="preserve">
-    <value>ファイル転送完了</value>
+    <value>File transfer completed</value>
   </data>
   <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
-    <value>{1} から {0} を受信しました</value>
+    <value>Received {0} from {1}</value>
   </data>
   <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
-    <value>{1} から {0} 個のファイルを受信しました</value>
+    <value>Received {0} files from {1}</value>
   </data>
   <data name="FileTransferNotification.SentSingle" xml:space="preserve">
-    <value>{0} を {1} に送信しました</value>
+    <value>Sent {0} to {1}</value>
   </data>
   <data name="FileTransferNotification.SentBulk" xml:space="preserve">
-    <value>{0} 個のファイルを {1} に送信しました</value>
+    <value>Sent {0} files to {1}</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
-    <value>キャンセル</value>
+    <value>Cancel</value>
+  </data>
+  <data name="NoPairedDevices" xml:space="preserve">
+    <value>No paired devices</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="HostnamePlaceholder" xml:space="preserve">
+    <value>Enter hostname or IP address</value>
+  </data>
+  <data name="UnlockCommandsPlaceholder" xml:space="preserve">
+    <value>input keyevent 26
+input keyevent 66
+input text %pwd%</value>
+  </data>
+  <data name="FileDropCaption" xml:space="preserve">
+    <value>Drop files to send</value>
+  </data>
+  <data name="DeviceAddresses" xml:space="preserve">
+    <value>Device Addresses</value>
+  </data>
+  <data name="ManageAddressesAndPriority" xml:space="preserve">
+    <value>Manage addresses and connection priority</value>
+  </data>
+  <data name="SendFiles" xml:space="preserve">
+    <value>Send files</value>
   </data>
   <data name="NoPairedDevices" xml:space="preserve">
     <value>No paired devices</value>

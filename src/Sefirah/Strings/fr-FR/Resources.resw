@@ -250,7 +250,7 @@
     <value>Connectez votre appareil</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>Les appareils détectés dans votre réseau apparaîtront ci-dessous, et vous pourrez initier la connexion à partir de votre téléphone (assurez-vous que le code pin correspond).</value>
+    <value>Scan the QR code or pair directly from the discovered devices below</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
     <value>Demande de connexion de l'appareil</value>
@@ -304,10 +304,10 @@
     <value>Tapez une réponse</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
-    <value>Ouvrir le fichier</value>
+    <value>Open file</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
-    <value>Ouvrir le dossier</value>
+    <value>Open folder</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
     <value>Désactiver les notifications de {0}</value>
@@ -646,34 +646,60 @@
     <value>Sauvegarder</value>
   </data>
   <data name="FileTransferNotification.Receiving" xml:space="preserve">
-    <value>Réception depuis {0}</value>
+    <value>Receiving from {0}</value>
   </data>
   <data name="FileTransferNotification.Sending" xml:space="preserve">
-    <value>Envoi vers {0}</value>
+    <value>Sending to {0}</value>
   </data>
   <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
-    <value>Réception {0}/{1} depuis {2}</value>
+    <value>Receiving {0}/{1} from {2}</value>
   </data>
   <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
-    <value>Envoi {0}/{1} vers {2}</value>
+    <value>Sending {0}/{1} to {2}</value>
   </data>
   <data name="FileTransferNotification.Completed" xml:space="preserve">
-    <value>Transfert de fichier terminé</value>
+    <value>File transfer completed</value>
   </data>
   <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
-    <value>{0} reçu depuis {1}</value>
+    <value>Received {0} from {1}</value>
   </data>
   <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
-    <value>{0} fichiers reçus depuis {1}</value>
+    <value>Received {0} files from {1}</value>
   </data>
   <data name="FileTransferNotification.SentSingle" xml:space="preserve">
-    <value>{0} envoyé vers {1}</value>
+    <value>Sent {0} to {1}</value>
   </data>
   <data name="FileTransferNotification.SentBulk" xml:space="preserve">
-    <value>{0} fichiers envoyés vers {1}</value>
+    <value>Sent {0} files to {1}</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
-    <value>Annuler</value>
+    <value>Cancel</value>
+  </data>
+  <data name="NoPairedDevices" xml:space="preserve">
+    <value>No paired devices</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="HostnamePlaceholder" xml:space="preserve">
+    <value>Enter hostname or IP address</value>
+  </data>
+  <data name="UnlockCommandsPlaceholder" xml:space="preserve">
+    <value>input keyevent 26
+input keyevent 66
+input text %pwd%</value>
+  </data>
+  <data name="FileDropCaption" xml:space="preserve">
+    <value>Déposer les fichiers à envoyer</value>
+  </data>
+  <data name="DeviceAddresses" xml:space="preserve">
+    <value>Device Addresses</value>
+  </data>
+  <data name="ManageAddressesAndPriority" xml:space="preserve">
+    <value>Manage addresses and connection priority</value>
+  </data>
+  <data name="SendFiles" xml:space="preserve">
+    <value>Send files</value>
   </data>
   <data name="NoPairedDevices" xml:space="preserve">
     <value>No paired devices</value>
