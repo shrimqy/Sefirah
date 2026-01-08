@@ -686,9 +686,9 @@ page.</value>
     <value>Enter hostname or IP address</value>
   </data>
   <data name="UnlockCommandsPlaceholder" xml:space="preserve">
-    <value>입력 키이벤트 26
-입력 키이벤트 66
-입력 키 %pwd%</value>
+    <value>input keyevent 26
+input keyevent 66
+input text %pwd%</value>
   </data>
   <data name="FileDropCaption" xml:space="preserve">
     <value>전송할 파일 드롭</value>
