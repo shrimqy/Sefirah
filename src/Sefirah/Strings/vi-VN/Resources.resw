@@ -702,30 +702,4 @@ input text %pwd%</value>
   <data name="SendFiles" xml:space="preserve">
     <value>Send files</value>
   </data>
-  <data name="NoPairedDevices" xml:space="preserve">
-    <value>No paired devices</value>
-  </data>
-  <data name="Add" xml:space="preserve">
-    <value>Add</value>
-  </data>
-  <data name="HostnamePlaceholder" xml:space="preserve">
-    <value>Enter hostname or IP address</value>
-  </data>
-  <data name="UnlockCommandsPlaceholder" xml:space="preserve">
-    <value>input keyevent 26
-input keyevent 66
-input text %pwd%</value>
-  </data>
-  <data name="FileDropCaption" xml:space="preserve">
-    <value>Drop files to send</value>
-  </data>
-  <data name="DeviceAddresses" xml:space="preserve">
-    <value>Device Addresses</value>
-  </data>
-  <data name="ManageAddressesAndPriority" xml:space="preserve">
-    <value>Manage addresses and connection priority</value>
-  </data>
-  <data name="SendFiles" xml:space="preserve">
-    <value>Send files</value>
-  </data>
 </root>
