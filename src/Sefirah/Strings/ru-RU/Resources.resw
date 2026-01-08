@@ -652,10 +652,10 @@
     <value>Отправка в {0}</value>
   </data>
   <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
-    <value>Получение {0}/{1} от {2}</value>
+    <value>Receiving {0} files from {1}</value>
   </data>
   <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
-    <value>Отправление {0}/{1} в {2}</value>
+    <value>Sending {0} files to {1}</value>
   </data>
   <data name="FileTransferNotification.Completed" xml:space="preserve">
     <value>Передача файла завершена</value>
