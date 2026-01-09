@@ -1,6 +1,5 @@
 using Microsoft.UI.Xaml.Media.Imaging;
 using Sefirah.Data.Enums;
-using Sefirah.Extensions;
 using Sefirah.Helpers;
 
 namespace Sefirah.Data.Models;
@@ -9,10 +8,10 @@ public class Notification
 {
     public string Key { get; set; } = string.Empty;
     public bool Pinned { get; set; } = false;
-    public string? TimeStamp { get; set; }
+    public string TimeStamp { get; set; } = string.Empty;
     public NotificationType Type { get; set; }
-    public string? AppName { get; set; }
-    public string? AppPackage { get; set; }
+    public string AppName { get; set; } = string.Empty;
+    public string AppPackage { get; set; } = string.Empty;
     public string? Title { get; set; }
     public string? Text { get; set; }
     public List<NotificationGroup> GroupedMessages { get; set; } = [];
