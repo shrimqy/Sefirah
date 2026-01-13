@@ -568,6 +568,12 @@ page.</value>
   <data name="MediaSessions" xml:space="preserve">
     <value>미디어 세션</value>
   </data>
+  <data name="StorageAccess" xml:space="preserve">
+    <value>Show device in File Explorer</value>
+  </data>
+  <data name="StorageAccessDescription" xml:space="preserve">
+    <value>Enables or disables storage access for this device in the File Explorer</value>
+  </data>
   <data name="DisplayToastNotifications" xml:space="preserve">
     <value>이 PC에서 토스트 알림 표시</value>
   </data>
