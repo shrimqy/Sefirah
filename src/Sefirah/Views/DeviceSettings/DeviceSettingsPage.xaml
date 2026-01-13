@@ -16,6 +16,7 @@
     <Page.Resources>
         <wctconverters:EmptyObjectToObjectConverter x:Key="EmptyObjectToOpacityConverter" EmptyValue="1.0" NotEmptyValue="0.0" />
         <converters:EmptyObjectToVisibilityConverter x:Key="EmptyObjectToVisibilityConverter" />
+        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
     </Page.Resources>
 
     <ScrollViewer>
@@ -81,7 +82,8 @@
                             <TextBlock
                                 FontSize="14"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                Text="{x:Bind ViewModel.DisplayPhoneNumbers, Mode=OneWay}" />
+                                Text="{x:Bind ViewModel.DisplayPhoneNumbers, Mode=OneWay}"
+                                Visibility="{x:Bind ViewModel.Device.PhoneNumbers.Count, Mode=OneWay, Converter={StaticResource CountToVisibilityConverter}}" />
                             <TextBlock
                                 FontSize="12"
                                 Foreground="{ThemeResource TextFillColorTertiaryBrush}"
