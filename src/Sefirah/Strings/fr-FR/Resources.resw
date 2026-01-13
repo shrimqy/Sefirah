@@ -567,6 +567,12 @@
   <data name="MediaSessions" xml:space="preserve">
     <value>Sessions média</value>
   </data>
+  <data name="StorageAccess" xml:space="preserve">
+    <value>Show device in File Explorer</value>
+  </data>
+  <data name="StorageAccessDescription" xml:space="preserve">
+    <value>Enables or disables storage access for this device in the File Explorer</value>
+  </data>
   <data name="DisplayToastNotifications" xml:space="preserve">
     <value>Afficher les notifications toast sur ce PC</value>
   </data>
