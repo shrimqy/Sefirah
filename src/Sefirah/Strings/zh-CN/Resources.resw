@@ -568,6 +568,12 @@
   <data name="MediaSessions" xml:space="preserve">
     <value>媒体会话</value>
   </data>
+  <data name="StorageAccess" xml:space="preserve">
+    <value>Show device in File Explorer</value>
+  </data>
+  <data name="StorageAccessDescription" xml:space="preserve">
+    <value>Enables or disables storage access for this device in the File Explorer</value>
+  </data>
   <data name="DisplayToastNotifications" xml:space="preserve">
     <value>在此电脑上显示 toast 通知</value>
   </data>
