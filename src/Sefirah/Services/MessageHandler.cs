@@ -58,9 +58,11 @@ public class MessageHandler(
                     break;
 
                 case SftpServerInfo sftpServerInfo:
-                    await sftpService.InitializeAsync(device, sftpServerInfo);
+                    if (device.DeviceSettings.StorageAccess)
+                    {
+                        await sftpService.InitializeAsync(device, sftpServerInfo);
+                    }
                     break;
-
                 case FileTransferMessage fileTransfer:
                     await fileTransferService.ReceiveFiles(fileTransfer, device);
                     break;

@@ -590,7 +590,30 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     #endregion
 
+    #region Storage Access Settings
 
+    public bool StorageAccess
+    {
+        get => DeviceSettings.StorageAccess;
+        set
+        {
+            if (DeviceSettings.StorageAccess != value)
+            {
+                DeviceSettings.StorageAccess = value;
+                OnPropertyChanged();
+                
+                // If storage access is disabled, remove the sync root
+                if (!value)
+                {
+                    sftpService.Remove(Device.Id);
+                }
+            }
+        }
+    }
+
+    #endregion
+
+    private readonly ISftpService sftpService = Ioc.Default.GetRequiredService<ISftpService>();
     private readonly IAdbService AdbService = Ioc.Default.GetRequiredService<IAdbService>();
     private readonly IDeviceSettingsService DeviceSettings;
     public PairedDevice Device;

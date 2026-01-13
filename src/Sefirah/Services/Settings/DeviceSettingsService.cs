@@ -269,4 +269,10 @@ internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSh
         get => Get(true);
         set => Set(value);
     }
+
+    public bool StorageAccess
+    {
+        get => Get(true);
+        set => Set(value);
+    }
 } 

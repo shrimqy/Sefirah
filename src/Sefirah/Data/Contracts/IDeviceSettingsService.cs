@@ -228,4 +228,9 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// Gets or sets a value indicating whether to automatically connect via ADB.
     /// </summary>
     bool AdbAutoConnect { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether storage access is enabled.
+    /// </summary>
+    bool StorageAccess { get; set; }
 } 

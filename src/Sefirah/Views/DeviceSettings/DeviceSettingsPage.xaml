@@ -178,6 +178,14 @@
                     </wuc:SettingsCard.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind ViewModel.MediaSessionSyncEnabled, Mode=TwoWay}" />
                 </wuc:SettingsCard>
+
+                <!--  Storage Access Settings  -->
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=StorageAccessDescription}" Header="{helpers:ResourceString Name=StorageAccess}">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE8A5;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.StorageAccess, Mode=TwoWay}" />
+                </wuc:SettingsCard>
             </StackPanel>
 
         </StackPanel>
