@@ -37,6 +37,7 @@ public sealed partial class AppsViewModel : BaseViewModel
     {
         Apps.Clear();
         PinnedApps.Clear();
+        OnPropertyChanged(nameof(HasPinnedApps));
 
         if (DeviceManager.ActiveDevice is null) return;
         IsLoading = true;
@@ -121,25 +122,15 @@ public sealed partial class AppsViewModel : BaseViewModel
     private void OnApplicationListUpdated(object? sender, string deviceId)
     {   
         if (DeviceManager.ActiveDevice?.Id != deviceId) return;
-
-        App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
-        {
-            Apps = RemoteAppsRepository.GetApplicationsForDevice(deviceId);
-            PinnedApps = Apps.Where(a => a.DeviceInfo.Pinned).ToObservableCollection();
-            
-            IsLoading = false;
-            OnPropertyChanged(nameof(IsEmpty));
-            OnPropertyChanged(nameof(HasPinnedApps));
-        });
+        LoadApps();
     }
 
     private void OnApplicationItemUpdated(object? sender, (string deviceId, ApplicationInfo? appInfo, string? packageName) args)
     {
         var (deviceId, appInfo, packageName) = args;
-        
+
         // Only update if this is for the active device
-        if (DeviceManager.ActiveDevice?.Id != deviceId)
-            return;
+        if (DeviceManager.ActiveDevice?.Id != deviceId || IsLoading) return;
 
         App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {

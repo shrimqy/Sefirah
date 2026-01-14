@@ -106,9 +106,23 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
     {
         try
         {
-            // Remove all apps for this device from the database before adding the new list
-            RemoveAllAppsForDeviceAsync(pairedDevice.Id);
+            var currentPackageNames = context.Database.Table<ApplicationInfoEntity>()
+                .ToList()
+                .Where(a => HasDevice(a, pairedDevice.Id))
+                .Select(a => a.PackageName)
+                .ToHashSet();
 
+            // Get new app package names
+            var newPackageNames = applicationList.AppList.Select(a => a.PackageName).ToHashSet();
+            
+            // Find apps that need to be removed (in current but not in new)
+            var appsToRemove = currentPackageNames.Except(newPackageNames).ToList();
+            foreach (var packageName in appsToRemove)
+            {
+                await RemoveDeviceFromApplication(packageName, pairedDevice.Id);
+            }
+            
+            // Add or update apps from the new list
             foreach (var appInfo in applicationList.AppList)
             {
                 await AddOrUpdateApplicationForDevice(appInfo, pairedDevice.Id);
