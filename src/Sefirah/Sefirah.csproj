@@ -1,4 +1,4 @@
-<Project Sdk="Uno.Sdk">
+﻿<Project Sdk="Uno.Sdk">
     <PropertyGroup>
         <TargetFrameworks>net9.0-windows10.0.26100;net9.0-desktop</TargetFrameworks>
 
@@ -112,6 +112,8 @@
         <PackageReference Include="Vanara.PInvoke.Ole" />
         <PackageReference Include="Vanara.PInvoke.Shell32" />
         <PackageReference Include="QRCoder" />
+        <PackageReference Include="GioSharp" />
+        <PackageReference Include="GLibSharp" />
     </ItemGroup>
     
     <ItemGroup>

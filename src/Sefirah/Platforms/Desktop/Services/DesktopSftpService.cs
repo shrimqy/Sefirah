@@ -1,6 +1,7 @@
+using GLib;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
-using Sefirah.Utils;
+using Task = System.Threading.Tasks.Task;
 
 namespace Sefirah.Platforms.Desktop.Services;
 
@@ -10,67 +11,134 @@ public class DesktopSftpService(ILogger<DesktopSftpService> logger) : ISftpServi
 
     public async Task InitializeAsync(PairedDevice device, SftpServerInfo info)
     {
-        logger.LogInformation("Initializing SFTP service for device {DeviceName}, IP: {IpAddress}, Port: {Port}, Password: {Password}", 
-            device.Name, info.IpAddress, info.Port, info.Password);
-
-        var sftpUri = $"sftp://{info.Username}@{info.IpAddress}:{info.Port}/";
+        var sftpUri = $"sftp://{info.IpAddress}:{info.Port}/";
         
-        logger.LogInformation("Mounting SFTP for device {DeviceName}", device.Name);
-
-        ProcessExecutor.ExecuteProcess("gio", $"mount -s \"{sftpUri}\"");
-
-        // Use gio mount with password input via stdin
-        var (exitCode, errorOutput) = await ExecuteProcessWithPasswordAsync("gio", $"mount \"{sftpUri}\"", info.Password);
-        
-        if (exitCode != 0)
+        logger.Info($"Initializing SFTP service for device {device.Name}, uri: {sftpUri}");
+        try
         {
-            logger.LogError("Failed to mount SFTP for device {DeviceName}: {Error}", device.Name, errorOutput);
-            return;
+            var file = FileFactory.NewForUri(sftpUri);
+
+            using var mountOp = new MountOperation
+            {
+                Username = info.Username,
+                Password = info.Password,
+                PasswordSave = PasswordSave.Never
+            };
+            
+            // Handle signals
+            mountOp.AskPassword += (sender, args) =>
+            {
+                args.RetVal = MountOperationResult.Handled; 
+            };
+            
+            mountOp.AskQuestion += (sender, args) =>
+            {
+                args.RetVal = MountOperationResult.Handled;
+            };
+            
+            using var cancellable = new Cancellable();
+            
+            var tcs = new TaskCompletionSource<bool>();
+
+            file.MountEnclosingVolume(
+                MountMountFlags.None,
+                mountOp,
+                cancellable,
+                (sourceObject, res) =>
+                {
+                    logger.Info("MountEnclosingVolume callback invoked");
+                    try
+                    {
+                        if (sourceObject is IFile fileObj)
+                        {
+                            var success = fileObj.MountEnclosingVolumeFinish(res);
+                            logger.Info($"MountEnclosingVolumeFinish returned: {success}");
+                            tcs.SetResult(success);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex, "Error in MountEnclosingVolumeFinish callback: {Error}", ex.Message);
+                        tcs.SetException(ex);
+                    }
+                }
+            );
+            
+            logger.Info("Waiting for mount operation to complete...");
+            
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            try
+            {
+                await tcs.Task.WaitAsync(cts.Token);
+                logger.Info("Mount operation completed");
+            }
+            catch (OperationCanceledException) when (cts.Token.IsCancellationRequested)
+            {
+                cancellable.Cancel();
+                throw new TimeoutException("Mount operation timed out");
+            }
+
+            _mountedDevices[device.Id] = sftpUri;
+            logger.Info($"Successfully mounted SFTP for device {device.Name}");
         }
-        
-        _mountedDevices[device.Id] = sftpUri;
-        logger.LogInformation("Successfully mounted SFTP for device {DeviceName}", device.Name);
-    }
-
-    private static async Task<(int ExitCode, string ErrorOutput)> ExecuteProcessWithPasswordAsync(string fileName, string arguments, string password)
-    {
-        var psi = new ProcessStartInfo(fileName)
+        catch (Exception ex)
         {
-            Arguments = arguments,
-            CreateNoWindow = true,
-            UseShellExecute = false,
-            RedirectStandardError = true,
-            RedirectStandardOutput = true,
-            RedirectStandardInput = true
-        };
-
-        using var process = Process.Start(psi);
-        if (process == null)
-        {
-            return (-1, "Failed to start process");
+            logger.Error($"Failed to mount SFTP for device {device.Name}: {ex.Message}");
         }
-
-        // Send password to stdin when prompted
-        await process.StandardInput.WriteLineAsync(password);
-        await process.StandardInput.FlushAsync();
-        process.StandardInput.Close();
-
-        await process.WaitForExitAsync();
-        var errorOutput = await process.StandardError.ReadToEndAsync();
-        
-        return (process.ExitCode, errorOutput);
     }
 
     public void Remove(string deviceId)
     {
         if (!_mountedDevices.TryGetValue(deviceId, out var sftpUri))
         {
-            logger.LogDebug("Device {DeviceId} is not mounted", deviceId);
+            logger.Info($"Device {deviceId} is not mounted");
             return;
         }
         
-        logger.LogInformation("Unmounting SFTP for device {DeviceId}", deviceId);
-        ProcessExecutor.ExecuteProcess("gio", $"mount -u \"{sftpUri}\"");
-        _mountedDevices.Remove(deviceId);
+        logger.Info($"Unmounting SFTP for device {deviceId}");
+        
+        try
+        {
+            var file = FileFactory.NewForUri(sftpUri);
+
+            using var cancellable = new Cancellable();
+
+            var mount = file.FindEnclosingMount(cancellable);
+            if (mount is not null)
+            {
+                var tcs = new TaskCompletionSource<bool>();
+                using var mountOp = new MountOperation();
+                
+                mount.UnmountWithOperation(
+                    MountUnmountFlags.None,
+                    mountOp,
+                    cancellable,
+                    (sourceObject, res) =>
+                    {
+                        try
+                        {
+                            var success = mount.UnmountWithOperationFinish(res);
+                            tcs.SetResult(success);
+                        }
+                        catch (Exception ex)
+                        {
+                            tcs.SetException(ex);
+                        }
+                    }
+                );
+
+                tcs.Task.Wait();
+                
+                logger.Info($"Successfully unmounted SFTP for device {deviceId}");
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"Error unmounting SFTP for device {deviceId}: {ex.Message}");
+        }
+        finally
+        {
+            _mountedDevices.Remove(deviceId);
+        }
     }
 }
