@@ -403,7 +403,7 @@
     <value>Adb устройство не в сети</value>
   </data>
   <data name="AdbDeviceOfflineDescription" xml:space="preserve">
-    <value>Подключите устройство через USB с включенной отладкой по USB и повторите попытку</value>
+    <value>Подключите устройство через USB с включенной отладкой по USB и повторите попытку.</value>
   </data>
   <data name="Dismiss" xml:space="preserve">
     <value>Отменить</value>
@@ -568,7 +568,7 @@
     <value>Медиа-сессия</value>
   </data>
   <data name="StorageAccess" xml:space="preserve">
-    <value>Show device in File Explorer</value>
+    <value>Показывать устройство в Проводнике</value>
   </data>
   <data name="StorageAccessDescription" xml:space="preserve">
     <value>Enables or disables storage access for this device in the File Explorer</value>
@@ -699,12 +699,12 @@ input text %pwd%</value>
     <value>Перетащите файл для отправки</value>
   </data>
   <data name="DeviceAddresses" xml:space="preserve">
-    <value>Device Addresses</value>
+    <value>Адреса устройства</value>
   </data>
   <data name="ManageAddressesAndPriority" xml:space="preserve">
-    <value>Manage addresses and connection priority</value>
+    <value>Управление адресами и приоритетом подключения</value>
   </data>
   <data name="SendFiles" xml:space="preserve">
-    <value>Send files</value>
+    <value>Отправить файлы</value>
   </data>
 </root>
