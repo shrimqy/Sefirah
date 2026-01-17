@@ -250,7 +250,7 @@
     <value>Подключите свое устройство</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>Scan the QR code or pair directly from the discovered devices below</value>
+    <value>Отсканируйте QR код или подключитесь напрямую к найденным устройствам ниже</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
     <value>Запрос на подключение устройства</value>
@@ -457,7 +457,7 @@
     <value>Настройки Adb</value>
   </data>
   <data name="AutoConnect" xml:space="preserve">
-    <value>Автоматическое соединение</value>
+    <value>Автоматическое подключение</value>
   </data>
   <data name="Both" xml:space="preserve">
     <value>Оба</value>
@@ -502,7 +502,7 @@
     <value>Помощь команд оболочки</value>
   </data>
   <data name="UnlockDeviceHelpDescription" xml:space="preserve">
-    <value>The shell commands in the text box will be executed before launching scrcpy. Enter commands that work on your device, separated by line.</value>
+    <value>Команды оболочки в текстовом поле будут выполнены перед запуском scrcpy. Введите команды, которые работают на вашем устройстве, разделяя их по строкам. Используйте %pwd% для замещения вашего пароля, если вам нужно ввести его.</value>
   </data>
   <data name="UnlockDeviceHelpExample" xml:space="preserve">
     <value>Пример:</value>
@@ -532,7 +532,7 @@
     <value>Настройки уведомлений</value>
   </data>
   <data name="ScreenMirrorSettings" xml:space="preserve">
-    <value>Настройки зеркльного экрана</value>
+    <value>Настройки зеркального экрана</value>
   </data>
   <data name="OpenLinksInBrowserDescription" xml:space="preserve">
     <value>Автоматически открывать ссылки из буфера обмена в браузере</value>
@@ -568,10 +568,10 @@
     <value>Медиа-сессия</value>
   </data>
   <data name="StorageAccess" xml:space="preserve">
-    <value>Показывать устройство в Проводнике</value>
+    <value>Отображать устройство в Проводнике</value>
   </data>
   <data name="StorageAccessDescription" xml:space="preserve">
-    <value>Enables or disables storage access for this device in the File Explorer</value>
+    <value>Включить / отключить доступ к хранилищу этого устройства в Проводнике</value>
   </data>
   <data name="DisplayToastNotifications" xml:space="preserve">
     <value>Показывать всплывающие уведомления на этом ПК</value>
@@ -655,13 +655,13 @@
     <value>Получение от {0}</value>
   </data>
   <data name="FileTransferNotification.Sending" xml:space="preserve">
-    <value>Отправка в {0}</value>
+    <value>Отправка на {0}</value>
   </data>
   <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
-    <value>Receiving {0} files from {1}</value>
+    <value>Получение {0} файлов от {1}</value>
   </data>
   <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
-    <value>Sending {0} files to {1}</value>
+    <value>Отправка {0} файлов на {1}</value>
   </data>
   <data name="FileTransferNotification.Completed" xml:space="preserve">
     <value>Передача файла завершена</value>
@@ -673,10 +673,10 @@
     <value>Получено {0} файлов от {1}</value>
   </data>
   <data name="FileTransferNotification.SentSingle" xml:space="preserve">
-    <value>Отправлено {0} в {1}</value>
+    <value>Отправлено {0} на {1}</value>
   </data>
   <data name="FileTransferNotification.SentBulk" xml:space="preserve">
-    <value>Отправлено {0} файлов в {1}</value>
+    <value>Отправлено {0} файлов на {1}</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
     <value>Отменить</value>
@@ -685,10 +685,10 @@
     <value>Нет подключенных устройств</value>
   </data>
   <data name="Add" xml:space="preserve">
-    <value>Add</value>
+    <value>Добавить</value>
   </data>
   <data name="HostnamePlaceholder" xml:space="preserve">
-    <value>Enter hostname or IP address</value>
+    <value>Введите hostname или IP адрес</value>
   </data>
   <data name="UnlockCommandsPlaceholder" xml:space="preserve">
     <value>input keyevent 26
