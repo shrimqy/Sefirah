@@ -10,9 +10,14 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     string DeviceId { get; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether clipboard synchronization is enabled.
+    /// Gets or sets a value indicating whether to receive clipboard content from the device.
     /// </summary>
-    bool ClipboardSyncEnabled { get; set; }
+    bool ClipboardReceiveEnabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to send clipboard content to the device.
+    /// </summary>
+    bool ClipboardSendEnabled { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to show clipboard toast notifications.
@@ -23,7 +28,7 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// Gets or sets a value indicating whether links should be opened in the browser.
     /// </summary>
     bool OpenLinksInBrowser { get; set; }
-    
+
     /// <summary>
     /// Gets or sets a value indicating whether notification synchronization is enabled.
     /// </summary>
@@ -102,7 +107,7 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// <summary>
     /// Gets or sets the video bitrate.
     /// </summary>
-    string? VideoBitrate { get; set; }  
+    string? VideoBitrate { get; set; }
 
     /// <summary>
     /// Gets or sets the video resolution.
@@ -117,13 +122,13 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// <summary>
     /// Gets or sets the audio bitrate.
     /// </summary>
-    string? AudioBitrate { get; set; }  
+    string? AudioBitrate { get; set; }
 
     /// <summary>
     /// Gets or sets the audio buffer.
     /// </summary>
     string? AudioBuffer { get; set; }
-    
+
     /// <summary>
     /// Gets or sets custom command-line arguments for scrcpy.
     /// </summary>
@@ -233,4 +238,4 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// Gets or sets a value indicating whether storage access is enabled.
     /// </summary>
     bool StorageAccess { get; set; }
-} 
+}

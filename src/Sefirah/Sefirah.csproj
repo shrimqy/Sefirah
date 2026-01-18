@@ -99,6 +99,7 @@
         <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" />
         <PackageReference Include="CommunityToolkit.WinUI.Converters" />
         <PackageReference Include="CommunityToolkit.WinUI.Extensions" />
+        <PackageReference Include="CommunityToolkit.WinUI.Controls.Segmented" />
         <PackageReference Include="H.NotifyIcon.Uno.WinUI" />
         <PackageReference Include="MeaMod.DNS" />
         <PackageReference Include="NAudio" />

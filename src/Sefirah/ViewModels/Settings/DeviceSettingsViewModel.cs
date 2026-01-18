@@ -16,14 +16,27 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
     #endregion
 
     #region Clipboard Settings
-    public bool ClipboardSyncEnabled
+    public bool ClipboardReceiveEnabled
     {
-        get => DeviceSettings.ClipboardSyncEnabled;
+        get => DeviceSettings.ClipboardReceiveEnabled;
         set
         {
-            if (DeviceSettings.ClipboardSyncEnabled != value)
+            if (DeviceSettings.ClipboardReceiveEnabled != value)
             {
-                DeviceSettings.ClipboardSyncEnabled = value;
+                DeviceSettings.ClipboardReceiveEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool ClipboardSendEnabled
+    {
+        get => DeviceSettings.ClipboardSendEnabled;
+        set
+        {
+            if (DeviceSettings.ClipboardSendEnabled != value)
+            {
+                DeviceSettings.ClipboardSendEnabled = value;
                 OnPropertyChanged();
             }
         }
