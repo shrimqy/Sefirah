@@ -112,7 +112,18 @@
                     <wuc:SettingsCard.ActionIcon>
                         <FontIcon FontSize="11" Glyph="&#xE76C;" />
                     </wuc:SettingsCard.ActionIcon>
-                    <ToggleSwitch IsOn="{x:Bind ViewModel.ClipboardSyncEnabled, Mode=TwoWay}" />
+                    <wuc:Segmented SelectionMode="Multiple" SelectionChanged="ClipboardSyncSegmented_SelectionChanged" Loaded="ClipboardSyncSegmented_Loaded">
+                        <wuc:SegmentedItem>
+                            <wuc:SegmentedItem.Icon>
+                                <FontIcon Glyph="&#xE896;" />
+                            </wuc:SegmentedItem.Icon>
+                        </wuc:SegmentedItem>
+                        <wuc:SegmentedItem>
+                            <wuc:SegmentedItem.Icon>
+                                <FontIcon Glyph="&#xE898;" />
+                            </wuc:SegmentedItem.Icon>
+                        </wuc:SegmentedItem>
+                    </wuc:Segmented>
                 </wuc:SettingsCard>
 
                 <!--  Notification Settings  -->
