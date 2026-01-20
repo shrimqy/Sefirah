@@ -95,13 +95,10 @@ public sealed partial class MainPageViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    public void SetRingerMode(string? modeStr)
+    public void ToggleDnd()
     {
-        if (int.TryParse(modeStr, out int mode))
-        {
-            var message = new DeviceRingerMode { RingerMode = mode };
-            Device!.SendMessage(message);
-        }
+        var message = new DndStatus { IsEnabled = !Device!.DndEnabled };
+        Device.SendMessage(message);
     }
 
     [RelayCommand]
@@ -126,6 +123,12 @@ public sealed partial class MainPageViewModel : BaseViewModel
     public void HandleNotificationAction(NotificationAction action)
     {
         NotificationService.ProcessClickAction(Device!, action.NotificationKey, action.ActionIndex);
+    }
+
+    [RelayCommand]
+    public void OpenDeviceSettings()
+    {
+        App.OpenDeviceSettingsWindow(Device!);
     }
 
     #endregion
@@ -175,10 +178,20 @@ public sealed partial class MainPageViewModel : BaseViewModel
         NotificationService.ProcessReplyAction(Device!, notification.Key, notification.ReplyResultKey!, replyText);
     }
 
-    public void OpenDeviceSettings()
+    public void SetRingerMode(int mode)
     {
-        if (Device is null) return;
-        App.OpenDeviceSettingsWindow(Device);
+        var message = new RingerMode { Mode = mode };
+        Device!.SendMessage(message);
+    }
+
+    public void SetAudioLevel(AudioStreamType streamType, int level)
+    {
+        var message = new AudioStreamMessage
+        {
+            StreamType = streamType,
+            Level = level
+        };
+        Device!.SendMessage(message);
     }
 
     #endregion

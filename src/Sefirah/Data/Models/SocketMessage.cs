@@ -8,24 +8,26 @@ namespace Sefirah.Data.Models;
 [JsonDerivedType(typeof(PairMessage), typeDiscriminator: "1")]
 [JsonDerivedType(typeof(UdpBroadcast), typeDiscriminator: "2")]
 [JsonDerivedType(typeof(DeviceInfo), typeDiscriminator: "3")]
-[JsonDerivedType(typeof(DeviceStatus), typeDiscriminator: "4")]
-[JsonDerivedType(typeof(DeviceRingerMode), typeDiscriminator: "5")]
-[JsonDerivedType(typeof(CommandMessage), typeDiscriminator: "6")]
-[JsonDerivedType(typeof(TextMessage), typeDiscriminator: "7")]
-[JsonDerivedType(typeof(TextConversation), typeDiscriminator: "8")]
-[JsonDerivedType(typeof(ThreadRequest), typeDiscriminator: "9")]
-[JsonDerivedType(typeof(ContactMessage), typeDiscriminator: "10")]
-[JsonDerivedType(typeof(NotificationMessage), typeDiscriminator: "11")]
-[JsonDerivedType(typeof(NotificationAction), typeDiscriminator: "12")]
-[JsonDerivedType(typeof(ReplyAction), typeDiscriminator: "13")]
-[JsonDerivedType(typeof(FileTransferMessage), typeDiscriminator: "14")]
-[JsonDerivedType(typeof(SftpServerInfo), typeDiscriminator: "15")]
-[JsonDerivedType(typeof(ClipboardMessage), typeDiscriminator: "16")]
-[JsonDerivedType(typeof(PlaybackSession), typeDiscriminator: "17")]
-[JsonDerivedType(typeof(PlaybackAction), typeDiscriminator: "18")]
-[JsonDerivedType(typeof(AudioDevice), typeDiscriminator: "19")]
-[JsonDerivedType(typeof(ApplicationList), typeDiscriminator: "20")]
-[JsonDerivedType(typeof(ActionMessage), typeDiscriminator: "21")]
+[JsonDerivedType(typeof(BatteryStatus), typeDiscriminator: "4")]
+[JsonDerivedType(typeof(RingerMode), typeDiscriminator: "5")]
+[JsonDerivedType(typeof(DndStatus), typeDiscriminator: "6")]
+[JsonDerivedType(typeof(AudioDevice), typeDiscriminator: "7")]
+[JsonDerivedType(typeof(AudioStreamMessage), typeDiscriminator: "8")]
+[JsonDerivedType(typeof(CommandMessage), typeDiscriminator: "9")]
+[JsonDerivedType(typeof(TextMessage), typeDiscriminator: "10")]
+[JsonDerivedType(typeof(TextConversation), typeDiscriminator: "11")]
+[JsonDerivedType(typeof(ThreadRequest), typeDiscriminator: "12")]
+[JsonDerivedType(typeof(ContactMessage), typeDiscriminator: "13")]
+[JsonDerivedType(typeof(NotificationMessage), typeDiscriminator: "14")]
+[JsonDerivedType(typeof(NotificationAction), typeDiscriminator: "15")]
+[JsonDerivedType(typeof(ReplyAction), typeDiscriminator: "16")]
+[JsonDerivedType(typeof(FileTransferMessage), typeDiscriminator: "17")]
+[JsonDerivedType(typeof(SftpServerInfo), typeDiscriminator: "18")]
+[JsonDerivedType(typeof(ClipboardMessage), typeDiscriminator: "19")]
+[JsonDerivedType(typeof(PlaybackSession), typeDiscriminator: "20")]
+[JsonDerivedType(typeof(PlaybackAction), typeDiscriminator: "21")]
+[JsonDerivedType(typeof(ApplicationList), typeDiscriminator: "22")]
+[JsonDerivedType(typeof(ActionMessage), typeDiscriminator: "23")]
 public class SocketMessage { }
 
 public class AuthenticationMessage : SocketMessage
@@ -68,27 +70,36 @@ public class DeviceInfo : SocketMessage
     public List<PhoneNumber> PhoneNumbers { get; set; } = [];
 }
 
-public class DeviceStatus : SocketMessage
+public class BatteryStatus : SocketMessage
 {
-    public int BatteryStatus { get; set; }
+    public int BatteryLevel { get; set; }
 
-    public bool ChargingStatus { get; set; }
-
-    public bool BluetoothStatus { get; set; }
-
-    public bool IsDndEnabled { get; set; }
-
-    public int RingerMode { get; set; }
+    public bool IsCharging { get; set; }
 }
 
-public class DeviceRingerMode : SocketMessage
+public class RingerMode : SocketMessage
 {
-    public int RingerMode { get; set; }
+    public int Mode { get; set; }
 }
+
+public class DndStatus : SocketMessage
+{
+    public bool IsEnabled { get; set; }
+}
+
+public class AudioStreamMessage : SocketMessage
+{
+    public AudioStreamType StreamType { get; set; }
+
+    public int Level { get; set; }
+
+    public int MaxLevel { get; set; }
+}
+
 
 public class CommandMessage : SocketMessage
 {
-    public required CommandType CommandType { get; set; }
+    public CommandType CommandType { get; set; }
 }
 
 public class TextMessage : SocketMessage

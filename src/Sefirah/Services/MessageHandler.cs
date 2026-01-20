@@ -37,8 +37,21 @@ public class MessageHandler(
                     await playbackService.HandleMediaActionAsync(action);
                     break;
 
-                case DeviceStatus deviceStatus:
-                    await App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.Status = deviceStatus);
+                case BatteryStatus batteryStatus:
+                    await App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.BatteryStatus = batteryStatus);
+                    break;
+
+                case RingerMode ringerMode:
+                    await App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.RingerMode = ringerMode.Mode);
+                    break;
+
+                case DndStatus dndStatus:
+                    await App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.DndEnabled = dndStatus.IsEnabled);
+                    break;
+
+                case AudioStreamMessage audioStream:
+                    await App.MainWindow.DispatcherQueue.EnqueueAsync(() => 
+                        device.Audio.Update(audioStream.StreamType, audioStream.Level, audioStream.MaxLevel));
                     break;
 
                 case ClipboardMessage clipboardMessage:

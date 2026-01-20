@@ -77,12 +77,28 @@ public partial class PairedDevice : BaseRemoteDevice
     public bool IsConnecting => ConnectionStatus.IsConnecting;
     public bool IsConnectedOrConnecting => ConnectionStatus.IsConnectedOrConnecting;
 
-    private DeviceStatus? status;
-    public DeviceStatus? Status
+    private BatteryStatus? batteryStatus;
+    public BatteryStatus? BatteryStatus
     {
-        get => status;
-        set => SetProperty(ref status, value);
+        get => batteryStatus;
+        set => SetProperty(ref batteryStatus, value);
     }
+
+    private int ringerMode;
+    public int RingerMode
+    {
+        get => ringerMode;
+        set => SetProperty(ref ringerMode, value);
+    }
+
+    private bool dndEnabled;
+    public bool DndEnabled
+    {
+        get => dndEnabled;
+        set => SetProperty(ref dndEnabled, value);
+    }
+
+    public Audio Audio { get; } = new();
 
     public ObservableCollection<AdbDevice> ConnectedAdbDevices { get; set; } = [];
 

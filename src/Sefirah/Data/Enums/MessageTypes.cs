@@ -73,3 +73,14 @@ public enum ConversationType
     New
 }
 
+/// <summary>
+/// Android AudioManager stream type constants.
+/// </summary>
+public enum AudioStreamType
+{
+    VoiceCall = 0,
+    Ring = 2,
+    Media = 3,
+    Alarm = 4,
+    Notification = 5
+}
