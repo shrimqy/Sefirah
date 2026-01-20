@@ -1,9 +1,14 @@
+using Sefirah.Data.AppDatabase.Migrations;
 using Sefirah.Data.AppDatabase.Models;
 using SQLite;
 namespace Sefirah.Data.AppDatabase;
 
 public class DatabaseContext
 {
+    private const int CurrentSchemaVersion = 1;
+
+    private static readonly IMigration[] Migrations = [];
+
     public SQLiteConnection Database { get; private set; }
 
     public DatabaseContext(ILogger<DatabaseContext> logger)
@@ -11,7 +16,7 @@ public class DatabaseContext
         try
         {
             logger.LogInformation("Initializing database context");
-            Database = TryCreateDatabase();
+            Database = TryCreateDatabase(logger);
         }
         catch (Exception ex)
         {
@@ -20,46 +25,96 @@ public class DatabaseContext
         }
     }
 
-    private static SQLiteConnection TryCreateDatabase()
+    private static SQLiteConnection TryCreateDatabase(ILogger logger)
     {
         var databasePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "sefirah.db");
         var db = new SQLiteConnection(databasePath);
 
-        if (db.GetTableInfo(nameof(LocalDeviceEntity)).Count == 0)
-        {
-            db.CreateTable<LocalDeviceEntity>();
-        }
+        db.CreateTable<SchemaVersionEntity>();
 
-        if (db.GetTableInfo(nameof(RemoteDeviceEntity)).Count == 0)
-        {
-            db.CreateTable<RemoteDeviceEntity>();
-        }
+        int? storedSchemaVersion = db.Table<SchemaVersionEntity>().FirstOrDefault()?.Version;
 
-        if (db.GetTableInfo(nameof(ApplicationInfoEntity)).Count == 0)
+        // If schema version doesn't match or doesn't exist, run migrations or recreate
+        if (storedSchemaVersion != CurrentSchemaVersion)
         {
-            db.CreateTable<ApplicationInfoEntity>();
+            if (storedSchemaVersion.HasValue && storedSchemaVersion < CurrentSchemaVersion)
+            {
+                RunMigrations(db, storedSchemaVersion.Value, logger);
+            }
+            else
+            {
+                // New database
+                DestructiveFallback(db);
+            }
+            
+            SetSchemaVersion(db, CurrentSchemaVersion);
+            logger.LogInformation("Database schema updated successfully");
         }
-
-        if (db.GetTableInfo(nameof(ContactEntity)).Count == 0)
+        else
         {
-            db.CreateTable<ContactEntity>();
-        }
-
-        if (db.GetTableInfo(nameof(ConversationEntity)).Count == 0)
-        {
-            db.CreateTable<ConversationEntity>();
-        }
-
-        if (db.GetTableInfo(nameof(MessageEntity)).Count == 0)
-        {
-            db.CreateTable<MessageEntity>();
-        }
-
-        if (db.GetTableInfo(nameof(AttachmentEntity)).Count == 0)
-        {
-            db.CreateTable<AttachmentEntity>();
+            CreateAllTables(db);
         }
 
         return db;
     }
+
+    private static void SetSchemaVersion(SQLiteConnection db, int version)
+    {
+        db.InsertOrReplace(new SchemaVersionEntity { Version = version });
+    }
+
+    private static void DestructiveFallback(SQLiteConnection db)
+    {
+        DropAllTables(db);
+        CreateAllTables(db);
+    }
+
+    private static void RunMigrations(SQLiteConnection db, int fromVersion, ILogger logger)
+    {
+        var migrationsToRun = Migrations
+            .Where(m => m.TargetVersion > fromVersion && m.TargetVersion <= CurrentSchemaVersion)
+            .OrderBy(m => m.TargetVersion)
+            .ToArray();
+
+        foreach (var migration in migrationsToRun)
+        {
+            try
+            {
+                logger.LogInformation("Running migration to version {Version}", migration.TargetVersion);
+                migration.Up(db);
+                SetSchemaVersion(db, migration.TargetVersion);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Migration to version {Version} failed. Falling back to destructive mode.", migration.TargetVersion);
+                DestructiveFallback(db);
+                return;
+            }
+        }
+    }
+
+    private static void CreateAllTables(SQLiteConnection db)
+    {
+        db.CreateTable<SchemaVersionEntity>();
+        db.CreateTable<LocalDeviceEntity>();
+        db.CreateTable<PairedDeviceEntity>();
+        db.CreateTable<ApplicationInfoEntity>();
+        db.CreateTable<ContactEntity>();
+        db.CreateTable<ConversationEntity>();
+        db.CreateTable<MessageEntity>();
+        db.CreateTable<AttachmentEntity>();
+    }
+
+    private static void DropAllTables(SQLiteConnection db)
+    {
+        db.DropTable<LocalDeviceEntity>();
+        db.DropTable<PairedDeviceEntity>();
+        db.DropTable<ApplicationInfoEntity>();
+        db.DropTable<ContactEntity>();
+        db.DropTable<ConversationEntity>();
+        db.DropTable<MessageEntity>();
+        db.DropTable<AttachmentEntity>();
+        db.DropTable<SchemaVersionEntity>();
+    }
+
 }
