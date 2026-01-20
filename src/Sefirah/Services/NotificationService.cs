@@ -109,7 +109,6 @@ public class NotificationService(
         Notification notification)
     {
         var existing = notifications.FirstOrDefault(n => n.Key == notification.Key);
-
         if (existing is not null)
         {
             var index = notifications.IndexOf(existing);
@@ -120,11 +119,9 @@ public class NotificationService(
         {
             notifications.Insert(0, notification);
         }
+        if (device.DeviceSettings.IgnoreWindowsApps && await IsAppActiveAsync(message.AppName!)) return;
 
-        if (!device.DeviceSettings.IgnoreWindowsApps && !await IsAppActiveAsync(message.AppName!))
-        {
-            await platformNotificationHandler.ShowRemoteNotification(message, device.Id);
-        }
+        await platformNotificationHandler.ShowRemoteNotification(message, device.Id);
     }
 
     private async Task HandleRemovedNotificationAsync(PairedDevice device, NotificationMessage message)
@@ -308,14 +305,21 @@ public class NotificationService(
         BadgeUpdateManager.CreateBadgeUpdaterForApplication().Clear();
     }
 
-    private static async Task<bool> IsAppActiveAsync(string appName)
+    private readonly List<string> IgnoreWindowsApps =
+    [
+        "Instagram"
+    ];
+
+    private async Task<bool> IsAppActiveAsync(string appName)
     {
+        if (IgnoreWindowsApps.Contains(appName)) return false;
+
         try
         {
 #if WINDOWS
             var diagnosticInfo = await AppDiagnosticInfo.RequestInfoAsync();
             return diagnosticInfo.Any(info =>
-                info.AppInfo.DisplayInfo.DisplayName.Equals(appName, StringComparison.OrdinalIgnoreCase));
+                info.AppInfo.DisplayInfo.DisplayName.Contains(appName, StringComparison.OrdinalIgnoreCase));
 #else
             return false;
 #endif
