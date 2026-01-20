@@ -141,9 +141,6 @@
   <data name="AndroidGitHubRepository" xml:space="preserve">
     <value>안드로이드 앱 GitHub 저장소</value>
   </data>
-  <data name="Clipboard" xml:space="preserve">
-    <value>클립보드</value>
-  </data>
   <data name="Feedback" xml:space="preserve">
     <value>피드백</value>
   </data>
@@ -157,13 +154,10 @@
     <value>저장 위치</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>원격 기기 저장소 위치</value>
+    <value>Remote storage location</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>클립보드 토스트 알림 표시</value>
-  </data>
-  <data name="ImageToClipboard" xml:space="preserve">
-    <value>클립보드 모니터에 이미지 포함</value>
   </data>
   <data name="ClipboardFiles" xml:space="preserve">
     <value>수신한 파일을 클립보드에 추가</value>
@@ -181,10 +175,10 @@
     <value>비활성화</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>알림 피드</value>
+    <value>Notification feed</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>알림 피드 + 토스트</value>
+    <value>Notification feed + toast</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>사용 가능한 기기</value>
@@ -254,7 +248,7 @@ page.</value>
     <value>Scan the QR code or pair directly from the discovered devices below</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>기기 연결 요청</value>
+    <value>Device connection request</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
     <value>두 기기에서 패스키 일치 확인:</value>
@@ -325,14 +319,11 @@ page.</value>
   <data name="Devices.Title" xml:space="preserve">
     <value>Devices</value>
   </data>
-  <data name="RingerModeNormal.Content" xml:space="preserve">
-    <value>일반</value>
+  <data name="AudioSilent" xml:space="preserve">
+    <value>Silent</value>
   </data>
-  <data name="RingerModeSilent.Content" xml:space="preserve">
-    <value>무음</value>
-  </data>
-  <data name="RingerModeVibrate.Content" xml:space="preserve">
-    <value>진동</value>
+  <data name="AudioVibrate" xml:space="preserve">
+    <value>Vibrate</value>
   </data>
   <data name="Pin" xml:space="preserve">
     <value>고정</value>
@@ -340,14 +331,11 @@ page.</value>
   <data name="Unpin" xml:space="preserve">
     <value>고정 해제</value>
   </data>
-  <data name="ScreenMirror" xml:space="preserve">
-    <value>화면 미러링</value>
-  </data>
   <data name="VideoSettings" xml:space="preserve">
     <value>Video Settings</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>오디오 설정</value>
+    <value>Audio settings</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
     <value>앱에서 열기</value>
@@ -544,9 +532,6 @@ page.</value>
   <data name="ClipboardFilesDescription" xml:space="preserve">
     <value>클립보드를 통한 파일 동기화 활성화</value>
   </data>
-  <data name="ImageToClipboardDescription" xml:space="preserve">
-    <value>클립보드를 통한 이미지 동기화 활성화</value>
-  </data>
   <data name="AutoConnectDescription" xml:space="preserve">
     <value>기기 연결 시 자동으로 ADB에 연결</value>
   </data>
@@ -555,24 +540,6 @@ page.</value>
   </data>
   <data name="ConfigureNotificationSettings" xml:space="preserve">
     <value>알림 설정 변경</value>
-  </data>
-  <data name="ConfigureScreenMirroring" xml:space="preserve">
-    <value>화면 미러링 설정</value>
-  </data>
-  <data name="ConfigureAdbConnection" xml:space="preserve">
-    <value>ADB 연결 설정 및 주소 관리</value>
-  </data>
-  <data name="SyncMediaSessions" xml:space="preserve">
-    <value>미디어 및 오디오 세션 동기화</value>
-  </data>
-  <data name="MediaSessions" xml:space="preserve">
-    <value>미디어 세션</value>
-  </data>
-  <data name="StorageAccess" xml:space="preserve">
-    <value>Show device in File Explorer</value>
-  </data>
-  <data name="StorageAccessDescription" xml:space="preserve">
-    <value>Enables or disables storage access for this device in the File Explorer</value>
   </data>
   <data name="DisplayToastNotifications" xml:space="preserve">
     <value>이 PC에서 토스트 알림 표시</value>
@@ -611,7 +578,7 @@ page.</value>
     <value>인수</value>
   </data>
   <data name="StartInDirectory" xml:space="preserve">
-    <value>이 디렉터리에서 시작</value>
+    <value>Start in directory</value>
   </data>
   <data name="EnterActionName" xml:space="preserve">
     <value>동작 이름 입력</value>
@@ -700,12 +667,54 @@ input text %pwd%</value>
     <value>전송할 파일 드롭</value>
   </data>
   <data name="DeviceAddresses" xml:space="preserve">
-    <value>Device Addresses</value>
+    <value>Device addresses</value>
   </data>
   <data name="ManageAddressesAndPriority" xml:space="preserve">
     <value>Manage addresses and connection priority</value>
   </data>
-  <data name="SendFiles" xml:space="preserve">
-    <value>Send files</value>
+  <data name="StorageAccess" xml:space="preserve">
+    <value>Show device in File Explorer</value>
+  </data>
+  <data name="StorageAccessDescription" xml:space="preserve">
+    <value>Enables or disables storage access for this device in the File Explorer</value>
+  </data>
+  <data name="AudioRing" xml:space="preserve">
+    <value>Ring</value>
+  </data>
+  <data name="AudioMedia" xml:space="preserve">
+    <value>Media</value>
+  </data>
+  <data name="AudioNotification" xml:space="preserve">
+    <value>Notification</value>
+  </data>
+  <data name="AudioCall" xml:space="preserve">
+    <value>Call</value>
+  </data>
+  <data name="AudioAlarm" xml:space="preserve">
+    <value>Alarm</value>
+  </data>
+  <data name="AdbSettingsDescription" xml:space="preserve">
+    <value>Configure ADB connection</value>
+  </data>
+  <data name="ScreenMirrorSettingsDescription" xml:space="preserve">
+    <value>Configure scrcpy flags and screen mirroring options</value>
+  </data>
+  <data name="MediaSessionDescription" xml:space="preserve">
+    <value>Sync media playback information with this device</value>
+  </data>
+  <data name="AudioControl" xml:space="preserve">
+    <value>Audio device control</value>
+  </data>
+  <data name="MediaSession" xml:space="preserve">
+    <value>Media playback session</value>
+  </data>
+  <data name="AudioControlDescription" xml:space="preserve">
+    <value>Allow audio device control with this device</value>
+  </data>
+  <data name="ClipboardIncludeImagesDescription" xml:space="preserve">
+    <value>Enable image synchronization through clipboard</value>
+  </data>
+  <data name="ClipboardIncludeImages" xml:space="preserve">
+    <value>Include images in clipboard monitor</value>
   </data>
 </root>
