@@ -68,8 +68,8 @@ public sealed partial class DeviceSettingsPage : Page
 
         // Index 0 = Receive (Download), Index 1 = Send (Upload)
         var selectedItems = segmented.SelectedItems;
-        ViewModel.ClipboardReceiveEnabled = segmented.Items.Count > 0 && selectedItems.Contains(segmented.Items[0]);
-        ViewModel.ClipboardSendEnabled = segmented.Items.Count > 1 && selectedItems.Contains(segmented.Items[1]);
+        ViewModel.ClipboardReceive = segmented.Items.Count > 0 && selectedItems.Contains(segmented.Items[0]);
+        ViewModel.ClipboardSend = segmented.Items.Count > 1 && selectedItems.Contains(segmented.Items[1]);
     }
 
     private void UpdateSegmentedSelection(Segmented segmented)
@@ -77,10 +77,10 @@ public sealed partial class DeviceSettingsPage : Page
         isUpdatingSelection = true;
         segmented.SelectedItems.Clear();
         
-        if (ViewModel.ClipboardReceiveEnabled && segmented.Items.Count > 0)
+        if (ViewModel.ClipboardReceive && segmented.Items.Count > 0)
             segmented.SelectedItems.Add(segmented.Items[0]);
         
-        if (ViewModel.ClipboardSendEnabled && segmented.Items.Count > 1)
+        if (ViewModel.ClipboardSend && segmented.Items.Count > 1)
             segmented.SelectedItems.Add(segmented.Items[1]);
         
         isUpdatingSelection = false;

@@ -141,9 +141,6 @@
   <data name="AndroidGitHubRepository" xml:space="preserve">
     <value>GitHub-Repository für Android-App</value>
   </data>
-  <data name="Clipboard" xml:space="preserve">
-    <value>Zwischenablage</value>
-  </data>
   <data name="Feedback" xml:space="preserve">
     <value>Feedback</value>
   </data>
@@ -161,9 +158,6 @@
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>Zwischenablagen-Benachrichtigung anzeigen</value>
-  </data>
-  <data name="ImageToClipboard" xml:space="preserve">
-    <value>Bilder im Zwischenablagen-Anzeige einbeziehen</value>
   </data>
   <data name="ClipboardFiles" xml:space="preserve">
     <value>Empfangene Benachrichtigungen zur Zwischenablage hinzufügen</value>
@@ -324,13 +318,10 @@
   <data name="Devices.Title" xml:space="preserve">
     <value>Devices</value>
   </data>
-  <data name="RingerModeNormal.Content" xml:space="preserve">
-    <value>Normal</value>
-  </data>
-  <data name="RingerModeSilent.Content" xml:space="preserve">
+  <data name="AudioSilent" xml:space="preserve">
     <value>Stumm</value>
   </data>
-  <data name="RingerModeVibrate.Content" xml:space="preserve">
+  <data name="AudioVibrate" xml:space="preserve">
     <value>Vibrieren</value>
   </data>
   <data name="Pin" xml:space="preserve">
@@ -338,9 +329,6 @@
   </data>
   <data name="Unpin" xml:space="preserve">
     <value>Loslösen</value>
-  </data>
-  <data name="ScreenMirror" xml:space="preserve">
-    <value>Bildschirmspiegelung</value>
   </data>
   <data name="VideoSettings" xml:space="preserve">
     <value>Videoeinstellungen</value>
@@ -543,9 +531,6 @@
   <data name="ClipboardFilesDescription" xml:space="preserve">
     <value>Dateisynchronisierung durch Zwischenablage aktivieren</value>
   </data>
-  <data name="ImageToClipboardDescription" xml:space="preserve">
-    <value>Bildsynchronisierung durch Zwischenablage aktivieren</value>
-  </data>
   <data name="AutoConnectDescription" xml:space="preserve">
     <value>Bei Verbindung zum Gerät automatisch mit ADB verbinden</value>
   </data>
@@ -554,18 +539,6 @@
   </data>
   <data name="ConfigureNotificationSettings" xml:space="preserve">
     <value>Benachrichtigungseinstellungen konfigurieren</value>
-  </data>
-  <data name="ConfigureScreenMirroring" xml:space="preserve">
-    <value>Bildschirmspiegelung konfigurieren</value>
-  </data>
-  <data name="ConfigureAdbConnection" xml:space="preserve">
-    <value>ADB-Verbindung konfigurieren und Adressen verwalten</value>
-  </data>
-  <data name="SyncMediaSessions" xml:space="preserve">
-    <value>Medien- und Audio-Sitzungen synchronisieren</value>
-  </data>
-  <data name="MediaSessions" xml:space="preserve">
-    <value>Mediensitzungen</value>
   </data>
   <data name="DisplayToastNotifications" xml:space="preserve">
     <value>Benachrichtigungen auf diesem PC anzeigen</value>
@@ -698,13 +671,49 @@ input text %pwd%</value>
   <data name="ManageAddressesAndPriority" xml:space="preserve">
     <value>Manage addresses and connection priority</value>
   </data>
-  <data name="SendFiles" xml:space="preserve">
-    <value>Send files</value>
-  </data>
   <data name="StorageAccess" xml:space="preserve">
     <value>Show device in File Explorer</value>
   </data>
   <data name="StorageAccessDescription" xml:space="preserve">
     <value>Enables or disables storage access for this device in the File Explorer</value>
+  </data>
+  <data name="AudioRing" xml:space="preserve">
+    <value>Ring</value>
+  </data>
+  <data name="AudioMedia" xml:space="preserve">
+    <value>Media</value>
+  </data>
+  <data name="AudioNotification" xml:space="preserve">
+    <value>Notification</value>
+  </data>
+  <data name="AudioCall" xml:space="preserve">
+    <value>Call</value>
+  </data>
+  <data name="AudioAlarm" xml:space="preserve">
+    <value>Alarm</value>
+  </data>
+  <data name="AdbSettingsDescription" xml:space="preserve">
+    <value>ADB-Verbindung konfigurieren</value>
+  </data>
+  <data name="ScreenMirrorSettingsDescription" xml:space="preserve">
+    <value>Configure scrcpy flags and screen mirroring options</value>
+  </data>
+  <data name="MediaSessionDescription" xml:space="preserve">
+    <value>Sync media playback information with this device</value>
+  </data>
+  <data name="AudioControl" xml:space="preserve">
+    <value>Audio device control</value>
+  </data>
+  <data name="MediaSession" xml:space="preserve">
+    <value>Media playback session</value>
+  </data>
+  <data name="AudioControlDescription" xml:space="preserve">
+    <value>Allow audio device control with this device</value>
+  </data>
+  <data name="ClipboardIncludeImagesDescription" xml:space="preserve">
+    <value>Bildsynchronisierung durch Zwischenablage aktivieren</value>
+  </data>
+  <data name="ClipboardIncludeImages" xml:space="preserve">
+    <value>Bilder im Zwischenablagen-Anzeige einbeziehen</value>
   </data>
 </root>

@@ -91,12 +91,9 @@ public static class NotificationHints
 /// D-Bus client for org.freedesktop.Notifications
 /// Implements the Desktop Notifications Specification
 /// </summary>
-partial class Notifications : NotificationsObject
+partial class Notifications(NotificationsService service, ObjectPath path) : NotificationsObject(service, path)
 {
     private const string __Interface = "org.freedesktop.Notifications";
-
-    public Notifications(NotificationsService service, ObjectPath path) : base(service, path)
-    { }
 
     /// <summary>
     /// Send a notification to the notification server

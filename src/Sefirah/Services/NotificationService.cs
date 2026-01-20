@@ -51,7 +51,7 @@ public class NotificationService(
 
     public async Task HandleNotificationMessage(PairedDevice device, NotificationMessage message)
     {
-        if (!device.DeviceSettings.NotificationSyncEnabled) return;
+        if (!device.DeviceSettings.NotificationSync) return;
 
         var notificationLock = GetNotificationLock(device.Id);
         await notificationLock.WaitAsync();

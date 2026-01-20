@@ -6,19 +6,19 @@ namespace Sefirah.Services.Settings;
 
 internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSharingContext settingsSharingContext) : BaseDeviceAwareJsonSettings(deviceId, settingsSharingContext), IDeviceSettingsService
 {
-    public bool ClipboardReceiveEnabled
+    public bool ClipboardReceive
     {
         get => Get(true);
         set => Set(value);
     }
 
-    public bool ClipboardSendEnabled
+    public bool ClipboardSend
     {
         get => Get(true);
         set => Set(value);
     }
 
-    public bool ImageToClipboardEnabled
+    public bool ClipboardIncludeImages
     {
         get => Get(false);
         set => Set(value);
@@ -36,7 +36,7 @@ internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSh
         set => Set(value);
     }
 
-    public bool NotificationSyncEnabled
+    public bool NotificationSync
     {
         get => Get(true);
         set => Set(value);
@@ -84,7 +84,7 @@ internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSh
         set => Set(value);
     }
 
-    public bool ClipboardFilesEnabled
+    public bool ClipboardFiles
     {
         get => Get(false);
         set => Set(value);
@@ -258,7 +258,13 @@ internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSh
         set => Set(value);
     }
 
-    public bool MediaSessionSyncEnabled
+    public bool MediaSession
+    {
+        get => Get(true);
+        set => Set(value);
+    }
+
+    public bool AudioSync
     {
         get => Get(true);
         set => Set(value);

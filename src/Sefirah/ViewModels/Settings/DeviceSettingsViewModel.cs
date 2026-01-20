@@ -16,27 +16,27 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
     #endregion
 
     #region Clipboard Settings
-    public bool ClipboardReceiveEnabled
+    public bool ClipboardReceive
     {
-        get => DeviceSettings.ClipboardReceiveEnabled;
+        get => DeviceSettings.ClipboardReceive;
         set
         {
-            if (DeviceSettings.ClipboardReceiveEnabled != value)
+            if (DeviceSettings.ClipboardReceive != value)
             {
-                DeviceSettings.ClipboardReceiveEnabled = value;
+                DeviceSettings.ClipboardReceive = value;
                 OnPropertyChanged();
             }
         }
     }
 
-    public bool ClipboardSendEnabled
+    public bool ClipboardSend
     {
-        get => DeviceSettings.ClipboardSendEnabled;
+        get => DeviceSettings.ClipboardSend;
         set
         {
-            if (DeviceSettings.ClipboardSendEnabled != value)
+            if (DeviceSettings.ClipboardSend != value)
             {
-                DeviceSettings.ClipboardSendEnabled = value;
+                DeviceSettings.ClipboardSend = value;
                 OnPropertyChanged();
             }
         }
@@ -68,27 +68,27 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         }
     }
 
-    public bool ClipboardFilesEnabled
+    public bool ClipboardFiles
     {
-        get => DeviceSettings.ClipboardFilesEnabled;
+        get => DeviceSettings.ClipboardFiles;
         set
         {
-            if (DeviceSettings.ClipboardFilesEnabled != value)
+            if (DeviceSettings.ClipboardFiles != value)
             {
-                DeviceSettings.ClipboardFilesEnabled = value;
+                DeviceSettings.ClipboardFiles = value;
                 OnPropertyChanged();
             }
         }
     }
 
-    public bool ImageToClipboardEnabled
+    public bool ClipboardIncludeImages
     {
-        get => DeviceSettings.ImageToClipboardEnabled;
+        get => DeviceSettings.ClipboardIncludeImages;
         set
         {
-            if (DeviceSettings.ImageToClipboardEnabled != value)
+            if (DeviceSettings.ClipboardIncludeImages != value)
             {
-                DeviceSettings.ImageToClipboardEnabled = value;
+                DeviceSettings.ClipboardIncludeImages = value;
                 OnPropertyChanged();
             }
         }
@@ -96,14 +96,14 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
     #endregion
 
     #region Notification Settings
-    public bool NotificationSyncEnabled
+    public bool NotificationSync
     {
-        get => DeviceSettings.NotificationSyncEnabled;
+        get => DeviceSettings.NotificationSync;
         set
         {
-            if (DeviceSettings.NotificationSyncEnabled != value)
+            if (DeviceSettings.NotificationSync != value)
             {
-                DeviceSettings.NotificationSyncEnabled = value;
+                DeviceSettings.NotificationSync = value;
                 OnPropertyChanged();
             }
         }
@@ -539,14 +539,27 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     #region Media Session Settings
 
-    public bool MediaSessionSyncEnabled
+    public bool MediaSession
     {
-        get => DeviceSettings.MediaSessionSyncEnabled;
+        get => DeviceSettings.MediaSession;
         set
         {
-            if (DeviceSettings.MediaSessionSyncEnabled != value)
+            if (DeviceSettings.MediaSession != value)
             {
-                DeviceSettings.MediaSessionSyncEnabled = value;
+                DeviceSettings.MediaSession = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool AudioSync
+    {
+        get => DeviceSettings.AudioSync;
+        set
+        {
+            if (DeviceSettings.AudioSync != value)
+            {
+                DeviceSettings.AudioSync = value;
                 OnPropertyChanged();
             }
         }

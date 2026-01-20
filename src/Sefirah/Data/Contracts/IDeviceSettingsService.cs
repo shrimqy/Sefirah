@@ -12,12 +12,12 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// <summary>
     /// Gets or sets a value indicating whether to receive clipboard content from the device.
     /// </summary>
-    bool ClipboardReceiveEnabled { get; set; }
+    bool ClipboardReceive { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to send clipboard content to the device.
     /// </summary>
-    bool ClipboardSendEnabled { get; set; }
+    bool ClipboardSend { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to show clipboard toast notifications.
@@ -32,7 +32,7 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// <summary>
     /// Gets or sets a value indicating whether notification synchronization is enabled.
     /// </summary>
-    bool NotificationSyncEnabled { get; set; }
+    bool NotificationSync { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to show notification toast messages.
@@ -72,12 +72,12 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// <summary>
     /// Gets or sets a value indicating whether to copy received files to clipboard.
     /// </summary>
-    bool ClipboardFilesEnabled { get; set; }
+    bool ClipboardFiles { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to include images in clipboard sync.
     /// </summary>
-    bool ImageToClipboardEnabled { get; set; }
+    bool ClipboardIncludeImages { get; set; }
 
     /// <summary>
     /// Gets or sets the path to the scrcpy executable.
@@ -220,9 +220,14 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     bool IsVirtualDisplayEnabled { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether to sync media/audio sessions.
+    /// Gets or sets a value indicating whether to sync media playback sessions.
     /// </summary>
-    bool MediaSessionSyncEnabled { get; set; }
+    bool MediaSession { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to sync audio device information and controls.
+    /// </summary>
+    bool AudioSync { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to enable TCP/IP mode for ADB.
