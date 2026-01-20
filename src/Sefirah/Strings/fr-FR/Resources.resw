@@ -141,9 +141,6 @@
   <data name="AndroidGitHubRepository" xml:space="preserve">
     <value>Dépôt GitHub Android</value>
   </data>
-  <data name="Clipboard" xml:space="preserve">
-    <value>Presse-papiers</value>
-  </data>
   <data name="Feedback" xml:space="preserve">
     <value>Commentaires</value>
   </data>
@@ -157,13 +154,10 @@
     <value>Emplacement de sauvegarde</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Emplacement de stockage à distance</value>
+    <value>Remote storage location</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>Afficher le toast du presse-papiers</value>
-  </data>
-  <data name="ImageToClipboard" xml:space="preserve">
-    <value>Inclure des images dans le moniteur du presse-papiers</value>
   </data>
   <data name="ClipboardFiles" xml:space="preserve">
     <value>Ajouter les fichiers reçus au presse-papiers</value>
@@ -181,10 +175,10 @@
     <value>Désactivé</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Fil de notification</value>
+    <value>Notification feed</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>Fil de notification + Toast</value>
+    <value>Notification feed + toast</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>Appareils disponibles</value>
@@ -253,7 +247,7 @@
     <value>Scan the QR code or pair directly from the discovered devices below</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>Demande de connexion de l'appareil</value>
+    <value>Device connection request</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
     <value>Vérifiez que la clé d'accès correspond sur les deux appareils :</value>
@@ -324,14 +318,11 @@
   <data name="Devices.Title" xml:space="preserve">
     <value>Devices</value>
   </data>
-  <data name="RingerModeNormal.Content" xml:space="preserve">
-    <value>Son</value>
+  <data name="AudioSilent" xml:space="preserve">
+    <value>Silent</value>
   </data>
-  <data name="RingerModeSilent.Content" xml:space="preserve">
-    <value>Muet</value>
-  </data>
-  <data name="RingerModeVibrate.Content" xml:space="preserve">
-    <value>Vibreur</value>
+  <data name="AudioVibrate" xml:space="preserve">
+    <value>Vibrate</value>
   </data>
   <data name="Pin" xml:space="preserve">
     <value>Épingler</value>
@@ -339,14 +330,11 @@
   <data name="Unpin" xml:space="preserve">
     <value>Désépingler</value>
   </data>
-  <data name="ScreenMirror" xml:space="preserve">
-    <value>Miroir d'écran</value>
-  </data>
   <data name="VideoSettings" xml:space="preserve">
     <value>Réglages vidéo</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>Réglages audio</value>
+    <value>Audio settings</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
     <value>Ouvrir dans l'app</value>
@@ -543,9 +531,6 @@
   <data name="ClipboardFilesDescription" xml:space="preserve">
     <value>Activer la synchronisation des fichiers via le presse-papiers</value>
   </data>
-  <data name="ImageToClipboardDescription" xml:space="preserve">
-    <value>Activer la synchronisation des images via le presse-papiers</value>
-  </data>
   <data name="AutoConnectDescription" xml:space="preserve">
     <value>Se connecter automatiquement à ADB lorsque l'appareil se connecte</value>
   </data>
@@ -554,24 +539,6 @@
   </data>
   <data name="ConfigureNotificationSettings" xml:space="preserve">
     <value>Configurer les paramètres de notification</value>
-  </data>
-  <data name="ConfigureScreenMirroring" xml:space="preserve">
-    <value>Configurer la mise en miroir de l'écran</value>
-  </data>
-  <data name="ConfigureAdbConnection" xml:space="preserve">
-    <value>Configurer la connexion ADB et gérer les adresses</value>
-  </data>
-  <data name="SyncMediaSessions" xml:space="preserve">
-    <value>Synchroniser les médias et les sessions audio</value>
-  </data>
-  <data name="MediaSessions" xml:space="preserve">
-    <value>Sessions média</value>
-  </data>
-  <data name="StorageAccess" xml:space="preserve">
-    <value>Show device in File Explorer</value>
-  </data>
-  <data name="StorageAccessDescription" xml:space="preserve">
-    <value>Enables or disables storage access for this device in the File Explorer</value>
   </data>
   <data name="DisplayToastNotifications" xml:space="preserve">
     <value>Afficher les notifications toast sur ce PC</value>
@@ -610,7 +577,7 @@
     <value>Arguments</value>
   </data>
   <data name="StartInDirectory" xml:space="preserve">
-    <value>Démarrer dans le répertoire</value>
+    <value>Start in directory</value>
   </data>
   <data name="EnterActionName" xml:space="preserve">
     <value>Entrez le nom de l'action</value>
@@ -699,12 +666,54 @@ input text %pwd%</value>
     <value>Déposer les fichiers à envoyer</value>
   </data>
   <data name="DeviceAddresses" xml:space="preserve">
-    <value>Device Addresses</value>
+    <value>Device addresses</value>
   </data>
   <data name="ManageAddressesAndPriority" xml:space="preserve">
     <value>Manage addresses and connection priority</value>
   </data>
-  <data name="SendFiles" xml:space="preserve">
-    <value>Send files</value>
+  <data name="StorageAccess" xml:space="preserve">
+    <value>Show device in File Explorer</value>
+  </data>
+  <data name="StorageAccessDescription" xml:space="preserve">
+    <value>Enables or disables storage access for this device in the File Explorer</value>
+  </data>
+  <data name="AudioRing" xml:space="preserve">
+    <value>Ring</value>
+  </data>
+  <data name="AudioMedia" xml:space="preserve">
+    <value>Media</value>
+  </data>
+  <data name="AudioNotification" xml:space="preserve">
+    <value>Notification</value>
+  </data>
+  <data name="AudioCall" xml:space="preserve">
+    <value>Call</value>
+  </data>
+  <data name="AudioAlarm" xml:space="preserve">
+    <value>Alarm</value>
+  </data>
+  <data name="AdbSettingsDescription" xml:space="preserve">
+    <value>Configure ADB connection</value>
+  </data>
+  <data name="ScreenMirrorSettingsDescription" xml:space="preserve">
+    <value>Configure scrcpy flags and screen mirroring options</value>
+  </data>
+  <data name="MediaSessionDescription" xml:space="preserve">
+    <value>Sync media playback information with this device</value>
+  </data>
+  <data name="AudioControl" xml:space="preserve">
+    <value>Audio device control</value>
+  </data>
+  <data name="MediaSession" xml:space="preserve">
+    <value>Media playback session</value>
+  </data>
+  <data name="AudioControlDescription" xml:space="preserve">
+    <value>Allow audio device control with this device</value>
+  </data>
+  <data name="ClipboardIncludeImagesDescription" xml:space="preserve">
+    <value>Enable image synchronization through clipboard</value>
+  </data>
+  <data name="ClipboardIncludeImages" xml:space="preserve">
+    <value>Include images in clipboard monitor</value>
   </data>
 </root>
