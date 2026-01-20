@@ -141,9 +141,6 @@
   <data name="AndroidGitHubRepository" xml:space="preserve">
     <value>Репозиторий GitHub Android</value>
   </data>
-  <data name="Clipboard" xml:space="preserve">
-    <value>Буфер обмена</value>
-  </data>
   <data name="Feedback" xml:space="preserve">
     <value>Обратная связь</value>
   </data>
@@ -157,13 +154,10 @@
     <value>Путь сохранения</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Расположение удаленного хранилища</value>
+    <value>Remote storage location</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>Показать всплывающее окно буфера обмена</value>
-  </data>
-  <data name="ImageToClipboard" xml:space="preserve">
-    <value>Включать изображения в буфер мониторинга</value>
   </data>
   <data name="ClipboardFiles" xml:space="preserve">
     <value>Добавить полученные файлы в буфер обмена</value>
@@ -181,10 +175,10 @@
     <value>Выкл</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Лента уведомлений</value>
+    <value>Notification feed</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>Лента уведомлений + Всплывающие уведомления</value>
+    <value>Notification feed + toast</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>Доступные устройства</value>
@@ -253,7 +247,7 @@
     <value>Отсканируйте QR код или подключитесь напрямую к найденным устройствам ниже</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>Запрос на подключение устройства</value>
+    <value>Device connection request</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
     <value>Проверьте, совпадает ли ключ доступа на обоих устройствах:</value>
@@ -324,14 +318,11 @@
   <data name="Devices.Title" xml:space="preserve">
     <value>Устройства</value>
   </data>
-  <data name="RingerModeNormal.Content" xml:space="preserve">
-    <value>Обычный</value>
+  <data name="AudioSilent" xml:space="preserve">
+    <value>Silent</value>
   </data>
-  <data name="RingerModeSilent.Content" xml:space="preserve">
-    <value>Без звука</value>
-  </data>
-  <data name="RingerModeVibrate.Content" xml:space="preserve">
-    <value>Вибрация</value>
+  <data name="AudioVibrate" xml:space="preserve">
+    <value>Vibrate</value>
   </data>
   <data name="Pin" xml:space="preserve">
     <value>Закрепить</value>
@@ -339,14 +330,11 @@
   <data name="Unpin" xml:space="preserve">
     <value>Открепить</value>
   </data>
-  <data name="ScreenMirror" xml:space="preserve">
-    <value>Зеркальный экран</value>
-  </data>
   <data name="VideoSettings" xml:space="preserve">
     <value>Настройки видео</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>Настройки аудио</value>
+    <value>Audio settings</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
     <value>Открыть в приложении</value>
@@ -543,9 +531,6 @@
   <data name="ClipboardFilesDescription" xml:space="preserve">
     <value>Включить синхронизацию файлов через буфер обмена</value>
   </data>
-  <data name="ImageToClipboardDescription" xml:space="preserve">
-    <value>Включить синхронизацию изображений через буфер обмена</value>
-  </data>
   <data name="AutoConnectDescription" xml:space="preserve">
     <value>Автоматически подключаться к ADB при подключении устройства</value>
   </data>
@@ -554,24 +539,6 @@
   </data>
   <data name="ConfigureNotificationSettings" xml:space="preserve">
     <value>Настройка параметров уведомлений</value>
-  </data>
-  <data name="ConfigureScreenMirroring" xml:space="preserve">
-    <value>Настройка трансляции экрана</value>
-  </data>
-  <data name="ConfigureAdbConnection" xml:space="preserve">
-    <value>Настройте подключение и адрес ADB</value>
-  </data>
-  <data name="SyncMediaSessions" xml:space="preserve">
-    <value>Синхронизировать медиа и аудио сессии</value>
-  </data>
-  <data name="MediaSessions" xml:space="preserve">
-    <value>Медиа-сессия</value>
-  </data>
-  <data name="StorageAccess" xml:space="preserve">
-    <value>Отображать устройство в Проводнике</value>
-  </data>
-  <data name="StorageAccessDescription" xml:space="preserve">
-    <value>Включить / отключить доступ к хранилищу этого устройства в Проводнике</value>
   </data>
   <data name="DisplayToastNotifications" xml:space="preserve">
     <value>Показывать всплывающие уведомления на этом ПК</value>
@@ -610,7 +577,7 @@
     <value>Параметры</value>
   </data>
   <data name="StartInDirectory" xml:space="preserve">
-    <value>Запуск в каталоге</value>
+    <value>Start in directory</value>
   </data>
   <data name="EnterActionName" xml:space="preserve">
     <value>Введите имя действия</value>
@@ -699,12 +666,54 @@ input text %pwd%</value>
     <value>Перетащите файл для отправки</value>
   </data>
   <data name="DeviceAddresses" xml:space="preserve">
-    <value>Адреса устройства</value>
+    <value>Device addresses</value>
   </data>
   <data name="ManageAddressesAndPriority" xml:space="preserve">
     <value>Управление адресами и приоритетом подключения</value>
   </data>
-  <data name="SendFiles" xml:space="preserve">
-    <value>Отправить файлы</value>
+  <data name="StorageAccess" xml:space="preserve">
+    <value>Отображать устройство в Проводнике</value>
+  </data>
+  <data name="StorageAccessDescription" xml:space="preserve">
+    <value>Включить / отключить доступ к хранилищу этого устройства в Проводнике</value>
+  </data>
+  <data name="AudioRing" xml:space="preserve">
+    <value>Ring</value>
+  </data>
+  <data name="AudioMedia" xml:space="preserve">
+    <value>Media</value>
+  </data>
+  <data name="AudioNotification" xml:space="preserve">
+    <value>Notification</value>
+  </data>
+  <data name="AudioCall" xml:space="preserve">
+    <value>Call</value>
+  </data>
+  <data name="AudioAlarm" xml:space="preserve">
+    <value>Alarm</value>
+  </data>
+  <data name="AdbSettingsDescription" xml:space="preserve">
+    <value>Configure ADB connection</value>
+  </data>
+  <data name="ScreenMirrorSettingsDescription" xml:space="preserve">
+    <value>Configure scrcpy flags and screen mirroring options</value>
+  </data>
+  <data name="MediaSessionDescription" xml:space="preserve">
+    <value>Sync media playback information with this device</value>
+  </data>
+  <data name="AudioControl" xml:space="preserve">
+    <value>Audio device control</value>
+  </data>
+  <data name="MediaSession" xml:space="preserve">
+    <value>Media playback session</value>
+  </data>
+  <data name="AudioControlDescription" xml:space="preserve">
+    <value>Allow audio device control with this device</value>
+  </data>
+  <data name="ClipboardIncludeImagesDescription" xml:space="preserve">
+    <value>Enable image synchronization through clipboard</value>
+  </data>
+  <data name="ClipboardIncludeImages" xml:space="preserve">
+    <value>Include images in clipboard monitor</value>
   </data>
 </root>
