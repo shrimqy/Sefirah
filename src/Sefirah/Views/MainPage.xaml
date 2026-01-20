@@ -1,4 +1,4 @@
-<Page
+﻿<Page
     x:Class="Sefirah.Views.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -218,7 +218,7 @@
                                                                 Height="120"
                                                                 Minimum="0"
                                                                 Maximum="{x:Bind MaxLevel, Mode=OneWay}"
-                                                                Value="{x:Bind Level, Mode=OneWay}"
+                                                                Value="{x:Bind Level, Mode=TwoWay}"
                                                                 PointerCaptureLost="AudioSlider_PointerCaptureLost"
                                                                 Tag="{x:Bind}" />
                                                             <TextBlock
