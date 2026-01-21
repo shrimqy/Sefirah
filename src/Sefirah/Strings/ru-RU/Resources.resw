@@ -711,48 +711,6 @@ input text %pwd%</value>
     <value>Allow audio device control with this device</value>
   </data>
   <data name="ClipboardIncludeImagesDescription" xml:space="preserve">
-    <value>Enable image synchronization through clipboard</value>
-  </data>
-  <data name="StorageAccess" xml:space="preserve">
-    <value>Show device in File Explorer</value>
-  </data>
-  <data name="StorageAccessDescription" xml:space="preserve">
-    <value>Enables or disables storage access for this device in the File Explorer</value>
-  </data>
-  <data name="AudioRing" xml:space="preserve">
-    <value>Ring</value>
-  </data>
-  <data name="AudioMedia" xml:space="preserve">
-    <value>Media</value>
-  </data>
-  <data name="AudioNotification" xml:space="preserve">
-    <value>Notification</value>
-  </data>
-  <data name="AudioCall" xml:space="preserve">
-    <value>Call</value>
-  </data>
-  <data name="AudioAlarm" xml:space="preserve">
-    <value>Alarm</value>
-  </data>
-  <data name="AdbSettingsDescription" xml:space="preserve">
-    <value>Configure ADB connection</value>
-  </data>
-  <data name="ScreenMirrorSettingsDescription" xml:space="preserve">
-    <value>Configure scrcpy flags and screen mirroring options</value>
-  </data>
-  <data name="MediaSessionDescription" xml:space="preserve">
-    <value>Sync media playback information with this device</value>
-  </data>
-  <data name="AudioControl" xml:space="preserve">
-    <value>Audio device control</value>
-  </data>
-  <data name="MediaSession" xml:space="preserve">
-    <value>Media playback session</value>
-  </data>
-  <data name="AudioControlDescription" xml:space="preserve">
-    <value>Allow audio device control with this device</value>
-  </data>
-  <data name="ClipboardIncludeImagesDescription" xml:space="preserve">
     <value>Включить синхронизацию изображений через буфер обмена</value>
   </data>
   <data name="ClipboardIncludeImages" xml:space="preserve">
