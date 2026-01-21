@@ -84,7 +84,7 @@ public partial class PairedDevice : BaseRemoteDevice
         set => SetProperty(ref batteryStatus, value);
     }
 
-    private int ringerMode;
+    private int ringerMode = -1;
     public int RingerMode
     {
         get => ringerMode;
