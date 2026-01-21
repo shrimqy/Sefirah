@@ -1,3 +1,4 @@
+using CommunityToolkit.WinUI.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Sefirah.Data.Contracts;
@@ -5,9 +6,7 @@ using Sefirah.Data.Models;
 using Sefirah.Utils;
 using Sefirah.ViewModels;
 using Sefirah.ViewModels.Settings;
-using Sefirah.Views;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.Storage;
 using Windows.System;
 
 namespace Sefirah.Views;
@@ -241,7 +240,7 @@ public sealed partial class MainPage : Page
         e.DragUIOverride.Caption = "FileDropCaption".GetLocalizedResource();
     }
 
-    private async void SendFilesMenuItem_Click(object sender, RoutedEventArgs e)
+    private async void SendFilesButton_Click(object sender, RoutedEventArgs e)
     {
         if (ViewModel.Device is null) return;
 
@@ -252,10 +251,20 @@ public sealed partial class MainPage : Page
         }
     }
 
-    private void DeviceSettingsMenuItem_Click(object sender, RoutedEventArgs e)
+    private void RingerModeSegmented_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (ViewModel.Device is null) return;
-
-        ViewModel.OpenDeviceSettings();
+        if (sender is Segmented segmented)
+        {
+            ViewModel.SetRingerMode(segmented.SelectedIndex);
+        }
     }
+
+    private void AudioSlider_PointerCaptureLost(object sender, PointerRoutedEventArgs e)
+    {
+        if (sender is Slider slider && slider.Tag is AudioStream stream)
+        {
+            ViewModel.SetAudioLevel(stream.StreamType, (int)slider.Value);
+        }
+    }
+
 }

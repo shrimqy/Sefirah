@@ -11,38 +11,32 @@ namespace Sefirah.ViewModels.Settings;
 public sealed partial class DeviceSettingsViewModel : BaseViewModel
 {
     #region Display Properties
-    public string DisplayPhoneNumbers
-    {
-        get
-        {
-            if (Device?.PhoneNumbers == null || Device.PhoneNumbers.Count == 0)
-                return "No phone numbers";
-
-            return string.Join(", ", Device.PhoneNumbers.Select(p => p.Number));
-        }
-    }
-
-    public string DisplayAddresses
-    {
-        get
-        {
-            if (Device?.Addresses is null || Device.Addresses.Count == 0)
-                return "No addresses";
-
-            return string.Join(", ", Device.Addresses.Where(a => a.IsEnabled).Select(a => a.Address));
-        }
-    }
+    public string DisplayPhoneNumbers => string.Join(", ", Device.PhoneNumbers.Select(p => p.Number));
+    public string DisplayAddresses => string.Join(", ", Device.GetEnabledAddresses());
     #endregion
 
     #region Clipboard Settings
-    public bool ClipboardSyncEnabled
+    public bool ClipboardReceive
     {
-        get => DeviceSettings?.ClipboardSyncEnabled ?? true;
+        get => DeviceSettings.ClipboardReceive;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.ClipboardSyncEnabled != value)
+            if (DeviceSettings.ClipboardReceive != value)
             {
-                DeviceSettings.ClipboardSyncEnabled = value;
+                DeviceSettings.ClipboardReceive = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool ClipboardSend
+    {
+        get => DeviceSettings.ClipboardSend;
+        set
+        {
+            if (DeviceSettings.ClipboardSend != value)
+            {
+                DeviceSettings.ClipboardSend = value;
                 OnPropertyChanged();
             }
         }
@@ -50,10 +44,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public bool OpenLinksInBrowser
     {
-        get => DeviceSettings?.OpenLinksInBrowser ?? false;
+        get => DeviceSettings.OpenLinksInBrowser;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.OpenLinksInBrowser != value)
+            if (DeviceSettings.OpenLinksInBrowser != value)
             {
                 DeviceSettings.OpenLinksInBrowser = value;
                 OnPropertyChanged();
@@ -63,10 +57,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public bool ShowClipboardToast
     {
-        get => DeviceSettings?.ShowClipboardToast ?? false;
+        get => DeviceSettings.ShowClipboardToast;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.ShowClipboardToast != value)
+            if (DeviceSettings.ShowClipboardToast != value)
             {
                 DeviceSettings.ShowClipboardToast = value;
                 OnPropertyChanged();
@@ -74,27 +68,27 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         }
     }
 
-    public bool ClipboardFilesEnabled
+    public bool ClipboardFiles
     {
-        get => DeviceSettings?.ClipboardFilesEnabled ?? false;
+        get => DeviceSettings.ClipboardFiles;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.ClipboardFilesEnabled != value)
+            if (DeviceSettings.ClipboardFiles != value)
             {
-                DeviceSettings.ClipboardFilesEnabled = value;
+                DeviceSettings.ClipboardFiles = value;
                 OnPropertyChanged();
             }
         }
     }
 
-    public bool ImageToClipboardEnabled
+    public bool ClipboardIncludeImages
     {
-        get => DeviceSettings?.ImageToClipboardEnabled ?? false;
+        get => DeviceSettings.ClipboardIncludeImages;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.ImageToClipboardEnabled != value)
+            if (DeviceSettings.ClipboardIncludeImages != value)
             {
-                DeviceSettings.ImageToClipboardEnabled = value;
+                DeviceSettings.ClipboardIncludeImages = value;
                 OnPropertyChanged();
             }
         }
@@ -102,14 +96,14 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
     #endregion
 
     #region Notification Settings
-    public bool NotificationSyncEnabled
+    public bool NotificationSync
     {
-        get => DeviceSettings?.NotificationSyncEnabled ?? true;
+        get => DeviceSettings.NotificationSync;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.NotificationSyncEnabled != value)
+            if (DeviceSettings.NotificationSync != value)
             {
-                DeviceSettings.NotificationSyncEnabled = value;
+                DeviceSettings.NotificationSync = value;
                 OnPropertyChanged();
             }
         }
@@ -117,10 +111,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public bool ShowNotificationToast
     {
-        get => DeviceSettings?.ShowNotificationToast ?? false;
+        get => DeviceSettings.ShowNotificationToast;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.ShowNotificationToast != value)
+            if (DeviceSettings.ShowNotificationToast != value)
             {
                 DeviceSettings.ShowNotificationToast = value;
                 OnPropertyChanged();
@@ -130,10 +124,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public bool ShowBadge
     {
-        get => DeviceSettings?.ShowBadge ?? true;
+        get => DeviceSettings.ShowBadge;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.ShowBadge != value)
+            if (DeviceSettings.ShowBadge != value)
             {
                 DeviceSettings.ShowBadge = value;
                 OnPropertyChanged();
@@ -143,10 +137,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public bool IgnoreWindowsApps
     {
-        get => DeviceSettings?.IgnoreWindowsApps ?? false;
+        get => DeviceSettings.IgnoreWindowsApps;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.IgnoreWindowsApps != value)
+            if (DeviceSettings.IgnoreWindowsApps != value)
             {
                 DeviceSettings.IgnoreWindowsApps = value;
                 OnPropertyChanged();
@@ -159,7 +153,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         get => DeviceSettings?.IgnoreNotificationDuringDnd ?? false;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.IgnoreNotificationDuringDnd != value)
+            if (DeviceSettings.IgnoreNotificationDuringDnd != value)
             {
                 DeviceSettings.IgnoreNotificationDuringDnd = value;
                 OnPropertyChanged();
@@ -201,10 +195,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public ScrcpyDevicePreferenceType ScrcpyDevicePreference
     {
-        get => DeviceSettings?.ScrcpyDevicePreference ?? ScrcpyDevicePreferenceType.Auto;
+        get => DeviceSettings.ScrcpyDevicePreference;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.ScrcpyDevicePreference != value)
+            if (DeviceSettings.ScrcpyDevicePreference != value)
             {
                 DeviceSettings.ScrcpyDevicePreference = value;
                 OnPropertyChanged();
@@ -214,10 +208,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public bool ScreenOff
     {
-        get => DeviceSettings?.ScreenOff ?? false;
+        get => DeviceSettings.ScreenOff;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.ScreenOff != value)
+            if (DeviceSettings.ScreenOff != value)
             {
                 DeviceSettings.ScreenOff = value;
                 OnPropertyChanged();
@@ -227,10 +221,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public bool PhysicalKeyboard
     {
-        get => DeviceSettings?.PhysicalKeyboard ?? false;
+        get => DeviceSettings.PhysicalKeyboard;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.PhysicalKeyboard != value)
+            if (DeviceSettings.PhysicalKeyboard != value)
             {
                 DeviceSettings.PhysicalKeyboard = value;
                 OnPropertyChanged();
@@ -240,10 +234,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public bool UnlockDeviceBeforeLaunch
     {
-        get => DeviceSettings?.UnlockDeviceBeforeLaunch ?? false;
+        get => DeviceSettings.UnlockDeviceBeforeLaunch;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.UnlockDeviceBeforeLaunch != value)
+            if (DeviceSettings.UnlockDeviceBeforeLaunch != value)
             {
                 DeviceSettings.UnlockDeviceBeforeLaunch = value;
                 OnPropertyChanged();
@@ -253,10 +247,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public int UnlockTimeout
     {
-        get => DeviceSettings?.UnlockTimeout ?? 0;
+        get => DeviceSettings.UnlockTimeout;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.UnlockTimeout != value)
+            if (DeviceSettings.UnlockTimeout != value)
             {
                 DeviceSettings.UnlockTimeout = value;
                 OnPropertyChanged();
@@ -266,10 +260,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public string? UnlockCommands
     {
-        get => DeviceSettings?.UnlockCommands;
+        get => DeviceSettings.UnlockCommands;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.UnlockCommands != value)
+            if (DeviceSettings.UnlockCommands != value)
             {
                 DeviceSettings.UnlockCommands = value;
                 OnPropertyChanged();
@@ -280,10 +274,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public string? CustomArguments
     {
-        get => DeviceSettings?.CustomArguments;
+        get => DeviceSettings.CustomArguments;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.CustomArguments != value)
+            if (DeviceSettings.CustomArguments != value)
             {
                 DeviceSettings.CustomArguments = value;
                 OnPropertyChanged();
@@ -296,10 +290,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public bool DisableVideoForwarding
     {
-        get => DeviceSettings?.DisableVideoForwarding ?? false;
+        get => DeviceSettings.DisableVideoForwarding;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.DisableVideoForwarding != value)
+            if (DeviceSettings.DisableVideoForwarding != value)
             {
                 DeviceSettings.DisableVideoForwarding = value;
                 OnPropertyChanged();
@@ -309,10 +303,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public int VideoCodec
     {
-        get => DeviceSettings?.VideoCodec ?? 0;
+        get => DeviceSettings.VideoCodec;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.VideoCodec != value)
+            if (DeviceSettings.VideoCodec != value)
             {
                 DeviceSettings.VideoCodec = value;
                 OnPropertyChanged();
@@ -322,10 +316,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public string? VideoBitrate
     {
-        get => DeviceSettings?.VideoBitrate;
+        get => DeviceSettings.VideoBitrate;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.VideoBitrate != value)
+            if (DeviceSettings.VideoBitrate != value)
             {
                 DeviceSettings.VideoBitrate = value;
                 OnPropertyChanged();
@@ -335,10 +329,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public string? FrameRate
     {
-        get => DeviceSettings?.FrameRate;
+        get => DeviceSettings.FrameRate;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.FrameRate != value)
+            if (DeviceSettings.FrameRate != value)
             {
                 DeviceSettings.FrameRate = value;
                 OnPropertyChanged();
@@ -348,10 +342,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public string? Crop
     {
-        get => DeviceSettings?.Crop;
+        get => DeviceSettings.Crop;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.Crop != value)
+            if (DeviceSettings.Crop != value)
             {
                 DeviceSettings.Crop = value;
                 OnPropertyChanged();
@@ -374,11 +368,11 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public bool IsVirtualDisplayEnabled
     {
-        get => DeviceSettings?.IsVirtualDisplayEnabled ?? false;
+        get => DeviceSettings.IsVirtualDisplayEnabled;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.IsVirtualDisplayEnabled != value)
-            {
+            if (DeviceSettings.IsVirtualDisplayEnabled != value)
+            {   
                 DeviceSettings.IsVirtualDisplayEnabled = value;
                 OnPropertyChanged();
             }
@@ -387,10 +381,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public string? VirtualDisplaySize
     {
-        get => DeviceSettings?.VirtualDisplaySize;
+        get => DeviceSettings.VirtualDisplaySize;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.VirtualDisplaySize != value)
+            if (DeviceSettings.VirtualDisplaySize != value)
             {
                 DeviceSettings.VirtualDisplaySize = value;
                 OnPropertyChanged();
@@ -400,10 +394,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public int DisplayOrientation
     {
-        get => DeviceSettings?.DisplayOrientation ?? 0;
+        get => DeviceSettings.DisplayOrientation;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.DisplayOrientation != value)
+            if (DeviceSettings.DisplayOrientation != value)
             {
                 DeviceSettings.DisplayOrientation = value;
                 OnPropertyChanged();
@@ -413,10 +407,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public string? RotationAngle
     {
-        get => DeviceSettings?.RotationAngle;
+        get => DeviceSettings.RotationAngle;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.RotationAngle != value)
+            if (DeviceSettings.RotationAngle != value)
             {
                 DeviceSettings.RotationAngle = value;
                 OnPropertyChanged();
@@ -443,10 +437,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public AudioOutputModeType AudioOutputMode
     {
-        get => DeviceSettings?.AudioOutputMode ?? AudioOutputModeType.Desktop;
+        get => DeviceSettings.AudioOutputMode;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.AudioOutputMode != value)
+            if (DeviceSettings.AudioOutputMode != value)
             {
                 DeviceSettings.AudioOutputMode = value;
                 OnPropertyChanged();
@@ -476,10 +470,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public string? AudioBitrate
     {
-        get => DeviceSettings?.AudioBitrate;
+        get => DeviceSettings.AudioBitrate;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.AudioBitrate != value)
+            if (DeviceSettings.AudioBitrate != value)
             {
                 DeviceSettings.AudioBitrate = value;
                 OnPropertyChanged();
@@ -489,10 +483,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public bool ForwardMicrophone
     {
-        get => DeviceSettings?.ForwardMicrophone ?? false;
+        get => DeviceSettings.ForwardMicrophone;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.ForwardMicrophone != value)
+            if (DeviceSettings.ForwardMicrophone != value)
             {
                 DeviceSettings.ForwardMicrophone = value;
                 OnPropertyChanged();
@@ -502,10 +496,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public int AudioCodec
     {
-        get => DeviceSettings?.AudioCodec ?? 0;
+        get => DeviceSettings.AudioCodec;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.AudioCodec != value)
+            if (DeviceSettings.AudioCodec != value)
             {
                 DeviceSettings.AudioCodec = value;
                 OnPropertyChanged();
@@ -515,10 +509,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public string? AudioOutputBuffer
     {
-        get => DeviceSettings?.AudioOutputBuffer;
+        get => DeviceSettings.AudioOutputBuffer;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.AudioOutputBuffer != value)
+            if (DeviceSettings.AudioOutputBuffer != value)
             {
                 DeviceSettings.AudioOutputBuffer = value;
                 OnPropertyChanged();
@@ -528,10 +522,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public string? AudioBuffer
     {
-        get => DeviceSettings?.AudioBuffer;
+        get => DeviceSettings.AudioBuffer;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.AudioBuffer != value)
+            if (DeviceSettings.AudioBuffer != value)
             {
                 DeviceSettings.AudioBuffer = value;
                 OnPropertyChanged();
@@ -545,14 +539,27 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     #region Media Session Settings
 
-    public bool MediaSessionSyncEnabled
+    public bool MediaSession
     {
-        get => DeviceSettings?.MediaSessionSyncEnabled ?? false;
+        get => DeviceSettings.MediaSession;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.MediaSessionSyncEnabled != value)
+            if (DeviceSettings.MediaSession != value)
             {
-                DeviceSettings.MediaSessionSyncEnabled = value;
+                DeviceSettings.MediaSession = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool AudioSync
+    {
+        get => DeviceSettings.AudioSync;
+        set
+        {
+            if (DeviceSettings.AudioSync != value)
+            {
+                DeviceSettings.AudioSync = value;
                 OnPropertyChanged();
             }
         }
@@ -564,10 +571,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public bool AdbTcpipModeEnabled
     {
-        get => DeviceSettings?.AdbTcpipModeEnabled ?? false;
+        get => DeviceSettings.AdbTcpipModeEnabled;
         set
         {
-            if (DeviceSettings is not null && DeviceSettings.AdbTcpipModeEnabled != value)
+            if (DeviceSettings.AdbTcpipModeEnabled != value)
             {
                 DeviceSettings.AdbTcpipModeEnabled = value;
                 OnPropertyChanged();
@@ -577,10 +584,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public bool AdbAutoConnect
     {
-        get => DeviceSettings?.AdbAutoConnect ?? true;
+        get => DeviceSettings.AdbAutoConnect;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.AdbAutoConnect != value)
+            if (DeviceSettings.AdbAutoConnect != value)
             {
                 DeviceSettings.AdbAutoConnect = value;
                 OnPropertyChanged();
@@ -590,7 +597,30 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     #endregion
 
+    #region Storage Access Settings
 
+    public bool StorageAccess
+    {
+        get => DeviceSettings.StorageAccess;
+        set
+        {
+            if (DeviceSettings.StorageAccess != value)
+            {
+                DeviceSettings.StorageAccess = value;
+                OnPropertyChanged();
+                
+                // If storage access is disabled, remove the sync root
+                if (!value)
+                {
+                    sftpService.Remove(Device.Id);
+                }
+            }
+        }
+    }
+
+    #endregion
+
+    private readonly ISftpService sftpService = Ioc.Default.GetRequiredService<ISftpService>();
     private readonly IAdbService AdbService = Ioc.Default.GetRequiredService<IAdbService>();
     private readonly IDeviceSettingsService DeviceSettings;
     public PairedDevice Device;

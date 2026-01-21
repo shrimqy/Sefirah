@@ -3,6 +3,7 @@ using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
+using Sefirah.ViewModels.Settings;
 using Sefirah.Views.DevicePreferences;
 using Windows.Graphics;
 using Rect = Windows.Foundation.Rect;
@@ -17,6 +18,7 @@ public sealed partial class DeviceSettingsWindow : Window
     public DeviceSettingsWindow(PairedDevice device)
     {
         Device = device;
+        var viewModel = new DeviceSettingsViewModel(device);
         
         InitializeComponent();
         Title = device.Name;
@@ -33,7 +35,7 @@ public sealed partial class DeviceSettingsWindow : Window
         BackButton.Loaded += (s, e) => SetRegionsForCustomTitleBar();
 #endif
         var rootFrame = EnsureWindowIsInitialized();
-        rootFrame.Navigate(typeof(DeviceSettingsPage), device);
+        rootFrame.Navigate(typeof(DeviceSettingsPage), viewModel);
         InitializeThemeService();
 
         AppWindow.Closing += (s, e) => App.RemoveDeviceSettingsWindow(Device.Id);

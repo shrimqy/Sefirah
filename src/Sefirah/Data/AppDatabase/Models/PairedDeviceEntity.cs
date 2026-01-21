@@ -5,7 +5,7 @@ using SQLite;
 
 namespace Sefirah.Data.AppDatabase.Models;
 
-public class RemoteDeviceEntity
+public class PairedDeviceEntity
 {
     [PrimaryKey]
     public string DeviceId { get; set; } = string.Empty;

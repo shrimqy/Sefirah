@@ -48,16 +48,22 @@ public class WindowsPlaybackService(
 
             sessionManager.ConnectionStatusChanged += async (sender, device) =>
             {
-                if (device.IsConnected && device.DeviceSettings.MediaSessionSyncEnabled)
+                if (device.IsConnected)
                 {
-                    foreach (var session in activeSessions.Values)
+                    if (device.DeviceSettings.MediaSession)
                     {
-                        await UpdatePlaybackDataAsync(session);
+                        foreach (var session in activeSessions.Values)
+                        {
+                            await UpdatePlaybackDataAsync(session);
+                        }
                     }
-                    foreach (var audioDevice in AudioDevices)
+                    if (device.DeviceSettings.AudioSync)
                     {
-                        audioDevice.AudioDeviceType = AudioMessageType.New;
-                        device.SendMessage(audioDevice);
+                        foreach (var audioDevice in AudioDevices)
+                        {
+                            audioDevice.AudioDeviceType = AudioMessageType.New;
+                            device.SendMessage(audioDevice);
+                        }
                     }
                 }
             };
@@ -362,7 +368,7 @@ public class WindowsPlaybackService(
         {
             foreach (var device in deviceManager.PairedDevices)
             {
-                if (device.IsConnected && device.DeviceSettings.MediaSessionSyncEnabled)
+                if (device.IsConnected && device.DeviceSettings.MediaSession)
                 {
                     device.SendMessage(playbackSession);
                 }
@@ -438,7 +444,7 @@ public class WindowsPlaybackService(
         {
             foreach (var device in deviceManager.PairedDevices)
             {
-                if (device.IsConnected && device.DeviceSettings.MediaSessionSyncEnabled)
+                if (device.IsConnected && device.DeviceSettings.AudioSync)
                 {
                     device.SendMessage(audioDevice);
                 }

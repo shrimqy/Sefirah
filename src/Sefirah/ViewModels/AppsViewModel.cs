@@ -12,7 +12,6 @@ public sealed partial class AppsViewModel : BaseViewModel
     private RemoteAppRepository RemoteAppsRepository { get; } = Ioc.Default.GetRequiredService<RemoteAppRepository>();
     private IScreenMirrorService ScreenMirrorService { get; } = Ioc.Default.GetRequiredService<IScreenMirrorService>();
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
-    private ISessionManager SessionManager { get; } = Ioc.Default.GetRequiredService<ISessionManager>();
     private IAdbService AdbService { get; } = Ioc.Default.GetRequiredService<IAdbService>();
     #endregion
 
@@ -38,6 +37,7 @@ public sealed partial class AppsViewModel : BaseViewModel
     {
         Apps.Clear();
         PinnedApps.Clear();
+        OnPropertyChanged(nameof(HasPinnedApps));
 
         if (DeviceManager.ActiveDevice is null) return;
         IsLoading = true;
@@ -103,11 +103,12 @@ public sealed partial class AppsViewModel : BaseViewModel
                 PinnedApps.Clear();
 
                 if (DeviceManager.ActiveDevice is null) return;
-                IsLoading = true;
 
+                IsLoading = true;
                 Apps = RemoteAppsRepository.GetApplicationsForDevice(DeviceManager.ActiveDevice.Id);
                 PinnedApps = Apps.Where(a => a.DeviceInfo.Pinned).ToObservableCollection();
-
+                OnPropertyChanged(nameof(Apps));
+                OnPropertyChanged(nameof(PinnedApps));
                 OnPropertyChanged(nameof(HasPinnedApps));
                 IsLoading = false;
             });
@@ -120,27 +121,16 @@ public sealed partial class AppsViewModel : BaseViewModel
 
     private void OnApplicationListUpdated(object? sender, string deviceId)
     {   
-        if (DeviceManager.ActiveDevice?.Id != deviceId)
-            return;
-
-        App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
-        {
-            Apps = RemoteAppsRepository.GetApplicationsForDevice(deviceId);
-            PinnedApps = Apps.Where(a => a.DeviceInfo.Pinned).ToObservableCollection();
-            
-            IsLoading = false;
-            OnPropertyChanged(nameof(IsEmpty));
-            OnPropertyChanged(nameof(HasPinnedApps));
-        });
+        if (DeviceManager.ActiveDevice?.Id != deviceId) return;
+        LoadApps();
     }
 
     private void OnApplicationItemUpdated(object? sender, (string deviceId, ApplicationInfo? appInfo, string? packageName) args)
     {
         var (deviceId, appInfo, packageName) = args;
-        
+
         // Only update if this is for the active device
-        if (DeviceManager.ActiveDevice?.Id != deviceId)
-            return;
+        if (DeviceManager.ActiveDevice?.Id != deviceId || IsLoading) return;
 
         App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {

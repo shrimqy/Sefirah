@@ -28,7 +28,7 @@ public interface IDeviceManager
     /// <summary>
     /// Gets the device info.
     /// </summary>
-    Task<RemoteDeviceEntity> GetDeviceInfoAsync(string deviceId);
+    Task<PairedDeviceEntity> GetDeviceInfoAsync(string deviceId);
 
     /// <summary>
     /// Gets the last connected device.
@@ -43,7 +43,7 @@ public interface IDeviceManager
     /// <summary>
     /// Updates the device in the database.
     /// </summary>
-    Task UpdateDevice(RemoteDeviceEntity device);
+    Task UpdateDevice(PairedDeviceEntity device);
 
     /// <summary>
     /// Gets the local device.

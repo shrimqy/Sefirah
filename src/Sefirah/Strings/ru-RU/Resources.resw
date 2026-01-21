@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string"/>
-              <xsd:attribute name="type" type="xsd:string"/>
-              <xsd:attribute name="mimetype" type="xsd:string"/>
-              <xsd:attribute ref="xml:space"/>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string"/>
-              <xsd:attribute name="name" type="xsd:string"/>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
-              <xsd:attribute ref="xml:space"/>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required"/>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -319,10 +319,10 @@
     <value>Устройства</value>
   </data>
   <data name="AudioSilent" xml:space="preserve">
-    <value>Silent</value>
+    <value>Без звука</value>
   </data>
   <data name="AudioVibrate" xml:space="preserve">
-    <value>Vibrate</value>
+    <value>Вибрация</value>
   </data>
   <data name="Pin" xml:space="preserve">
     <value>Закрепить</value>
@@ -713,7 +713,49 @@ input text %pwd%</value>
   <data name="ClipboardIncludeImagesDescription" xml:space="preserve">
     <value>Enable image synchronization through clipboard</value>
   </data>
+  <data name="StorageAccess" xml:space="preserve">
+    <value>Show device in File Explorer</value>
+  </data>
+  <data name="StorageAccessDescription" xml:space="preserve">
+    <value>Enables or disables storage access for this device in the File Explorer</value>
+  </data>
+  <data name="AudioRing" xml:space="preserve">
+    <value>Ring</value>
+  </data>
+  <data name="AudioMedia" xml:space="preserve">
+    <value>Media</value>
+  </data>
+  <data name="AudioNotification" xml:space="preserve">
+    <value>Notification</value>
+  </data>
+  <data name="AudioCall" xml:space="preserve">
+    <value>Call</value>
+  </data>
+  <data name="AudioAlarm" xml:space="preserve">
+    <value>Alarm</value>
+  </data>
+  <data name="AdbSettingsDescription" xml:space="preserve">
+    <value>Configure ADB connection</value>
+  </data>
+  <data name="ScreenMirrorSettingsDescription" xml:space="preserve">
+    <value>Configure scrcpy flags and screen mirroring options</value>
+  </data>
+  <data name="MediaSessionDescription" xml:space="preserve">
+    <value>Sync media playback information with this device</value>
+  </data>
+  <data name="AudioControl" xml:space="preserve">
+    <value>Audio device control</value>
+  </data>
+  <data name="MediaSession" xml:space="preserve">
+    <value>Media playback session</value>
+  </data>
+  <data name="AudioControlDescription" xml:space="preserve">
+    <value>Allow audio device control with this device</value>
+  </data>
+  <data name="ClipboardIncludeImagesDescription" xml:space="preserve">
+    <value>Включить синхронизацию изображений через буфер обмена</value>
+  </data>
   <data name="ClipboardIncludeImages" xml:space="preserve">
-    <value>Include images in clipboard monitor</value>
+    <value>Включать изображения в буфер мониторинга</value>
   </data>
 </root>

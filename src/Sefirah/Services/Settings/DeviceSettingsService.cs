@@ -6,68 +6,74 @@ namespace Sefirah.Services.Settings;
 
 internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSharingContext settingsSharingContext) : BaseDeviceAwareJsonSettings(deviceId, settingsSharingContext), IDeviceSettingsService
 {
-    public bool ClipboardSyncEnabled 
-    { 
+    public bool ClipboardReceive
+    {
         get => Get(true);
         set => Set(value);
     }
 
-    public bool ImageToClipboardEnabled 
-    { 
+    public bool ClipboardSend
+    {
+        get => Get(true);
+        set => Set(value);
+    }
+
+    public bool ClipboardIncludeImages
+    {
         get => Get(false);
         set => Set(value);
     }
 
-    public bool ShowClipboardToast 
-    { 
+    public bool ShowClipboardToast
+    {
         get => Get(false);
         set => Set(value);
     }
 
-    public bool OpenLinksInBrowser 
-    { 
+    public bool OpenLinksInBrowser
+    {
         get => Get(false);
         set => Set(value);
-    }   
+    }
 
-    public bool NotificationSyncEnabled 
-    { 
+    public bool NotificationSync
+    {
         get => Get(true);
         set => Set(value);
     }
 
-    public bool ShowNotificationToast 
-    { 
+    public bool ShowNotificationToast
+    {
         get => Get(true);
         set => Set(value);
     }
 
-    public bool ShowBadge 
-    { 
+    public bool ShowBadge
+    {
         get => Get(true);
         set => Set(value);
     }
 
-    public NotificationLaunchPreference NotificationLaunchPreference 
-    { 
+    public NotificationLaunchPreference NotificationLaunchPreference
+    {
         get => Get(NotificationLaunchPreference.Dynamic);
         set => Set((long)value);
     }
 
-    public string RemoteStoragePath 
+    public string RemoteStoragePath
     {
         get => Get(Constants.UserEnvironmentPaths.DefaultRemoteDevicePath);
         set => Set(value);
     }
 
-    public string ReceivedFilesPath 
-    { 
+    public string ReceivedFilesPath
+    {
         get => Get(Constants.UserEnvironmentPaths.DownloadsPath);
         set => Set(value);
     }
 
-    public bool IgnoreWindowsApps 
-    { 
+    public bool IgnoreWindowsApps
+    {
         get => Get(true);
         set => Set(value);
     }
@@ -78,8 +84,8 @@ internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSh
         set => Set(value);
     }
 
-    public bool ClipboardFilesEnabled 
-    { 
+    public bool ClipboardFiles
+    {
         get => Get(false);
         set => Set(value);
     }
@@ -113,7 +119,7 @@ internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSh
         get => Get(0);
         set => Set(value);
     }
-    
+
     public string? UnlockCommands
     {
         get => Get(string.Empty);
@@ -137,13 +143,13 @@ internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSh
         get => Get("0");
         set => Set(value);
     }
-    
+
     public string? AudioBitrate
     {
         get => Get("128K");
         set => Set(value);
-    }   
-    
+    }
+
     public string? AudioBuffer
     {
         get => Get(string.Empty);
@@ -167,7 +173,7 @@ internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSh
         get => Get(0);
         set => Set(value);
     }
-     
+
     public string? FrameRate
     {
         get => Get("60");
@@ -252,7 +258,13 @@ internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSh
         set => Set(value);
     }
 
-    public bool MediaSessionSyncEnabled
+    public bool MediaSession
+    {
+        get => Get(true);
+        set => Set(value);
+    }
+
+    public bool AudioSync
     {
         get => Get(true);
         set => Set(value);
@@ -269,4 +281,10 @@ internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSh
         get => Get(true);
         set => Set(value);
     }
-} 
+
+    public bool StorageAccess
+    {
+        get => Get(true);
+        set => Set(value);
+    }
+}

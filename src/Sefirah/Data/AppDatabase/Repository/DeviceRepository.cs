@@ -30,27 +30,27 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
         }
     }
 
-    public void AddOrUpdateRemoteDevice(RemoteDeviceEntity device)
+    public void AddOrUpdateRemoteDevice(PairedDeviceEntity device)
     {
         context.Database.InsertOrReplace(device);
     }
 
-    public bool HasDevice(string deviceId, out RemoteDeviceEntity device)
+    public bool HasDevice(string deviceId, out PairedDeviceEntity device)
     {
-        device = context.Database.Find<RemoteDeviceEntity>(deviceId);
+        device = context.Database.Find<PairedDeviceEntity>(deviceId);
         return device != null;
     }
 
-    public RemoteDeviceEntity GetRemoteDevice(string deviceId)
+    public PairedDeviceEntity GetRemoteDevice(string deviceId)
     {
-        return context.Database.Find<RemoteDeviceEntity>(deviceId);
+        return context.Database.Find<PairedDeviceEntity>(deviceId);
     }
 
     public async Task<PairedDevice?> GetLastConnectedDevice()
     {
         try
         {
-            var device = await Task.FromResult(context.Database.Table<RemoteDeviceEntity>().OrderByDescending(d => d.LastConnected).FirstOrDefault());
+            var device = await Task.FromResult(context.Database.Table<PairedDeviceEntity>().OrderByDescending(d => d.LastConnected).FirstOrDefault());
             if (device is null) return null;
             return await device.ToPairedDevice();
         }
@@ -65,7 +65,7 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
     {
         try
         {
-            var devices = context.Database.Table<RemoteDeviceEntity>()
+            var devices = context.Database.Table<PairedDeviceEntity>()
                 .OrderByDescending(d => d.LastConnected)
                 .ToList();
             var pairedDevices = await Task.WhenAll(devices.Select(d => d.ToPairedDevice()));
@@ -80,7 +80,7 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
 
     public void DeletePairedDevice(string deviceId)
     {
-        var device = context.Database.Find<RemoteDeviceEntity>(deviceId);
+        var device = context.Database.Find<PairedDeviceEntity>(deviceId);
         if (device != null)
         {
             context.Database.Delete(device);
@@ -89,7 +89,7 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
 
     public List<string> GetRemoteDeviceAddresses()
     {
-        return context.Database.Table<RemoteDeviceEntity>()
+        return context.Database.Table<PairedDeviceEntity>()
             .SelectMany(d => d.Addresses)
             .Where(ip => ip.IsEnabled)
             .Select(ip => ip.Address)

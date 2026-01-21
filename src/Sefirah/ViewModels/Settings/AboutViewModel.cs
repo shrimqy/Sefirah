@@ -125,6 +125,7 @@ public partial class AboutViewModel : ObservableObject
         new("https://github.com/tmds/Tmds.DBus", "Tmds.DBus"),
         new("https://github.com/SharpAdb/AdvancedSharpAdbClient", "AdvancedSharpAdbClient"),
 
+        new("https://github.com/Shane32/QRCoder", "QRCoder")
     ];
 }
 

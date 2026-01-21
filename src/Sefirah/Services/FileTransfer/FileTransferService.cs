@@ -76,7 +76,7 @@ public class FileTransferService(
 
             var file = await handler.ReceiveAsync();
 
-            if (file is not null && device.DeviceSettings.ClipboardFilesEnabled)
+            if (file is not null && device.DeviceSettings.ClipboardFiles)
             {
                 FileReceived?.Invoke(this, (device, file));
             }

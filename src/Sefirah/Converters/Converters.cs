@@ -1,7 +1,6 @@
 using System.Globalization;
 using Microsoft.UI.Xaml.Data;
 using Sefirah.Data.Models;
-using Sefirah.Extensions;
 
 namespace Sefirah.Converters;
 
@@ -244,12 +243,12 @@ internal sealed partial class BatteryStatusToIconConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        if (value is DeviceStatus deviceStatus)
+        if (value is BatteryStatus batteryStatus)
         {
             // Based on battery level and charging state, choose the appropriate icon
-            if (deviceStatus.ChargingStatus)
+            if (batteryStatus.IsCharging)
             {
-                return deviceStatus.BatteryStatus switch
+                return batteryStatus.BatteryLevel switch
                 {
                     >= 100 => "\uEA93",
                     >= 90 => "\uE83E",
@@ -266,7 +265,7 @@ internal sealed partial class BatteryStatusToIconConverter : IValueConverter
             }
             else
             {
-                return deviceStatus.BatteryStatus switch
+                return batteryStatus.BatteryLevel switch
                 {
                     >= 100 => "\uE83F",
                     >= 90 => "\uE859",
@@ -322,14 +321,14 @@ internal sealed partial class RingerModeToIconConverter : IValueConverter
         {
             return ringerMode switch
             {
-                2 => "\uE995",    // Normal (Speaker icon)
-                1 => "\uE877",    // Vibrate icon
-                0 => "\uE74F",    // Silent (Mute icon)
-                _ => "\uE995"     // Default to speaker icon
+                2 => "\uEA8F",    // Ringer
+                1 => "\uE877",    // Vibrate
+                0 => "\uE7ED",    // Silent Ringer
+                _ => "\uE995" 
             };
         }
 
-        return "\uE995"; // Default icon
+        return "\uE995";
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)

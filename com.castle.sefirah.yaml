@@ -37,7 +37,7 @@ modules:
         path: flatpak/icons/256x256/com.castle.sefirah.png
     build-commands:
       - mkdir -p /app/bin
-      - cp -r * /app/bin/
+      - cp -r . /app/bin/
       - mkdir -p /app/share/applications
       - install -Dm644 com.castle.sefirah.desktop /app/share/applications/com.castle.sefirah.desktop
       - mkdir -p /app/share/icons/hicolor/48x48/apps

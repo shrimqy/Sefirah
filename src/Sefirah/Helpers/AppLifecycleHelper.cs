@@ -168,12 +168,12 @@ public static class AppLifecycleHelper
 
         if (enable)
         {
-            if (startupTask.State == StartupTaskState.Disabled)
+            if (startupTask.State is StartupTaskState.Disabled)
                 await startupTask.RequestEnableAsync();
         }
         else
         {
-            if (startupTask.State == StartupTaskState.Enabled)
+            if (startupTask.State is StartupTaskState.Enabled)
                 startupTask.Disable();
         }
 #endif

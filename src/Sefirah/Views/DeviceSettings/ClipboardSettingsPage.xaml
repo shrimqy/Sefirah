@@ -40,14 +40,14 @@
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE8B7;" />
                     </wuc:SettingsCard.HeaderIcon>
-                    <ToggleSwitch IsOn="{x:Bind ViewModel.ClipboardFilesEnabled, Mode=TwoWay}" />
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.ClipboardFiles, Mode=TwoWay}" />
                 </wuc:SettingsCard>
 
-                <wuc:SettingsCard Description="{helpers:ResourceString Name=ImageToClipboardDescription}" Header="{helpers:ResourceString Name=ImageToClipboard}">
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=ClipboardIncludeImagesDescription}" Header="{helpers:ResourceString Name=ClipboardIncludeImages}">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEB9F;" />
                     </wuc:SettingsCard.HeaderIcon>
-                    <ToggleSwitch IsOn="{x:Bind ViewModel.ImageToClipboardEnabled, Mode=TwoWay}" />
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.ClipboardIncludeImages, Mode=TwoWay}" />
                 </wuc:SettingsCard>
             </StackPanel>
         </StackPanel>

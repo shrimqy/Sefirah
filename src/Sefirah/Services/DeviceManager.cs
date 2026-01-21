@@ -29,7 +29,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
     /// </summary>
     public PairedDevice? FindDeviceById(string deviceId) => PairedDevices.FirstOrDefault(device => device.Id == deviceId);
     
-    public Task<RemoteDeviceEntity> GetDeviceInfoAsync(string deviceId)
+    public Task<PairedDeviceEntity> GetDeviceInfoAsync(string deviceId)
     {
         if (repository.HasDevice(deviceId, out var device))
         {
@@ -76,14 +76,14 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
         }
     }
 
-    public Task UpdateDevice(RemoteDeviceEntity device)
+    public Task UpdateDevice(PairedDeviceEntity device)
     {
         throw new NotImplementedException();
     }
 
-    private static RemoteDeviceEntity CreateDeviceEntity(DiscoveredDevice device)
+    private static PairedDeviceEntity CreateDeviceEntity(DiscoveredDevice device)
     {
-        return new RemoteDeviceEntity
+        return new PairedDeviceEntity
         {
             DeviceId = device.Id,
             Name = device.Name,

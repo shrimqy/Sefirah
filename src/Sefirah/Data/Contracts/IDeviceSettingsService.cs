@@ -10,9 +10,14 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     string DeviceId { get; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether clipboard synchronization is enabled.
+    /// Gets or sets a value indicating whether to receive clipboard content from the device.
     /// </summary>
-    bool ClipboardSyncEnabled { get; set; }
+    bool ClipboardReceive { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to send clipboard content to the device.
+    /// </summary>
+    bool ClipboardSend { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to show clipboard toast notifications.
@@ -23,11 +28,11 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// Gets or sets a value indicating whether links should be opened in the browser.
     /// </summary>
     bool OpenLinksInBrowser { get; set; }
-    
+
     /// <summary>
     /// Gets or sets a value indicating whether notification synchronization is enabled.
     /// </summary>
-    bool NotificationSyncEnabled { get; set; }
+    bool NotificationSync { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to show notification toast messages.
@@ -67,12 +72,12 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// <summary>
     /// Gets or sets a value indicating whether to copy received files to clipboard.
     /// </summary>
-    bool ClipboardFilesEnabled { get; set; }
+    bool ClipboardFiles { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to include images in clipboard sync.
     /// </summary>
-    bool ImageToClipboardEnabled { get; set; }
+    bool ClipboardIncludeImages { get; set; }
 
     /// <summary>
     /// Gets or sets the path to the scrcpy executable.
@@ -102,7 +107,7 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// <summary>
     /// Gets or sets the video bitrate.
     /// </summary>
-    string? VideoBitrate { get; set; }  
+    string? VideoBitrate { get; set; }
 
     /// <summary>
     /// Gets or sets the video resolution.
@@ -117,13 +122,13 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// <summary>
     /// Gets or sets the audio bitrate.
     /// </summary>
-    string? AudioBitrate { get; set; }  
+    string? AudioBitrate { get; set; }
 
     /// <summary>
     /// Gets or sets the audio buffer.
     /// </summary>
     string? AudioBuffer { get; set; }
-    
+
     /// <summary>
     /// Gets or sets custom command-line arguments for scrcpy.
     /// </summary>
@@ -215,9 +220,14 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     bool IsVirtualDisplayEnabled { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether to sync media/audio sessions.
+    /// Gets or sets a value indicating whether to sync media playback sessions.
     /// </summary>
-    bool MediaSessionSyncEnabled { get; set; }
+    bool MediaSession { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to sync audio device information and controls.
+    /// </summary>
+    bool AudioSync { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to enable TCP/IP mode for ADB.
@@ -228,4 +238,9 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// Gets or sets a value indicating whether to automatically connect via ADB.
     /// </summary>
     bool AdbAutoConnect { get; set; }
-} 
+
+    /// <summary>
+    /// Gets or sets a value indicating whether storage access is enabled.
+    /// </summary>
+    bool StorageAccess { get; set; }
+}

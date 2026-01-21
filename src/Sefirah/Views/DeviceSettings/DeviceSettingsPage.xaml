@@ -16,6 +16,7 @@
     <Page.Resources>
         <wctconverters:EmptyObjectToObjectConverter x:Key="EmptyObjectToOpacityConverter" EmptyValue="1.0" NotEmptyValue="0.0" />
         <converters:EmptyObjectToVisibilityConverter x:Key="EmptyObjectToVisibilityConverter" />
+        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
     </Page.Resources>
 
     <ScrollViewer>
@@ -81,7 +82,8 @@
                             <TextBlock
                                 FontSize="14"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                Text="{x:Bind ViewModel.DisplayPhoneNumbers, Mode=OneWay}" />
+                                Text="{x:Bind ViewModel.DisplayPhoneNumbers, Mode=OneWay}"
+                                Visibility="{x:Bind ViewModel.Device.PhoneNumbers.Count, Mode=OneWay, Converter={StaticResource CountToVisibilityConverter}}" />
                             <TextBlock
                                 FontSize="12"
                                 Foreground="{ThemeResource TextFillColorTertiaryBrush}"
@@ -102,7 +104,7 @@
                 <wuc:SettingsCard
                     Click="OpenClipboardSettings"
                     Description="{helpers:ResourceString Name=SyncClipboardChanges}"
-                    Header="{helpers:ResourceString Name=Clipboard}"
+                    Header="{helpers:ResourceString Name=ClipboardSettings}"
                     IsClickEnabled="True">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xF0E3;" />
@@ -110,14 +112,25 @@
                     <wuc:SettingsCard.ActionIcon>
                         <FontIcon FontSize="11" Glyph="&#xE76C;" />
                     </wuc:SettingsCard.ActionIcon>
-                    <ToggleSwitch IsOn="{x:Bind ViewModel.ClipboardSyncEnabled, Mode=TwoWay}" />
+                    <wuc:Segmented SelectionMode="Multiple" SelectionChanged="ClipboardSyncSegmented_SelectionChanged" Loaded="ClipboardSyncSegmented_Loaded">
+                        <wuc:SegmentedItem>
+                            <wuc:SegmentedItem.Icon>
+                                <FontIcon Glyph="&#xE896;" />
+                            </wuc:SegmentedItem.Icon>
+                        </wuc:SegmentedItem>
+                        <wuc:SegmentedItem>
+                            <wuc:SegmentedItem.Icon>
+                                <FontIcon Glyph="&#xE898;" />
+                            </wuc:SegmentedItem.Icon>
+                        </wuc:SegmentedItem>
+                    </wuc:Segmented>
                 </wuc:SettingsCard>
 
                 <!--  Notification Settings  -->
                 <wuc:SettingsCard
                     Click="OpenNotificationsSettings"
                     Description="{helpers:ResourceString Name=ConfigureNotificationSettings}"
-                    Header="{helpers:ResourceString Name=Notifications}"
+                    Header="{helpers:ResourceString Name=NotificationSettings}"
                     IsClickEnabled="True">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xF0E3;" />
@@ -125,14 +138,14 @@
                     <wuc:SettingsCard.ActionIcon>
                         <FontIcon FontSize="11" Glyph="&#xE76C;" />
                     </wuc:SettingsCard.ActionIcon>
-                    <ToggleSwitch IsOn="{x:Bind ViewModel.NotificationSyncEnabled, Mode=TwoWay}" />
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.NotificationSync, Mode=TwoWay}" />
                 </wuc:SettingsCard>
 
                 <!--  Screen Mirror Settings  -->
                 <wuc:SettingsCard
                     Click="OpenScreenMirrorSettings"
-                    Description="{helpers:ResourceString Name=ConfigureScreenMirroring}"
-                    Header="{helpers:ResourceString Name=ScreenMirror}"
+                    Description="{helpers:ResourceString Name=ScreenMirrorSettingsDescription}"
+                    Header="{helpers:ResourceString Name=ScreenMirrorSettings}"
                     IsClickEnabled="True">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEC15;" />
@@ -145,7 +158,7 @@
                 <!--  ADB Settings  -->
                 <wuc:SettingsCard
                     Click="OpenAdbSettings"
-                    Description="{helpers:ResourceString Name=ConfigureAdbConnection}"
+                    Description="{helpers:ResourceString Name=AdbSettingsDescription}"
                     Header="{helpers:ResourceString Name=AdbSettings}"
                     IsClickEnabled="True">
                     <wuc:SettingsCard.HeaderIcon>
@@ -171,12 +184,28 @@
                 </wuc:SettingsCard>
 
 
-                <!--  Media Session Settings  -->
-                <wuc:SettingsCard Description="{helpers:ResourceString Name=SyncMediaSessions}" Header="{helpers:ResourceString Name=MediaSessions}">
+                <!--  Audio Sync Settings  -->
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=AudioControlDescription}" Header="{helpers:ResourceString Name=AudioControl}">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE767;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.AudioSync, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+
+                <!--  Media sync Settings  -->
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=MediaSessionDescription}" Header="{helpers:ResourceString Name=MediaSession}">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEA69;" />
                     </wuc:SettingsCard.HeaderIcon>
-                    <ToggleSwitch IsOn="{x:Bind ViewModel.MediaSessionSyncEnabled, Mode=TwoWay}" />
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.MediaSession, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+
+                <!--  Storage Access Settings  -->
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=StorageAccessDescription}" Header="{helpers:ResourceString Name=StorageAccess}">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE8A5;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.StorageAccess, Mode=TwoWay}" />
                 </wuc:SettingsCard>
             </StackPanel>
 

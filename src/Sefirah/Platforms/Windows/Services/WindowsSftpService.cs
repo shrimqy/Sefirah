@@ -12,13 +12,14 @@ public class WindowsSftpService(
     ILogger logger,
     SyncRootRegistrar registrar,
     SyncProviderPool syncProviderPool,  
-    IUserSettingsService userSettingsService,
-    IDeviceManager deviceManager,
-    ISessionManager sessionManager
+    IUserSettingsService userSettingsService
     ) : ISftpService
 {
     private StorageProviderSyncRootInfo? info;
 
+    /// <summary>
+    /// Initializes the sftp service with the server information and shell services.
+    /// </summary>
     public async Task InitializeAsync(PairedDevice device, SftpServerInfo info)
     {
         try
@@ -66,11 +67,15 @@ public class WindowsSftpService(
         }
     }
 
+
+    /// <summary>
+    /// Removes the sync root registration for the specified device ID.
+    /// </summary>
     public async void Remove(string deviceId)
     {
-        var id = $"Shrimqy:Sefirah!{WindowsIdentity.GetCurrent().User}!{deviceId}";
         try
         {
+            var id = $"Shrimqy:Sefirah!{WindowsIdentity.GetCurrent().User}!{deviceId}";
             if (info?.Id == id)
             {
                 await syncProviderPool.StopSyncRoot(info);

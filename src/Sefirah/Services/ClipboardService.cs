@@ -51,7 +51,7 @@ public class ClipboardService(
     {
         var devicesWithClipboardSync = deviceManager.PairedDevices
             .Where(device => device.IsConnected &&
-                device.DeviceSettings.ClipboardSyncEnabled);
+                device.DeviceSettings.ClipboardSend);
 
         dispatcher.EnqueueAsync(() =>
         {
@@ -86,10 +86,10 @@ public class ClipboardService(
         {
             try
             {
-                // Check if any connected devices have clipboard sync enabled
+                // Check if any connected devices have clipboard send enabled
                 var devicesWithClipboardSync = deviceManager.PairedDevices
                     .Where(device => device.IsConnected &&
-                        device.DeviceSettings.ClipboardSyncEnabled)
+                        device.DeviceSettings.ClipboardSend)
                     .ToList();
 
                 if (devicesWithClipboardSync.Count == 0) return;
@@ -106,7 +106,7 @@ public class ClipboardService(
 
                 // Check if any device has image clipboard enabled
                 var devicesWithImageSync = devicesWithClipboardSync
-                    .Where(d => d.DeviceSettings.ImageToClipboardEnabled)
+                    .Where(d => d.DeviceSettings.ClipboardIncludeImages)
                     .ToList();
 
                 if (devicesWithImageSync.Count == 0) return; 
@@ -218,7 +218,7 @@ public class ClipboardService(
 
     public async Task SetContentAsync(object content, PairedDevice sourceDevice)
     {
-        if (!sourceDevice.DeviceSettings.ClipboardSyncEnabled) return;
+        if (!sourceDevice.DeviceSettings.ClipboardReceive) return;
 
         await dispatcher.EnqueueAsync(async () =>
         {

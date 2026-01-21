@@ -27,9 +27,9 @@ public partial class DiscoveredDevice : BaseRemoteDevice
         };
     }
 
-    internal RemoteDeviceEntity ToDeviceEntity()
+    internal PairedDeviceEntity ToDeviceEntity()
     {
-        return new RemoteDeviceEntity
+        return new PairedDeviceEntity
         {
             DeviceId = Id,
             Name = Name,
