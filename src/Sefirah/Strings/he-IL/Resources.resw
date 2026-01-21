@@ -154,7 +154,7 @@
     <value>נתיב שמירת קבצים במחשב</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>נתיב שמירת קבצים בהתקן מרוחק</value>
+    <value>Remote storage location</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>הצג התראות Windows על סנכרון לוח העתקה</value>
@@ -175,10 +175,10 @@
     <value>מושבת</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>הצג בפיד ההתראות</value>
+    <value>Notification feed</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>הצג בפיד ההתראות וכהתראת Windows</value>
+    <value>Notification feed + toast</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>התקנים זמינים</value>
@@ -247,7 +247,7 @@
     <value>Scan the QR code or pair directly from the discovered devices below</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>בקשת חיבור התקן</value>
+    <value>Device connection request</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
     <value>נא לוודא שהקוד תואם בשני ההתקנים:</value>
@@ -334,7 +334,7 @@
     <value>הגדרות וידיאו</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>הגדרות קול</value>
+    <value>Audio settings</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
     <value>פתיחה באפליקציה</value>
@@ -577,7 +577,7 @@
     <value>Arguments</value>
   </data>
   <data name="StartInDirectory" xml:space="preserve">
-    <value>Start In directory</value>
+    <value>Start in directory</value>
   </data>
   <data name="EnterActionName" xml:space="preserve">
     <value>Enter action name</value>
@@ -666,7 +666,7 @@ input text %pwd%</value>
     <value>Drop files to send</value>
   </data>
   <data name="DeviceAddresses" xml:space="preserve">
-    <value>Device Addresses</value>
+    <value>Device addresses</value>
   </data>
   <data name="ManageAddressesAndPriority" xml:space="preserve">
     <value>Manage addresses and connection priority</value>

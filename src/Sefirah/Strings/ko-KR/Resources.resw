@@ -154,7 +154,7 @@
     <value>저장 위치</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>원격 기기 저장소 위치</value>
+    <value>Remote storage location</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>클립보드 토스트 알림 표시</value>
@@ -175,10 +175,10 @@
     <value>비활성화</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>알림 피드</value>
+    <value>Notification feed</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>알림 피드 + 토스트</value>
+    <value>Notification feed + toast</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>사용 가능한 기기</value>
@@ -248,7 +248,7 @@ page.</value>
     <value>Scan the QR code or pair directly from the discovered devices below</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>기기 연결 요청</value>
+    <value>Device connection request</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
     <value>두 기기에서 패스키 일치 확인:</value>
@@ -335,7 +335,7 @@ page.</value>
     <value>Video Settings</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>오디오 설정</value>
+    <value>Audio settings</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
     <value>앱에서 열기</value>
@@ -578,7 +578,7 @@ page.</value>
     <value>인수</value>
   </data>
   <data name="StartInDirectory" xml:space="preserve">
-    <value>이 디렉터리에서 시작</value>
+    <value>Start in directory</value>
   </data>
   <data name="EnterActionName" xml:space="preserve">
     <value>동작 이름 입력</value>
@@ -667,7 +667,7 @@ input text %pwd%</value>
     <value>전송할 파일 드롭</value>
   </data>
   <data name="DeviceAddresses" xml:space="preserve">
-    <value>Device Addresses</value>
+    <value>Device addresses</value>
   </data>
   <data name="ManageAddressesAndPriority" xml:space="preserve">
     <value>Manage addresses and connection priority</value>

@@ -154,7 +154,7 @@
     <value>保存先</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>リモート ストレージの場所</value>
+    <value>Remote storage location</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>クリップボード トースト通知を表示</value>
@@ -175,10 +175,10 @@
     <value>無効</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>通知フィード</value>
+    <value>Notification feed</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>通知フィード + トースト通知</value>
+    <value>Notification feed + toast</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>利用可能なデバイス</value>
@@ -247,7 +247,7 @@
     <value>Scan the QR code or pair directly from the discovered devices below</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>デバイス接続要求</value>
+    <value>Device connection request</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
     <value>両方のデバイスでパスキーが一致しているか確認してください:</value>
@@ -334,7 +334,7 @@
     <value>映像設定</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>オーディオ設定</value>
+    <value>Audio settings</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
     <value>アプリで開く</value>
@@ -577,7 +577,7 @@
     <value>Arguments</value>
   </data>
   <data name="StartInDirectory" xml:space="preserve">
-    <value>Start In directory</value>
+    <value>Start in directory</value>
   </data>
   <data name="EnterActionName" xml:space="preserve">
     <value>Enter action name</value>
@@ -666,7 +666,7 @@ input text %pwd%</value>
     <value>Drop files to send</value>
   </data>
   <data name="DeviceAddresses" xml:space="preserve">
-    <value>Device Addresses</value>
+    <value>Device addresses</value>
   </data>
   <data name="ManageAddressesAndPriority" xml:space="preserve">
     <value>Manage addresses and connection priority</value>

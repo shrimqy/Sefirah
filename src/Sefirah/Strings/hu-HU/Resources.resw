@@ -154,7 +154,7 @@
     <value>Mentési hely</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Remote Storage Location</value>
+    <value>Remote storage location</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>Show clipboard toast</value>
@@ -175,10 +175,10 @@
     <value>Ki</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Üzenetek</value>
+    <value>Notification feed</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>Notification Feed + Toast</value>
+    <value>Notification feed + toast</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>Elérhető eszközök</value>
@@ -248,7 +248,7 @@ page.</value>
     <value>Scan the QR code or pair directly from the discovered devices below</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>Eszköz csatlakozási kérelem</value>
+    <value>Device connection request</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
     <value>Verify the passkey matches on both devices:</value>
@@ -335,7 +335,7 @@ page.</value>
     <value>Videó beállítások</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>Hang beállítások</value>
+    <value>Audio settings</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
     <value>Megnyitás alkalmazásban</value>
@@ -578,7 +578,7 @@ page.</value>
     <value>Argumentumok</value>
   </data>
   <data name="StartInDirectory" xml:space="preserve">
-    <value>Start In directory</value>
+    <value>Start in directory</value>
   </data>
   <data name="EnterActionName" xml:space="preserve">
     <value>Enter action name</value>
@@ -667,7 +667,7 @@ input text %pwd%</value>
     <value>Drop files to send</value>
   </data>
   <data name="DeviceAddresses" xml:space="preserve">
-    <value>Device Addresses</value>
+    <value>Device addresses</value>
   </data>
   <data name="ManageAddressesAndPriority" xml:space="preserve">
     <value>Manage addresses and connection priority</value>

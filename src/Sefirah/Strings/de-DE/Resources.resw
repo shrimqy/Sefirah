@@ -154,7 +154,7 @@
     <value>Speicherort festlegen</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Remote-Speicherort</value>
+    <value>Remote storage location</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>Zwischenablagen-Benachrichtigung anzeigen</value>
@@ -175,10 +175,10 @@
     <value>Deaktiviert</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Benachrichtigungs-Feed</value>
+    <value>Notification feed</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>Benachrichtigungs-Feed + Pop-up</value>
+    <value>Notification feed + toast</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>Verfügbare Geräte</value>
@@ -247,7 +247,7 @@
     <value>Scan the QR code or pair directly from the discovered devices below</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>Geräteverbindungsanfrage</value>
+    <value>Device connection request</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
     <value>Überprüfen Sie, dass der Schlüssel auf beiden Geräten übereinstimmt:</value>
@@ -334,7 +334,7 @@
     <value>Videoeinstellungen</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>Audioeinstellungen</value>
+    <value>Audio settings</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
     <value>In App öffnen</value>
@@ -577,7 +577,7 @@
     <value>Argumente</value>
   </data>
   <data name="StartInDirectory" xml:space="preserve">
-    <value>Starte im Verzeichnis</value>
+    <value>Start in directory</value>
   </data>
   <data name="EnterActionName" xml:space="preserve">
     <value>Aktionsname eingeben</value>
@@ -666,7 +666,7 @@ input text %pwd%</value>
     <value>Zu sendende Dateien ablegen</value>
   </data>
   <data name="DeviceAddresses" xml:space="preserve">
-    <value>Device Addresses</value>
+    <value>Device addresses</value>
   </data>
   <data name="ManageAddressesAndPriority" xml:space="preserve">
     <value>Manage addresses and connection priority</value>

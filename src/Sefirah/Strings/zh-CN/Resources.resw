@@ -154,7 +154,7 @@
     <value>保存位置</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>远程存储位置</value>
+    <value>Remote storage location</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>显示剪贴板提示</value>
@@ -175,10 +175,10 @@
     <value>禁用</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>通知订阅</value>
+    <value>Notification feed</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>通知订阅 + Toast</value>
+    <value>Notification feed + toast</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>可用设备</value>
@@ -247,7 +247,7 @@
     <value>Scan the QR code or pair directly from the discovered devices below</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>设备连接请求</value>
+    <value>Device connection request</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
     <value>请验证两台设备上的配对密钥是否匹配：</value>
@@ -335,7 +335,7 @@
     <value>视频设置</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>音频设置</value>
+    <value>Audio settings</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
     <value>在应用程序中打开</value>
@@ -578,7 +578,7 @@
     <value>参数</value>
   </data>
   <data name="StartInDirectory" xml:space="preserve">
-    <value>在目录中打开</value>
+    <value>Start in directory</value>
   </data>
   <data name="EnterActionName" xml:space="preserve">
     <value>输入动作名称</value>
@@ -667,7 +667,7 @@ input text %pwd%</value>
     <value>拖动要发送文件</value>
   </data>
   <data name="DeviceAddresses" xml:space="preserve">
-    <value>Device Addresses</value>
+    <value>Device addresses</value>
   </data>
   <data name="ManageAddressesAndPriority" xml:space="preserve">
     <value>Manage addresses and connection priority</value>

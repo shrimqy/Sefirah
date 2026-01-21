@@ -154,7 +154,7 @@
     <value>Emplacement de sauvegarde</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Emplacement de stockage à distance</value>
+    <value>Remote storage location</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>Afficher le toast du presse-papiers</value>
@@ -175,10 +175,10 @@
     <value>Désactivé</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Fil de notification</value>
+    <value>Notification feed</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>Fil de notification + Toast</value>
+    <value>Notification feed + toast</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>Appareils disponibles</value>
@@ -247,7 +247,7 @@
     <value>Scan the QR code or pair directly from the discovered devices below</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>Demande de connexion de l'appareil</value>
+    <value>Device connection request</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
     <value>Vérifiez que la clé d'accès correspond sur les deux appareils :</value>
@@ -334,7 +334,7 @@
     <value>Réglages vidéo</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>Réglages audio</value>
+    <value>Audio settings</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
     <value>Ouvrir dans l'app</value>
@@ -577,7 +577,7 @@
     <value>Arguments</value>
   </data>
   <data name="StartInDirectory" xml:space="preserve">
-    <value>Démarrer dans le répertoire</value>
+    <value>Start in directory</value>
   </data>
   <data name="EnterActionName" xml:space="preserve">
     <value>Entrez le nom de l'action</value>
@@ -666,7 +666,7 @@ input text %pwd%</value>
     <value>Déposer les fichiers à envoyer</value>
   </data>
   <data name="DeviceAddresses" xml:space="preserve">
-    <value>Device Addresses</value>
+    <value>Device addresses</value>
   </data>
   <data name="ManageAddressesAndPriority" xml:space="preserve">
     <value>Manage addresses and connection priority</value>

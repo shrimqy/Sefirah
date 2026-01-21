@@ -154,7 +154,7 @@
     <value>Vị trí Lưu</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Vị trí cho lưu trữ từ xa</value>
+    <value>Remote storage location</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>Hiển thị thông báo khi sao chép</value>
@@ -175,10 +175,10 @@
     <value>Tắt</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Nguồn thông báo</value>
+    <value>Notification feed</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>Nguồn thông báo + thông báo nổi</value>
+    <value>Notification feed + toast</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>Thiết bị khả dụng</value>
@@ -248,7 +248,7 @@ page.</value>
     <value>Scan the QR code or pair directly from the discovered devices below</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>Yêu cầu ghép nối thiết bị</value>
+    <value>Device connection request</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
     <value>Xác minh rằng mã khóa trùng khớp trên cả hai thiết bị:</value>
@@ -335,7 +335,7 @@ page.</value>
     <value>Video Settings</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>Audio Settings</value>
+    <value>Audio settings</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
     <value>Open in app</value>
@@ -578,7 +578,7 @@ page.</value>
     <value>Arguments</value>
   </data>
   <data name="StartInDirectory" xml:space="preserve">
-    <value>Start In directory</value>
+    <value>Start in directory</value>
   </data>
   <data name="EnterActionName" xml:space="preserve">
     <value>Enter action name</value>
@@ -667,7 +667,7 @@ input text %pwd%</value>
     <value>Drop files to send</value>
   </data>
   <data name="DeviceAddresses" xml:space="preserve">
-    <value>Device Addresses</value>
+    <value>Device addresses</value>
   </data>
   <data name="ManageAddressesAndPriority" xml:space="preserve">
     <value>Manage addresses and connection priority</value>
