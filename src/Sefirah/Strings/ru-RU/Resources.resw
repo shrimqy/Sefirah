@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -154,7 +154,7 @@
     <value>Путь сохранения</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Remote storage location</value>
+    <value>Расположение удаленного хранилища</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>Показать всплывающее окно буфера обмена</value>
@@ -175,10 +175,10 @@
     <value>Выкл</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Notification feed</value>
+    <value>Лента уведомлений</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>Notification feed + toast</value>
+    <value>Лента уведомлений + всплывающее уведомление</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>Доступные устройства</value>
@@ -247,7 +247,7 @@
     <value>Отсканируйте QR код или подключитесь напрямую к найденным устройствам ниже</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>Device connection request</value>
+    <value>Запрос на подключение устройства</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
     <value>Проверьте, совпадает ли ключ доступа на обоих устройствах:</value>
@@ -319,10 +319,10 @@
     <value>Устройства</value>
   </data>
   <data name="AudioSilent" xml:space="preserve">
-    <value>Без звука</value>
+    <value>Silent</value>
   </data>
   <data name="AudioVibrate" xml:space="preserve">
-    <value>Вибрация</value>
+    <value>Vibrate</value>
   </data>
   <data name="Pin" xml:space="preserve">
     <value>Закрепить</value>
@@ -711,9 +711,9 @@ input text %pwd%</value>
     <value>Allow audio device control with this device</value>
   </data>
   <data name="ClipboardIncludeImagesDescription" xml:space="preserve">
-    <value>Включить синхронизацию изображений через буфер обмена</value>
+    <value>Enable image synchronization through clipboard</value>
   </data>
   <data name="ClipboardIncludeImages" xml:space="preserve">
-    <value>Включать изображения в буфер мониторинга</value>
+    <value>Include images in clipboard monitor</value>
   </data>
 </root>
