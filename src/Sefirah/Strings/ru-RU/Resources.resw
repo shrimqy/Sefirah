@@ -232,7 +232,7 @@
     <value>Добро пожаловать в Sefirah</value>
   </data>
   <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
-    <value>Чтобы начать загрузку и установку Comapanion приложения через соответствующую страницу github.</value>
+    <value>Для начала загрузите и установите сопутствующее приложение через соответствующую страницу GitHub.</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
     <value>Начнём</value>
