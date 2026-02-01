@@ -27,13 +27,9 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
     /// </summary>
     public PairedDevice? FindDeviceById(string deviceId) => PairedDevices.FirstOrDefault(device => device.Id == deviceId);
     
-    public Task<PairedDeviceEntity> GetDeviceInfoAsync(string deviceId)
+    public async Task<PairedDeviceEntity> GetPairedDevice(string deviceId)
     {
-        if (repository.HasDevice(deviceId, out var device))
-        {
-            return Task.FromResult(device);
-        }
-        throw new InvalidOperationException($"Device with ID {deviceId} not found");
+        return await repository.GetPairedDevice(deviceId) ?? throw new InvalidOperationException($"Device with ID {deviceId} not found"); ;
     }   
 
     public List<string> GetRemoteDeviceAddresses()
@@ -41,37 +37,18 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
         return repository.GetRemoteDeviceAddresses();
     }
 
-    public async Task<PairedDevice?> GetLastConnectedDevice()
-    {
-        return await repository.GetLastConnectedDevice();
-    }
-
     public async Task RemoveDevice(PairedDevice device)
     {
-        try
+        var result = repository.DeletePairedDevice(device.Id);
+        if (!result) throw new Exception($"Failed to remove device {device.Id}");
+
+        await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {
-            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+            if (PairedDevices.Remove(device) && ActiveDevice == device)
             {
-                try
-                {
-                    ActiveDevice = null;
-                    var result = PairedDevices.Remove(device);
-                    repository.DeletePairedDevice(device.Id);
-                    if (ActiveDevice?.Id == device.Id)
-                    {
-                        ActiveDevice = PairedDevices.FirstOrDefault();
-                    }
-                }
-                catch (Exception ex)
-                {
-                }
-            });
-        }
-        catch (COMException ex)
-        {
-            logger.LogError(ex, "COMException occurred while removing device {DeviceId}", device.Id);
-            throw;
-        }
+                ActiveDevice = PairedDevices.FirstOrDefault();
+            }
+        });
     }
 
     public Task UpdateDevice(PairedDeviceEntity device)
@@ -144,7 +121,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
 
     public async Task UpdateDeviceInfo(PairedDevice device, DeviceInfo deviceInfo)
     {
-        var existingDevice = repository.GetRemoteDevice(device.Id);
+        var existingDevice = await repository.GetPairedDevice(device.Id);
         existingDevice.Name = deviceInfo.DeviceName;
         existingDevice.PhoneNumbers = deviceInfo.PhoneNumbers;
         if (!string.IsNullOrEmpty(deviceInfo.Avatar))
@@ -165,8 +142,8 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
 
     public async Task<PairedDevice> AddDevice(DiscoveredDevice device)
     {
-        var newDeviceEntity = CreateDeviceEntity(device);
-        repository.AddOrUpdateRemoteDevice(newDeviceEntity);
+        var deviceEntity = CreateDeviceEntity(device);
+        repository.AddOrUpdateRemoteDevice(deviceEntity);
         return await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
         {
             var pairedDevice = device.ToPairedDevice();

@@ -3,31 +3,16 @@ using Sefirah.Data.Models;
 
 namespace Sefirah.Data.AppDatabase.Repository;
 
-public class DeviceRepository(DatabaseContext context, ILogger logger)
+public class DeviceRepository(DatabaseContext context)
 {
     public LocalDeviceEntity? GetLocalDevice()
     {
-        try
-        {
-            return context.Database.Table<LocalDeviceEntity>().FirstOrDefault();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError("Failed to get local devices {ex}", ex);
-            return null;
-        }
+        return context.Database.Table<LocalDeviceEntity>().FirstOrDefault();
     }
 
     public void AddOrUpdateLocalDevice(LocalDeviceEntity device)
     {
-        try
-        {
-            context.Database.InsertOrReplace(device);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError("Failed to add local device {ex}", ex);
-        }
+        context.Database.InsertOrReplace(device);
     }
 
     public void AddOrUpdateRemoteDevice(PairedDeviceEntity device)
@@ -35,56 +20,26 @@ public class DeviceRepository(DatabaseContext context, ILogger logger)
         context.Database.InsertOrReplace(device);
     }
 
-    public bool HasDevice(string deviceId, out PairedDeviceEntity device)
+    public async Task<PairedDeviceEntity> GetPairedDevice(string deviceId)
     {
-        device = context.Database.Find<PairedDeviceEntity>(deviceId);
-        return device != null;
+        return await Task.Run(() => context.Database.Find<PairedDeviceEntity>(deviceId));
     }
-
-    public PairedDeviceEntity GetRemoteDevice(string deviceId)
-    {
-        return context.Database.Find<PairedDeviceEntity>(deviceId);
-    }
-
-    public async Task<PairedDevice?> GetLastConnectedDevice()
-    {
-        try
-        {
-            var device = await Task.FromResult(context.Database.Table<PairedDeviceEntity>().OrderByDescending(d => d.LastConnected).FirstOrDefault());
-            if (device is null) return null;
-            return await device.ToPairedDevice();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError("Failed to get last connected device {ex}", ex);
-            return null;
-        }
-    }
-
     public async Task<List<PairedDevice>> GetPairedDevices()
     {
-        try
-        {
-            var devices = context.Database.Table<PairedDeviceEntity>()
-                .OrderByDescending(d => d.LastConnected)
-                .ToList();
-            var pairedDevices = await Task.WhenAll(devices.Select(d => d.ToPairedDevice()));
-            return pairedDevices.ToList();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to get paired devices");
-            return [];
-        }
+        return [.. await Task.WhenAll(context.Database.Table<PairedDeviceEntity>()
+            .OrderByDescending(d => d.LastConnected)
+            .Select(d => d.ToPairedDevice()))];
     }
+        
 
-    public void DeletePairedDevice(string deviceId)
+    public bool DeletePairedDevice(string deviceId)
     {
         var device = context.Database.Find<PairedDeviceEntity>(deviceId);
-        if (device != null)
+        if (device is not null)
         {
-            context.Database.Delete(device);
+            return context.Database.Delete(device) > 0;
         }
+        return false;
     }
 
     public List<string> GetRemoteDeviceAddresses()

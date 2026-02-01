@@ -297,7 +297,7 @@ public class NetworkService(
             
             // Determine shared secret based on whether device is paired
             byte[] sharedSecret = pairedDevice is not null
-                ? (await deviceManager.GetDeviceInfoAsync(pairedDevice.Id)).SharedSecret
+                ? (await deviceManager.GetPairedDevice(pairedDevice.Id)).SharedSecret
                 : EcdhHelper.DeriveKey(authMessage.PublicKey, localDevice.PrivateKey);
 
             if (!EcdhHelper.VerifyProof(sharedSecret, authMessage.Nonce, authMessage.Proof))
@@ -608,7 +608,7 @@ public class NetworkService(
 
         try
         {
-            var remoteDevice = await deviceManager.GetDeviceInfoAsync(device.Id);
+            var remoteDevice = await deviceManager.GetPairedDevice(device.Id);
             var localDevice = await deviceManager.GetLocalDeviceAsync();
             var nonce = EcdhHelper.GenerateNonce();
             var proof = EcdhHelper.GenerateProof(remoteDevice.SharedSecret, nonce);
@@ -783,7 +783,7 @@ public class NetworkService(
 
     private async Task AuthenticatePairedDeviceServer(Client client, PairedDevice pairedDevice, string address, AuthenticationMessage authMessage)
     {
-        var remoteDevice = await deviceManager.GetDeviceInfoAsync(pairedDevice.Id);
+        var remoteDevice = await deviceManager.GetPairedDevice(pairedDevice.Id);
 
         if (!EcdhHelper.VerifyProof(remoteDevice.SharedSecret, authMessage.Nonce, authMessage.Proof))
         {

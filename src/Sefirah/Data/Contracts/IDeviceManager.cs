@@ -33,12 +33,7 @@ public interface IDeviceManager
     /// <summary>
     /// Gets the device info.
     /// </summary>
-    Task<PairedDeviceEntity> GetDeviceInfoAsync(string deviceId);
-
-    /// <summary>
-    /// Gets the last connected device.
-    /// </summary>
-    Task<PairedDevice?> GetLastConnectedDevice();
+    Task<PairedDeviceEntity> GetPairedDevice(string deviceId);
 
     /// <summary>
     /// Removes the device from the database.

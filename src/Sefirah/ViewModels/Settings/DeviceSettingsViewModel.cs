@@ -684,7 +684,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         SaveAddresses();
     }
 
-    public void SaveAddresses()
+    public async void SaveAddresses()
     {
         // Update priorities based on current order
         for (int i = 0; i < Addresses.Count; i++)
@@ -696,7 +696,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         Device.Addresses = Addresses.ToList();
 
         // Save to database
-        var deviceEntity = DeviceRepository.GetRemoteDevice(Device.Id);
+        var deviceEntity = await DeviceRepository.GetPairedDevice(Device.Id);
         if (deviceEntity is not null)
         {
             deviceEntity.Addresses = Addresses.ToList();
