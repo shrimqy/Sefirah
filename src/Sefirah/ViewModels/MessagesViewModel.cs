@@ -66,7 +66,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
     public MessagesViewModel()
     {
-        ((INotifyPropertyChanged)deviceManager).PropertyChanged += OnDeviceManagerPropertyChanged;
+        deviceManager.ActiveDeviceChanged += OnActiveDeviceChanged;
         smsHandlerService.ConversationsUpdated += OnConversationsUpdated;
 
         InitializeAsync();
@@ -80,16 +80,12 @@ public sealed partial class MessagesViewModel : BaseViewModel
         }
     }
 
-    private void OnDeviceManagerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void OnActiveDeviceChanged(object? sender, PairedDevice? _)
     {
-        if (e.PropertyName is nameof(IDeviceManager.ActiveDevice))
-        {
-            OnPropertyChanged(nameof(ActiveDevice));
-            InitializeAsync();
-
-            SelectedConversation = null;
-            IsNewConversation = false;
-        }
+        OnPropertyChanged(nameof(ActiveDevice));
+        InitializeAsync();
+        SelectedConversation = null;
+        IsNewConversation = false;
     }
 
     private async void LoadContacts()

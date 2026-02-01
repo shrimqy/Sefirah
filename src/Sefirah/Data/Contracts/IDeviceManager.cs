@@ -21,6 +21,11 @@ public interface IDeviceManager
     PairedDevice? ActiveDevice { get; set; }
 
     /// <summary>
+    /// Event raised when the active device changes.
+    /// </summary>
+    event EventHandler<PairedDevice?>? ActiveDeviceChanged;
+
+    /// <summary>
     /// Finds a device session by device ID
     /// </summary>
     PairedDevice? FindDeviceById(string deviceId);

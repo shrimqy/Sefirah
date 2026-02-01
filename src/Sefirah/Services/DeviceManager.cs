@@ -7,7 +7,6 @@ using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
 using Sefirah.Helpers;
 using Sefirah.Utils;
-using System.Runtime.InteropServices;
 
 namespace Sefirah.Services;
 
@@ -19,10 +18,9 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
     [ObservableProperty]
     public partial PairedDevice? ActiveDevice { get; set; }
 
-    /// <summary>
-    /// Event fired when the active session changes
-    /// </summary>
     public event EventHandler<PairedDevice?>? ActiveDeviceChanged;
+
+    partial void OnActiveDeviceChanged(PairedDevice? value) => ActiveDeviceChanged?.Invoke(this, value);
 
     /// <summary>
     /// Finds a device session by device ID

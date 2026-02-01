@@ -119,6 +119,11 @@ public sealed partial class AppsViewModel : BaseViewModel
         }
     }
 
+    private void OnActiveDeviceChanged(object? sender, PairedDevice? _)
+    {
+        LoadApps();
+    }
+
     private void OnApplicationListUpdated(object? sender, string deviceId)
     {   
         if (DeviceManager.ActiveDevice?.Id != deviceId) return;
@@ -211,10 +216,6 @@ public sealed partial class AppsViewModel : BaseViewModel
         
         RemoteAppsRepository.ApplicationListUpdated += OnApplicationListUpdated;
         RemoteAppsRepository.ApplicationItemUpdated += OnApplicationItemUpdated;
-        ((INotifyPropertyChanged)DeviceManager).PropertyChanged += (s, e) =>
-        {
-            if (e.PropertyName is nameof(IDeviceManager.ActiveDevice))
-                LoadApps();
-        };
+        DeviceManager.ActiveDeviceChanged += OnActiveDeviceChanged;
     }
 }

@@ -27,18 +27,11 @@ public class NotificationService(
     private SemaphoreSlim GetNotificationLock(string deviceId) =>
         notificationLocks.GetOrAdd(deviceId, _ => new SemaphoreSlim(1, 1));
 
-    public Task Initialize()
+    public async Task Initialize()
     {
         ClearBadge();
         sessionManager.ConnectionStatusChanged += OnConnectionStatusChanged;
-
-        ((INotifyPropertyChanged)deviceManager).PropertyChanged += (s, e) =>
-        {
-            if (e.PropertyName is nameof(IDeviceManager.ActiveDevice) && deviceManager.ActiveDevice is not null)
-                SyncActiveNotifications(deviceManager.ActiveDevice);
-        };
-
-        return Task.CompletedTask;
+        // deviceManager.ActiveDeviceChanged += OnActiveDeviceChanged;
     }
 
     private async void OnConnectionStatusChanged(object? sender, PairedDevice device)
