@@ -58,7 +58,7 @@ public class MessageHandler(
                     await clipboardService.SetContentAsync(clipboardMessage.Content, device);
                     break;
 
-                case TextConversation textConversation:
+                case ConversationMessage textConversation:
                     await smsHandlerService.HandleTextMessage(device.Id, textConversation);
                     break;
 

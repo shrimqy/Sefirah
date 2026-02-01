@@ -1,3 +1,4 @@
+using CommunityToolkit.WinUI;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
@@ -12,7 +13,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
     #endregion
 
     #region Properties
-    public ObservableCollection<Conversation>? Conversations { get; private set; }
+    public ObservableCollection<Conversation> Conversations { get; } = [];
     public ObservableCollection<Conversation> SearchResults { get; } = [];
     public ObservableCollection<Contact> SearchContactsResults { get; } = [];
     private HashSet<long> MessageIds { get; set; } = [];
@@ -33,7 +34,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
         set
         {
             // If selecting a conversation, exit new conversation mode 
-            if (value != null)
+            if (value is not null)
             {
                 IsNewConversation = false;
             }
@@ -67,8 +68,8 @@ public sealed partial class MessagesViewModel : BaseViewModel
     public MessagesViewModel()
     {
         deviceManager.ActiveDeviceChanged += OnActiveDeviceChanged;
-        smsHandlerService.ConversationsUpdated += OnConversationsUpdated;
-
+        smsHandlerService.ConversationRemoved += OnConversationRemoved;
+        smsHandlerService.ConversationUpdated += OnConversationUpdated;
         InitializeAsync();
     }
 
@@ -77,6 +78,10 @@ public sealed partial class MessagesViewModel : BaseViewModel
         if (ActiveDevice is not null)
         {
             await LoadConversationsForActiveDevice();
+        }
+        else
+        {
+            await dispatcher.EnqueueAsync(() => Conversations.Clear());
         }
     }
 
@@ -95,19 +100,14 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
     private async Task LoadConversationsForActiveDevice()
     {
-        if (ActiveDevice is null)
-        {
-            Conversations = null;
-            OnPropertyChanged(nameof(Conversations));
-            return;
-        }
-
         try
         {
-            await smsHandlerService.LoadConversationsFromDatabase(ActiveDevice.Id);
-
-            Conversations = smsHandlerService.GetConversationsForDevice(ActiveDevice.Id);
-            OnPropertyChanged(nameof(Conversations));
+            var conversations = await smsHandlerService.LoadConversationAsync(ActiveDevice!.Id);
+            await dispatcher.EnqueueAsync(() =>
+            {
+                Conversations.Clear();
+                Conversations.AddRange(conversations);
+            });
         }
         catch (Exception ex)
         {
@@ -119,34 +119,24 @@ public sealed partial class MessagesViewModel : BaseViewModel
     {
         if (SelectedConversation is null || ActiveDevice is null) return;
 
-        try
+        var dbMessages = await smsHandlerService.LoadMessagesForConversation(ActiveDevice.Id, SelectedConversation.ThreadId);
+        if (dbMessages.Count > 0)
         {
-            var dbMessages = await smsHandlerService.LoadMessagesForConversation(ActiveDevice.Id, SelectedConversation.ThreadId);
-            
             MessageGroups.Clear();
-            
-            if (dbMessages.Count > 0)
-            {
-                var sortedMessages = dbMessages.OrderBy(m => m.Timestamp).ToList();
-                
-                MessageIds.AddRange(sortedMessages.Select(m => m.UniqueId));
-                
-                BuildMessageGroups(sortedMessages);
-            }
+            MessageIds.Clear();
 
-            // Request thread history from device
-            await SmsHandlerService.RequestThreadHistory(ActiveDevice, SelectedConversation.ThreadId);
+            var sortedMessages = dbMessages.OrderBy(m => m.Timestamp).ToList();
+            MessageIds.AddRange(sortedMessages.Select(m => m.UniqueId));
+            BuildMessageGroups(sortedMessages);
         }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error loading messages for conversation: {ThreadId}", SelectedConversation.ThreadId);
-        }
+
+        // Request thread history from device
+        await SmsHandlerService.RequestThreadHistory(ActiveDevice, SelectedConversation.ThreadId);
     }
 
     public void SendMessage(string messageText)
     {
-        if (string.IsNullOrWhiteSpace(messageText) || !ActiveDevice!.IsConnected)
-            return;
+        if (string.IsNullOrWhiteSpace(messageText) || !ActiveDevice!.IsConnected) return;
         
         try
         {
@@ -223,11 +213,9 @@ public sealed partial class MessagesViewModel : BaseViewModel
     {
         SearchResults.Clear();
         
-        if (string.IsNullOrWhiteSpace(searchText) || Conversations is null)
-            return;
+        if (string.IsNullOrWhiteSpace(searchText)) return;
 
-        if (searchText.Length < 2)
-            return;
+        if (searchText.Length < 2) return;
 
         var filtered = Conversations
             .Where(c => c.DisplayName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
@@ -262,21 +250,65 @@ public sealed partial class MessagesViewModel : BaseViewModel
         SearchContactsResults.AddRange(filtered);
     }
 
-    private void OnConversationsUpdated(object? sender, (string DeviceId, long ThreadId) args)
+    private void OnConversationRemoved(object? sender, (string DeviceId, long ThreadId) args)
     {
-        if (ActiveDevice?.Id == args.DeviceId)
+        if (ActiveDevice?.Id != args.DeviceId) return;
+
+        dispatcher.EnqueueAsync(() =>
         {
-            var updatedConversation = Conversations?.FirstOrDefault(c => c.ThreadId == args.ThreadId);
-            if (updatedConversation is not null && SelectedConversation is not null && args.ThreadId == SelectedConversation.ThreadId)
+            var toRemove = Conversations.FirstOrDefault(c => c.ThreadId == args.ThreadId);
+            if (toRemove is not null)
+                Conversations.Remove(toRemove);
+            if (SelectedConversation?.ThreadId == args.ThreadId)
             {
-                var newMessages = updatedConversation.Messages
-                    .Where(m => !MessageIds.Contains(m.UniqueId))
-                    .OrderBy(m => m.Timestamp)
-                    .ToList();
-                HandleNewMessages(newMessages);
+                MessageGroups.Clear();
+                MessageIds.Clear();
+                SelectedConversation = null;
+                OnPropertyChanged(nameof(ShouldShowEmptyState));
+                OnPropertyChanged(nameof(ShouldShowComposeUI));
             }
-            OnPropertyChanged(nameof(Conversations));
+        });
+    }
+
+    private void OnConversationUpdated(object? sender, (string DeviceId, long ThreadId, Conversation Conversation, IReadOnlyList<Message> NewMessages) args)
+    {
+        if (ActiveDevice?.Id != args.DeviceId) return;
+
+        dispatcher.EnqueueAsync(() =>
+        {
+            var conversation = args.Conversation;
+            var existing = Conversations.FirstOrDefault(c => c.ThreadId == args.ThreadId);
+            if (existing is not null)
+            {
+                existing.UpdateFrom(conversation);
+                var currentIndex = Conversations.IndexOf(existing);
+                var targetIndex = FindConversationInsertionIndex(Conversations, existing.LastMessageTimestamp);
+                if (currentIndex != targetIndex)
+                    Conversations.Move(currentIndex, targetIndex);
+            }
+            else
+            {
+                var index = FindConversationInsertionIndex(Conversations, conversation.LastMessageTimestamp);
+                Conversations.Insert(index, conversation);
+            }
+
+            if (SelectedConversation?.ThreadId == args.ThreadId && args.NewMessages.Count > 0)
+            {
+                var newMessages = args.NewMessages.Where(m => !MessageIds.Contains(m.UniqueId)).OrderBy(m => m.Timestamp).ToList();
+                if (newMessages.Count > 0)
+                    HandleNewMessages(newMessages);
+            }
+        });
+    }
+
+    private static int FindConversationInsertionIndex(ObservableCollection<Conversation> conversations, long lastMessageTimestamp)
+    {
+        for (int i = 0; i < conversations.Count; i++)
+        {
+            if (conversations[i].LastMessageTimestamp <= lastMessageTimestamp)
+                return i;
         }
+        return conversations.Count;
     }
 
     private const int groupingThreshold = 300000; // 5 min

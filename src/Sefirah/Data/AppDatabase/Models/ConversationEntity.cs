@@ -32,15 +32,7 @@ public class ConversationEntity
         {
             Addresses = JsonSerializer.Deserialize<List<string>>(AddressesJson) ?? [];
         }
-        
-        var messageEntity = await repository.GetMessagesAsync(DeviceId, ThreadId);
-        var messages = new ObservableCollection<Message>();
-        foreach (var entity in messageEntity)
-        {
-            var message = await entity.ToMessageAsync(repository);
-            messages.Add(message);
-        }
-        
+
         var contacts = new List<Contact>();
         foreach (var address in Addresses)
         {
@@ -66,7 +58,7 @@ public class ConversationEntity
             Contacts = contacts,
             LastMessage = LastMessage ?? string.Empty,
             LastMessageTimestamp = LastMessageTimestamp,
-            Messages = messages,
+            HasRead = HasRead,
             AvatarGlyph = avatarGlyph,
             AvatarImage = avatarImage,
         };

@@ -15,7 +15,7 @@ namespace Sefirah.Data.Models;
 [JsonDerivedType(typeof(AudioDevice), typeDiscriminator: "8")]
 [JsonDerivedType(typeof(CommandMessage), typeDiscriminator: "9")]
 [JsonDerivedType(typeof(TextMessage), typeDiscriminator: "10")]
-[JsonDerivedType(typeof(TextConversation), typeDiscriminator: "11")]
+[JsonDerivedType(typeof(ConversationMessage), typeDiscriminator: "11")]
 [JsonDerivedType(typeof(ThreadRequest), typeDiscriminator: "12")]
 [JsonDerivedType(typeof(ContactMessage), typeDiscriminator: "13")]
 [JsonDerivedType(typeof(NotificationMessage), typeDiscriminator: "14")]
@@ -102,21 +102,32 @@ public class CommandMessage : SocketMessage
     public CommandType CommandType { get; set; }
 }
 
+public class ConversationMessage : SocketMessage
+{
+    public required ConversationType ConversationType { get; set; }
+
+    public required long ThreadId { get; set; }
+
+    public List<string> Recipients { get; set; } = [];
+
+    public List<TextMessage> Messages { get; set; } = [];
+}
+
 public class TextMessage : SocketMessage
 {
+    public long UniqueId { get; set; }
+
     public List<string> Addresses { get; set; } = [];
 
     public long? ThreadId { get; set; } = null;
 
     public required string Body { get; set; }
-        
-    public long Timestamp { get; set; }
-                    
-    public int MessageType { get; set; }
-    
-    public bool Read { get; set; } = false;
 
-    public long UniqueId { get; set; }
+    public long Timestamp { get; set; }
+
+    public int MessageType { get; set; }
+
+    public bool Read { get; set; } = false;
 
     public int SubscriptionId { get; set; } = 0;
 
@@ -129,22 +140,11 @@ public class TextMessage : SocketMessage
 
 public class SmsAttachment
 {
-
-    public string? Base64Data { get; set; }
-
-    public string? FileName { get; set; }
+    public string? Id { get; set; }
+    public string? MimeType { get; set; }
+    public string? Base64EncodedFile { get; set; }
 }
 
-public class TextConversation : SocketMessage
-{
-    public required ConversationType ConversationType { get; set; }
-
-    public required long ThreadId { get; set; }
-
-    public List<string> Recipients { get; set; } = [];
-
-    public List<TextMessage> Messages { get; set; } = [];
-}
 
 public class ThreadRequest: SocketMessage
 {

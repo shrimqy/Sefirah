@@ -3,55 +3,29 @@ using Sefirah.Data.Models;
 
 namespace Sefirah.Data.AppDatabase.Repository;
 
-public class SmsRepository(DatabaseContext databaseContext, ILogger logger)
+public class SmsRepository(DatabaseContext context, ILogger logger)
 {
-
     #region Conversation Operations
 
     public async Task<ConversationEntity?> GetConversationAsync(string deviceId, long threadId)
     {
-        try
-        {
-            return await Task.Run(() => 
-                databaseContext.Database.Table<ConversationEntity>()
-                    .FirstOrDefault(c => c.DeviceId == deviceId && c.ThreadId == threadId));
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error getting conversation for device {DeviceId}, thread {ThreadId}", deviceId, threadId);
-            return null;
-        }
+        return await Task.Run(() => 
+            context.Database.Table<ConversationEntity>()
+                .FirstOrDefault(c => c.DeviceId == deviceId && c.ThreadId == threadId));
     }
 
     public async Task<List<ConversationEntity>> GetConversationsAsync(string deviceId)
     {
-        try
-        {
-            return await Task.Run(() => 
-                databaseContext.Database.Table<ConversationEntity>()
-                    .Where(c => c.DeviceId == deviceId)
-                    .OrderByDescending(c => c.LastMessageTimestamp)
-                    .ToList());
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error getting conversations for device {DeviceId}", deviceId);
-            return [];
-        }
+        return await Task.Run(() => 
+            context.Database.Table<ConversationEntity>()
+                .Where(c => c.DeviceId == deviceId)
+                .OrderByDescending(c => c.LastMessageTimestamp)
+                .ToList());
     }
 
-    public async Task<bool> SaveConversationAsync(ConversationEntity conversation)
+    public async Task SaveConversationAsync(ConversationEntity conversation)
     {
-        try
-        {
-            await Task.Run(() => databaseContext.Database.InsertOrReplace(conversation));
-            return true;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error saving conversation {ThreadId} for device {DeviceId}", conversation.ThreadId, conversation.DeviceId);
-            return false;
-        }
+        await Task.Run(() => context.Database.InsertOrReplace(conversation));
     }
 
     public async Task<bool> DeleteConversationAsync(string deviceId, long threadId)
@@ -61,10 +35,10 @@ public class SmsRepository(DatabaseContext databaseContext, ILogger logger)
             await Task.Run(() =>
             {
                 // Delete conversation
-                databaseContext.Database.Delete<ConversationEntity>(threadId);
+                context.Database.Delete<ConversationEntity>(threadId);
                 
                 // Delete associated messages
-                databaseContext.Database.Execute("DELETE FROM TextMessageEntity WHERE DeviceId = ? AND ThreadId = ?", deviceId, threadId);
+                context.Database.Execute("DELETE FROM TextMessageEntity WHERE DeviceId = ? AND ThreadId = ?", deviceId, threadId);
                 
             });
             return true;
@@ -76,25 +50,39 @@ public class SmsRepository(DatabaseContext databaseContext, ILogger logger)
         }
     }
 
+    /// <summary>
+    /// Deletes all SMS data (conversations, messages, contacts, attachments) for a device.
+    /// Call when a device is removed.
+    /// </summary>
+    public void DeleteAllDataForDevice(string deviceId)
+    {
+        // Order matters: attachments reference messages, so delete attachments first.
+        var messageIds = context.Database.Table<MessageEntity>()
+            .Where(m => m.DeviceId == deviceId)
+            .Select(m => m.UniqueId)
+            .ToList();
+        context.Database.Table<AttachmentEntity>()
+            .Where(a => messageIds.Contains(a.MessageUniqueId))
+            .Delete();
+
+        context.Database.Table<MessageEntity>().Where(m => m.DeviceId == deviceId).Delete();
+        context.Database.Table<ConversationEntity>().Where(c => c.DeviceId == deviceId).Delete();
+        context.Database.Table<ContactEntity>().Where(c => c.DeviceId == deviceId).Delete();
+
+        logger.LogInformation("Deleted all SMS data for device {DeviceId}", deviceId);
+    }
+
     #endregion
 
     #region Message Operations
 
     public async Task<List<MessageEntity>> GetMessagesAsync(string deviceId, long threadId)
     {
-        try
-        {
-            return await Task.Run(() => 
-                databaseContext.Database.Table<MessageEntity>()
-                    .Where(m => m.DeviceId == deviceId && m.ThreadId == threadId)
-                    .OrderBy(m => m.Timestamp)
-                    .ToList());
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error getting messages for device {DeviceId}, thread {ThreadId}", deviceId, threadId);
-            return [];
-        }
+        return await Task.Run(() => 
+            context.Database.Table<MessageEntity>()
+                .Where(m => m.DeviceId == deviceId && m.ThreadId == threadId)
+                .OrderBy(m => m.Timestamp)
+                .ToList());
     }
 
     public async Task<List<MessageEntity>> GetMessagesWithAttachmentsAsync(string deviceId, long threadId)
@@ -130,7 +118,7 @@ public class SmsRepository(DatabaseContext databaseContext, ILogger logger)
     {
         try
         {
-            return databaseContext.Database.Table<MessageEntity>().Where(m => m.DeviceId == deviceId && m.UniqueId == uniqueId).ToList();
+            return context.Database.Table<MessageEntity>().Where(m => m.DeviceId == deviceId && m.UniqueId == uniqueId).ToList();
         }
         catch (Exception ex)
         {
@@ -143,7 +131,7 @@ public class SmsRepository(DatabaseContext databaseContext, ILogger logger)
     {
         try
         {
-            await Task.Run(() => databaseContext.Database.InsertOrReplace(message));
+            await Task.Run(() => context.Database.InsertOrReplace(message));
             return true;
         }
         catch (Exception ex)
@@ -157,7 +145,7 @@ public class SmsRepository(DatabaseContext databaseContext, ILogger logger)
     {
         try
         {
-            await Task.Run(() => databaseContext.Database.InsertAll(messages, "OR REPLACE"));
+            await Task.Run(() => context.Database.InsertAll(messages, "OR REPLACE"));
             return true;
         }
         catch (Exception ex)
@@ -173,7 +161,7 @@ public class SmsRepository(DatabaseContext databaseContext, ILogger logger)
         {
             await Task.Run(() =>
             {
-                databaseContext.Database.Execute("DELETE FROM TextMessageEntity WHERE DeviceId = ? AND UniqueId = ?", deviceId, uniqueId);
+                context.Database.Execute("DELETE FROM TextMessageEntity WHERE DeviceId = ? AND UniqueId = ?", deviceId, uniqueId);
                 // Note: Attachment deletion removed for now as per user request
             });
             return true;
@@ -189,94 +177,35 @@ public class SmsRepository(DatabaseContext databaseContext, ILogger logger)
 
     #region Contact Operations
 
-    public async Task<List<ContactEntity>> GetContactsAsync(string deviceId)
-    {
-        try
-        {
-            return await Task.Run(() => 
-                databaseContext.Database.Table<ContactEntity>()
-                    .Where(c => c.DeviceId == deviceId)
-                    .ToList());
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error getting contacts for device {DeviceId}", deviceId);
-            return [];
-        }
-    }
-
     public async Task<List<ContactEntity>> GetAllContactsAsync()
     {
-        try
-        {
-            return await Task.Run(() =>
-            {
-                return databaseContext.Database.Table<ContactEntity>().ToList();
-            });
-        }
-        catch
-        {
-            return [];
-        }
+        return await Task.Run(() => context.Database.Table<ContactEntity>().ToList());
     }
 
+    public async Task<List<ContactEntity>> GetContactsForDevice(string deviceId)
+    {
+        return await Task.Run(() => context.Database.Table<ContactEntity>()
+            .Where(c => c.DeviceId == deviceId)
+            .OrderByDescending(n => n.DisplayName)
+            .ToList());
+    }
 
     public async Task<ContactEntity?> GetContactAsync(string deviceId, string phoneNumber)  
     {
-        try
-        {
-            return await Task.Run(() => 
-                databaseContext.Database.Table<ContactEntity>()
-                    .FirstOrDefault(c => c.DeviceId == deviceId && c.Number == phoneNumber));
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error getting contact {PhoneNumber} for device {DeviceId}", phoneNumber, deviceId);
-            return null;
-        }
+        return await Task.Run(() => context.Database.Table<ContactEntity>()
+            .FirstOrDefault(c => c.DeviceId == deviceId && c.Number == phoneNumber));
     }
 
     public async Task<ContactEntity?> GetContactByIdAsync(string deviceId, string contactId)
     {
-        try
-        {
-            return await Task.Run(() => 
-                databaseContext.Database.Table<ContactEntity>()
-                    .FirstOrDefault(c => c.DeviceId == deviceId && c.Id == contactId));
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error getting contact by ID {ContactId} for device {DeviceId}", contactId, deviceId);
-            return null;
-        }
+        return await Task.Run(() => context.Database.Table<ContactEntity>()
+            .FirstOrDefault(c => c.DeviceId == deviceId && c.Id == contactId));
     }
 
-    public async Task<bool> SaveContactAsync(ContactEntity contact)
+    public async Task SaveContactAsync(string deviceId, ContactMessage contact)
     {
-        try
-        {
-            await Task.Run(() => databaseContext.Database.InsertOrReplace(contact));
-            return true;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error saving contact {PhoneNumber} for device {DeviceId}", contact.Number, contact.DeviceId);
-            return false;
-        }
-    }
-
-    public async Task<bool> SaveContactsAsync(List<ContactEntity> contacts)
-    {
-        try
-        {
-            await Task.Run(() => databaseContext.Database.InsertAll(contacts, "OR REPLACE"));
-            return true;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error saving batch contacts");
-            return false;
-        }
+        var contactEntity = ToEntity(contact, deviceId);
+        await Task.Run(() => context.Database.InsertOrReplace(contactEntity));
     }
 
     #endregion
@@ -288,7 +217,7 @@ public class SmsRepository(DatabaseContext databaseContext, ILogger logger)
         try
         {
             return await Task.Run(() => 
-                databaseContext.Database.Table<AttachmentEntity>()
+                context.Database.Table<AttachmentEntity>()
                     .Where(a => a.MessageUniqueId == messageUniqueId)
                     .ToList());
         }
@@ -303,7 +232,7 @@ public class SmsRepository(DatabaseContext databaseContext, ILogger logger)
     {
         try
         {
-            await Task.Run(() => databaseContext.Database.InsertOrReplace(attachment));
+            await Task.Run(() => context.Database.InsertOrReplace(attachment));
             return true;
         }
         catch (Exception ex)
@@ -317,7 +246,7 @@ public class SmsRepository(DatabaseContext databaseContext, ILogger logger)
     {
         try
         {
-            await Task.Run(() => databaseContext.Database.InsertAll(attachments, "OR REPLACE"));
+            await Task.Run(() => context.Database.InsertAll(attachments, "OR REPLACE"));
             return true;
         }
         catch (Exception ex)
@@ -378,15 +307,14 @@ public class SmsRepository(DatabaseContext databaseContext, ILogger logger)
         return new AttachmentEntity
         {
             MessageUniqueId = messageUniqueId,
-            Data = Convert.FromBase64String(attachment.Base64Data)
+            Data = Convert.FromBase64String(attachment.Base64EncodedFile)
         };
     }
 
-    public static ConversationEntity ToEntity(TextConversation textConversation, string deviceId)
+    public static ConversationEntity ToEntity(ConversationMessage textConversation, string deviceId)
     {
         var latestMessage = textConversation.Messages.OrderByDescending(m => m.Timestamp).First();
 
-        Debug.WriteLine($"latestMessage: {latestMessage.Body} AddressesJson: {JsonSerializer.Serialize(textConversation.Recipients)}");
         return new ConversationEntity
         {
             ThreadId = textConversation.ThreadId,
