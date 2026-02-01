@@ -16,22 +16,63 @@ public class NotificationService(
     ISessionManager sessionManager,
     IDeviceManager deviceManager,
     IPlatformNotificationHandler platformNotificationHandler,
-    RemoteAppRepository remoteAppsRepository) : INotificationService
+    RemoteAppRepository remoteAppsRepository,
+    NotificationRepository notificationRepository) : INotificationService
 {
-    private readonly ConcurrentDictionary<string, List<Notification>> deviceNotifications = [];
     private readonly ConcurrentDictionary<string, SemaphoreSlim> notificationLocks = [];
 
-    private readonly ObservableCollection<Notification> activeNotifications = [];
-    public ReadOnlyObservableCollection<Notification> NotificationHistory => new(activeNotifications);
+    public ObservableCollection<Notification> Notifications { get; } = [];
 
-    private SemaphoreSlim GetNotificationLock(string deviceId) =>
-        notificationLocks.GetOrAdd(deviceId, _ => new SemaphoreSlim(1, 1));
+    private SemaphoreSlim GetNotificationLock(string deviceId) => notificationLocks.GetOrAdd(deviceId, _ => new SemaphoreSlim(1, 1));
 
     public async Task Initialize()
     {
         ClearBadge();
         sessionManager.ConnectionStatusChanged += OnConnectionStatusChanged;
-        // deviceManager.ActiveDeviceChanged += OnActiveDeviceChanged;
+        deviceManager.ActiveDeviceChanged += OnActiveDeviceChanged;
+
+        await LoadNotificationsFromDatabase(deviceManager.ActiveDevice);
+    }
+
+    private async void OnActiveDeviceChanged(object? sender, PairedDevice? device)
+    {
+        await LoadNotificationsFromDatabase(device);
+    }
+
+    public async Task LoadNotificationsFromDatabase(PairedDevice? device)
+    {
+        if (device is null)
+        {
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(() => Notifications.Clear());
+            ClearBadge();
+            return;
+        }
+
+        var notificationLock = GetNotificationLock(device.Id);
+        await notificationLock.WaitAsync();
+        try
+        {
+            var entities = await notificationRepository.GetNotificationsAsync(device.Id);
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
+            {
+                Notifications.Clear();
+                foreach (var entity in entities)
+                {
+                    var notification = await entity.ToNotificationAsync();
+                    if (notification is not null) Notifications.Add(notification);
+                }
+                SortNotifications();
+                UpdateBadge();
+            });
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error loading notifications from database for device {DeviceId}", device.Id);
+        }
+        finally
+        {
+            notificationLock.Release();
+        }
     }
 
     private async void OnConnectionStatusChanged(object? sender, PairedDevice device)
@@ -52,37 +93,31 @@ public class NotificationService(
         {
             if (message.NotificationType is NotificationType.Removed)
             {
-                await HandleRemovedNotificationAsync(device, message);
+                await HandleRemovedNotification(device, message);
                 return;
             }
 
-            if (message.Title is null || message.AppPackage is null) return;
-
-            var filter = await remoteAppsRepository.GetOrCreateAppNotificationFilter(
-                device.Id, message.AppPackage, message.AppName!, message.AppIcon);
+            var filter = await remoteAppsRepository.GetOrCreateAppNotificationFilter(device.Id, message.AppPackage!, message.AppName!, message.AppIcon);
 
             if (filter is NotificationFilter.Disabled) return;
 
+            notificationRepository.SaveNotification(message, device.Id);
+
             await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
             {
-                var notifications = deviceNotifications.GetOrAdd(device.Id, _ => []);
                 var notification = await Notification.FromMessage(message);
+
+                if (device == deviceManager.ActiveDevice)
+                {
+                    await HandleNotificationForActiveDevice(notification);
+                }
 
                 if (message.NotificationType is NotificationType.New && filter is NotificationFilter.ToastFeed)
                 {
-                    await HandleNewNotificationAsync(device, message, notifications, notification);
-                }
-                else if (filter is NotificationFilter.Feed or NotificationFilter.ToastFeed)
-                {
-                    notifications.Add(notification);
-                }
-                else
-                {
-                    return;
-                }
+                    if (device.DeviceSettings.IgnoreWindowsApps && await IsAppActiveAsync(message.AppName!)) return;
 
-                SortNotifications(notifications);
-                SyncActiveNotifications(device);
+                    await platformNotificationHandler.ShowRemoteNotification(message, device.Id);
+                }
             });
         }
         catch (Exception ex)
@@ -95,69 +130,70 @@ public class NotificationService(
         }
     }
 
-    private async Task HandleNewNotificationAsync(
-        PairedDevice device,
-        NotificationMessage message,
-        List<Notification> notifications,
-        Notification notification)
+    private async Task HandleNotificationForActiveDevice(Notification notification)
     {
-        var existing = notifications.FirstOrDefault(n => n.Key == notification.Key);
+        var existing = Notifications.FirstOrDefault(n => n.Key == notification.Key);
         if (existing is not null)
         {
-            var index = notifications.IndexOf(existing);
+            var index = Notifications.IndexOf(existing);
             notification.Pinned = existing.Pinned;
-            notifications[index] = notification;
+            Notifications[index] = notification;
         }
         else
         {
-            notifications.Insert(0, notification);
+            Notifications.Insert(0, notification);
         }
-        if (device.DeviceSettings.IgnoreWindowsApps && await IsAppActiveAsync(message.AppName!)) return;
-
-        await platformNotificationHandler.ShowRemoteNotification(message, device.Id);
+        SortNotifications();
+        UpdateBadge();
     }
 
-    private async Task HandleRemovedNotificationAsync(PairedDevice device, NotificationMessage message)
+    private async Task HandleRemovedNotification(PairedDevice device, NotificationMessage message)
     {
-        if (!deviceNotifications.TryGetValue(device.Id, out var notifications)) return;
+        var deleted = await notificationRepository.DeleteNotificationAsync(device.Id, message.NotificationKey);
+        if (!deleted) return;
 
-        var notification = notifications.FirstOrDefault(n => n.Key == message.NotificationKey);
-        if (notification is null || notification.Pinned) return;
-
-        await App.MainWindow.DispatcherQueue.EnqueueAsync(() => notifications.Remove(notification));
-        SyncActiveNotifications(device);
+        if (device == deviceManager.ActiveDevice)
+        {
+            var notification = Notifications.FirstOrDefault(n => n.Key == message.NotificationKey);
+            if (notification is not null)
+            {
+                await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+                {
+                    Notifications.Remove(notification);
+                    UpdateBadge();
+                });
+            }
+        }
     }
 
 
-    public void TogglePinNotification(Notification notification)
+    public async void TogglePinNotification(Notification notification)
     {
         var activeDevice = deviceManager.ActiveDevice!;
 
-        App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+        await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {
-            if (!deviceNotifications.TryGetValue(activeDevice.Id, out var notifications)) return;
-
-            var index = notifications.IndexOf(notification);
-            if (index < 0) return;
-
+            var index = Notifications.IndexOf(notification);
             notification.Pinned = !notification.Pinned;
-            notifications[index] = notification;
-
-            SortNotifications(notifications);
-            SyncActiveNotifications(activeDevice);
+            Notifications[index] = notification;
+            SortNotifications();
         });
+
+        UpdateBadge();
+        notificationRepository.UpdateNotificationPin(notification, activeDevice.Id);
     }
 
-    public void RemoveNotification(PairedDevice device, Notification notification)
+    public async void RemoveNotification(PairedDevice device, Notification notification)
     {
-        if (notification.Pinned) return;
-        if (!deviceNotifications.TryGetValue(device.Id, out var notifications)) return;
-
         try
         {
-            App.MainWindow.DispatcherQueue.EnqueueAsync(() => notifications.Remove(notification));
-            platformNotificationHandler.RemoveNotificationsByTagAndGroup(notification.Tag, notification.GroupKey);
-            SyncActiveNotifications(device);
+            var result = await notificationRepository.DeleteNotificationAsync(device.Id, notification.Key);
+            if (!result) return;
+
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(() => Notifications.Remove(notification));
+            UpdateBadge();
+
+            await platformNotificationHandler.RemoveNotificationsByTagAndGroup(notification.Tag, notification.GroupKey);
 
             if (device.IsConnected)
             {
@@ -168,8 +204,7 @@ public class NotificationService(
                 });
             }
 
-            logger.LogDebug("Removed notification with key: {NotificationKey} from device {DeviceId}",
-                notification.Key, device.Id);
+            logger.LogDebug("Removed notification with key: {NotificationKey} from device {DeviceId}", notification.Key, device.Id);
         }
         catch (Exception ex)
         {
@@ -188,8 +223,7 @@ public class NotificationService(
             ReplyText = replyText
         });
 
-        logger.LogDebug("Sent reply action for notification {NotificationKey} to device {DeviceId}",
-            notificationKey, device.Id);
+        logger.LogDebug("Sent reply action for notification {NotificationKey} to device {DeviceId}", notificationKey, device.Id);
     }
 
     public void ProcessClickAction(PairedDevice device, string notificationKey, int actionIndex)
@@ -200,11 +234,9 @@ public class NotificationService(
         {
             NotificationKey = notificationKey,
             ActionIndex = actionIndex,
-            IsReplyAction = false
         });
 
-        logger.LogDebug("Sent click action for notification {NotificationKey} to device {DeviceId}",
-            notificationKey, device.Id);
+        logger.LogDebug("Sent click action for notification {NotificationKey} to device {DeviceId}", notificationKey, device.Id);
     }
 
     public async void ClearAllNotification()
@@ -212,8 +244,14 @@ public class NotificationService(
         var activeDevice = deviceManager.ActiveDevice!;
         try
         {
-            await ClearHistoryAsync(activeDevice);
-            App.MainWindow.DispatcherQueue.TryEnqueue(() => activeNotifications.Clear());
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
+            {
+                foreach (var notification in Notifications.Where(n => !n.Pinned).ToList())
+                {
+                    await platformNotificationHandler.RemoveNotificationsByTagAndGroup(notification.Tag, notification.GroupKey);
+                }
+                await ClearHistoryAsync(activeDevice);
+            });
 
             if (!activeDevice.IsConnected) return;
 
@@ -226,24 +264,25 @@ public class NotificationService(
         }
     }
 
-    public async Task ClearHistoryAsync(PairedDevice device)
+    private async Task ClearHistoryAsync(PairedDevice device)
     {
         var notificationLock = GetNotificationLock(device.Id);
         await notificationLock.WaitAsync();
         try
         {
-            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+            notificationRepository.ClearHistoryForDevice(device.Id);
+
+            if (device == deviceManager.ActiveDevice)
             {
-                if (!deviceNotifications.TryGetValue(device.Id, out var notifications)) return;
-
-                foreach (var notification in notifications)
+                await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
                 {
-                    platformNotificationHandler.RemoveNotificationsByTagAndGroup(notification.Tag, notification.GroupKey);
-                }
-
-                notifications.Clear();
-                ClearBadge();
-            });
+                    foreach (var n in Notifications.Where(x => !x.Pinned).ToList())
+                    {
+                        Notifications.Remove(n);
+                    }
+                });
+                UpdateBadge();
+            }
         }
         catch (Exception ex)
         {
@@ -255,42 +294,36 @@ public class NotificationService(
         }
     }
 
-    private void SyncActiveNotifications(PairedDevice device)
+    private void SortNotifications()
     {
-        var activeDevice = deviceManager.ActiveDevice;
-        if (activeDevice is null || activeDevice.Id != device.Id) return;
+        var sortedNotifications = Notifications
+            .OrderByDescending(n => n.Pinned)
+            .ThenByDescending(n => n.TimeStamp)
+            .ToList();
 
-        App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+        // Move items to their correct positions
+        for (int targetIndex = 0; targetIndex < sortedNotifications.Count; targetIndex++)
         {
-            activeNotifications.Clear();
-
-            if (deviceNotifications.TryGetValue(activeDevice.Id, out var notifications))
+            var targetNotification = sortedNotifications[targetIndex];
+            var currentIndex = Notifications.IndexOf(targetNotification);
+            if (currentIndex != targetIndex)
             {
-                activeNotifications.AddRange(notifications);
-                UpdateBadge(notifications.Count, activeDevice.DeviceSettings.ShowBadge);
+                Notifications.Move(currentIndex, targetIndex);
             }
-        });
+        }
     }
 
-    private static void SortNotifications(List<Notification> notifications)
+    private void UpdateBadge()
     {
-        notifications.Sort((a, b) =>
+        if (deviceManager.ActiveDevice?.DeviceSettings.ShowBadge is true)
         {
-            var pinnedCompare = b.Pinned.CompareTo(a.Pinned);
-            return pinnedCompare != 0 ? pinnedCompare : b.TimeStamp.CompareTo(a.TimeStamp);
-        });
-    }
+            var badgeXml = BadgeUpdateManager.GetTemplateContent(BadgeTemplateType.BadgeNumber);
+            var badgeElement = (XmlElement)badgeXml.SelectSingleNode("/badge")!;
+            badgeElement.SetAttribute("value", Notifications.Count.ToString());
 
-    private static void UpdateBadge(int count, bool showBadge)
-    {
-        if (!showBadge) return;
-
-        var badgeXml = BadgeUpdateManager.GetTemplateContent(BadgeTemplateType.BadgeNumber);
-        var badgeElement = (XmlElement)badgeXml.SelectSingleNode("/badge")!;
-        badgeElement.SetAttribute("value", count.ToString());
-
-        var badgeUpdater = BadgeUpdateManager.CreateBadgeUpdaterForApplication();
-        badgeUpdater.Update(new BadgeNotification(badgeXml));
+            var badgeUpdater = BadgeUpdateManager.CreateBadgeUpdaterForApplication();
+            badgeUpdater.Update(new BadgeNotification(badgeXml));
+        }
     }
 
     private static void ClearBadge()

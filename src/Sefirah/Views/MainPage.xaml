@@ -666,8 +666,7 @@
                                                                 BorderBrush="Transparent"
                                                                 Command="{Binding ViewModel.HandleNotificationActionCommand, ElementName=PageRoot}"
                                                                 CommandParameter="{x:Bind}"
-                                                                Content="{x:Bind Label}"
-                                                                Visibility="{x:Bind IsReplyAction, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                                                                Content="{x:Bind Label}" />
                                                         </DataTemplate>
                                                     </ItemsRepeater.ItemTemplate>
                                                 </ItemsRepeater>

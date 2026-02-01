@@ -20,13 +20,17 @@ public sealed partial class MainPageViewModel : BaseViewModel
 
     #region Properties
     public ObservableCollection<PairedDevice> PairedDevices => DeviceManager.PairedDevices;
-    public ReadOnlyObservableCollection<Notification> Notifications => NotificationService.NotificationHistory;
     public PairedDevice? Device => DeviceManager.ActiveDevice;
 
     [ObservableProperty]
     public partial bool LoadingScrcpy { get; set; } = false;
 
     public bool IsUpdateAvailable => UpdateService.IsUpdateAvailable;
+
+    /// <summary>
+    /// Active device's notifications
+    /// </summary>
+    public ObservableCollection<Notification> Notifications => NotificationService.Notifications;
     #endregion
 
     #region Commands

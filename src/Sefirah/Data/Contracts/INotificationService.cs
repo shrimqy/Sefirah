@@ -5,16 +5,17 @@ namespace Sefirah.Data.Contracts;
 public interface INotificationService
 {
     /// <summary>
-    /// Gets notifications for the currently active device session
-    /// </summary>
-    ReadOnlyObservableCollection<Notification> NotificationHistory { get; }
-
-    /// <summary>
     /// Initializes the notification service
     /// </summary>  
     Task Initialize();
 
     Task HandleNotificationMessage(PairedDevice device, NotificationMessage notificationMessage);
+
+    /// <summary>
+    /// Single collection for the active device's notifications.
+    /// </summary>
+    ObservableCollection<Notification> Notifications { get; }
+
     void RemoveNotification(PairedDevice device, Notification notification);
     
     /// <summary>
@@ -27,7 +28,6 @@ public interface INotificationService
     /// </summary>
     void ClearAllNotification();
     
-    Task ClearHistoryAsync(PairedDevice device);
     void ProcessReplyAction(PairedDevice device, string notificationKey, string replyResultKey, string replyText);
     void ProcessClickAction(PairedDevice device, string notificationKey, int actionIndex);
 }

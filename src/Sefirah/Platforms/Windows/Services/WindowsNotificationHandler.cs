@@ -2,10 +2,8 @@ using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
-using Sefirah.Extensions;
 using Sefirah.Services;
 using Sefirah.Utils;
-using Uno.Logging;
 using Windows.System;
 using static Sefirah.Constants;
 
@@ -41,31 +39,29 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
                     builder.SetAppLogoOverride(iconUri, AppNotificationImageCrop.Circle);
                 }
             }
+            
+            // add textbox if a reply action exists
+            if (!string.IsNullOrEmpty(message.ReplyResultKey))
+            {
+                builder
+                    .AddTextBox("textBox", "ReplyPlaceholder".GetLocalizedResource(), "")
+                    .AddButton(new AppNotificationButton("SendButton".GetLocalizedResource())
+                        .AddArgument("notificationType", ToastNotificationType.RemoteNotification)
+                        .AddArgument("tag", message.NotificationKey)
+                        .AddArgument("replyResultKey", message.ReplyResultKey)
+                        .AddArgument("action", "Reply")
+                        .AddArgument("deviceId", deviceId).SetInputId("textBox"));
+            }
 
             // Handle actions
             foreach (var action in message.Actions)
             {
-                if (action.IsReplyAction)
-                {
-                    builder
-                        .AddTextBox("textBox", "ReplyPlaceholder".GetLocalizedResource(), "")
-                        .AddButton(new AppNotificationButton("SendButton".GetLocalizedResource())
-                            .AddArgument("notificationType", ToastNotificationType.RemoteNotification)
-                            .AddArgument("tag", message.NotificationKey)
-                            .AddArgument("replyResultKey", message.ReplyResultKey)
-                            .AddArgument("action", "Reply")
-                            .AddArgument("deviceId", deviceId)
-                                .SetInputId("textBox"));
-                }
-                else
-                {
-                    builder.AddButton(new AppNotificationButton(action.Label)
-                        .AddArgument("notificationType", ToastNotificationType.RemoteNotification)
-                        .AddArgument("action", "Click")
-                        .AddArgument("actionIndex", action.ActionIndex.ToString())
-                        .AddArgument("tag", message.NotificationKey)
-                        .AddArgument("deviceId", deviceId));
-                }
+                builder.AddButton(new AppNotificationButton(action.Label)
+                    .AddArgument("notificationType", ToastNotificationType.RemoteNotification)
+                    .AddArgument("action", "Click")
+                    .AddArgument("actionIndex", action.ActionIndex.ToString())
+                    .AddArgument("tag", message.NotificationKey)
+                    .AddArgument("deviceId", deviceId));
             }
 
             var notification = builder.BuildNotification();

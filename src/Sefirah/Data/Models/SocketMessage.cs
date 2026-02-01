@@ -195,8 +195,6 @@ public class NotificationMessage : SocketMessage
 
     public string? AppIcon { get; set; }
 
-    public string? BigPicture { get; set; }
-
     public string? LargeIcon { get; set; }
 }
 
@@ -209,13 +207,11 @@ public class NotificationTextMessage
 
 public class NotificationAction : SocketMessage
 {
-    public required string NotificationKey { get; set; }
+    public string? NotificationKey { get; set; }
 
     public string? Label { get; set; } = string.Empty;
 
-    public required int ActionIndex { get; set; }
-
-    public bool IsReplyAction { get; set; }
+    public int ActionIndex { get; set; }
 }
 
 public class ReplyAction : SocketMessage

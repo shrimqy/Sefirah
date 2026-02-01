@@ -119,6 +119,7 @@ public static class AppLifecycleHelper
                 .AddSingleton<DeviceRepository>()
                 .AddSingleton<RemoteAppRepository>()
                 .AddSingleton<SmsRepository>()
+                .AddSingleton<NotificationRepository>()
 
                 // Platform-specific services
 #if WINDOWS
