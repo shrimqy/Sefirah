@@ -716,4 +716,10 @@ input text %pwd%</value>
   <data name="ClipboardIncludeImages" xml:space="preserve">
     <value>כלול תמונות בסנכרון לוח העתקה</value>
   </data>
+  <data name="ScrcpyLocation" xml:space="preserve">
+    <value>Scrcpy location</value>
+  </data>
+  <data name="AdbLocation" xml:space="preserve">
+    <value>Adb location</value>
+  </data>
 </root>

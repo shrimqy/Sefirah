@@ -1,4 +1,4 @@
-<Page
+﻿<Page
     x:Class="Sefirah.Views.Settings.GeneralPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -59,7 +59,7 @@
             </wuc:SettingsCard>
 
             <!--  Scrcpy location  -->
-            <wuc:SettingsCard Description="{x:Bind ViewModel.ScrcpyPath, Mode=OneWay}" Header="{helpers:ResourceString Name=ScreenMirrorSettings}">
+            <wuc:SettingsCard Description="{x:Bind ViewModel.ScrcpyPath, Mode=OneWay}" Header="{helpers:ResourceString Name=ScrcpyLocation}">
                 <wuc:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xEC15;" />
                 </wuc:SettingsCard.HeaderIcon>
@@ -67,7 +67,7 @@
             </wuc:SettingsCard>
 
             <!--  Adb Settings  -->
-            <wuc:SettingsCard Description="{x:Bind ViewModel.AdbPath, Mode=OneWay}" Header="{helpers:ResourceString Name=AdbSettings}">
+            <wuc:SettingsCard Description="{x:Bind ViewModel.AdbPath, Mode=OneWay}" Header="{helpers:ResourceString Name=AdbLocation}">
                 <wuc:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xEC7A;" />
                 </wuc:SettingsCard.HeaderIcon>
