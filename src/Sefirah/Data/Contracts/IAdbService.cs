@@ -13,7 +13,7 @@ public interface IAdbService
     Task StartAsync();
     Task<bool> ConnectWireless(string host, int port = 5555);
     Task StopAsync();
-    Task UninstallApp(string deviceId, string appPackage);
+    Task<bool> UninstallApp(string deviceId, string appPackage);
     void UnlockDevice(DeviceData deviceData, List<string> unlockCommands);
     bool IsMonitoring { get; }
     AdbClient AdbClient { get; }

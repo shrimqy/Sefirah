@@ -612,14 +612,15 @@ public class AdbService(
         return consoleReceiver.ToString().Trim() == "true";
     }
 
-    public async Task UninstallApp(string deviceId, string appPackage)
+    public async Task<bool> UninstallApp(string deviceId, string appPackage)
     {
         logger.LogInformation("Uninstalling app {appPackage} from {deviceId}", appPackage, deviceId);
 
         var adbDevice = AdbDevices.FirstOrDefault(d => d.AndroidId == deviceId);
-        if (adbDevice?.DeviceData is null) return;
+        if (adbDevice?.DeviceData is null) return false;
         
         await adbClient.UninstallPackageAsync(adbDevice.DeviceData, appPackage);
+        return true;
     }
 
     /// <summary>

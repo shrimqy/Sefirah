@@ -73,7 +73,9 @@ public sealed partial class AppsViewModel : BaseViewModel
     {
         try
         {
-            await AdbService.UninstallApp(DeviceManager.ActiveDevice!.Id, app.PackageName);
+            var result = await AdbService.UninstallApp(DeviceManager.ActiveDevice!.Id, app.PackageName);
+            if (!result) return;
+
             await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
             {
                 Apps.Remove(app);
