@@ -2,6 +2,7 @@ using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Models;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
+using Sefirah.Data.Items;
 using Sefirah.Helpers;
 
 namespace Sefirah.ViewModels.Settings;
@@ -14,6 +15,23 @@ public sealed partial class GeneralViewModel : BaseViewModel
     #endregion
 
     #region Properties
+    // Language
+    public ObservableCollection<AppLanguageItem> SupportedLanguages => AppLanguageHelper.SupportedLanguages;
+
+    private int selectedAppLanguageIndex;
+    public int SelectedAppLanguageIndex
+    {
+        get => selectedAppLanguageIndex;
+        set
+        {
+            if (AppLanguageHelper.TryChange(value))
+            {
+                selectedAppLanguageIndex = value;
+                OnPropertyChanged(nameof(SelectedAppLanguageIndex));
+            }
+        }
+    }
+
     // Theme settings
     public Theme CurrentTheme
     {
@@ -162,7 +180,7 @@ public sealed partial class GeneralViewModel : BaseViewModel
     {
         selectedThemeType = ThemeTypes[CurrentTheme];
         selectedStartupType = StartupTypes[StartupOption];
-
+        selectedAppLanguageIndex = AppLanguageHelper.SupportedLanguages.IndexOf(AppLanguageHelper.PreferredLanguage);
         // Load initial local device name
         LoadLocalDeviceName();
     }

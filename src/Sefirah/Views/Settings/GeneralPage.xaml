@@ -58,6 +58,18 @@
                     SelectedItem="{x:Bind ViewModel.SelectedThemeType, Mode=TwoWay}" />
             </wuc:SettingsCard>
 
+            <!--  Language  -->
+            <wuc:SettingsCard Description="{helpers:ResourceString Name=LanguageDescription}" Header="{helpers:ResourceString Name=Language}">
+                <wuc:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE12B;" />
+                </wuc:SettingsCard.HeaderIcon>
+                <ComboBox
+                    MinWidth="200"
+                    ItemsSource="{x:Bind ViewModel.SupportedLanguages}"
+                    SelectedIndex="{x:Bind ViewModel.SelectedAppLanguageIndex, Mode=TwoWay}"
+                    DisplayMemberPath="Name" />
+            </wuc:SettingsCard>
+
             <!--  Scrcpy location  -->
             <wuc:SettingsCard Description="{x:Bind ViewModel.ScrcpyPath, Mode=OneWay}" Header="{helpers:ResourceString Name=ScrcpyLocation}">
                 <wuc:SettingsCard.HeaderIcon>

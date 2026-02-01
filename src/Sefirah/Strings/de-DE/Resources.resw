@@ -716,6 +716,15 @@ input text %pwd%</value>
   <data name="ClipboardIncludeImages" xml:space="preserve">
     <value>Bilder im Zwischenablagen-Anzeige einbeziehen</value>
   </data>
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="LanguageDescription" xml:space="preserve">
+    <value>Choose your preferred display language</value>
+  </data>
+  <data name="UseSystemSetting" xml:space="preserve">
+    <value>Use system setting</value>
+  </data>
   <data name="ScrcpyLocation" xml:space="preserve">
     <value>Scrcpy location</value>
   </data>
