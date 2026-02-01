@@ -86,7 +86,7 @@
             </Grid.ColumnDefinitions>
 
             <!--  Left Panel: Device Info and Notifications  -->
-            <Grid Grid.Column="0" Margin="18,0" Padding="0,0,4,0" RowSpacing="12">
+            <Grid Grid.Column="0" Margin="18,0" Padding="0" RowSpacing="8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -110,7 +110,7 @@
                         Width="54"
                         Height="100"
                         VerticalAlignment="Center"
-                        CornerRadius="7"
+                        CornerRadius="8"
                         PointerEntered="PhoneFrame_PointerEntered"
                         PointerExited="PhoneFrame_PointerExited"
                         PointerWheelChanged="PhoneFrame_PointerWheelChanged">
@@ -177,22 +177,21 @@
                     <StackPanel
                         Grid.Column="1"
                         VerticalAlignment="Bottom"
-                        Spacing="5">
+                        Spacing="4">
 
                         <TextBlock
-                            FontSize="14"
                             FontWeight="SemiBold"
                             Text="{x:Bind ViewModel.Device.Name, Mode=OneWay}"
                             Visibility="{x:Bind ViewModel.Device.Name, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}" />
 
                         <StackPanel
                             Orientation="Horizontal"
-                            Spacing="5"
+                            Spacing="4"
                             Visibility="{x:Bind ViewModel.Device.IsConnected, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
                             <!--  Audio Mode Button  -->
                             <Button
                                 Grid.Column="2"
-                                Padding="5"
+                                Padding="4"
                                 Background="Transparent"
                                 BorderThickness="0">
                                 <FontIcon Glyph="{x:Bind ViewModel.Device.RingerMode, Converter={StaticResource RingerModeToIconConverter}, Mode=OneWay}" />
@@ -286,19 +285,20 @@
                 <Grid
                     Grid.Row="1"
                     ColumnSpacing="8"
-                    Visibility="{x:Bind ViewModel.Device.IsConnected, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
+                    Visibility="{x:Bind ViewModel.Device, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    
+
                     <!--  DND Toggle  -->
                     <Button
                         Grid.Column="0"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"
                         Padding="8,4"
+                        IsEnabled="{x:Bind ViewModel.Device.IsConnected, Mode=OneWay}"
                         Style="{x:Bind ViewModel.Device.DndEnabled, Converter={StaticResource BoolToDndButtonStyleConverter}, Mode=OneWay}"
                         Command="{x:Bind ViewModel.ToggleDndCommand}">
                         <FontIcon Glyph="&#xECE4;" />
@@ -309,6 +309,7 @@
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"
                         Padding="8,4"
+                        IsEnabled="{x:Bind ViewModel.Device.IsConnected, Mode=OneWay}"
                         Click="SendFilesButton_Click">
                         <FontIcon Glyph="&#xE72D;" />
                     </Button>
@@ -478,7 +479,7 @@
                                                 Text="{x:Bind Position, Converter={StaticResource MillisecondsToTimeConverter}, Mode=OneWay}" />
                                             <Slider
                                                 Grid.Column="1"
-                                                Minimum="0"
+                                                Minimum="{x:Bind MinSeekTime, Mode=OneWay}"
                                                 Maximum="{x:Bind MaxSeekTime, Mode=OneWay}"
                                                 Value="{x:Bind Position, Mode=TwoWay}"
                                                 IsThumbToolTipEnabled="False"
@@ -500,14 +501,12 @@
                 </StackPanel>
 
                 <!--  Notifications  -->
-                <Grid
-                    Grid.Row="3"
-                    Margin="0,0,-20,0"
-                    Visibility="{x:Bind ViewModel.Device, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}">
+                <Grid Grid.Row="3" Visibility="{x:Bind ViewModel.Device, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
+
                     <Grid Grid.Row="0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -524,45 +523,40 @@
                         <!--  Clear All Button  -->
                         <Button
                             Grid.Column="1"
-                            Margin="0,0,20,0"
-                            Padding="10,5"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
                             Background="Transparent"
                             BorderBrush="Transparent"
                             Command="{x:Bind ViewModel.ClearAllNotificationsCommand}"
-                            Content="{helpers:ResourceString Name=NotificationsClearButton}"
-                            FontSize="14" />
+                            Content="{helpers:ResourceString Name=NotificationsClearButton}" />
                     </Grid>
                     <ScrollViewer
                         Grid.Row="1"
-                        Margin="0,10,0,0"
-                        Padding="0,0,20,0"
+                        Margin="0,8,-18,8"
+                        Padding="0,0,18,0"
                         HorizontalScrollBarVisibility="Disabled"
                         HorizontalScrollMode="Disabled"
                         VerticalScrollBarVisibility="Auto"
                         VerticalScrollMode="Enabled">
-                        <ItemsRepeater ItemsSource="{x:Bind ViewModel.Notifications, Mode=OneWay}">
+                        <ItemsRepeater ItemsSource="{x:Bind ViewModel.Notifications, Mode=OneWay}" VerticalCacheLength="4">
                             <ItemsRepeater.Layout>
-                                <StackLayout Orientation="Vertical" Spacing="7" />
+                                <StackLayout Orientation="Vertical" Spacing="8" />
                             </ItemsRepeater.Layout>
                             <ItemsRepeater.ItemTemplate>
                                 <DataTemplate x:DataType="models:Notification">
                                     <Border
-                                        Padding="10"
+                                        Padding="8"
                                         Background="{ThemeResource CardBackgroundFillColorDefault}"
                                         BorderBrush="{ThemeResource CardStrokeColorDefault}"
                                         BorderThickness="1"
                                         CornerRadius="8"
                                         PointerEntered="OnPointerEntered"
                                         PointerExited="OnPointerExited">
-                                        <Grid RowSpacing="10">
+                                        <Grid RowSpacing="12" ColumnSpacing="12">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
                                             <Grid.RowDefinitions>
-                                                <RowDefinition Height="*" MaxHeight="500" />
+                                                <RowDefinition Height="*" />
                                                 <RowDefinition Height="Auto" />
                                             </Grid.RowDefinitions>
                                             <Image
@@ -570,13 +564,9 @@
                                                 Grid.Column="0"
                                                 Width="48"
                                                 Height="48"
-                                                Margin="0,5,10,0"
                                                 VerticalAlignment="Top"
                                                 Source="{x:Bind Icon, Mode=OneWay}" />
-                                            <StackPanel
-                                                Grid.Row="0"
-                                                Grid.Column="1"
-                                                Spacing="5">
+                                            <StackPanel Grid.Row="0" Grid.Column="1" Spacing="4">
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="Auto" />
@@ -584,14 +574,14 @@
                                                     </Grid.ColumnDefinitions>
                                                     <TextBlock
                                                         Grid.Column="0"
-                                                        FontSize="13"
+                                                        Foreground="{ThemeResource TextFillColorSecondary}"
                                                         FontWeight="Medium"
                                                         Text="{x:Bind AppName}" />
                                                     <StackPanel
                                                         Grid.Column="1"
                                                         HorizontalAlignment="Right"
                                                         Orientation="Horizontal"
-                                                        Spacing="5">
+                                                        Spacing="8">
                                                         <Button
                                                             x:Name="MoreButton"
                                                             Width="20"
@@ -656,8 +646,7 @@
                                                         <TextBlock
                                                             x:Name="TimeStampTextBlock"
                                                             Grid.Column="1"
-                                                            Margin="0,0,0,0"
-                                                            Foreground="Gray"
+                                                            Foreground="{ThemeResource TextFillColorTertiary}"
                                                             HorizontalTextAlignment="End"
                                                             Text="{x:Bind TimeStamp, Converter={StaticResource DateTimeConverter}}"
                                                             Visibility="Visible" />
@@ -670,14 +659,16 @@
                                                     FontWeight="SemiBold"
                                                     Text="{x:Bind Title}"
                                                     TextWrapping="Wrap" />
+
                                                 <!--  Display Text if GroupedMessages is empty  -->
                                                 <TextBlock
                                                     x:Name="FallbackTextBlock"
                                                     x:Load="{x:Bind HasGroupedMessages, Converter={StaticResource BoolNegationConverter}}"
-                                                    Foreground="Gray"
+                                                    Foreground="{ThemeResource TextFillColorTertiary}"
                                                     IsTextSelectionEnabled="True"
                                                     Text="{x:Bind Text}"
                                                     TextWrapping="Wrap" />
+
                                                 <!--  Display GroupedMessages if not empty  -->
                                                 <ItemsRepeater
                                                     x:Name="GroupedMessagesRepeater"
@@ -685,7 +676,7 @@
                                                     x:Load="{x:Bind HasGroupedMessages}"
                                                     ItemsSource="{x:Bind GroupedMessages}">
                                                     <ItemsRepeater.Layout>
-                                                        <StackLayout Orientation="Vertical" Spacing="5" />
+                                                        <StackLayout Orientation="Vertical" Spacing="8" />
                                                     </ItemsRepeater.Layout>
                                                     <ItemsRepeater.ItemTemplate>
                                                         <DataTemplate x:DataType="models:NotificationGroup">
@@ -698,7 +689,7 @@
                                                                     <ItemsRepeater.ItemTemplate>
                                                                         <DataTemplate x:DataType="x:String">
                                                                             <TextBlock
-                                                                                Foreground="Gray"
+                                                                                Foreground="{ThemeResource TextFillColorTertiary}"
                                                                                 IsTextSelectionEnabled="True"
                                                                                 Text="{x:Bind}"
                                                                                 TextWrapping="Wrap" />
@@ -715,13 +706,12 @@
                                                 Grid.Row="1"
                                                 Grid.Column="0"
                                                 Grid.ColumnSpan="2"
-                                                HorizontalAlignment="Stretch"
-                                                Spacing="7">
+                                                Spacing="8">
 
-                                                <!--  Reply Actions Container  -->
+                                                <!--  Notification Reply Action  -->
                                                 <Grid
                                                     x:Name="ReplyActionGrid"
-                                                    ColumnSpacing="5"
+                                                    ColumnSpacing="4"
                                                     Visibility="{x:Bind ReplyResultKey, Converter={StaticResource EmptyObjectToVisibilityConverter}}">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*" />
@@ -731,8 +721,6 @@
                                                     <TextBox
                                                         x:Name="ReplyTextBox"
                                                         Grid.Column="0"
-                                                        HorizontalAlignment="Stretch"
-                                                        VerticalAlignment="Center"
                                                         KeyDown="ReplyTextBox_KeyDown"
                                                         PlaceholderText="{helpers:ResourceString Name=Reply}"
                                                         Tag="{x:Bind}" />
@@ -740,10 +728,6 @@
                                                     <Button
                                                         x:Name="SendButton"
                                                         Grid.Column="1"
-                                                        Width="32"
-                                                        Height="32"
-                                                        Padding="0"
-                                                        VerticalAlignment="Center"
                                                         Background="Transparent"
                                                         BorderBrush="Transparent"
                                                         Click="SendButton_Click"
@@ -752,25 +736,16 @@
                                                     </Button>
                                                 </Grid>
 
-                                                <!--  Non-Reply Actions Container  -->
-                                                <ItemsRepeater
-                                                    x:Name="NonReplyActions"
-                                                    HorizontalAlignment="Stretch"
-                                                    ItemsSource="{x:Bind Actions}">
-
-                                                    <!--  Layout for horizontal alignment  -->
+                                                <!-- Notification Actions -->
+                                                <ItemsRepeater ItemsSource="{x:Bind Actions}">
                                                     <ItemsRepeater.Layout>
-                                                        <StackLayout Orientation="Horizontal" />
+                                                        <StackLayout Orientation="Horizontal" Spacing="4" />
                                                     </ItemsRepeater.Layout>
 
                                                     <ItemsRepeater.ItemTemplate>
                                                         <DataTemplate x:DataType="models:NotificationAction">
                                                             <Button
                                                                 x:Name="ActionButton"
-                                                                Margin="0,0,5,0"
-                                                                Padding="5"
-                                                                HorizontalAlignment="Stretch"
-                                                                HorizontalContentAlignment="Stretch"
                                                                 Background="Transparent"
                                                                 BorderBrush="Transparent"
                                                                 Command="{Binding ViewModel.HandleNotificationActionCommand, ElementName=PageRoot}"

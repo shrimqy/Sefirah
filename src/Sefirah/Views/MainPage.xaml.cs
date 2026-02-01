@@ -76,6 +76,10 @@ public sealed partial class MainPage : Page
             closeButton.IsHitTestVisible = true;
             moreButton.Opacity = 1;
             moreButton.IsHitTestVisible = true;
+
+            // Hover shadow / elevation
+            border.Shadow = new ThemeShadow();
+            border.Translation = new System.Numerics.Vector3(0, 0, 12);
         }
     }
 
@@ -103,6 +107,10 @@ public sealed partial class MainPage : Page
             closeButton.IsHitTestVisible = false;
             moreButton.Opacity = 0;
             moreButton.IsHitTestVisible = false;
+
+            // Remove hover shadow / elevation
+            border.Shadow = null;
+            border.Translation = new System.Numerics.Vector3(0, 0, 0);
         }
     }
 
