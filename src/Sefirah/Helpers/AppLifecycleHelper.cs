@@ -137,6 +137,7 @@ public static class AppLifecycleHelper
 
                 .AddSingleton<INotificationService, NotificationService>()
                 .AddSingleton<IClipboardService, ClipboardService>()
+                .AddSingleton<IRemoteMediaHandler, RemoteMediaHandler>()
                 .AddSingleton<SmsHandlerService>()
 
                 .AddSingleton<IMessageHandler, MessageHandler>()

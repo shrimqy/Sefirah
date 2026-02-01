@@ -102,6 +102,8 @@ public partial class PairedDevice : BaseRemoteDevice
 
     public ObservableCollection<AdbDevice> ConnectedAdbDevices { get; set; } = [];
 
+    public ObservableCollection<MediaSession> RemotePlaybackSessions { get; } = [];
+
     private readonly IAdbService adbService = Ioc.Default.GetRequiredService<IAdbService>();
     private readonly IUserSettingsService userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
 

@@ -220,9 +220,14 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     bool IsVirtualDisplayEnabled { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether to sync media playback sessions.
+    /// Gets or sets a value indicating whether to receive media playback sessions from the device.
     /// </summary>
-    bool MediaSession { get; set; }
+    bool MediaSessionReceive { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to send media playback sessions to the device.
+    /// </summary>
+    bool MediaSessionSend { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to sync audio device information and controls.

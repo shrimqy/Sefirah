@@ -1,5 +1,4 @@
 using CommunityToolkit.WinUI;
-using Sefirah.Data.AppDatabase.Models;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
@@ -14,6 +13,7 @@ public class MessageHandler(
     SmsHandlerService smsHandlerService,
     IFileTransferService fileTransferService,
     IPlaybackService playbackService,
+    IRemoteMediaHandler remotePlaybackService,
     IActionService actionService,
     ISftpService sftpService,
     ISessionManager sessionManager,
@@ -35,6 +35,13 @@ public class MessageHandler(
 
                 case PlaybackAction action:
                     await playbackService.HandleMediaActionAsync(action);
+                    break;
+
+                case PlaybackSession playbackSession:
+                    if (device.DeviceSettings.MediaSessionReceive)
+                    {
+                        await remotePlaybackService.HandleRemotePlaybackSessionAsync(device, playbackSession);
+                    }
                     break;
 
                 case BatteryStatus batteryStatus:

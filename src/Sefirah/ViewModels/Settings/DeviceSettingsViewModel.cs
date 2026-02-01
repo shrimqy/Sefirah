@@ -539,14 +539,31 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     #region Media Session Settings
 
-    public bool MediaSession
+    public bool MediaSessionReceive
     {
-        get => DeviceSettings.MediaSession;
+        get => DeviceSettings.MediaSessionReceive;
         set
         {
-            if (DeviceSettings.MediaSession != value)
+            if (DeviceSettings.MediaSessionReceive != value)
             {
-                DeviceSettings.MediaSession = value;
+                DeviceSettings.MediaSessionReceive = value;
+                if (!value)
+                {
+                    Device.RemotePlaybackSessions.Clear();
+                }
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool MediaSessionSend
+    {
+        get => DeviceSettings.MediaSessionSend;
+        set
+        {
+            if (DeviceSettings.MediaSessionSend != value)
+            {
+                DeviceSettings.MediaSessionSend = value;
                 OnPropertyChanged();
             }
         }

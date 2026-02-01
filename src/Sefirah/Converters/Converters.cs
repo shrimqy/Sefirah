@@ -184,6 +184,24 @@ internal sealed partial class CountToVisibilityConverter : IValueConverter
     }
 }
 
+internal sealed partial class CountToBooleanConverter : IValueConverter
+{
+    public bool Inverse { get; set; }
+
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        int count = value is int intCount ? intCount : 0;
+        bool isEmpty = count == 0;
+
+        return Inverse ? !isEmpty : isEmpty;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}
+
 internal sealed partial class DateTimeConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
@@ -484,6 +502,28 @@ internal sealed partial class SubscriptionToIconConverter : IValueConverter
             };
         }
         return "\uE884";
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+internal sealed partial class MillisecondsToTimeConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (value is double milliseconds && milliseconds >= 0)
+        {
+            var timeSpan = TimeSpan.FromMilliseconds(milliseconds);
+            if (timeSpan.TotalHours >= 1)
+            {
+                return $"{(int)timeSpan.TotalHours}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
+            }
+            return $"{timeSpan.Minutes}:{timeSpan.Seconds:D2}";
+        }
+        return "0:00";
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)

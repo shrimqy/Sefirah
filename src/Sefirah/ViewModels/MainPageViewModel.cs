@@ -198,6 +198,19 @@ public sealed partial class MainPageViewModel : BaseViewModel
         Device!.SendMessage(message);
     }
 
+    public void HandlePlaybackAction(MediaSession session, PlaybackActionType actionType, double? value = null)
+    {
+        if (Device is null || string.IsNullOrEmpty(session.Source)) return;
+
+        var playbackAction = new PlaybackAction
+        {
+            PlaybackActionType = actionType,
+            Source = session.Source,
+            Value = value
+        };
+        Device.SendMessage(playbackAction);
+    }
+
     #endregion
 
     public MainPageViewModel()

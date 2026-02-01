@@ -29,14 +29,19 @@
         <wctconverters:BoolToObjectConverter x:Key="BoolToDndButtonStyleConverter"
             FalseValue="{StaticResource DefaultButtonStyle}"
             TrueValue="{StaticResource AccentButtonStyle}" />
-        
+
+        <converters:CountToBooleanConverter x:Key="CountToBooleanConverter" />
+        <converters:CountToBooleanConverter x:Key="InverseCountToBooleanConverter" Inverse="True" />
+
         <wctconverters:EmptyObjectToObjectConverter x:Key="EmptyObjectToOpacityConverter" EmptyValue="1.0" NotEmptyValue="0.0" />
         <wctconverters:BoolToObjectConverter x:Key="BoolToPinGlyphConverter" FalseValue="&#xE718;" TrueValue="&#xE77A;" />
+        <wctconverters:BoolToObjectConverter x:Key="BoolToPlayPauseGlyphConverter" FalseValue="&#xE768;" TrueValue="&#xE769;" />
         <wctconverters:BoolNegationConverter x:Key="BoolNegationConverter" />
 
         <converters:DateTimeConverter x:Key="DateTimeConverter" />
         <converters:RingerModeToIconConverter x:Key="RingerModeToIconConverter" />
         <converters:BatteryStatusToIconConverter x:Key="BatteryStatusToIconConverter" />
+        <converters:MillisecondsToTimeConverter x:Key="MillisecondsToTimeConverter" />
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" Inverse="True" />
         <converters:EmptyObjectToVisibilityConverter x:Key="EmptyObjectToVisibilityConverter" />
@@ -308,7 +313,7 @@
                         <FontIcon Glyph="&#xE72D;" />
                     </Button>
 
-                    <!--  Device Settings Button  -->
+                    <!--  Device Settings  -->
                     <Button
                         Grid.Column="2"
                         HorizontalAlignment="Stretch"
@@ -319,76 +324,180 @@
                     </Button>
                 </Grid>
 
-                <!--  No Device Connected View  -->
-                <Grid
-                    Grid.Row="0"
-                    Grid.RowSpan="3"
-                    Margin="18,20,10,10"
-                    Visibility="{x:Bind ViewModel.Device, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}, Mode=OneWay}">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
+                <StackPanel
+                    Grid.Row="2"
+                    Background="Transparent"
+                    Visibility="{x:Bind ViewModel.Device, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}">
 
-                    <!--  Device List Section  -->
-                    <Grid Grid.Row="2">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
+                    <Rectangle Height="1" Fill="{ThemeResource ControlStrokeColorDefaultBrush}" />
 
-                        <TextBlock
-                            Grid.Row="0"
-                            Margin="0,0,0,12"
-                            FontSize="18"
-                            FontWeight="SemiBold"
-                            Text="{helpers:ResourceString Name=AvailableDevices/Title}" />
+                    <!-- Media sessions -->
+                    <StackPanel x:Name="MediaSession" Visibility="{x:Bind ViewModel.Device.DeviceSettings.MediaSessionReceive, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <FlipView
+                            Margin="0,8,0,0"
+                            x:Name="MediaSessionFlipView"
+                            x:Load="{x:Bind ViewModel.Device.RemotePlaybackSessions.Count, Converter={StaticResource InverseCountToBooleanConverter}, Mode=OneWay}"
+                            Background="Transparent"
+                            MaxHeight="150"
+                            ItemsSource="{x:Bind ViewModel.Device.RemotePlaybackSessions, Mode=OneWay}">
+                        <FlipView.ItemTemplate>
+                            <DataTemplate x:DataType="models:MediaSession">
+                                <Border
+                                    Background="{ThemeResource CardBackgroundFillColorDefault}"
+                                    BorderBrush="{ThemeResource CardStrokeColorDefault}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="12">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid Grid.Row="0" ColumnSpacing="12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <!--  Thumbnail  -->
+                                            <Border
+                                                Grid.Column="0"
+                                                Width="94"
+                                                Height="94"
+                                                Background="Transparent"
+                                                Visibility="{x:Bind Thumbnail, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}"
+                                                CornerRadius="4">
+                                                <Image Source="{x:Bind Thumbnail, Mode=OneWay}" Stretch="UniformToFill" />
+                                            </Border>
 
-                        <!--  Available Devices  -->
-                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                            <ItemsRepeater ItemsSource="{x:Bind DevicesViewModel.DiscoveredDevices, Mode=OneWay}">
-                                <ItemsRepeater.Layout>
-                                    <StackLayout Orientation="Vertical" Spacing="8" />
-                                </ItemsRepeater.Layout>
-                                <ItemsRepeater.ItemTemplate>
-                                    <DataTemplate x:DataType="models:DiscoveredDevice">
-                                        <Button
-                                            Margin="0,0,0,4"
-                                            Padding="12"
-                                            HorizontalAlignment="Stretch"
-                                            HorizontalContentAlignment="Left"
-                                            Click="DiscoveredDeviceButton_Click"
-                                            Tag="{x:Bind}">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="*" />
-                                                </Grid.ColumnDefinitions>
-                                                <FontIcon
-                                                    Grid.Column="0"
-                                                    Margin="0,0,12,0"
-                                                    VerticalAlignment="Center"
-                                                    Glyph="&#xE8EA;" />
-                                                <StackPanel Grid.Column="1" Spacing="4">
-                                                    <TextBlock FontWeight="SemiBold" Text="{x:Bind Name}" />
-                                                    <TextBlock
-                                                        FontSize="12"
-                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                        Text="{x:Bind VerificationKey}" />
+                                            <!--  Media Info  -->
+                                            <StackPanel Grid.Column="1" Spacing="6" VerticalAlignment="Center">
+                                                <TextBlock
+                                                    FontSize="12"
+                                                    FontWeight="SemiBold"
+                                                    Text="{x:Bind AppName, Mode=OneWay}"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    TextTrimming="CharacterEllipsis"
+                                                    Visibility="{x:Bind AppName, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}" />
+                                                <TextBlock
+                                                    FontSize="14"
+                                                    FontWeight="Medium"
+                                                    Text="{x:Bind TrackTitle, Mode=OneWay}"
+                                                    TextTrimming="CharacterEllipsis"
+                                                    TextWrapping="NoWrap"
+                                                    Visibility="{x:Bind TrackTitle, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}" />
+                                                <TextBlock
+                                                    FontSize="12"
+                                                    Text="{x:Bind Artist, Mode=OneWay}"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    TextTrimming="CharacterEllipsis"
+                                                    TextWrapping="NoWrap"
+                                                    Visibility="{x:Bind Artist, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}" />
+
+                                                <!--  Playback Controls  -->
+                                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                                    <Button
+                                                        Background="Transparent"
+                                                        BorderBrush="Transparent"
+                                                        Click="PreviousButton_Click"
+                                                        Visibility="{x:Bind CanGoPrevious, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
+                                                            <FontIcon FontSize="14" Glyph="&#xE892;" />
+                                                    </Button>
+                                                    <Button
+                                                        Background="Transparent"
+                                                        BorderBrush="Transparent"
+                                                        Click="PlayPauseButton_Click">
+                                                        <FontIcon FontSize="14"  Glyph="{x:Bind IsPlaying, Converter={StaticResource BoolToPlayPauseGlyphConverter}, Mode=OneWay}" />
+                                                    </Button>
+                                                    <Button
+                                                        Background="Transparent"
+                                                        BorderBrush="Transparent"
+                                                        Click="NextButton_Click"
+                                                        Visibility="{x:Bind CanGoNext, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
+                                                        <FontIcon FontSize="14" Glyph="&#xE893;" />
+                                                    </Button>
+                                                    <Button
+                                                        Background="Transparent"
+                                                        BorderBrush="Transparent"
+                                                        Click="VolumeButton_Click"
+                                                        Tag="{x:Bind}">
+                                                        <FontIcon FontSize="14" Glyph="&#xE767;" />
+                                                    </Button>
                                                 </StackPanel>
-                                            </Grid>
-                                        </Button>
-                                    </DataTemplate>
-                                </ItemsRepeater.ItemTemplate>
-                            </ItemsRepeater>
-                        </ScrollViewer>
-                    </Grid>
-                </Grid>
+                                            </StackPanel>
+                                        </Grid>
 
-                <!--  Separator  -->
-                <Rectangle Grid.Row="2" Height="1" Fill="{ThemeResource SystemControlForegroundBaseMediumLowBrush}" Visibility="{x:Bind ViewModel.Device, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}" />
+                                        <!--  Volume Slider  -->
+                                        <Grid
+                                            Grid.Row="1"
+                                            Visibility="{x:Bind IsVolumeSliderVisible, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+                                            ColumnSpacing="8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="24" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="24" />
+                                            </Grid.ColumnDefinitions>
+                                            <FontIcon
+                                                Grid.Column="0"
+                                                Glyph="&#xE767;"
+                                                FontSize="14"
+                                                VerticalAlignment="Center"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            <Slider
+                                                Grid.Column="1"
+                                                Minimum="0"
+                                                Maximum="100"
+                                                IsThumbToolTipEnabled="False"
+                                                Value="{x:Bind Volume, Mode=TwoWay}"
+                                                PointerCaptureLost="MediaVolumeSlider_PointerCaptureLost"
+                                                Tag="{x:Bind}" />
+                                            <TextBlock
+                                                Grid.Column="2"
+                                                FontSize="12"
+                                                VerticalAlignment="Center"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Text="{x:Bind VolumePercentText, Mode=OneWay}" />
+                                        </Grid>
+
+                                        <!--  Position Slider  -->
+                                        <Grid
+                                            Grid.Row="2"
+                                            Visibility="{x:Bind CanSeek, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+                                            ColumnSpacing="8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="24" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="24" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock
+                                                Grid.Column="0"
+                                                FontSize="12"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Left"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Text="{x:Bind Position, Converter={StaticResource MillisecondsToTimeConverter}, Mode=OneWay}" />
+                                            <Slider
+                                                Grid.Column="1"
+                                                Minimum="0"
+                                                Maximum="{x:Bind MaxSeekTime, Mode=OneWay}"
+                                                Value="{x:Bind Position, Mode=TwoWay}"
+                                                IsThumbToolTipEnabled="False"
+                                                PointerCaptureLost="MediaPositionSlider_PointerCaptureLost"
+                                                Tag="{x:Bind}" />
+                                            <TextBlock
+                                                Grid.Column="2"
+                                                VerticalAlignment="Center"
+                                                FontSize="12"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Text="{x:Bind MaxSeekTime, Converter={StaticResource MillisecondsToTimeConverter}, Mode=OneWay}" />
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </FlipView.ItemTemplate>
+                    </FlipView>
+                    </StackPanel>
+                </StackPanel>
 
                 <!--  Notifications  -->
                 <Grid
@@ -678,6 +787,74 @@
                         </ItemsRepeater>
                     </ScrollViewer>
                 </Grid>
+
+                <!--  No Device Connected View  -->
+                <Grid
+                    Grid.Row="0"
+                    Margin="0,20,0,0"
+                    Visibility="{x:Bind ViewModel.Device, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}, Mode=OneWay}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!--  Device List Section  -->
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock
+                            Grid.Row="0"
+                            Margin="0,0,0,12"
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Text="{helpers:ResourceString Name=AvailableDevices/Title}" />
+
+                        <!--  Available Devices  -->
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsRepeater ItemsSource="{x:Bind DevicesViewModel.DiscoveredDevices, Mode=OneWay}">
+                                <ItemsRepeater.Layout>
+                                    <StackLayout Orientation="Vertical" Spacing="8" />
+                                </ItemsRepeater.Layout>
+                                <ItemsRepeater.ItemTemplate>
+                                    <DataTemplate x:DataType="models:DiscoveredDevice">
+                                        <Button
+                                            Margin="0,0,0,4"
+                                            Padding="12"
+                                            HorizontalAlignment="Stretch"
+                                            HorizontalContentAlignment="Left"
+                                            Click="DiscoveredDeviceButton_Click"
+                                            Tag="{x:Bind}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <FontIcon
+                                                    Grid.Column="0"
+                                                    Margin="0,0,12,0"
+                                                    VerticalAlignment="Center"
+                                                    Glyph="&#xE8EA;" />
+                                                <StackPanel Grid.Column="1" Spacing="4">
+                                                    <TextBlock FontWeight="SemiBold" Text="{x:Bind Name}" />
+                                                    <TextBlock
+                                                        FontSize="12"
+                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        Text="{x:Bind VerificationKey}" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsRepeater.ItemTemplate>
+                            </ItemsRepeater>
+                        </ScrollViewer>
+                    </Grid>
+                </Grid>
+
             </Grid>
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>

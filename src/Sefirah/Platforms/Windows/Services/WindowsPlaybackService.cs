@@ -50,7 +50,7 @@ public class WindowsPlaybackService(
             {
                 if (device.IsConnected)
                 {
-                    if (device.DeviceSettings.MediaSession)
+                    if (device.DeviceSettings.MediaSessionSend)
                     {
                         foreach (var session in activeSessions.Values)
                         {
@@ -368,7 +368,7 @@ public class WindowsPlaybackService(
         {
             foreach (var device in deviceManager.PairedDevices)
             {
-                if (device.IsConnected && device.DeviceSettings.MediaSession)
+                if (device.IsConnected && device.DeviceSettings.MediaSessionSend)
                 {
                     device.SendMessage(playbackSession);
                 }
@@ -378,11 +378,6 @@ public class WindowsPlaybackService(
         {
             logger.LogError(ex, "Error sending playback data");
         }
-    }
-
-    public Task HandleRemotePlaybackMessageAsync(PlaybackSession data)
-    {
-        throw new NotImplementedException();
     }
 
     public void GetAllAudioDevices()

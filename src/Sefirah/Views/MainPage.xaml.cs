@@ -2,6 +2,7 @@ using CommunityToolkit.WinUI.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Sefirah.Data.Contracts;
+using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Utils;
 using Sefirah.ViewModels;
@@ -10,6 +11,7 @@ using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
 
 namespace Sefirah.Views;
+
 public sealed partial class MainPage : Page
 {
     public MainPageViewModel ViewModel { get; }
@@ -267,4 +269,52 @@ public sealed partial class MainPage : Page
         }
     }
 
+    private void PreviousButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.DataContext is MediaSession session)
+        {
+            ViewModel.HandlePlaybackAction(session, PlaybackActionType.Previous);
+        }
+    }
+
+    private void PlayPauseButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.DataContext is MediaSession session)
+        {
+            var actionType = session.IsPlaying ? PlaybackActionType.Pause : PlaybackActionType.Play;
+            ViewModel.HandlePlaybackAction(session, actionType);
+        }
+    }
+
+    private void NextButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.DataContext is MediaSession session)
+        {
+            ViewModel.HandlePlaybackAction(session, PlaybackActionType.Next);
+        }
+    }
+
+    private void MediaPositionSlider_PointerCaptureLost(object sender, PointerRoutedEventArgs e)
+    {
+        if (sender is Slider slider && slider.DataContext is MediaSession session && session.CanSeek == true)
+        {
+            ViewModel.HandlePlaybackAction(session, PlaybackActionType.Seek, slider.Value);
+        }
+    }
+
+    private void VolumeButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is MediaSession session)
+        {
+            session.IsVolumeSliderVisible = !session.IsVolumeSliderVisible;
+        }
+    }
+
+    private void MediaVolumeSlider_PointerCaptureLost(object sender, PointerRoutedEventArgs e)
+    {
+        if (sender is Slider slider && slider.Tag is MediaSession session)
+        {
+            ViewModel.HandlePlaybackAction(session, PlaybackActionType.VolumeUpdate, slider.Value);
+        }
+    }
 }

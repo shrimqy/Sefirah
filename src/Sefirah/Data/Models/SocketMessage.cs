@@ -185,6 +185,7 @@ public class NotificationMessage : SocketMessage
     public string? Text { get; set; }
 
     public List<NotificationTextMessage> Messages { get; set; } = [];
+
     public string? GroupKey { get; set; }
 
     public string? Tag { get; set; }
@@ -270,7 +271,7 @@ public class PlaybackSession : SocketMessage
 {
     public SessionType SessionType { get; set; }
 
-    public string? Source { get; set; }
+    public required string Source { get; set; }
 
     public string? TrackTitle { get; set; }
 
@@ -291,6 +292,20 @@ public class PlaybackSession : SocketMessage
     public double? MinSeekTime { get; set; }
 
     public string? Thumbnail { get; set; }
+
+    public string? AppName { get; set; }
+
+    public int Volume { get; set; }
+
+    public bool? CanPlay { get; set; }
+
+    public bool? CanPause { get; set; }
+
+    public bool? CanGoNext { get; set; }
+
+    public bool? CanGoPrevious { get; set; }
+
+    public bool? CanSeek { get; set; }
 }
 
 public class PlaybackAction : SocketMessage

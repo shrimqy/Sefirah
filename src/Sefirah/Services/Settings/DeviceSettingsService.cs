@@ -258,7 +258,13 @@ internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSh
         set => Set(value);
     }
 
-    public bool MediaSession
+    public bool MediaSessionReceive
+    {
+        get => Get(true);
+        set => Set(value);
+    }
+
+    public bool MediaSessionSend
     {
         get => Get(true);
         set => Set(value);

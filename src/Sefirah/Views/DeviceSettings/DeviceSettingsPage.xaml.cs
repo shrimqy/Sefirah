@@ -52,6 +52,7 @@ public sealed partial class DeviceSettingsPage : Page
     }
 
     private bool isUpdatingSelection = false;
+    private bool isUpdatingMediaSessionSelection = false;
 
     private void ClipboardSyncSegmented_Loaded(object sender, RoutedEventArgs e)
     {
@@ -84,5 +85,40 @@ public sealed partial class DeviceSettingsPage : Page
             segmented.SelectedItems.Add(segmented.Items[1]);
         
         isUpdatingSelection = false;
+    }
+    
+    // TODO: Refactor this later
+
+    private void MediaSessionSyncSegmented_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is Segmented segmented)
+        {
+            UpdateMediaSessionSegmentedSelection(segmented);
+        }
+    }
+
+    private void MediaSessionSyncSegmented_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (isUpdatingMediaSessionSelection || sender is not Segmented segmented)
+            return;
+
+        // Index 0 = Receive (Download), Index 1 = Send (Upload)
+        var selectedItems = segmented.SelectedItems;
+        ViewModel.MediaSessionReceive = segmented.Items.Count > 0 && selectedItems.Contains(segmented.Items[0]);
+        ViewModel.MediaSessionSend = segmented.Items.Count > 1 && selectedItems.Contains(segmented.Items[1]);
+    }
+
+    private void UpdateMediaSessionSegmentedSelection(Segmented segmented)
+    {
+        isUpdatingMediaSessionSelection = true;
+        segmented.SelectedItems.Clear();
+
+        if (ViewModel.MediaSessionReceive && segmented.Items.Count > 0)
+            segmented.SelectedItems.Add(segmented.Items[0]);
+
+        if (ViewModel.MediaSessionSend && segmented.Items.Count > 1)
+            segmented.SelectedItems.Add(segmented.Items[1]);
+
+        isUpdatingMediaSessionSelection = false;
     }
 }

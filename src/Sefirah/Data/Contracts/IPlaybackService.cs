@@ -16,11 +16,5 @@ public interface IPlaybackService
     /// </summary>
     /// <param name="action">The media action to execute.</param>
     Task HandleMediaActionAsync(PlaybackAction mediaAction);
-
-    /// <summary>
-    /// Handles a media playback message from the remote device.
-    /// </summary>
-    /// <param name="data">The playback data containing action details.</param>
-    Task HandleRemotePlaybackMessageAsync(PlaybackSession data);
 }
 
