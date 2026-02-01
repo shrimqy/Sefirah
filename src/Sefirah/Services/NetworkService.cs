@@ -28,11 +28,11 @@ public class NetworkService(
     private static SslContext SslContext => CertificateHelper.SslContext;
     private static readonly IEnumerable<int> PORT_RANGE = Enumerable.Range(5150, 20); // 5150 to 5169
 
-    private readonly ConcurrentDictionary<Guid, string> connectionBuffers = [];
+    private readonly ConcurrentDictionary<Guid, StringBuilder> connectionBuffers = [];
     private readonly HashSet<string> connectingDeviceIds = [];
     private readonly ConcurrentDictionary<Guid, TaskCompletionSource<bool>> handshakeCompletion = [];
     private readonly ConcurrentDictionary<string, CancellationTokenSource> connectionCancellationTokens = [];
-    
+
     private ObservableCollection<PairedDevice> PairedDevices => deviceManager.PairedDevices;
     private ObservableCollection<DiscoveredDevice> DiscoveredDevices => deviceManager.DiscoveredDevices;
 
@@ -145,9 +145,6 @@ public class NetworkService(
         }
     }
 
-    private static byte[] EncodeMessage(SocketMessage message) =>
-        Encoding.UTF8.GetBytes(JsonMessageSerializer.Serialize(message) + "\n");
-
     public void BroadcastMessage(SocketMessage message)
     {
         if (PairedDevices.Count == 0) return;
@@ -163,11 +160,47 @@ public class NetworkService(
             logger.LogError("Error sending message to all {ex}", ex);
         }
     }
+    private static byte[] EncodeMessage(SocketMessage message) =>
+        Encoding.UTF8.GetBytes(JsonMessageSerializer.Serialize(message) + "\n");
+
+    /// <summary>
+    /// Extracts complete newline-delimited messages from the buffer, deserializes them, removes from buffer, returns list.
+    /// </summary>
+    private static List<SocketMessage> GetMessagesFromBuffer(StringBuilder sb, ILogger logger)
+    {
+        List<SocketMessage> messages = [];
+        while (sb.Length > 0)
+        {
+            int newlineIndex = -1;
+            for (int i = 0; i < sb.Length; i++)
+            {
+                if (sb[i] == '\n')
+                {
+                    newlineIndex = i; break;
+                }
+            }
+            if (newlineIndex < 0) break;
+
+            var messageString = sb.ToString(0, newlineIndex).Trim();
+            sb.Remove(0, newlineIndex + 1);
+
+            if (string.IsNullOrEmpty(messageString)) continue;
+
+            logger.LogDebug("Processing message: {Preview}", messageString.Length > 100 ? string.Concat(messageString.AsSpan(0, 100), "...") : messageString);
+
+            var socketMessage = JsonMessageSerializer.DeserializeMessage(messageString);
+            if (socketMessage is not null)
+            {
+                messages.Add(socketMessage);
+            }
+        }
+        return messages;
+    }
 
     #region Server events
     public void OnConnected(ServerSession session) 
     {
-        connectionBuffers[session.Id] = string.Empty;
+        connectionBuffers[session.Id] = new StringBuilder();
     }
 
     public void OnDisconnected(ServerSession session)
@@ -186,46 +219,24 @@ public class NetworkService(
     {
         try
         {
-            string newData = Encoding.UTF8.GetString(buffer, (int)offset, (int)size);
-            if (!connectionBuffers.TryGetValue(session.Id, out var buffered))
+            var sb = connectionBuffers.GetOrAdd(session.Id, _ => new StringBuilder());
+            sb.Append(Encoding.UTF8.GetString(buffer, (int)offset, (int)size));
+
+            foreach (var socketMessage in GetMessagesFromBuffer(sb, logger))
             {
-                buffered = string.Empty;
-            }
-
-            buffered += newData;
-            
-            while (buffered.IndexOf('\n') is var newlineIndex && newlineIndex != -1)
-            {
-                string messageString = buffered[..newlineIndex].Trim();
-                buffered = newlineIndex + 1 >= buffered.Length ? string.Empty : buffered[(newlineIndex + 1)..];
-
-                if (string.IsNullOrEmpty(messageString)) continue;
-
-                logger.Debug($"Processing message: {(messageString.Length > 100 ? string.Concat(messageString.AsSpan(0, Math.Min(100, messageString.Length)), "...") : messageString)}");
-
-                var socketMessage = JsonMessageSerializer.DeserializeMessage(messageString);
-                if (socketMessage is null) continue;
-
-                logger.Debug($"Received message: {socketMessage.GetType().Name}");
-
                 if (socketMessage is AuthenticationMessage authMessage)
                 {
                     HandleServerSessionAuthentication(session, authMessage);
                     return;
                 }
-
                 RouteMessage(session.Id, socketMessage);
             }
-
-            connectionBuffers[session.Id] = buffered;
         }
         catch (Exception ex)
         {
             logger.LogError("Error in OnReceived for session {id}: {ex}", session.Id, ex);
         }
     }
-
-
 
     /// <summary>
     /// Routes a deserialized message from a client and server to the appropriate handler
@@ -687,7 +698,7 @@ public class NetworkService(
     public void OnConnected(Client client)
     {
         logger.Info($"OnConnected for client {client.Id}");
-        connectionBuffers[client.Id] = string.Empty;
+        connectionBuffers[client.Id] = new StringBuilder();
     }
 
     public void OnHandshaked(Client client)
@@ -720,26 +731,11 @@ public class NetworkService(
     {
         try
         {
-            string newData = Encoding.UTF8.GetString(buffer, (int)offset, (int)size);
-            if (!connectionBuffers.TryGetValue(client.Id, out var buffered))
+            var sb = connectionBuffers.GetOrAdd(client.Id, _ => new StringBuilder());
+            sb.Append(Encoding.UTF8.GetString(buffer, (int)offset, (int)size));
+
+            foreach (var socketMessage in GetMessagesFromBuffer(sb, logger))
             {
-                buffered = string.Empty;
-            }
-
-            buffered += newData;
-
-            while (buffered.IndexOf('\n') is var newlineIndex && newlineIndex != -1)
-            {
-                string messageString = buffered[..newlineIndex].Trim();
-                buffered = newlineIndex + 1 >= buffered.Length ? string.Empty : buffered[(newlineIndex + 1)..];
-
-                if (string.IsNullOrEmpty(messageString)) continue;
-
-                logger.Debug($"Processing client message: {(messageString.Length > 100 ? string.Concat(messageString.AsSpan(0, Math.Min(100, messageString.Length)), "...") : messageString)}");
-
-                var socketMessage = JsonMessageSerializer.DeserializeMessage(messageString);
-                if (socketMessage is null) continue;
-
                 if (socketMessage is AuthenticationMessage authMessage)
                 {
                     HandleServerAuthentication(client, authMessage);
@@ -747,8 +743,6 @@ public class NetworkService(
                 }
                 RouteMessage(client.Id, socketMessage);
             }
-
-            connectionBuffers[client.Id] = buffered;
         }
         catch (Exception ex)
         {
