@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Sefirah.Data.Models;
 using SQLite;
 
@@ -18,12 +19,19 @@ public class NotificationEntity
     /// </summary>
     public string NotificationMessage { get; set; } = string.Empty;
 
+    public static NotificationEntity FromMessage(NotificationInfo message, string deviceId) => new()
+    {
+        Id = $"{deviceId}|{message.NotificationKey}",
+        DeviceId = deviceId,
+        NotificationMessage = JsonSerializer.Serialize(message)
+    };
+
     /// <summary>
     /// Deserializes NotificationMessage and builds Notification for UI
     /// </summary>
     internal async Task<Notification?> ToNotificationAsync()
     {
-        var message = JsonSerializer.Deserialize<NotificationMessage>(NotificationMessage);
+        var message = JsonSerializer.Deserialize<NotificationInfo>(NotificationMessage);
         if (message is null) return null;
 
         var notification = await Notification.FromMessage(message);

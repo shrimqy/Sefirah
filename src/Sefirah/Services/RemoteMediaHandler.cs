@@ -9,25 +9,27 @@ public class RemoteMediaHandler : IRemoteMediaHandler
 {
     private readonly SemaphoreSlim sessionLock = new(1, 1);
 
-    public async Task HandleRemotePlaybackSessionAsync(PairedDevice device, PlaybackSession session)
+    public async Task HandleRemotePlaybackSessionAsync(PairedDevice device, PlaybackInfo session)
     {
+        if (!device.DeviceSettings.MediaSessionReceive) return;
+        
         await sessionLock.WaitAsync();
         try
         {
             await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
             {
-                switch (session.SessionType)
+                switch (session.InfoType)
                 {
-                    case SessionType.PlaybackInfo:
+                    case PlaybackInfoType.PlaybackInfo:
                         await HandlePlaybackInfo(device, session);
                         break;
-                    case SessionType.PlaybackUpdate:
+                    case PlaybackInfoType.PlaybackUpdate:
                         HandlePlaybackUpdate(device, session);
                         break;
-                    case SessionType.TimelineUpdate:
+                    case PlaybackInfoType.TimelineUpdate:
                         HandleTimelineUpdate(device, session);
                         break;
-                    case SessionType.RemovedSession:
+                    case PlaybackInfoType.RemovedSession:
                         HandleRemovedSession(device, session);
                         break;
                 }
@@ -39,7 +41,7 @@ public class RemoteMediaHandler : IRemoteMediaHandler
         }
     }
 
-    private static async Task HandlePlaybackInfo(PairedDevice device, PlaybackSession session)
+    private static async Task HandlePlaybackInfo(PairedDevice device, PlaybackInfo session)
     {
         var existing = device.RemotePlaybackSessions.FirstOrDefault(s => s.Source == session.Source);
             
@@ -55,7 +57,7 @@ public class RemoteMediaHandler : IRemoteMediaHandler
         }
     }
 
-    private static void HandlePlaybackUpdate(PairedDevice device, PlaybackSession session)
+    private static void HandlePlaybackUpdate(PairedDevice device, PlaybackInfo session)
     {
         var existing = device.RemotePlaybackSessions.FirstOrDefault(s => s.Source == session.Source);
         if (existing is not null)
@@ -68,7 +70,7 @@ public class RemoteMediaHandler : IRemoteMediaHandler
         }
     }
 
-    private static void HandleTimelineUpdate(PairedDevice device, PlaybackSession session)
+    private static void HandleTimelineUpdate(PairedDevice device, PlaybackInfo session)
     {
         var existing = device.RemotePlaybackSessions.FirstOrDefault(s => s.Source == session.Source);
         if (existing is not null && session.Position.HasValue)
@@ -77,7 +79,7 @@ public class RemoteMediaHandler : IRemoteMediaHandler
         }
     }
 
-    private static void HandleRemovedSession(PairedDevice device, PlaybackSession session)
+    private static void HandleRemovedSession(PairedDevice device, PlaybackInfo session)
     {
         var sessionToRemove = device.RemotePlaybackSessions.FirstOrDefault(s => s.Source == session.Source);
         if (sessionToRemove is not null)

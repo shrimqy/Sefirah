@@ -1,4 +1,6 @@
+using System.Text.Json;
 using Sefirah.Data.AppDatabase.Repository;
+using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
 using SQLite;
 
@@ -26,6 +28,21 @@ public class ConversationEntity
     public List<string> Addresses { get; set; } = [];
 
     #region Helpers
+    public static ConversationEntity FromMessage(ConversationInfo thread, string deviceId)
+    {
+        var latestMessage = thread.Messages.OrderByDescending(m => m.Timestamp).First();
+        return new ConversationEntity
+        {
+            ThreadId = thread.ThreadId,
+            DeviceId = deviceId,
+            AddressesJson = JsonSerializer.Serialize(thread.Recipients),
+            HasRead = thread.Messages.Any(m => m.Read),
+            TimeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+            LastMessageTimestamp = latestMessage.Timestamp,
+            LastMessage = latestMessage.Body
+        };
+    }
+
     internal async Task<Conversation> ToConversationAsync(SmsRepository repository)
     {
         if (!string.IsNullOrEmpty(AddressesJson))

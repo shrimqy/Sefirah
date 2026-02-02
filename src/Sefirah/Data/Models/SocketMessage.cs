@@ -4,33 +4,45 @@ using Sefirah.Data.Models.Messages;
 namespace Sefirah.Data.Models;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
-[JsonDerivedType(typeof(AuthenticationMessage), typeDiscriminator: "0")]
-[JsonDerivedType(typeof(PairMessage), typeDiscriminator: "1")]
-[JsonDerivedType(typeof(UdpBroadcast), typeDiscriminator: "2")]
-[JsonDerivedType(typeof(DeviceInfo), typeDiscriminator: "3")]
-[JsonDerivedType(typeof(BatteryStatus), typeDiscriminator: "4")]
-[JsonDerivedType(typeof(RingerMode), typeDiscriminator: "5")]
-[JsonDerivedType(typeof(DndStatus), typeDiscriminator: "6")]
-[JsonDerivedType(typeof(AudioStreamMessage), typeDiscriminator: "7")]
-[JsonDerivedType(typeof(AudioDevice), typeDiscriminator: "8")]
-[JsonDerivedType(typeof(CommandMessage), typeDiscriminator: "9")]
-[JsonDerivedType(typeof(TextMessage), typeDiscriminator: "10")]
-[JsonDerivedType(typeof(ConversationMessage), typeDiscriminator: "11")]
-[JsonDerivedType(typeof(ThreadRequest), typeDiscriminator: "12")]
-[JsonDerivedType(typeof(ContactMessage), typeDiscriminator: "13")]
-[JsonDerivedType(typeof(NotificationMessage), typeDiscriminator: "14")]
-[JsonDerivedType(typeof(NotificationAction), typeDiscriminator: "15")]
-[JsonDerivedType(typeof(ReplyAction), typeDiscriminator: "16")]
-[JsonDerivedType(typeof(FileTransferMessage), typeDiscriminator: "17")]
-[JsonDerivedType(typeof(SftpServerInfo), typeDiscriminator: "18")]
-[JsonDerivedType(typeof(ClipboardMessage), typeDiscriminator: "19")]
-[JsonDerivedType(typeof(PlaybackSession), typeDiscriminator: "20")]
-[JsonDerivedType(typeof(PlaybackAction), typeDiscriminator: "21")]
-[JsonDerivedType(typeof(ApplicationList), typeDiscriminator: "22")]
-[JsonDerivedType(typeof(ActionMessage), typeDiscriminator: "23")]
-public class SocketMessage { }
+[JsonDerivedType(typeof(ActionInfo), nameof(ActionInfo))]
+[JsonDerivedType(typeof(ApplicationInfo), nameof(ApplicationInfo))]
+[JsonDerivedType(typeof(ApplicationList), nameof(ApplicationList))]
+[JsonDerivedType(typeof(Authentication), nameof(Authentication))]
+[JsonDerivedType(typeof(AudioDeviceInfo), nameof(AudioDeviceInfo))]
+[JsonDerivedType(typeof(AudioStreamState), nameof(AudioStreamState))]
+[JsonDerivedType(typeof(BatteryState), nameof(BatteryState))]
+[JsonDerivedType(typeof(ClearNotifications), nameof(ClearNotifications))]
+[JsonDerivedType(typeof(ClipboardInfo), nameof(ClipboardInfo))]
+[JsonDerivedType(typeof(ConnectionAck), nameof(ConnectionAck))]
+[JsonDerivedType(typeof(ContactInfo), nameof(ContactInfo))]
+[JsonDerivedType(typeof(ConversationInfo), nameof(ConversationInfo))]
+[JsonDerivedType(typeof(DeviceInfo), nameof(DeviceInfo))]
+[JsonDerivedType(typeof(Disconnect), nameof(Disconnect))]
+[JsonDerivedType(typeof(DndState), nameof(DndState))]
+[JsonDerivedType(typeof(FileTransferInfo), nameof(FileTransferInfo))]
+[JsonDerivedType(typeof(MediaAction), nameof(MediaAction))]
+[JsonDerivedType(typeof(NotificationAction), nameof(NotificationAction))]
+[JsonDerivedType(typeof(NotificationInfo), nameof(NotificationInfo))]
+[JsonDerivedType(typeof(NotificationReply), nameof(NotificationReply))]
+[JsonDerivedType(typeof(PairMessage), nameof(PairMessage))]
+[JsonDerivedType(typeof(PlaybackInfo), nameof(PlaybackInfo))]
+[JsonDerivedType(typeof(RequestApplicationList), nameof(RequestApplicationList))]
+[JsonDerivedType(typeof(RingerModeState), nameof(RingerModeState))]
+[JsonDerivedType(typeof(SftpServerInfo), nameof(SftpServerInfo))]
+[JsonDerivedType(typeof(TextMessage), nameof(TextMessage))]
+[JsonDerivedType(typeof(ThreadRequest), nameof(ThreadRequest))]
+[JsonDerivedType(typeof(UdpBroadcast), nameof(UdpBroadcast))]
+public class SocketMessage;
 
-public class AuthenticationMessage : SocketMessage
+public class ConnectionAck : SocketMessage;
+
+public class Disconnect : SocketMessage;
+
+public class ClearNotifications : SocketMessage;
+
+public class RequestApplicationList : SocketMessage;
+
+public class Authentication : SocketMessage
 {
     public required string DeviceId { get; set; }
 
@@ -47,7 +59,7 @@ public class AuthenticationMessage : SocketMessage
 
 public class PairMessage : SocketMessage
 {
-    public required bool Pair { get; set; }
+    public bool Pair { get; set; }
 }
 
 public class UdpBroadcast : SocketMessage
@@ -70,41 +82,48 @@ public class DeviceInfo : SocketMessage
     public List<PhoneNumber> PhoneNumbers { get; set; } = [];
 }
 
-public class BatteryStatus : SocketMessage
+public class BatteryState : SocketMessage
 {
     public int BatteryLevel { get; set; }
 
     public bool IsCharging { get; set; }
 }
 
-public class RingerMode : SocketMessage
+public class RingerModeState : SocketMessage
 {
     public int Mode { get; set; }
 }
 
-public class DndStatus : SocketMessage
+public class DndState : SocketMessage
 {
     public bool IsEnabled { get; set; }
 }
 
-public class AudioStreamMessage : SocketMessage
+public class AudioStreamState : SocketMessage
 {
     public AudioStreamType StreamType { get; set; }
 
     public int Level { get; set; }
-
-    public int MaxLevel { get; set; }
 }
 
-
-public class CommandMessage : SocketMessage
+public class AudioDeviceInfo : SocketMessage
 {
-    public CommandType CommandType { get; set; }
+    public AudioInfoType InfoType { get; set; }
+
+    public required string DeviceId { get; set; }
+
+    public string DeviceName { get; set; } = string.Empty;
+
+    public float Volume { get; set; }
+
+    public bool IsMuted { get; set; }
+
+    public bool IsSelected { get; set; }
 }
 
-public class ConversationMessage : SocketMessage
+public class ConversationInfo : SocketMessage
 {
-    public required ConversationType ConversationType { get; set; }
+    public required ConversationInfoType InfoType { get; set; }
 
     public required long ThreadId { get; set; }
 
@@ -119,7 +138,7 @@ public class TextMessage : SocketMessage
 
     public List<string> Addresses { get; set; } = [];
 
-    public long? ThreadId { get; set; } = null;
+    public long ThreadId { get; set; }
 
     public required string Body { get; set; }
 
@@ -145,21 +164,20 @@ public class SmsAttachment
     public string? Base64EncodedFile { get; set; }
 }
 
-
-public class ThreadRequest: SocketMessage
+public class ThreadRequest : SocketMessage
 {
     public required long ThreadId { get; set; }
-    
+
     public long RangeStartTimestamp { get; set; } = -1;
 
     public long NumberToRequest { get; set; } = -1;
 }
 
-public class ContactMessage : SocketMessage
+public class ContactInfo : SocketMessage
 {
     public required string Id { get; set; }
 
-    public string? LookupKey { get; set; }
+    public required string LookupKey { get; set; }
 
     public required string DisplayName { get; set; }
 
@@ -168,11 +186,12 @@ public class ContactMessage : SocketMessage
     public string? PhotoBase64 { get; set; }
 }
 
-public class NotificationMessage : SocketMessage
+// --- Notifications ---
+public class NotificationInfo : SocketMessage
 {
     public required string NotificationKey { get; set; }
 
-    public required NotificationType NotificationType { get; set; }
+    public NotificationInfoType InfoType { get; set; }
 
     public string? TimeStamp { get; set; }
 
@@ -184,7 +203,7 @@ public class NotificationMessage : SocketMessage
 
     public string? Text { get; set; }
 
-    public List<NotificationTextMessage> Messages { get; set; } = [];
+    public List<NotificationMessage> Messages { get; set; } = [];
 
     public string? GroupKey { get; set; }
 
@@ -199,12 +218,7 @@ public class NotificationMessage : SocketMessage
     public string? LargeIcon { get; set; }
 }
 
-public class NotificationTextMessage
-{
-    public required string Sender { get; set; }
-
-    public required string Text { get; set; }
-}
+public record NotificationMessage(string Sender, string Text);
 
 public class NotificationAction : SocketMessage
 {
@@ -215,7 +229,7 @@ public class NotificationAction : SocketMessage
     public int ActionIndex { get; set; }
 }
 
-public class ReplyAction : SocketMessage
+public class NotificationReply : SocketMessage
 {
     public required string NotificationKey { get; set; }
 
@@ -224,29 +238,13 @@ public class ReplyAction : SocketMessage
     public required string ReplyText { get; set; }
 }
 
-public class FileTransferMessage : SocketMessage
+public class FileTransferInfo : SocketMessage
 {
     public required List<FileMetadata> Files { get; set; }
 
     public required ServerInfo ServerInfo { get; set; }
 
     public bool IsClipboard { get; set; }
-}
-
-public class ServerInfo
-{
-    public required int Port { get; set; }
-
-    public required string Password { get; set; }
-}
-
-public class FileMetadata
-{
-    public required string FileName { get; set; }
-
-    public required string MimeType { get; set; }
-
-    public required long FileSize { get; set; }
 }
 
 public class SftpServerInfo : SocketMessage
@@ -260,16 +258,16 @@ public class SftpServerInfo : SocketMessage
     public int Port { get; set; }
 }
 
-public class ClipboardMessage : SocketMessage
+public class ClipboardInfo : SocketMessage
 {
-    public string ClipboardType { get; set; } = "text/plain";
+    public required string ClipboardType { get; set; }
 
-    public string Content { get; set; } = string.Empty;
+    public required string Content { get; set; }
 }
 
-public class PlaybackSession : SocketMessage
+public class PlaybackInfo : SocketMessage
 {
-    public SessionType SessionType { get; set; }
+    public PlaybackInfoType InfoType { get; set; }
 
     public required string Source { get; set; }
 
@@ -308,46 +306,30 @@ public class PlaybackSession : SocketMessage
     public bool? CanSeek { get; set; }
 }
 
-public class PlaybackAction : SocketMessage
+public class MediaAction : SocketMessage
 {
-    public PlaybackActionType PlaybackActionType { get; set; }
+    public MediaActionType ActionType { get; set; }
 
     public required string Source { get; set; }
 
     public double? Value { get; set; }
 }
 
-public class AudioDevice : SocketMessage
-{
-    public AudioMessageType AudioDeviceType { get; set; }
-
-    public required string DeviceId { get; set; }
-
-    public string DeviceName { get; set; } = string.Empty;
-
-    public float Volume { get; set; }
-
-    public bool IsMuted { get; set; }
-
-    public bool IsSelected { get; set; }
-}
-
 public class ApplicationList : SocketMessage
 {
-    public required List<ApplicationInfoMessage> AppList { get; set; }
+    public required List<ApplicationInfo> AppList { get; set; }
 }
 
-public class ApplicationInfoMessage : SocketMessage
-{       
+public class ApplicationInfo : SocketMessage
+{
     public required string PackageName { get; set; }
 
     public required string AppName { get; set; }
 
     public string? AppIcon { get; set; }
-
 }
 
-public class ActionMessage : SocketMessage
+public class ActionInfo : SocketMessage
 {
     public required string ActionId { get; set; }
 

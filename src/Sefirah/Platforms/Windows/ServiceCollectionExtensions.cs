@@ -24,7 +24,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddWindowsServices(this IServiceCollection services)
     {
         services.AddSingleton<IPlatformNotificationHandler, WindowsNotificationHandler>();
-        services.AddSingleton<IPlaybackService, WindowsPlaybackService>();
+        services.AddSingleton<IMediaService, WindowsMediaService>();
         services.AddSingleton<IActionService, WindowsActionService>();
         services.AddSingleton<IUpdateService, WindowsUpdateService>();
 

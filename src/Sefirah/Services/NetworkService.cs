@@ -224,7 +224,7 @@ public class NetworkService(
 
             foreach (var socketMessage in GetMessagesFromBuffer(sb, logger))
             {
-                if (socketMessage is AuthenticationMessage authMessage)
+                if (socketMessage is Authentication authMessage)
                 {
                     HandleServerSessionAuthentication(session, authMessage);
                     return;
@@ -249,6 +249,11 @@ public class NetworkService(
             var pairedDevice = PairedDevices.FirstOrDefault(d => (d.Client?.Id == guid || d.Session?.Id == guid) && d.IsConnected);
             if (pairedDevice is not null)
             {
+                if (message is ConnectionAck)
+                {
+                    ConnectionStatusChanged?.Invoke(this, pairedDevice);
+                    return;
+                }
                 messageHandler.Value.HandleMessageAsync(pairedDevice, message);
                 return;
             }
@@ -283,7 +288,7 @@ public class NetworkService(
 
     #region Server Authentication
 
-    private async void HandleServerSessionAuthentication(ServerSession session, AuthenticationMessage authMessage)
+    private async void HandleServerSessionAuthentication(ServerSession session, Authentication authMessage)
     {
         try
         {
@@ -308,7 +313,7 @@ public class NetworkService(
             // Generate response
             var nonceForResponse = EcdhHelper.GenerateNonce();
             var proofForResponse = EcdhHelper.GenerateProof(sharedSecret, nonceForResponse);
-            var authResponse = new AuthenticationMessage
+            var authResponse = new Authentication
             {
                 DeviceId = localDevice.DeviceId,
                 DeviceName = localDevice.DeviceName,
@@ -332,7 +337,7 @@ public class NetworkService(
         }
     }
 
-    private async Task AuthenticatePairedDeviceClient(ServerSession session, PairedDevice pairedDevice, string address, AuthenticationMessage authResponse)
+    private async Task AuthenticatePairedDeviceClient(ServerSession session, PairedDevice pairedDevice, string address, Authentication authResponse)
     {
         logger.Info($"Paired device {pairedDevice.Name} verified, updating connection");
 
@@ -362,14 +367,9 @@ public class NetworkService(
 
         logger.Debug("Sending auth response");
         SendMessage(session, authResponse);
-
-        // wait a bit after sending auth response
-        await Task.Delay(100);
-
-        ConnectionStatusChanged?.Invoke(this, pairedDevice);
     }
 
-    private async Task AuthenticateNewDeviceClient(ServerSession session, AuthenticationMessage authMessage, string address, byte[] sharedSecret, AuthenticationMessage authResponse)
+    private async Task AuthenticateNewDeviceClient(ServerSession session, Authentication authMessage, string address, byte[] sharedSecret, Authentication authResponse)
     {
         await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {
@@ -427,15 +427,8 @@ public class NetworkService(
 
         var accepted = await tcs.Task;
 
-
         device.SendMessage(new PairMessage { Pair = accepted });
-        if (accepted)
-        {
-            var pairedDevice = await deviceManager.AddDevice(device);
-            // wait a bit after sending pair responses
-            await Task.Delay(100); 
-            ConnectionStatusChanged?.Invoke(this, pairedDevice);
-        }
+        if (accepted) await deviceManager.AddDevice(device);
     }
 
     private async Task HandlePairResponse(DiscoveredDevice device, PairMessage pairMessage)
@@ -546,7 +539,7 @@ public class NetworkService(
             var nonce = EcdhHelper.GenerateNonce();
             var proof = EcdhHelper.GenerateProof(sharedSecret, nonce);
 
-            var authMessage = new AuthenticationMessage
+            var authMessage = new Authentication
             {
                 DeviceId = localDevice.DeviceId,
                 DeviceName = localDevice.DeviceName,
@@ -613,7 +606,7 @@ public class NetworkService(
             var nonce = EcdhHelper.GenerateNonce();
             var proof = EcdhHelper.GenerateProof(remoteDevice.SharedSecret, nonce);
 
-            var authMessage = new AuthenticationMessage
+            var authMessage = new Authentication
             {
                 DeviceId = localDevice.DeviceId,
                 DeviceName = localDevice.DeviceName,
@@ -736,7 +729,7 @@ public class NetworkService(
 
             foreach (var socketMessage in GetMessagesFromBuffer(sb, logger))
             {
-                if (socketMessage is AuthenticationMessage authMessage)
+                if (socketMessage is Authentication authMessage)
                 {
                     HandleServerAuthentication(client, authMessage);
                     return;
@@ -753,7 +746,7 @@ public class NetworkService(
 
     #region Client Authentication
 
-    private async void HandleServerAuthentication(Client client, AuthenticationMessage authMessage)
+    private async void HandleServerAuthentication(Client client, Authentication authMessage)
     {
         try
         {
@@ -781,7 +774,7 @@ public class NetworkService(
         }
     }
 
-    private async Task AuthenticatePairedDeviceServer(Client client, PairedDevice pairedDevice, string address, AuthenticationMessage authMessage)
+    private async Task AuthenticatePairedDeviceServer(Client client, PairedDevice pairedDevice, string address, Authentication authMessage)
     {
         var remoteDevice = await deviceManager.GetPairedDevice(pairedDevice.Id);
 
@@ -805,11 +798,10 @@ public class NetworkService(
             deviceManager.ActiveDevice = pairedDevice;
         });
 
-        ConnectionStatusChanged?.Invoke(this, pairedDevice);
         logger.Info($"Paired device {pairedDevice.Name} connected successfully");
     }
 
-    private async Task AuthenticateNewDeviceServer(Client client, AuthenticationMessage authMessage, string address, int port)
+    private async Task AuthenticateNewDeviceServer(Client client, Authentication authMessage, string address, int port)
     {
         var localDevice = await deviceManager.GetLocalDeviceAsync();
         var sharedSecret = EcdhHelper.DeriveKey(authMessage.PublicKey, localDevice.PrivateKey);

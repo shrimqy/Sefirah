@@ -1,3 +1,4 @@
+using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
 using Sefirah.Helpers;
 using SQLite;
@@ -21,6 +22,16 @@ public class ContactEntity
     public byte[]? Avatar { get; set; }
 
     #region Helpers
+    public static ContactEntity FromMessage(ContactInfo message, string deviceId) => new()
+    {
+        Id = message.Id,
+        DeviceId = deviceId,
+        LookupKey = message.LookupKey,
+        DisplayName = message.DisplayName,
+        Number = message.Number,
+        Avatar = message.PhotoBase64 is not null ? Convert.FromBase64String(message.PhotoBase64) : null
+    };
+
     internal async Task<Contact> ToContact()
     {
         var displayName = !string.IsNullOrEmpty(DisplayName) ? DisplayName : Number;

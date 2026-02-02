@@ -59,7 +59,7 @@ public class FileTransferService(
 
     #region Receive
 
-    public async Task ReceiveFiles(FileTransferMessage data, PairedDevice device)
+    public async Task ReceiveFiles(FileTransferInfo data, PairedDevice device)
     {
         var handler = new ReceiveFileHandler(
             data.Files,
@@ -139,7 +139,7 @@ public class FileTransferService(
             files,
             fileMetadataList.ToList(),
             device,
-            serverInfo => device.SendMessage(new FileTransferMessage
+            serverInfo => device.SendMessage(new FileTransferInfo
             {
                 Files = [.. fileMetadataList],
                 ServerInfo = serverInfo,

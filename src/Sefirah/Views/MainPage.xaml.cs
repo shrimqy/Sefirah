@@ -281,7 +281,7 @@ public sealed partial class MainPage : Page
     {
         if (sender is Button button && button.DataContext is MediaSession session)
         {
-            ViewModel.HandlePlaybackAction(session, PlaybackActionType.Previous);
+            ViewModel.HandlePlaybackAction(session, MediaActionType.Previous);
         }
     }
 
@@ -289,7 +289,7 @@ public sealed partial class MainPage : Page
     {
         if (sender is Button button && button.DataContext is MediaSession session)
         {
-            var actionType = session.IsPlaying ? PlaybackActionType.Pause : PlaybackActionType.Play;
+            var actionType = session.IsPlaying ? MediaActionType.Pause : MediaActionType.Play;
             ViewModel.HandlePlaybackAction(session, actionType);
         }
     }
@@ -298,7 +298,7 @@ public sealed partial class MainPage : Page
     {
         if (sender is Button button && button.DataContext is MediaSession session)
         {
-            ViewModel.HandlePlaybackAction(session, PlaybackActionType.Next);
+            ViewModel.HandlePlaybackAction(session, MediaActionType.Next);
         }
     }
 
@@ -306,7 +306,7 @@ public sealed partial class MainPage : Page
     {
         if (sender is Slider slider && slider.DataContext is MediaSession session && session.CanSeek == true)
         {
-            ViewModel.HandlePlaybackAction(session, PlaybackActionType.Seek, slider.Value);
+            ViewModel.HandlePlaybackAction(session, MediaActionType.Seek, slider.Value);
         }
     }
 
@@ -322,7 +322,7 @@ public sealed partial class MainPage : Page
     {
         if (sender is Slider slider && slider.Tag is MediaSession session)
         {
-            ViewModel.HandlePlaybackAction(session, PlaybackActionType.VolumeUpdate, slider.Value);
+            ViewModel.HandlePlaybackAction(session, MediaActionType.VolumeUpdate, slider.Value);
         }
     }
 }

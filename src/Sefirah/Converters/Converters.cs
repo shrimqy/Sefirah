@@ -261,7 +261,7 @@ internal sealed partial class BatteryStatusToIconConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        if (value is BatteryStatus batteryStatus)
+        if (value is BatteryState batteryStatus)
         {
             // Based on battery level and charging state, choose the appropriate icon
             if (batteryStatus.IsCharging)

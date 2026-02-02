@@ -5,10 +5,15 @@ namespace Sefirah.Data.Models.Messages;
 public partial class Conversation : ObservableObject
 {
     public long ThreadId { get; set; }
+
     public List<Contact> Contacts { get; set; } = [];
+
     public string? AvatarGlyph { get; set; } = string.Empty;
+
     public BitmapImage? AvatarImage { get; set; }
+
     public string DisplayName => Contacts.Count != 0 ? string.Join(", ", Contacts.Select(s => !string.IsNullOrEmpty(s.DisplayName) ? s.DisplayName : s.Address)) : "Unknown";
+
 
     private string lastMessage = string.Empty;
     public string LastMessage

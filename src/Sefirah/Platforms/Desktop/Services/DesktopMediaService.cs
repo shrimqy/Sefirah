@@ -2,14 +2,15 @@ using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 
 namespace Sefirah.Platforms.Desktop.Services;
-public class DesktopPlaybackService : IPlaybackService
+
+public class DesktopMediaService : IMediaService
 {
-    public Task HandleMediaActionAsync(PlaybackAction mediaAction)
+    public Task HandleMediaActionAsync(MediaAction mediaAction)
     {
         return Task.CompletedTask;
     }
 
-    public Task HandleRemotePlaybackMessageAsync(PlaybackSession data)
+    public Task HandleRemotePlaybackMessageAsync(PlaybackInfo data)
     {
         return Task.CompletedTask;
     }
@@ -19,3 +20,4 @@ public class DesktopPlaybackService : IPlaybackService
         return Task.CompletedTask;
     }
 }
+

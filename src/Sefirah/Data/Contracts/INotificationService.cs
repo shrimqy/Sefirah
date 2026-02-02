@@ -9,7 +9,7 @@ public interface INotificationService
     /// </summary>  
     Task Initialize();
 
-    Task HandleNotificationMessage(PairedDevice device, NotificationMessage notificationMessage);
+    Task HandleNotificationMessage(PairedDevice device, NotificationInfo notificationMessage);
 
     /// <summary>
     /// Single collection for the active device's notifications.

@@ -15,7 +15,7 @@ namespace Sefirah.Platforms.Windows.Services;
 public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionManager, IDeviceManager deviceManager) : IPlatformNotificationHandler
 {
     /// <inheritdoc />
-    public async Task ShowRemoteNotification(NotificationMessage message, string deviceId)
+    public async Task ShowRemoteNotification(Data.Models.NotificationInfo message, string deviceId)
     {
         try
         {

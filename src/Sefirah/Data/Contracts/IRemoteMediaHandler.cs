@@ -13,5 +13,5 @@ public interface IRemoteMediaHandler
     /// </summary>
     /// <param name="device">The device that sent the playback session update.</param>
     /// <param name="session">The playback session data.</param>
-    Task HandleRemotePlaybackSessionAsync(PairedDevice device, PlaybackSession session);
+    Task HandleRemotePlaybackSessionAsync(PairedDevice device, PlaybackInfo session);
 }

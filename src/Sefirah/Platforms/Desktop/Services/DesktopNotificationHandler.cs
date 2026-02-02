@@ -65,7 +65,7 @@ public class DesktopNotificationHandler(
         }
     }
 
-    public async Task ShowRemoteNotification(NotificationMessage message, string deviceId)
+    public async Task ShowRemoteNotification(NotificationInfo message, string deviceId)
     {
         if (!await EnsureInitializedAsync() || _notifications == null)
             return;
@@ -95,7 +95,7 @@ public class DesktopNotificationHandler(
 
             foreach (var action in message.Actions)
             {
-                if (action is null || action?.Label is null || action.IsReplyAction) continue; // Skip reply actions
+                if (action is null || action?.Label is null) continue; // Skip reply actions
 
                 var actionId = $"action_{action.ActionIndex}";
                 actions.Add(actionId);

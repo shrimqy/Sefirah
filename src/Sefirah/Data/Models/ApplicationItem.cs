@@ -2,7 +2,7 @@ using Sefirah.Data.Enums;
 
 namespace Sefirah.Data.Models;
 
-public partial class ApplicationInfo(string packageName, string appName, string? iconPath, AppDeviceInfo deviceInfo) : ObservableObject
+public partial class ApplicationItem(string packageName, string appName, string? iconPath, AppDeviceInfo deviceInfo) : ObservableObject
 {
     private string packageName = packageName;
     public string PackageName 
@@ -39,7 +39,6 @@ public partial class ApplicationInfo(string packageName, string appName, string?
         set => SetProperty(ref isLoading, value);
     }
 
-    #region Helpers
     private string? selectedNotificationFilter;
     public string SelectedNotificationFilter
     {
@@ -53,6 +52,4 @@ public partial class ApplicationInfo(string packageName, string appName, string?
         { NotificationFilter.Feed, "NotificationFilterFeed.Content".GetLocalizedResource() },
         { NotificationFilter.Disabled, "NotificationFilterDisabled.Content".GetLocalizedResource() }
     };
-
-    #endregion
 }

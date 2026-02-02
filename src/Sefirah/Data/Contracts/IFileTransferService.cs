@@ -7,7 +7,7 @@ public interface IFileTransferService
     /// <summary>
     /// Receives files from a remote device.
     /// </summary>
-    Task ReceiveFiles(FileTransferMessage data, PairedDevice device);
+    Task ReceiveFiles(FileTransferInfo data, PairedDevice device);
 
     /// <summary>
     /// Sends files to a remote device.

@@ -1,4 +1,4 @@
-﻿<Page
+<Page
     x:Class="Sefirah.Views.AppsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -20,7 +20,7 @@
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" Inverse="True" />
         
-        <DataTemplate x:Key="AppItemTemplate" x:DataType="models:ApplicationInfo">
+        <DataTemplate x:Key="AppItemTemplate" x:DataType="models:ApplicationItem">
             <Grid
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
@@ -87,7 +87,7 @@
             </Grid>
         </DataTemplate>
         
-        <DataTemplate x:Key="SearchSuggestionTemplate" x:DataType="models:ApplicationInfo">
+        <DataTemplate x:Key="SearchSuggestionTemplate" x:DataType="models:ApplicationItem">
             <StackPanel
                 Margin="0,8,0,8"
                 VerticalAlignment="Center"

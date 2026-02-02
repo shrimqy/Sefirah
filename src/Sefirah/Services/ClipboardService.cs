@@ -59,13 +59,13 @@ public class ClipboardService(
             {
                 if (!devicesWithClipboardSync.Any() && isMonitoring)
                 {
-                    Clipboard.ContentChanged -= OnClipboardContentChanged;
+                    Windows.ApplicationModel.DataTransfer.Clipboard.ContentChanged -= OnClipboardContentChanged;
                     logger.LogInformation("Clipboard monitoring stopped");
                     isMonitoring = false;
                 }
                 else if (!isMonitoring)
                 {
-                    Clipboard.ContentChanged += OnClipboardContentChanged;
+                    Windows.ApplicationModel.DataTransfer.Clipboard.ContentChanged += OnClipboardContentChanged;
                     logger.LogInformation("Clipboard monitoring started");
                     isMonitoring = true;
                 }
@@ -96,7 +96,7 @@ public class ClipboardService(
 
                 logger.LogDebug("Sending clipboard content");
 
-                var dataPackageView = Clipboard.GetContent();
+                var dataPackageView = Windows.ApplicationModel.DataTransfer.Clipboard.GetContent();
 
                 if (dataPackageView.Contains(StandardDataFormats.Text))
                 {
@@ -176,7 +176,7 @@ public class ClipboardService(
         // Convert Windows CRLF to Unix LF 
         text = text.Replace("\r\n", "\n");
         
-        var message = new ClipboardMessage { Content = text, ClipboardType = "text/plain" };
+        var message = new Data.Models.ClipboardInfo { Content = text, ClipboardType = "text/plain" };
 
         foreach (var device in devices)
         {
@@ -187,12 +187,7 @@ public class ClipboardService(
 
     private async Task HandleLargeImageTransfer(StorageFile file, string fileType, string mimeType, List<PairedDevice> devices)
     {
-        var metadata = new FileMetadata
-        {
-            FileName = $"sefirah_clipboard_image.{fileType}",
-            MimeType = mimeType,
-            FileSize = (long)(await file.GetBasicPropertiesAsync()).Size
-        };
+        var metadata = new FileMetadata($"sefirah_clipboard_image.{fileType}", mimeType, (long)(await file.GetBasicPropertiesAsync()).Size);
 
         await Task.Run(async() =>
         {
@@ -209,7 +204,7 @@ public class ClipboardService(
         byte[] buffer = new byte[stream.Length];
         await stream.ReadExactlyAsync(buffer);
 
-        var message = new ClipboardMessage { Content = Convert.ToBase64String(buffer), ClipboardType = mimeType };
+        var message = new Data.Models.ClipboardInfo { Content = Convert.ToBase64String(buffer), ClipboardType = mimeType };
         foreach (var device in devices)
         {
             device.SendMessage(message);
@@ -257,7 +252,7 @@ public class ClipboardService(
                         throw new ArgumentException($"Unsupported content type: {content.GetType()}");
                 }
 
-                Clipboard.SetContent(dataPackage);
+                Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dataPackage);
                 await Task.Delay(50);
                 logger.LogInformation("Clipboard content set: {Content}", content);
 

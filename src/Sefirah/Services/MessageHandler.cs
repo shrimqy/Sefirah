@@ -1,7 +1,6 @@
 using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
-using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 
 namespace Sefirah.Services;
@@ -12,7 +11,7 @@ public class MessageHandler(
     IClipboardService clipboardService,
     SmsHandlerService smsHandlerService,
     IFileTransferService fileTransferService,
-    IPlaybackService playbackService,
+    IMediaService playbackService,
     IRemoteMediaHandler remotePlaybackService,
     IActionService actionService,
     ISftpService sftpService,
@@ -29,72 +28,67 @@ public class MessageHandler(
                     await remoteAppRepository.UpdateApplicationList(device, applicationList);
                     break;
 
-                case NotificationMessage notificationMessage:
+                case NotificationInfo notificationMessage:
                     await notificationService.HandleNotificationMessage(device, notificationMessage);
                     break;
 
-                case PlaybackAction action:
+                case MediaAction action:
                     await playbackService.HandleMediaActionAsync(action);
                     break;
 
-                case PlaybackSession playbackSession:
-                    if (device.DeviceSettings.MediaSessionReceive)
-                    {
-                        await remotePlaybackService.HandleRemotePlaybackSessionAsync(device, playbackSession);
-                    }
+                case PlaybackInfo playbackSession:
+                    await remotePlaybackService.HandleRemotePlaybackSessionAsync(device, playbackSession);
                     break;
 
-                case BatteryStatus batteryStatus:
+                case BatteryState batteryStatus:
                     await App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.BatteryStatus = batteryStatus);
                     break;
 
-                case RingerMode ringerMode:
+                case RingerModeState ringerMode:
                     await App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.RingerMode = ringerMode.Mode);
                     break;
 
-                case DndStatus dndStatus:
+                case DndState dndStatus:
                     await App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.DndEnabled = dndStatus.IsEnabled);
                     break;
 
-                case AudioStreamMessage audioStream:
-                    await App.MainWindow.DispatcherQueue.EnqueueAsync(() => 
-                        device.Audio.Update(audioStream.StreamType, audioStream.Level, audioStream.MaxLevel));
+                case AudioStreamState audioStream:
+                    await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+                        device.UpdateStreamLevel(audioStream.StreamType, audioStream.Level));
                     break;
 
-                case ClipboardMessage clipboardMessage:
-                    await clipboardService.SetContentAsync(clipboardMessage.Content, device);
+                case ClipboardInfo clipboard:
+                    await clipboardService.SetContentAsync(clipboard.Content, device);
                     break;
 
-                case ConversationMessage textConversation:
+                case ConversationInfo textConversation:
                     await smsHandlerService.HandleTextMessage(device.Id, textConversation);
                     break;
 
-                case ContactMessage contactMessage:
+                case ContactInfo contactMessage:
                     await smsHandlerService.HandleContactMessage(device.Id, contactMessage);
                     break;
 
-                case ActionMessage action:
+                case ActionInfo action:
                     actionService.HandleActionMessage(action);
                     break;
 
                 case SftpServerInfo sftpServerInfo:
-                    if (device.DeviceSettings.StorageAccess)
-                    {
-                        await sftpService.InitializeAsync(device, sftpServerInfo);
-                    }
+                    await sftpService.InitializeAsync(device, sftpServerInfo);
                     break;
-                case FileTransferMessage fileTransfer:
+
+                case FileTransferInfo fileTransfer:
                     await fileTransferService.ReceiveFiles(fileTransfer, device);
                     break;
+
                 case DeviceInfo deviceInfo:
                     await deviceManager.UpdateDeviceInfo(device, deviceInfo);
                     break;
-                case CommandMessage commandMessage:
-                    if (commandMessage.CommandType is CommandType.Disconnect)
-                    {
-                        sessionManager.DisconnectDevice(device, true);
-                    }
+
+                case Disconnect:
+                    sessionManager.DisconnectDevice(device, true);
                     break;
+
                 default:
                     logger.LogWarning("Unknown message type received: {type}", message.GetType().Name);
                     break;

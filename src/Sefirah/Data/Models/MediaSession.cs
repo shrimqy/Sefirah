@@ -77,7 +77,7 @@ public partial class MediaSession : ObservableObject
         positionUpdateTimer.Start();
     }
 
-    public async Task UpdateFrom(PlaybackSession session)
+    public async Task UpdateFrom(PlaybackInfo session)
     {
         Source = session.Source;
         TrackTitle = session.TrackTitle;

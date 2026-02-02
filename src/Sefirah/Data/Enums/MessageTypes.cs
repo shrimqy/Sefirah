@@ -1,7 +1,7 @@
 namespace Sefirah.Data.Enums;
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
-public enum SessionType
+public enum PlaybackInfoType
 {
     PlaybackInfo,
     PlaybackUpdate,
@@ -10,7 +10,7 @@ public enum SessionType
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
-public enum PlaybackActionType
+public enum MediaActionType
 {
     Play,
     Pause,
@@ -27,19 +27,11 @@ public enum PlaybackActionType
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
-public enum AudioMessageType
+public enum AudioInfoType
 {
     New,
     Removed,
     Active
-}
-
-[JsonConverter(typeof(JsonStringEnumConverter))]
-public enum CommandType
-{
-    ClearNotifications,
-    RequestAppList,
-    Disconnect
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -55,17 +47,16 @@ public enum ActionType
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
-public enum NotificationType
+public enum NotificationInfoType
 {
     Active,
     Removed,
     New,
-    Action,
     Invoke
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
-public enum ConversationType
+public enum ConversationInfoType
 {
     Active,
     ActiveUpdated,

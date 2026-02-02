@@ -7,7 +7,7 @@ namespace Sefirah.Data.Contracts;
 /// Provides functionality to track active media sessions, handle playback changes,
 /// and control media playback across different applications.
 /// </summary>
-public interface IPlaybackService
+public interface IMediaService
 {
     Task InitializeAsync();
 
@@ -15,6 +15,6 @@ public interface IPlaybackService
     /// Executes the corresponding media control action on the current device.
     /// </summary>
     /// <param name="action">The media action to execute.</param>
-    Task HandleMediaActionAsync(PlaybackAction mediaAction);
+    Task HandleMediaActionAsync(MediaAction mediaAction);
 }
 

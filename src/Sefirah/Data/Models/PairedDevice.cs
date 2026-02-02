@@ -1,6 +1,7 @@
 using System.Collections.Specialized;
 using CommunityToolkit.WinUI;
 using Sefirah.Data.Contracts;
+using Sefirah.Data.Enums;
 using Sefirah.Data.Models.Messages;
 
 namespace Sefirah.Data.Models;
@@ -77,8 +78,8 @@ public partial class PairedDevice : BaseRemoteDevice
     public bool IsConnecting => ConnectionStatus.IsConnecting;
     public bool IsConnectedOrConnecting => ConnectionStatus.IsConnectedOrConnecting;
 
-    private BatteryStatus? batteryStatus;
-    public BatteryStatus? BatteryStatus
+    private BatteryState? batteryStatus;
+    public BatteryState? BatteryStatus
     {
         get => batteryStatus;
         set => SetProperty(ref batteryStatus, value);
@@ -98,7 +99,20 @@ public partial class PairedDevice : BaseRemoteDevice
         set => SetProperty(ref dndEnabled, value);
     }
 
-    public Audio Audio { get; } = new();
+    public IReadOnlyList<AudioStream> Streams { get; } =
+    [
+        new(AudioStreamType.Media),
+        new(AudioStreamType.Ring),
+        new(AudioStreamType.Notification),
+        new(AudioStreamType.Alarm),
+        new(AudioStreamType.VoiceCall)
+    ];
+
+    public void UpdateStreamLevel(AudioStreamType streamType, int level)
+    {
+        var stream = Streams.FirstOrDefault(s => s.StreamType == streamType);
+        stream?.Level = level;
+    }
 
     public ObservableCollection<AdbDevice> ConnectedAdbDevices { get; set; } = [];
 

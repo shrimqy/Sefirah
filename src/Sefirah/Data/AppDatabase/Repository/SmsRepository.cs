@@ -202,9 +202,9 @@ public class SmsRepository(DatabaseContext context, ILogger logger)
             .FirstOrDefault(c => c.DeviceId == deviceId && c.Id == contactId));
     }
 
-    public async Task SaveContactAsync(string deviceId, ContactMessage contact)
+    public async Task SaveContactAsync(string deviceId, ContactInfo contact)
     {
-        var contactEntity = ToEntity(contact, deviceId);
+        var contactEntity = contact.ToEntity(deviceId);
         await Task.Run(() => context.Database.InsertOrReplace(contactEntity));
     }
 
@@ -256,75 +256,5 @@ public class SmsRepository(DatabaseContext context, ILogger logger)
         }
     }
 
-    #endregion
-
-    #region Helper Methods
-
-    public static MessageEntity ToEntity(TextMessage message, string deviceId)
-    {
-        return new MessageEntity
-        {
-            UniqueId = message.UniqueId,
-            ThreadId = message.ThreadId ?? 0,
-            DeviceId = deviceId,
-            Body = message.Body,
-            Timestamp = message.Timestamp,
-            Read = message.Read,
-            SubscriptionId = message.SubscriptionId,
-            MessageType = message.MessageType,
-            Address = message.Addresses[0] // 0 index is for sender
-        };
-    }
-
-    public static ContactEntity ToEntity(ContactMessage contact, string deviceId)
-    {
-        byte[]? avatar = null;
-        if (!string.IsNullOrEmpty(contact.PhotoBase64))
-        {
-            try
-            {
-                avatar = Convert.FromBase64String(contact.PhotoBase64);
-            }
-            catch (Exception)
-            {
-                avatar = null;
-            }
-        }
-
-        return new ContactEntity
-        {
-            Id = contact.Id,
-            DeviceId = deviceId,
-            LookupKey = contact.LookupKey,
-            DisplayName = contact.DisplayName,
-            Number = contact.Number,
-            Avatar = avatar
-        };
-    }
-
-    public static AttachmentEntity ToEntity(SmsAttachment attachment, long messageUniqueId)
-    {
-        return new AttachmentEntity
-        {
-            MessageUniqueId = messageUniqueId,
-            Data = Convert.FromBase64String(attachment.Base64EncodedFile)
-        };
-    }
-
-    public static ConversationEntity ToEntity(ConversationMessage textConversation, string deviceId)
-    {
-        var latestMessage = textConversation.Messages.OrderByDescending(m => m.Timestamp).First();
-
-        return new ConversationEntity
-        {
-            ThreadId = textConversation.ThreadId,
-            DeviceId = deviceId,
-            AddressesJson = JsonSerializer.Serialize(textConversation.Recipients),
-            HasRead = textConversation.Messages.Any(m => m.Read),
-            TimeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-            LastMessageTimestamp = latestMessage.Timestamp,
-            LastMessage = latestMessage.Body
-        };
-    }
     #endregion
 } 

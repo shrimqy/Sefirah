@@ -13,7 +13,7 @@ public interface IPlatformNotificationHandler
     /// <param name="message">The notification body from remote device</param>
     /// <param name="deviceId">The ID of the device that sent the notification</param>
     /// <returns>Task that completes when the notification is displayed</returns>
-    Task ShowRemoteNotification(NotificationMessage message, string deviceId);
+    Task ShowRemoteNotification(NotificationInfo message, string deviceId);
     
     /// <summary>
     /// Shows a simple notification with title and text

@@ -6,7 +6,7 @@ public class Message
 
     public required Contact Contact { get; set; }
 
-    public long? ThreadId { get; set; }
+    public long ThreadId { get; set; }
 
     public string Body { get; set; } = string.Empty;
 

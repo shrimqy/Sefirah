@@ -200,11 +200,7 @@ public partial class SendFileHandler(
                 };
                 server.Start();
 
-                var serverInfo = new ServerInfo
-                {
-                    Port = port,
-                    Password = EcdhHelper.GenerateRandomPassword()
-                };
+                var serverInfo = new ServerInfo(port, EcdhHelper.GenerateRandomPassword());
 
                 logger.Info($"File transfer server initialized at {serverInfo.Port}");
                 return serverInfo;

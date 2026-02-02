@@ -643,7 +643,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
     public PairedDevice Device;
 
     private readonly RemoteAppRepository RemoteAppsRepository = Ioc.Default.GetRequiredService<RemoteAppRepository>();
-    public ObservableCollection<ApplicationInfo> RemoteApps { get; set; } = [];
+    public ObservableCollection<ApplicationItem> RemoteApps { get; set; } = [];
 
     private readonly DeviceRepository DeviceRepository = Ioc.Default.GetRequiredService<DeviceRepository>();
 
@@ -764,7 +764,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public void ChangeNotificationFilter(string notificationFilter, string appPackage)
     {
-        var filterKey = ApplicationInfo.NotificationFilterTypes.First(f => f.Value == notificationFilter).Key;
+        var filterKey = ApplicationItem.NotificationFilterTypes.First(f => f.Value == notificationFilter).Key;
         RemoteAppsRepository.UpdateAppNotificationFilter(Device!.Id, appPackage, filterKey);
         var app = RemoteApps.First(p => p.PackageName == appPackage);
         app.DeviceInfo.Filter = filterKey;

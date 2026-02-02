@@ -8,7 +8,7 @@ public static class NotificationActionUtils
     {
         if (!device.IsConnected) return;
 
-        var replyAction = new ReplyAction
+        var replyAction = new NotificationReply
         {
             NotificationKey = notificationKey,
             ReplyResultKey = replyResultKey,

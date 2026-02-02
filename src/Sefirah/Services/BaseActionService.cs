@@ -30,13 +30,13 @@ public abstract class BaseActionService(
             var actions = generalSettingsService.Actions;
             foreach (var action in actions)
             {
-                var actionMessage = new ActionMessage { ActionId = action.Id, ActionName = action.Name };
+                var actionMessage = new ActionInfo { ActionId = action.Id, ActionName = action.Name };
                 device.SendMessage(actionMessage);
             }
         }
     }
 
-    public virtual void HandleActionMessage(ActionMessage action)
+    public virtual void HandleActionMessage(ActionInfo action)
     {
         logger.LogInformation("Executing action: {name}", action.ActionName);
         var actionToExecute = generalSettingsService.Actions.FirstOrDefault(a => a.Id == action.ActionId);

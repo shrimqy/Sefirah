@@ -22,6 +22,8 @@ public class WindowsSftpService(
     /// </summary>
     public async Task InitializeAsync(PairedDevice device, SftpServerInfo info)
     {
+        if (!device.DeviceSettings.StorageAccess) return;
+
         try
         {
             if (!StorageProviderSyncRootManager.IsSupported()) return;

@@ -7,16 +7,11 @@ public class NotificationRepository(DatabaseContext context)
 {
     public static string CompositeId(string deviceId, string key) => $"{deviceId}|{key}";
 
-    public void SaveNotification(NotificationMessage message, string deviceId)
+    public void SaveNotification(NotificationInfo message, string deviceId)
     {
         Task.Run(() =>
         {
-            var entity = new NotificationEntity
-            {
-                Id = CompositeId(deviceId, message.NotificationKey),
-                DeviceId = deviceId,
-                NotificationMessage = JsonSerializer.Serialize(message)
-            };
+            var entity = message.ToEntity(deviceId);
             context.Database.InsertOrReplace(entity);
         });
     }

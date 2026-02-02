@@ -141,7 +141,6 @@ public sealed partial class MessagesViewModel : BaseViewModel
         try
         {
             List<string> recipients = [];
-
             if (IsNewConversation)
             {
                 recipients = NewConversationRecipients.Select(c => c.Address).ToList();
@@ -159,7 +158,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
             var textMessage = new TextMessage
             {
                 Body = messageText.Trim(),
-                ThreadId = SelectedConversation?.ThreadId,
+                ThreadId = SelectedConversation?.ThreadId ?? -1,
                 Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 MessageType = 2, // SENT
                 Read = true,

@@ -38,7 +38,7 @@ public static class AppLifecycleHelper
         var notificationService = Ioc.Default.GetRequiredService<INotificationService>();
         var deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
         var adbService = Ioc.Default.GetRequiredService<IAdbService>();
-        var playbackService = Ioc.Default.GetRequiredService<IPlaybackService>();
+        var playbackService = Ioc.Default.GetRequiredService<IMediaService>();
         var actionService = Ioc.Default.GetRequiredService<IActionService>();
         var updateService = Ioc.Default.GetRequiredService<IUpdateService>();
         var generalSettingsService = Ioc.Default.GetRequiredService<IGeneralSettingsService>();

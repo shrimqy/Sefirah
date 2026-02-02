@@ -5,7 +5,7 @@ using SQLite;
 
 namespace Sefirah.Data.AppDatabase.Models;
 
-public partial class ApplicationInfoEntity
+public partial class ApplicationEntity
 {
     [PrimaryKey]
     public string PackageName { get; set; } = string.Empty;
@@ -23,17 +23,17 @@ public partial class ApplicationInfoEntity
     }
 
     #region Helpers
-    internal ApplicationInfo ToApplicationInfo(string deviceId)
+    internal ApplicationItem ToApplicationItem(string deviceId)
     {
-        var deviceInfo =  AppDeviceInfoList.FirstOrDefault(d => d.DeviceId == deviceId) ?? new AppDeviceInfo(deviceId, NotificationFilter.ToastFeed);
-        return new ApplicationInfo(PackageName, AppName, IconUtils.GetAppIconPath(PackageName), deviceInfo);
+        var deviceInfo = AppDeviceInfoList.FirstOrDefault(d => d.DeviceId == deviceId) ?? new AppDeviceInfo(deviceId, NotificationFilter.ToastFeed);
+        return new ApplicationItem(PackageName, AppName, IconUtils.GetAppIconPath(PackageName), deviceInfo);
     }
 
-    internal static async Task<ApplicationInfoEntity> FromApplicationInfoMessage(ApplicationInfoMessage info, string deviceId)
+    internal static async Task<ApplicationEntity> FromApplicationInfo(ApplicationInfo info, string deviceId)
     {
         List<AppDeviceInfo> appDeviceInfoList = [new(deviceId, NotificationFilter.ToastFeed)];
         await IconUtils.SaveAppIconToPathAsync(info.AppIcon, info.PackageName);
-        return new ApplicationInfoEntity
+        return new ApplicationEntity
         {
             PackageName = info.PackageName,
             AppName = info.AppName,

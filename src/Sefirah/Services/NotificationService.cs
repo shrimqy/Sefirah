@@ -83,7 +83,7 @@ public class NotificationService(
         }
     }
 
-    public async Task HandleNotificationMessage(PairedDevice device, NotificationMessage message)
+    public async Task HandleNotificationMessage(PairedDevice device, Data.Models.NotificationInfo message)
     {
         if (!device.DeviceSettings.NotificationSync) return;
 
@@ -91,7 +91,7 @@ public class NotificationService(
         await notificationLock.WaitAsync();
         try
         {
-            if (message.NotificationType is NotificationType.Removed)
+            if (message.InfoType is NotificationInfoType.Removed)
             {
                 await HandleRemovedNotification(device, message);
                 return;
@@ -112,7 +112,7 @@ public class NotificationService(
                     await HandleNotificationForActiveDevice(notification);
                 }
 
-                if (message.NotificationType is NotificationType.New && filter is NotificationFilter.ToastFeed)
+                if (message.InfoType is NotificationInfoType.New && filter is NotificationFilter.ToastFeed)
                 {
                     if (device.DeviceSettings.IgnoreWindowsApps && await IsAppActiveAsync(message.AppName!)) return;
 
@@ -147,7 +147,7 @@ public class NotificationService(
         UpdateBadge();
     }
 
-    private async Task HandleRemovedNotification(PairedDevice device, NotificationMessage message)
+    private async Task HandleRemovedNotification(PairedDevice device, Data.Models.NotificationInfo message)
     {
         var deleted = await notificationRepository.DeleteNotificationAsync(device.Id, message.NotificationKey);
         if (!deleted) return;
@@ -197,10 +197,10 @@ public class NotificationService(
 
             if (device.IsConnected)
             {
-                device.SendMessage(new NotificationMessage
+                device.SendMessage(new Data.Models.NotificationInfo
                 {
                     NotificationKey = notification.Key,
-                    NotificationType = NotificationType.Removed
+                    InfoType = NotificationInfoType.Removed
                 });
             }
 
@@ -216,7 +216,7 @@ public class NotificationService(
     {
         if (!device.IsConnected) return;
 
-        device.SendMessage(new ReplyAction
+        device.SendMessage(new NotificationReply
         {
             NotificationKey = notificationKey,
             ReplyResultKey = replyResultKey,
@@ -255,7 +255,7 @@ public class NotificationService(
 
             if (!activeDevice.IsConnected) return;
 
-            activeDevice.SendMessage(new CommandMessage { CommandType = CommandType.ClearNotifications });
+            activeDevice.SendMessage(new ClearNotifications());
             logger.LogInformation("Cleared all notifications for device {DeviceId}", activeDevice.Id);
         }
         catch (Exception ex)

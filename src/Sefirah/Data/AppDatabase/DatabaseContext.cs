@@ -7,7 +7,7 @@ public class DatabaseContext
 {
     private const int CurrentSchemaVersion = 2;
 
-    private static readonly IMigration[] Migrations = [new AddNotificationEntityMigration()];
+    private static readonly IMigration[] Migrations = [new SchemaVersion2Migration()];
 
     public SQLiteConnection Database { get; private set; }
 
@@ -98,7 +98,7 @@ public class DatabaseContext
         db.CreateTable<SchemaVersionEntity>();
         db.CreateTable<LocalDeviceEntity>();
         db.CreateTable<PairedDeviceEntity>();
-        db.CreateTable<ApplicationInfoEntity>();
+        db.CreateTable<ApplicationEntity>();
         db.CreateTable<ContactEntity>();
         db.CreateTable<ConversationEntity>();
         db.CreateTable<MessageEntity>();
@@ -110,7 +110,7 @@ public class DatabaseContext
     {
         db.DropTable<LocalDeviceEntity>();
         db.DropTable<PairedDeviceEntity>();
-        db.DropTable<ApplicationInfoEntity>();
+        db.DropTable<ApplicationEntity>();
         db.DropTable<ContactEntity>();
         db.DropTable<ConversationEntity>();
         db.DropTable<MessageEntity>();

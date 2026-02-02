@@ -36,24 +36,24 @@ public class SmsHandlerService(
         }
     }
 
-    public async Task HandleTextMessage(string deviceId, ConversationMessage textConversation)
+    public async Task HandleTextMessage(string deviceId, ConversationInfo textConversation)
     {
         await semaphore.WaitAsync();
         try
         {
-            switch (textConversation.ConversationType)
+            switch (textConversation.InfoType)
             {
                 // refactor later
-                case ConversationType.Active:
-                case ConversationType.New:
-                case ConversationType.ActiveUpdated:
+                case ConversationInfoType.Active:
+                case ConversationInfoType.New:
+                case ConversationInfoType.ActiveUpdated:
                     await HandleConversationUpdate(deviceId, textConversation);
                     break;
-                case ConversationType.Removed:
+                case ConversationInfoType.Removed:
                     await HandleRemovedConversation(deviceId, textConversation);
                     break;
                 default:
-                    logger.LogWarning("Unknown conversation type: {ConversationType}", textConversation.ConversationType);
+                    logger.LogWarning("Unknown conversation type: {ConversationType}", textConversation.InfoType);
                     break;
             }
         }
@@ -88,14 +88,14 @@ public class SmsHandlerService(
         return messages;
     }
 
-    private async Task HandleConversationUpdate(string deviceId, ConversationMessage textConversation)
+    private async Task HandleConversationUpdate(string deviceId, ConversationInfo textConversation)
     {
         try
         {
             var conversationEntity = await smsRepository.GetConversationAsync(deviceId, textConversation.ThreadId);
             if (conversationEntity is null)
             {
-                conversationEntity = SmsRepository.ToEntity(textConversation, deviceId);
+                conversationEntity = textConversation.ToEntity(deviceId);
             }
             else
             {
@@ -124,7 +124,7 @@ public class SmsHandlerService(
         }
     }
 
-    private async Task HandleRemovedConversation(string deviceId, ConversationMessage textConversation)
+    private async Task HandleRemovedConversation(string deviceId, ConversationInfo textConversation)
     {
         try
         {
@@ -137,12 +137,12 @@ public class SmsHandlerService(
         }
     }
 
-    private async Task SaveMessagesFromConversation(string deviceId, ConversationMessage textConversation)
+    private async Task SaveMessagesFromConversation(string deviceId, ConversationInfo textConversation)
     {
         try
         {
             var messageEntities = textConversation.Messages
-                .Select(m => SmsRepository.ToEntity(m, deviceId))
+                .Select(m => m.ToEntity(deviceId))
                 .ToList();
             await smsRepository.SaveMessagesAsync(messageEntities);
         }
@@ -179,7 +179,7 @@ public class SmsHandlerService(
         device.SendMessage(threadRequest);
     }
 
-    public async Task HandleContactMessage(string deviceId, ContactMessage contactMessage)
+    public async Task HandleContactMessage(string deviceId, ContactInfo contactMessage)
     {
         try
         {

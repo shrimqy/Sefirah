@@ -13,15 +13,16 @@ using Windows.Media;
 using Windows.Media.Control;
 
 namespace Sefirah.Platforms.Windows.Services;
-public class WindowsPlaybackService(
-    ILogger<WindowsPlaybackService> logger,
+
+public class WindowsMediaService(
+    ILogger<WindowsMediaService> logger,
     ISessionManager sessionManager,
-    IDeviceManager deviceManager) : IPlaybackService, IMMNotificationClient
+    IDeviceManager deviceManager) : IMediaService, IMMNotificationClient
 {
     private readonly DispatcherQueue dispatcher = DispatcherQueue.GetForCurrentThread();
     private readonly Dictionary<string, GlobalSystemMediaTransportControlsSession> activeSessions = [];
     private GlobalSystemMediaTransportControlsSessionManager? manager;
-    public List<AudioDevice> AudioDevices { get; private set; } = [];
+    public List<AudioDeviceInfo> AudioDevices { get; private set; } = [];
     private readonly MMDeviceEnumerator enumerator = new();
     private readonly Dictionary<string, DeviceVolumeNotificationHandler> deviceHandlers = [];
 
@@ -61,7 +62,7 @@ public class WindowsPlaybackService(
                     {
                         foreach (var audioDevice in AudioDevices)
                         {
-                            audioDevice.AudioDeviceType = AudioMessageType.New;
+                            audioDevice.InfoType = AudioInfoType.New;
                             device.SendMessage(audioDevice);
                         }
                     }
@@ -76,34 +77,34 @@ public class WindowsPlaybackService(
         }
     }
 
-    public async Task HandleMediaActionAsync(PlaybackAction mediaAction)
+    public async Task HandleMediaActionAsync(MediaAction mediaAction)
     {
         var session = activeSessions.Values.FirstOrDefault(s => s.SourceAppUserModelId == mediaAction.Source);
 
         await ExecuteSessionActionAsync(session, mediaAction);
     }
 
-    private async Task ExecuteSessionActionAsync(GlobalSystemMediaTransportControlsSession? session, PlaybackAction mediaAction)
+    private async Task ExecuteSessionActionAsync(GlobalSystemMediaTransportControlsSession? session, MediaAction mediaAction)
     {
         await dispatcher.EnqueueAsync(async () =>
         {
             try
             {
-                switch (mediaAction.PlaybackActionType)
+                switch (mediaAction.ActionType)
                 {
-                    case PlaybackActionType.Play:
+                    case MediaActionType.Play:
                         await session?.TryPlayAsync();
                         break;
-                    case PlaybackActionType.Pause:
+                    case MediaActionType.Pause:
                         await session?.TryPauseAsync();
                         break;
-                    case PlaybackActionType.Next:
+                    case MediaActionType.Next:
                         await session?.TrySkipNextAsync();
                         break;
-                    case PlaybackActionType.Previous:
+                    case MediaActionType.Previous:
                         await session?.TrySkipPreviousAsync();
                         break;
-                    case PlaybackActionType.Seek:
+                    case MediaActionType.Seek:
                         if (mediaAction.Value.HasValue)
                         {
                             // We need to use Ticks here
@@ -111,10 +112,10 @@ public class WindowsPlaybackService(
                             await session?.TryChangePlaybackPositionAsync(position.Ticks);
                         }
                         break;
-                    case PlaybackActionType.Shuffle:
+                    case MediaActionType.Shuffle:
                         await session?.TryChangeShuffleActiveAsync(true);
                         break;
-                    case PlaybackActionType.Repeat:
+                    case MediaActionType.Repeat:
                         if (mediaAction.Value.HasValue)
                         {
                             if (mediaAction.Value == 1.0)
@@ -127,26 +128,26 @@ public class WindowsPlaybackService(
                             }
                         }
                         break;
-                    case PlaybackActionType.DefaultDevice:
+                    case MediaActionType.DefaultDevice:
                         SetDefaultAudioDevice(mediaAction.Source);
                         break;
-                    case PlaybackActionType.VolumeUpdate:
+                    case MediaActionType.VolumeUpdate:
                         if (mediaAction.Value.HasValue)
                         {
                             SetVolume(mediaAction.Source, Convert.ToSingle(mediaAction.Value.Value));
                         }
                         break;
-                    case PlaybackActionType.ToggleMute:
+                    case MediaActionType.ToggleMute:
                         ToggleMute(mediaAction.Source);
                         break;
                     default:
-                        logger.LogWarning("Unhandled media action: {PlaybackActionType}", mediaAction.PlaybackActionType);
+                        logger.LogWarning("Unhandled media action: {PlaybackActionType}", mediaAction.ActionType);
                         break;
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error executing media action {PlaybackActionType}", mediaAction.PlaybackActionType);
+                logger.LogError(ex, "Error executing media action {PlaybackActionType}", mediaAction.ActionType);
             }
         });
     }
@@ -238,9 +239,9 @@ public class WindowsPlaybackService(
 
                 lastTimelinePosition[sender.SourceAppUserModelId] = currentPosition;
 
-                var playbackSession = new PlaybackSession
+                var playbackSession = new PlaybackInfo
                 {
-                    SessionType = SessionType.TimelineUpdate,
+                    InfoType = PlaybackInfoType.TimelineUpdate,
                     Source = sender.SourceAppUserModelId,
                     Position = currentPosition
                 };
@@ -260,9 +261,9 @@ public class WindowsPlaybackService(
         session.TimelinePropertiesChanged -= Session_TimelinePropertiesChanged;
         lastTimelinePosition.Remove(session.SourceAppUserModelId);
 
-        var playbackSession = new PlaybackSession
+        var playbackSession = new PlaybackInfo
         {
-            SessionType = SessionType.RemovedSession,
+            InfoType = PlaybackInfoType.RemovedSession,
             Source = session.SourceAppUserModelId
         };
         SendPlaybackData(playbackSession);
@@ -287,9 +288,9 @@ public class WindowsPlaybackService(
         try
         {
             var playbackInfo = sender.GetPlaybackInfo();
-            var playbackSession = new PlaybackSession
+            var playbackSession = new PlaybackInfo
             {
-                SessionType = SessionType.PlaybackUpdate,
+                InfoType = PlaybackInfoType.PlaybackUpdate,
                 Source = sender.SourceAppUserModelId,
                 IsPlaying = playbackInfo.PlaybackStatus is GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing,
                 PlaybackRate = playbackInfo.PlaybackRate,
@@ -323,7 +324,7 @@ public class WindowsPlaybackService(
         }
     }
 
-    private async Task<PlaybackSession?> GetPlaybackSessionAsync(GlobalSystemMediaTransportControlsSession session)
+    private async Task<PlaybackInfo?> GetPlaybackSessionAsync(GlobalSystemMediaTransportControlsSession session)
     {
         try
         {
@@ -335,9 +336,9 @@ public class WindowsPlaybackService(
 
             lastTimelinePosition[session.SourceAppUserModelId] = timelineProperties.Position.TotalMilliseconds;
 
-            var playbackSession = new PlaybackSession
+            var playbackSession = new PlaybackInfo
             {
-                SessionType = SessionType.PlaybackInfo,
+                InfoType = PlaybackInfoType.PlaybackInfo,
                 Source = session.SourceAppUserModelId,
                 TrackTitle = mediaProperties.Title,
                 Artist = mediaProperties.Artist ?? "Unknown Artist",
@@ -362,7 +363,7 @@ public class WindowsPlaybackService(
     }
 
 
-    private void SendPlaybackData(PlaybackSession playbackSession)
+    private void SendPlaybackData(PlaybackInfo playbackSession)
     {
         try
         {
@@ -392,7 +393,7 @@ public class WindowsPlaybackService(
             foreach (var device in devices)
             {
                 AudioDevices.Add(
-                    new AudioDevice
+                    new AudioDeviceInfo
                     {
                         DeviceId = device.ID,
                         DeviceName = device.FriendlyName,
@@ -423,7 +424,7 @@ public class WindowsPlaybackService(
 
             audioDevice.Volume = data.MasterVolume;
             audioDevice.IsMuted = data.Muted;
-            audioDevice.AudioDeviceType = AudioMessageType.Active;
+            audioDevice.InfoType = AudioInfoType.Active;
 
             SendAudioDeviceUpdate(audioDevice);
         }
@@ -433,7 +434,7 @@ public class WindowsPlaybackService(
         }
     }
 
-    private void SendAudioDeviceUpdate(AudioDevice audioDevice)
+    private void SendAudioDeviceUpdate(AudioDeviceInfo audioDevice)
     {
         try
         {
@@ -553,9 +554,9 @@ public class WindowsPlaybackService(
             var device = enumerator.GetDevice(pwstrDeviceId);
             if (device is null || device.State is not DeviceState.Active) return;
 
-            var audioDevice = new AudioDevice
+            var audioDevice = new AudioDeviceInfo
             {
-                AudioDeviceType = AudioMessageType.New,
+                InfoType = AudioInfoType.New,
                 DeviceId = pwstrDeviceId,
                 DeviceName = device.FriendlyName,
                 Volume = device.AudioEndpointVolume.MasterVolumeLevelScalar,
@@ -597,7 +598,7 @@ public class WindowsPlaybackService(
         var audioDevice = AudioDevices.FirstOrDefault(d => d.DeviceId == deviceId);
         if (audioDevice is not null)
         {
-            audioDevice.AudioDeviceType = AudioMessageType.Removed;
+            audioDevice.InfoType = AudioInfoType.Removed;
             SendAudioDeviceUpdate(audioDevice);
         }
 
@@ -616,12 +617,12 @@ public class WindowsPlaybackService(
             if (selectedIndex != -1)
             {
                 AudioDevices[selectedIndex].IsSelected = false;
-                AudioDevices[selectedIndex].AudioDeviceType = AudioMessageType.Active;
+                AudioDevices[selectedIndex].InfoType = AudioInfoType.Active;
                 SendAudioDeviceUpdate(AudioDevices[selectedIndex]);
             }
 
             AudioDevices[index].IsSelected = true;
-            AudioDevices[index].AudioDeviceType = AudioMessageType.Active;
+            AudioDevices[index].InfoType = AudioInfoType.Active;
             SendAudioDeviceUpdate(AudioDevices[index]);
 
             logger.LogInformation("Default device changed: {DefaultDeviceId}", defaultDeviceId);

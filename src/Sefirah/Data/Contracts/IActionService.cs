@@ -7,7 +7,7 @@ public interface IActionService
     /// <summary>
     /// Handle actions
     /// </summary>
-    void HandleActionMessage(ActionMessage action);
+    void HandleActionMessage(ActionInfo action);
 
     /// <summary>
     /// Initializes the service.

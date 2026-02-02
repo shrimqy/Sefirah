@@ -26,21 +26,5 @@ public partial class DiscoveredDevice : BaseRemoteDevice
             ConnectionStatus = new Connected(),
         };
     }
-
-    internal PairedDeviceEntity ToDeviceEntity()
-    {
-        return new PairedDeviceEntity
-        {
-            DeviceId = Id,
-            Name = Name,
-            LastConnected = DateTime.Now,
-            Model = Model,
-            SharedSecret = SharedSecret,
-            WallpaperBytes = null,
-            Addresses = [new AddressEntry { Address = Address, IsEnabled = true, Priority = 0 }],
-            PhoneNumbers = []
-        };
-    }
-
 }
 

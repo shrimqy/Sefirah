@@ -16,8 +16,8 @@ public sealed partial class AppsViewModel : BaseViewModel
     #endregion
 
     #region Properties
-    public ObservableCollection<ApplicationInfo> Apps { get; set; } = [];
-    public ObservableCollection<ApplicationInfo> PinnedApps { get; set; } = [];
+    public ObservableCollection<ApplicationItem> Apps { get; set; } = [];
+    public ObservableCollection<ApplicationItem> PinnedApps { get; set; } = [];
 
     [ObservableProperty]
     public partial bool IsLoading { get; set; }
@@ -41,11 +41,10 @@ public sealed partial class AppsViewModel : BaseViewModel
 
         if (DeviceManager.ActiveDevice is null) return;
         IsLoading = true;
-        var message = new CommandMessage { CommandType = CommandType.RequestAppList };
-        DeviceManager.ActiveDevice.SendMessage(message);
+        DeviceManager.ActiveDevice.SendMessage(new RequestApplicationList());
     }
 
-    public void PinApp(ApplicationInfo app)
+    public void PinApp(ApplicationItem app)
     {
         try
         {
@@ -69,7 +68,7 @@ public sealed partial class AppsViewModel : BaseViewModel
         }
     }
 
-    public async void UninstallApp(ApplicationInfo app)
+    public async void UninstallApp(ApplicationItem app)
     {
         try
         {
@@ -132,7 +131,7 @@ public sealed partial class AppsViewModel : BaseViewModel
         LoadApps();
     }
 
-    private void OnApplicationItemUpdated(object? sender, (string deviceId, ApplicationInfo? appInfo, string? packageName) args)
+    private void OnApplicationItemUpdated(object? sender, (string deviceId, ApplicationItem? appInfo, string? packageName) args)
     {
         var (deviceId, appInfo, packageName) = args;
 
@@ -189,7 +188,7 @@ public sealed partial class AppsViewModel : BaseViewModel
         });
     }
 
-    public async Task OpenApp(ApplicationInfo app)
+    public async Task OpenApp(ApplicationItem app)
     {
         await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
         {

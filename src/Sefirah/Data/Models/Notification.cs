@@ -6,16 +6,27 @@ namespace Sefirah.Data.Models;
 public class Notification
 {
     public string Key { get; set; } = string.Empty;
+
     public bool Pinned { get; set; } = false;
+
     public string? TimeStamp { get; set; }
+
     public string? AppName { get; set; }
+
     public string? AppPackage { get; set; }
+
     public string? Title { get; set; }
+
     public string? Text { get; set; }
+
     public List<NotificationGroup> GroupedMessages { get; set; } = [];
+
     public bool HasGroupedMessages => GroupedMessages?.Count > 0;
+
     public string? Tag { get; set; }
+
     public string? GroupKey { get; set; }
+
     public List<NotificationAction> Actions { get; set; } = [];
 
     public string? ReplyResultKey { get; set; }
@@ -38,7 +49,7 @@ public class Notification
     public string FlyoutFilterString => string.Format("NotificationFilterButton".GetLocalizedResource(), AppName);
 
     #region Helpers
-    public static async Task<Notification> FromMessage(NotificationMessage message)
+    public static async Task<Notification> FromMessage(NotificationInfo message)
     {
         var notification = new Notification
         {
@@ -72,11 +83,11 @@ public class Notification
         return notification;
     }
 
-    internal static List<NotificationGroup> GroupBySender(List<NotificationTextMessage> messages)
+    internal static List<NotificationGroup> GroupBySender(List<NotificationMessage> messages)
     {
         if (messages.Count == 0) return [];
 
-        List<NotificationGroup> result = [];
+        List<NotificationGroup> groups = [];
         NotificationGroup? currentGroup = null;
 
         foreach (var message in messages)
@@ -84,14 +95,14 @@ public class Notification
             if (currentGroup?.Sender != message.Sender)
             {
                 currentGroup = new NotificationGroup(message.Sender, []);
-                result.Add(currentGroup);
+                groups.Add(currentGroup);
             }
             if (!string.IsNullOrEmpty(message.Text))
             {
                 currentGroup.Messages.Add(message.Text);
             }
         }
-        return result;
+        return groups;
     }
     #endregion
 }

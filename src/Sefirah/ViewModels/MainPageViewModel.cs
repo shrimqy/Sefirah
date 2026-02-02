@@ -101,7 +101,7 @@ public sealed partial class MainPageViewModel : BaseViewModel
     [RelayCommand]
     public void ToggleDnd()
     {
-        var message = new DndStatus { IsEnabled = !Device!.DndEnabled };
+        var message = new DndState { IsEnabled = !Device!.DndEnabled };
         Device.SendMessage(message);
     }
 
@@ -141,10 +141,10 @@ public sealed partial class MainPageViewModel : BaseViewModel
 
     public async Task OpenApp(Notification notification)
     {
-        var notificationToInvoke = new NotificationMessage
+        var notificationToInvoke = new NotificationInfo
         {
             NotificationKey = notification.Key,
-            NotificationType = NotificationType.Invoke
+            InfoType = NotificationInfoType.Invoke
         };
         string? appIcon = string.Empty;
         if (!string.IsNullOrEmpty(notification.AppPackage))
@@ -184,13 +184,13 @@ public sealed partial class MainPageViewModel : BaseViewModel
 
     public void SetRingerMode(int mode)
     {
-        var message = new RingerMode { Mode = mode };
+        var message = new RingerModeState { Mode = mode };
         Device!.SendMessage(message);
     }
 
     public void SetAudioLevel(AudioStreamType streamType, int level)
     {
-        var message = new AudioStreamMessage
+        var message = new AudioStreamState
         {
             StreamType = streamType,
             Level = level
@@ -198,13 +198,13 @@ public sealed partial class MainPageViewModel : BaseViewModel
         Device!.SendMessage(message);
     }
 
-    public void HandlePlaybackAction(MediaSession session, PlaybackActionType actionType, double? value = null)
+    public void HandlePlaybackAction(MediaSession session, MediaActionType actionType, double? value = null)
     {
         if (Device is null || string.IsNullOrEmpty(session.Source)) return;
 
-        var playbackAction = new PlaybackAction
+        var playbackAction = new MediaAction
         {
-            PlaybackActionType = actionType,
+            ActionType = actionType,
             Source = session.Source,
             Value = value
         };

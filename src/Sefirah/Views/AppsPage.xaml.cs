@@ -14,7 +14,7 @@ public sealed partial class AppsPage : Page
 
     private async void AppsGridView_ItemClick(object sender, ItemClickEventArgs e)
     {
-        if (e.ClickedItem is ApplicationInfo app)
+        if (e.ClickedItem is ApplicationItem app)
         {
             await ViewModel.OpenApp(app);
         }
@@ -35,7 +35,7 @@ public sealed partial class AppsPage : Page
 
     private void AppSearchBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
     {
-        if (args.SelectedItem is ApplicationInfo selectedApp)
+        if (args.SelectedItem is ApplicationItem selectedApp)
         {
             sender.Text = selectedApp.AppName;
         }
@@ -43,7 +43,7 @@ public sealed partial class AppsPage : Page
 
     private async void AppSearchBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
     {
-        if (args.ChosenSuggestion is ApplicationInfo selectedApp)
+        if (args.ChosenSuggestion is ApplicationItem selectedApp)
         {
             sender.Text = string.Empty;
             sender.ItemsSource = null;
@@ -54,7 +54,7 @@ public sealed partial class AppsPage : Page
 
     private void PinAppClick(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuFlyoutItem menuItem && menuItem.DataContext is ApplicationInfo app)
+        if (sender is MenuFlyoutItem menuItem && menuItem.DataContext is ApplicationItem app)
         {
             ViewModel.PinApp(app);
         }
@@ -62,7 +62,7 @@ public sealed partial class AppsPage : Page
 
     private async void UninstallAppClick(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuFlyoutItem menuItem && menuItem.DataContext is ApplicationInfo app)
+        if (sender is MenuFlyoutItem menuItem && menuItem.DataContext is ApplicationItem app)
         {
             ViewModel.UninstallApp(app);
         }
