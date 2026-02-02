@@ -1,9 +1,7 @@
-using CommunityToolkit.WinUI;
 using Microsoft.UI.Dispatching;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
-using Sefirah.Views;
 
 namespace Sefirah.ViewModels.Settings;
 
@@ -15,6 +13,8 @@ public partial class DevicesViewModel : ObservableObject
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
     private ISftpService SftpService { get; } = Ioc.Default.GetRequiredService<ISftpService>();
     private RemoteAppRepository RemoteAppRepository { get; } = Ioc.Default.GetRequiredService<RemoteAppRepository>();
+    private SmsRepository SmsRepository { get; } = Ioc.Default.GetRequiredService<SmsRepository>();
+    private NotificationRepository NotificationRepository { get; } = Ioc.Default.GetRequiredService<NotificationRepository>();
     #endregion
     
     public ObservableCollection<PairedDevice> PairedDevices => DeviceManager.PairedDevices;
@@ -61,10 +61,12 @@ public partial class DevicesViewModel : ObservableObject
                     SessionManager.DisconnectDevice(device);
                 }
 
+                await DeviceManager.RemoveDevice(device);
+
                 SftpService.Remove(device.Id);
                 RemoteAppRepository.RemoveAllAppsForDeviceAsync(device.Id);
-
-                await DeviceManager.RemoveDevice(device);
+                SmsRepository.DeleteAllDataForDevice(device.Id);
+                NotificationRepository.RemoveNotificationsForDevice(device.Id);
             }
             catch (Exception ex)
             {
