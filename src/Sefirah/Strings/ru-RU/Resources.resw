@@ -711,7 +711,7 @@ input text %pwd%</value>
     <value>Allow audio device control with this device</value>
   </data>
   <data name="ClipboardIncludeImagesDescription" xml:space="preserve">
-    <value>Enable image synchronization through clipboard</value>
+    <value>Включить синхронизацию изображений через буфер обмена</value>
   </data>
   <data name="ClipboardIncludeImages" xml:space="preserve">
     <value>Включать изображения в буфер мониторинга</value>
