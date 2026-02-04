@@ -693,7 +693,7 @@ input text %pwd%</value>
     <value>Alarm</value>
   </data>
   <data name="AdbSettingsDescription" xml:space="preserve">
-    <value>Configure ADB connection</value>
+    <value>ADB-Verbindung konfigurieren</value>
   </data>
   <data name="ScreenMirrorSettingsDescription" xml:space="preserve">
     <value>Configure scrcpy flags and screen mirroring options</value>
