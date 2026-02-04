@@ -319,10 +319,10 @@
     <value>Devices</value>
   </data>
   <data name="AudioSilent" xml:space="preserve">
-    <value>Silent</value>
+    <value>サイレント</value>
   </data>
   <data name="AudioVibrate" xml:space="preserve">
-    <value>Vibrate</value>
+    <value>振動</value>
   </data>
   <data name="Pin" xml:space="preserve">
     <value>ピン留め</value>
