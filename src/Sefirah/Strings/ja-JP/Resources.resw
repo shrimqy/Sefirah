@@ -714,7 +714,7 @@ input text %pwd%</value>
     <value>Enable image synchronization through clipboard</value>
   </data>
   <data name="ClipboardIncludeImages" xml:space="preserve">
-    <value>Include images in clipboard monitor</value>
+    <value>クリップボードの監視に画像を含める</value>
   </data>
   <data name="Language" xml:space="preserve">
     <value>Language</value>
