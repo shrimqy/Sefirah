@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -154,7 +154,7 @@
     <value>Путь сохранения</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Remote storage location</value>
+    <value>Расположение удаленного хранилища</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>Показать всплывающее окно буфера обмена</value>
@@ -175,10 +175,10 @@
     <value>Выкл</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Notification feed</value>
+    <value>Лента уведомлений</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>Notification feed + toast</value>
+    <value>Лента уведомлений + всплывающее уведомление</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>Доступные устройства</value>
@@ -232,7 +232,7 @@
     <value>Добро пожаловать в Sefirah</value>
   </data>
   <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
-    <value>Чтобы начать загрузку и установку Comapanion приложения через соответствующую страницу github.</value>
+    <value>Для начала загрузите и установите сопутствующее приложение через соответствующую страницу GitHub.</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
     <value>Начнём</value>
@@ -247,7 +247,7 @@
     <value>Отсканируйте QR код или подключитесь напрямую к найденным устройствам ниже</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>Device connection request</value>
+    <value>Запрос на подключение устройства</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
     <value>Проверьте, совпадает ли ключ доступа на обоих устройствах:</value>
@@ -319,7 +319,7 @@
     <value>Устройства</value>
   </data>
   <data name="AudioSilent" xml:space="preserve">
-    <value>Без звука</value>
+    <value>Беззвучный</value>
   </data>
   <data name="AudioVibrate" xml:space="preserve">
     <value>Вибрация</value>
@@ -334,7 +334,7 @@
     <value>Настройки видео</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>Audio settings</value>
+    <value>Настройки звука</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
     <value>Открыть в приложении</value>
@@ -666,7 +666,7 @@ input text %pwd%</value>
     <value>Перетащите файл для отправки</value>
   </data>
   <data name="DeviceAddresses" xml:space="preserve">
-    <value>Device addresses</value>
+    <value>Адреса устройств</value>
   </data>
   <data name="ManageAddressesAndPriority" xml:space="preserve">
     <value>Управление адресами и приоритетом подключения</value>
@@ -678,19 +678,19 @@ input text %pwd%</value>
     <value>Включить / отключить доступ к хранилищу этого устройства в Проводнике</value>
   </data>
   <data name="AudioRing" xml:space="preserve">
-    <value>Ring</value>
+    <value>Звук</value>
   </data>
   <data name="AudioMedia" xml:space="preserve">
     <value>Media</value>
   </data>
   <data name="AudioNotification" xml:space="preserve">
-    <value>Notification</value>
+    <value>Уведомление</value>
   </data>
   <data name="AudioCall" xml:space="preserve">
-    <value>Call</value>
+    <value>Звонок</value>
   </data>
   <data name="AudioAlarm" xml:space="preserve">
-    <value>Alarm</value>
+    <value>Будильник</value>
   </data>
   <data name="AdbSettingsDescription" xml:space="preserve">
     <value>Configure ADB connection</value>
