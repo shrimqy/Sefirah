@@ -320,7 +320,7 @@ page.</value>
     <value>Devices</value>
   </data>
   <data name="AudioSilent" xml:space="preserve">
-    <value>Silent</value>
+    <value>무음</value>
   </data>
   <data name="AudioVibrate" xml:space="preserve">
     <value>진동</value>
@@ -694,7 +694,7 @@ input text %pwd%</value>
     <value>Alarm</value>
   </data>
   <data name="AdbSettingsDescription" xml:space="preserve">
-    <value>Configure ADB connection</value>
+    <value>ADB 연결 설정</value>
   </data>
   <data name="ScreenMirrorSettingsDescription" xml:space="preserve">
     <value>Configure scrcpy flags and screen mirroring options</value>
@@ -712,10 +712,10 @@ input text %pwd%</value>
     <value>Allow audio device control with this device</value>
   </data>
   <data name="ClipboardIncludeImagesDescription" xml:space="preserve">
-    <value>Enable image synchronization through clipboard</value>
+    <value>클립보드를 통한 이미지 동기화 활성화</value>
   </data>
   <data name="ClipboardIncludeImages" xml:space="preserve">
-    <value>Include images in clipboard monitor</value>
+    <value>클립보드 모니터에 이미지 포함</value>
   </data>
   <data name="Language" xml:space="preserve">
     <value>Language</value>
