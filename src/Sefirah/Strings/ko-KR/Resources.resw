@@ -323,7 +323,7 @@ page.</value>
     <value>Silent</value>
   </data>
   <data name="AudioVibrate" xml:space="preserve">
-    <value>Vibrate</value>
+    <value>진동</value>
   </data>
   <data name="Pin" xml:space="preserve">
     <value>고정</value>
