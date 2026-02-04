@@ -714,7 +714,7 @@ input text %pwd%</value>
     <value>Bildsynchronisierung durch Zwischenablage aktivieren</value>
   </data>
   <data name="ClipboardIncludeImages" xml:space="preserve">
-    <value>Include images in clipboard monitor</value>
+    <value>Bilder im Zwischenablagen-Anzeige einbeziehen</value>
   </data>
   <data name="Language" xml:space="preserve">
     <value>Language</value>
