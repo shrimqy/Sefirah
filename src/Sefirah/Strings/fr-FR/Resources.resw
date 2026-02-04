@@ -319,10 +319,10 @@
     <value>Devices</value>
   </data>
   <data name="AudioSilent" xml:space="preserve">
-    <value>Silent</value>
+    <value>Muet</value>
   </data>
   <data name="AudioVibrate" xml:space="preserve">
-    <value>Vibrate</value>
+    <value>Vibreur</value>
   </data>
   <data name="Pin" xml:space="preserve">
     <value>Épingler</value>
@@ -693,7 +693,7 @@ input text %pwd%</value>
     <value>Alarm</value>
   </data>
   <data name="AdbSettingsDescription" xml:space="preserve">
-    <value>Configure ADB connection</value>
+    <value>Configurer la connexion ADB</value>
   </data>
   <data name="ScreenMirrorSettingsDescription" xml:space="preserve">
     <value>Configure scrcpy flags and screen mirroring options</value>
@@ -714,7 +714,7 @@ input text %pwd%</value>
     <value>Activer la synchronisation des images via le presse-papiers</value>
   </data>
   <data name="ClipboardIncludeImages" xml:space="preserve">
-    <value>Include images in clipboard monitor</value>
+    <value>Inclure des images dans le moniteur du presse-papiers</value>
   </data>
   <data name="Language" xml:space="preserve">
     <value>Language</value>
