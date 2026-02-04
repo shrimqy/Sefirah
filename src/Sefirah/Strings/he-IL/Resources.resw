@@ -319,10 +319,10 @@
     <value>Devices</value>
   </data>
   <data name="AudioSilent" xml:space="preserve">
-    <value>Silent</value>
+    <value>שקט</value>
   </data>
   <data name="AudioVibrate" xml:space="preserve">
-    <value>Vibrate</value>
+    <value>רטט</value>
   </data>
   <data name="Pin" xml:space="preserve">
     <value>נעץ</value>
@@ -714,7 +714,7 @@ input text %pwd%</value>
     <value>Enable image synchronization through clipboard</value>
   </data>
   <data name="ClipboardIncludeImages" xml:space="preserve">
-    <value>Include images in clipboard monitor</value>
+    <value>כלול תמונות בסנכרון לוח העתקה</value>
   </data>
   <data name="Language" xml:space="preserve">
     <value>Language</value>
