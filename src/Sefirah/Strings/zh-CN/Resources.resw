@@ -320,10 +320,10 @@
     <value>设备</value>
   </data>
   <data name="AudioSilent" xml:space="preserve">
-    <value>Silent</value>
+    <value>静音</value>
   </data>
   <data name="AudioVibrate" xml:space="preserve">
-    <value>Vibrate</value>
+    <value>振动</value>
   </data>
   <data name="Pin" xml:space="preserve">
     <value>置顶</value>
@@ -712,10 +712,10 @@ input text %pwd%</value>
     <value>Allow audio device control with this device</value>
   </data>
   <data name="ClipboardIncludeImagesDescription" xml:space="preserve">
-    <value>Enable image synchronization through clipboard</value>
+    <value>启用通过粘贴板实现的图片同步</value>
   </data>
   <data name="ClipboardIncludeImages" xml:space="preserve">
-    <value>Include images in clipboard monitor</value>
+    <value>在剪贴板监视器中包含图像</value>
   </data>
   <data name="Language" xml:space="preserve">
     <value>Language</value>
