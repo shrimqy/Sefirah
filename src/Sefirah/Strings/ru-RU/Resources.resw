@@ -681,7 +681,7 @@ input text %pwd%</value>
     <value>Звук</value>
   </data>
   <data name="AudioMedia" xml:space="preserve">
-    <value>Media</value>
+    <value>Медиа</value>
   </data>
   <data name="AudioNotification" xml:space="preserve">
     <value>Уведомление</value>
@@ -693,22 +693,22 @@ input text %pwd%</value>
     <value>Будильник</value>
   </data>
   <data name="AdbSettingsDescription" xml:space="preserve">
-    <value>Configure ADB connection</value>
+    <value>Настройка подключения ADB</value>
   </data>
   <data name="ScreenMirrorSettingsDescription" xml:space="preserve">
-    <value>Configure scrcpy flags and screen mirroring options</value>
+    <value>Настройка флагов scrcpy и параметров зеркального отображения экрана</value>
   </data>
   <data name="MediaSessionDescription" xml:space="preserve">
-    <value>Sync media playback information with this device</value>
+    <value>Синхронизировать информацию о воспроизведении мультимедиа с этим устройством</value>
   </data>
   <data name="AudioControl" xml:space="preserve">
-    <value>Audio device control</value>
+    <value>Управление аудио</value>
   </data>
   <data name="MediaSession" xml:space="preserve">
     <value>Media playback session</value>
   </data>
   <data name="AudioControlDescription" xml:space="preserve">
-    <value>Allow audio device control with this device</value>
+    <value>Разрешить управление аудио с помощью этого устройства</value>
   </data>
   <data name="ClipboardIncludeImagesDescription" xml:space="preserve">
     <value>Включить синхронизацию изображений через буфер обмена</value>
@@ -717,18 +717,18 @@ input text %pwd%</value>
     <value>Включать изображения в буфер мониторинга</value>
   </data>
   <data name="Language" xml:space="preserve">
-    <value>Language</value>
+    <value>Язык</value>
   </data>
   <data name="LanguageDescription" xml:space="preserve">
-    <value>Choose your preferred display language</value>
+    <value>Выберите язык отображения</value>
   </data>
   <data name="UseSystemSetting" xml:space="preserve">
-    <value>Use system setting</value>
+    <value>Как в системе</value>
   </data>
   <data name="ScrcpyLocation" xml:space="preserve">
-    <value>Scrcpy location</value>
+    <value>Местоположение Scrcpy</value>
   </data>
   <data name="AdbLocation" xml:space="preserve">
-    <value>Adb location</value>
+    <value>Местоположение Adb</value>
   </data>
 </root>
