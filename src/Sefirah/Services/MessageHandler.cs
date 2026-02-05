@@ -28,6 +28,10 @@ public class MessageHandler(
                     await remoteAppRepository.UpdateApplicationList(device, applicationList);
                     break;
 
+                case ApplicationInfo applicationInfo:
+                    await remoteAppRepository.AddOrUpdateApplicationForDevice(applicationInfo, device.Id);
+                    break;
+
                 case NotificationInfo notificationMessage:
                     await notificationService.HandleNotificationMessage(device, notificationMessage);
                     break;
