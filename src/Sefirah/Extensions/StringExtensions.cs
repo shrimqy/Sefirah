@@ -9,8 +9,6 @@ public static class StringExtensions
 {
     private static readonly IStringLocalizer stringLocalizer = Ioc.Default.GetRequiredService<IStringLocalizer>();
 
-    private static readonly ConcurrentDictionary<string, string> cachedResources = new();
-
     /// <summary>
     /// Retrieves a localized resource string from the resource map.
     /// </summary>
@@ -18,16 +16,6 @@ public static class StringExtensions
     /// <returns>The localized resource string.</returns>
     public static string GetLocalizedResource(this string resourceKey)
     {
-        if (cachedResources.TryGetValue(resourceKey, out var value))
-        {
-            return value;
-        }
-
-        if (string.IsNullOrEmpty(value))
-        {
-            value = stringLocalizer[resourceKey];
-        }
-
-        return value ?? string.Empty;
+        return stringLocalizer[resourceKey] ?? string.Empty;
     }
 }
