@@ -577,7 +577,7 @@
     <value>Параметры</value>
   </data>
   <data name="StartInDirectory" xml:space="preserve">
-    <value>Start in directory</value>
+    <value>Начинать из папки</value>
   </data>
   <data name="EnterActionName" xml:space="preserve">
     <value>Введите имя действия</value>
@@ -705,7 +705,7 @@ input text %pwd%</value>
     <value>Управление аудио</value>
   </data>
   <data name="MediaSession" xml:space="preserve">
-    <value>Media playback session</value>
+    <value>Сеанс воспроизведения медиа</value>
   </data>
   <data name="AudioControlDescription" xml:space="preserve">
     <value>Разрешить управление аудио с помощью этого устройства</value>
