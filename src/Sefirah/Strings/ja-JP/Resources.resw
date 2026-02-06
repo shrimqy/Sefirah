@@ -544,7 +544,7 @@
     <value>Display toast notifications on this PC</value>
   </data>
   <data name="ShowBadge" xml:space="preserve">
-    <value>Show badge</value>
+    <value>バッジを表示</value>
   </data>
   <data name="ShowBadgeDescription" xml:space="preserve">
     <value>Show notification badge on taskbar</value>
@@ -559,22 +559,22 @@
     <value>Connection preference</value>
   </data>
   <data name="AddAction" xml:space="preserve">
-    <value>Add action</value>
+    <value>アクションを追加</value>
   </data>
   <data name="Edit" xml:space="preserve">
-    <value>Edit</value>
+    <value>編集</value>
   </data>
   <data name="NoActionsConfigured" xml:space="preserve">
     <value>No actions configured</value>
   </data>
   <data name="ActionName" xml:space="preserve">
-    <value>Action name</value>
+    <value>アクション名</value>
   </data>
   <data name="ExecutablePath" xml:space="preserve">
-    <value>Executable path</value>
+    <value>実行パス</value>
   </data>
   <data name="Arguments" xml:space="preserve">
-    <value>Arguments</value>
+    <value>引数</value>
   </data>
   <data name="StartInDirectory" xml:space="preserve">
     <value>Start in directory</value>
@@ -592,25 +592,25 @@
     <value>Enter password</value>
   </data>
   <data name="Reply" xml:space="preserve">
-    <value>Reply</value>
+    <value>返信</value>
   </data>
   <data name="Back" xml:space="preserve">
-    <value>Back</value>
+    <value>戻る</value>
   </data>
   <data name="Browse" xml:space="preserve">
-    <value>Browse</value>
+    <value>参照</value>
   </data>
   <data name="EnterAddressesAndCompose" xml:space="preserve">
     <value>Enter addresses above and compose your message below</value>
   </data>
   <data name="UseTcpIpMode" xml:space="preserve">
-    <value>Use TCP/IP mode</value>
+    <value>TCP/IP モードを使用する</value>
   </data>
   <data name="UseTcpIpModeDescription" xml:space="preserve">
     <value>Enable wireless ADB connections</value>
   </data>
   <data name="WorkingDirectory" xml:space="preserve">
-    <value>Working directory (optional)</value>
+    <value>作業ディレクトリ (任意)</value>
   </data>
   <data name="UnlockDeviceBeforeLaunch" xml:space="preserve">
     <value>Unlock device before launching scrcpy</value>
@@ -646,7 +646,7 @@
     <value>Sent {0} files to {1}</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>キャンセル</value>
   </data>
   <data name="NoPairedDevices" xml:space="preserve">
     <value>No paired devices</value>
@@ -687,10 +687,10 @@ input text %pwd%</value>
     <value>Notification</value>
   </data>
   <data name="AudioCall" xml:space="preserve">
-    <value>Call</value>
+    <value>通話</value>
   </data>
   <data name="AudioAlarm" xml:space="preserve">
-    <value>Alarm</value>
+    <value>アラーム</value>
   </data>
   <data name="AdbSettingsDescription" xml:space="preserve">
     <value>Configure ADB connection</value>
@@ -705,7 +705,7 @@ input text %pwd%</value>
     <value>Audio device control</value>
   </data>
   <data name="MediaSession" xml:space="preserve">
-    <value>Media playback session</value>
+    <value>メディア再生セッション</value>
   </data>
   <data name="AudioControlDescription" xml:space="preserve">
     <value>Allow audio device control with this device</value>
@@ -717,18 +717,18 @@ input text %pwd%</value>
     <value>クリップボードの監視に画像を含める</value>
   </data>
   <data name="Language" xml:space="preserve">
-    <value>Language</value>
+    <value>言語</value>
   </data>
   <data name="LanguageDescription" xml:space="preserve">
     <value>Choose your preferred display language</value>
   </data>
   <data name="UseSystemSetting" xml:space="preserve">
-    <value>Use system setting</value>
+    <value>システム設定を使用する</value>
   </data>
   <data name="ScrcpyLocation" xml:space="preserve">
-    <value>Scrcpy location</value>
+    <value>Scrcpy の場所</value>
   </data>
   <data name="AdbLocation" xml:space="preserve">
-    <value>Adb location</value>
+    <value>Adb の場所</value>
   </data>
 </root>
