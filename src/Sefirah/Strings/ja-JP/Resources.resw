@@ -154,7 +154,7 @@
     <value>保存先</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Remote storage location</value>
+    <value>リモートストレージの場所</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>クリップボード トースト通知を表示</value>
@@ -175,10 +175,10 @@
     <value>無効</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Notification feed</value>
+    <value>通知フィード</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>Notification feed + toast</value>
+    <value>通知フィード + トースト</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>利用可能なデバイス</value>
@@ -244,10 +244,10 @@
     <value>デバイスを接続</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>Scan the QR code or pair directly from the discovered devices below</value>
+    <value>QR コードをスキャンするか、以下の検出されたデバイスから直接ペアリングしてください</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>Device connection request</value>
+    <value>デバイス接続の要求</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
     <value>両方のデバイスでパスキーが一致しているか確認してください:</value>
@@ -316,7 +316,7 @@
     <value>デバイスがサイレント モード時はトースト通知を表示しない</value>
   </data>
   <data name="Devices.Title" xml:space="preserve">
-    <value>Devices</value>
+    <value>デバイス</value>
   </data>
   <data name="AudioSilent" xml:space="preserve">
     <value>サイレント</value>
@@ -334,7 +334,7 @@
     <value>映像設定</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>Audio settings</value>
+    <value>オーディオの設定</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
     <value>アプリで開く</value>
@@ -358,7 +358,7 @@
     <value>メッセージ</value>
   </data>
   <data name="EmptyMessages" xml:space="preserve">
-    <value>Start a new conversation or select one to reply</value>
+    <value>新しく会話を開始するか、返信する会話を選択してください</value>
   </data>
   <data name="MessagePlaceholder" xml:space="preserve">
     <value>メッセージを入力</value>
@@ -373,7 +373,7 @@
     <value>メッセージを検索</value>
   </data>
   <data name="AddressInputPlaceholder" xml:space="preserve">
-    <value>To</value>
+    <value>宛先</value>
   </data>
   <data name="RemoveAddress" xml:space="preserve">
     <value>アドレスを削除</value>
@@ -484,79 +484,79 @@
     <value>仮想ディスプレイを有効にする</value>
   </data>
   <data name="Uninstall" xml:space="preserve">
-    <value>Uninstall</value>
+    <value>アンインストール</value>
   </data>
   <data name="UnlockDeviceHelpTitle" xml:space="preserve">
-    <value>Shell commands help</value>
+    <value>シェルコマンドのヘルプ</value>
   </data>
   <data name="UnlockDeviceHelpDescription" xml:space="preserve">
     <value>The shell commands in the text box will be executed before launching scrcpy. Enter commands that work on your device, separated by line.</value>
   </data>
   <data name="UnlockDeviceHelpExample" xml:space="preserve">
-    <value>Example:</value>
+    <value>例:</value>
   </data>
   <data name="PinnedApps" xml:space="preserve">
-    <value>Pinned apps</value>
+    <value>ピン留めされたアプリ</value>
   </data>
   <data name="Actions" xml:space="preserve">
-    <value>Actions</value>
+    <value>アクション</value>
   </data>
   <data name="ActionsDescription" xml:space="preserve">
-    <value>Configure custom actions and executable commands</value>
+    <value>カスタムアクションと実行可能なコマンドを構成します</value>
   </data>
   <data name="AdbNoDevice" xml:space="preserve">
-    <value>No ADB devices connected</value>
+    <value>ADB デバイスが接続されていません</value>
   </data>
   <data name="AdbNoDeviceSubtitle" xml:space="preserve">
     <value>Turn on ADB and connect your device via USB or Wi-Fi to see it here</value>
   </data>
   <data name="ClipboardSettings" xml:space="preserve">
-    <value>Clipboard settings</value>
+    <value>クリップボードの設定</value>
   </data>
   <data name="DeviceSettings" xml:space="preserve">
-    <value>Device settings</value>
+    <value>デバイスの設定</value>
   </data>
   <data name="NotificationSettings" xml:space="preserve">
-    <value>Notification settings</value>
+    <value>通知の設定</value>
   </data>
   <data name="ScreenMirrorSettings" xml:space="preserve">
-    <value>Screen mirror settings</value>
+    <value>スクリーンミラーの設定</value>
   </data>
   <data name="OpenLinksInBrowserDescription" xml:space="preserve">
-    <value>Automatically open links from clipboard in default browser</value>
+    <value>クリップボードからのリンクをデフォルトのブラウザーで自動的に開きます</value>
   </data>
   <data name="ShowClipboardToastDescription" xml:space="preserve">
-    <value>Show toast notifications for clipboard changes</value>
+    <value>クリップボードの変更をトースト通知で表示します</value>
   </data>
   <data name="ClipboardFilesDescription" xml:space="preserve">
-    <value>Enable file synchronization through clipboard</value>
+    <value>クリップボードを介したファイル同期を有効化します</value>
   </data>
   <data name="AutoConnectDescription" xml:space="preserve">
-    <value>Automatically connect to ADB when device connects</value>
+    <value>デバイスの接続時に自動で ADB に接続します</value>
   </data>
   <data name="SyncClipboardChanges" xml:space="preserve">
-    <value>Sync clipboard changes with this device</value>
+    <value>クリップボードの変更をこのデバイスと同期します</value>
   </data>
   <data name="ConfigureNotificationSettings" xml:space="preserve">
-    <value>Configure notification settings</value>
+    <value>通知設定を構成</value>
   </data>
   <data name="DisplayToastNotifications" xml:space="preserve">
-    <value>Display toast notifications on this PC</value>
+    <value>この PC にトースト通知を表示します</value>
   </data>
   <data name="ShowBadge" xml:space="preserve">
     <value>バッジを表示</value>
   </data>
   <data name="ShowBadgeDescription" xml:space="preserve">
-    <value>Show notification badge on taskbar</value>
+    <value>通知バッジをタスク バーに表示します</value>
   </data>
   <data name="IgnoreDuringDoNotDisturb" xml:space="preserve">
-    <value>Ignore during Do Not Disturb</value>
+    <value>サイレント モード時は無視</value>
   </data>
   <data name="IgnoreDuringDoNotDisturbDescription" xml:space="preserve">
-    <value>Don't show notifications when Do Not Disturb is enabled</value>
+    <value>サイレント モードが有効化されている場合は通知を表示しません</value>
   </data>
   <data name="ConnectionPreference" xml:space="preserve">
-    <value>Connection preference</value>
+    <value>接続の設定</value>
   </data>
   <data name="AddAction" xml:space="preserve">
     <value>アクションを追加</value>
@@ -565,7 +565,7 @@
     <value>編集</value>
   </data>
   <data name="NoActionsConfigured" xml:space="preserve">
-    <value>No actions configured</value>
+    <value>アクションは構成されていません</value>
   </data>
   <data name="ActionName" xml:space="preserve">
     <value>アクション名</value>
@@ -577,19 +577,19 @@
     <value>引数</value>
   </data>
   <data name="StartInDirectory" xml:space="preserve">
-    <value>Start in directory</value>
+    <value>ディレクトリから開始</value>
   </data>
   <data name="EnterActionName" xml:space="preserve">
-    <value>Enter action name</value>
+    <value>アクション名を入力</value>
   </data>
   <data name="PathToExecutable" xml:space="preserve">
-    <value>Path to executable</value>
+    <value>実行パス</value>
   </data>
   <data name="CommandLineArguments" xml:space="preserve">
-    <value>Command line arguments (optional)</value>
+    <value>コマンドライン引数 (任意)</value>
   </data>
   <data name="EnterPassword" xml:space="preserve">
-    <value>Enter password</value>
+    <value>パスワードを入力</value>
   </data>
   <data name="Reply" xml:space="preserve">
     <value>返信</value>
@@ -601,61 +601,61 @@
     <value>参照</value>
   </data>
   <data name="EnterAddressesAndCompose" xml:space="preserve">
-    <value>Enter addresses above and compose your message below</value>
+    <value>上記にアドレスを入力し、下記にメッセージを入力してください</value>
   </data>
   <data name="UseTcpIpMode" xml:space="preserve">
     <value>TCP/IP モードを使用する</value>
   </data>
   <data name="UseTcpIpModeDescription" xml:space="preserve">
-    <value>Enable wireless ADB connections</value>
+    <value>ワイヤレス ADB 接続を有効化</value>
   </data>
   <data name="WorkingDirectory" xml:space="preserve">
     <value>作業ディレクトリ (任意)</value>
   </data>
   <data name="UnlockDeviceBeforeLaunch" xml:space="preserve">
-    <value>Unlock device before launching scrcpy</value>
+    <value>scrcpy を起動する前にデバイスのロックを解除してください</value>
   </data>
   <data name="Save" xml:space="preserve">
-    <value>Save</value>
+    <value>保存</value>
   </data>
   <data name="FileTransferNotification.Receiving" xml:space="preserve">
-    <value>Receiving from {0}</value>
+    <value>「{0}」から受信中</value>
   </data>
   <data name="FileTransferNotification.Sending" xml:space="preserve">
-    <value>Sending to {0}</value>
+    <value>「{0}」に送信中</value>
   </data>
   <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
-    <value>Receiving {0} files from {1}</value>
+    <value>「{0}」から {1} 個のファイルを受信中</value>
   </data>
   <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
-    <value>Sending {0} files to {1}</value>
+    <value>「{0}」に {1} 個のファイルを送信中</value>
   </data>
   <data name="FileTransferNotification.Completed" xml:space="preserve">
-    <value>File transfer completed</value>
+    <value>ファイル転送が完了しました</value>
   </data>
   <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
-    <value>Received {0} from {1}</value>
+    <value>「{0}」から {1} を受信しました</value>
   </data>
   <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
-    <value>Received {0} files from {1}</value>
+    <value>「{0}」から {1} 個のファイルを受信しました</value>
   </data>
   <data name="FileTransferNotification.SentSingle" xml:space="preserve">
-    <value>Sent {0} to {1}</value>
+    <value>「{0}」から {1} を送信</value>
   </data>
   <data name="FileTransferNotification.SentBulk" xml:space="preserve">
-    <value>Sent {0} files to {1}</value>
+    <value> {0} 個のファイルを「{1}」に送信</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
     <value>キャンセル</value>
   </data>
   <data name="NoPairedDevices" xml:space="preserve">
-    <value>No paired devices</value>
+    <value>ペア済みのデバイスがありません</value>
   </data>
   <data name="Add" xml:space="preserve">
-    <value>Add</value>
+    <value>追加</value>
   </data>
   <data name="HostnamePlaceholder" xml:space="preserve">
-    <value>Enter hostname or IP address</value>
+    <value>ホスト名または IP アドレスを入力</value>
   </data>
   <data name="UnlockCommandsPlaceholder" xml:space="preserve">
     <value>input keyevent 26
@@ -663,28 +663,28 @@ input keyevent 66
 input text %pwd%</value>
   </data>
   <data name="FileDropCaption" xml:space="preserve">
-    <value>Drop files to send</value>
+    <value>ファイルをドロップで送信</value>
   </data>
   <data name="DeviceAddresses" xml:space="preserve">
-    <value>Device addresses</value>
+    <value>デバイスのアドレス</value>
   </data>
   <data name="ManageAddressesAndPriority" xml:space="preserve">
-    <value>Manage addresses and connection priority</value>
+    <value>アドレスと接続の優先順位を管理します</value>
   </data>
   <data name="StorageAccess" xml:space="preserve">
-    <value>Show device in File Explorer</value>
+    <value>ファイル エクスプローラーでデバイスを表示</value>
   </data>
   <data name="StorageAccessDescription" xml:space="preserve">
-    <value>Enables or disables storage access for this device in the File Explorer</value>
+    <value>ファイル エクスプローラーでこのデバイスのストレージアクセスを有効または無効にします</value>
   </data>
   <data name="AudioRing" xml:space="preserve">
-    <value>Ring</value>
+    <value>着信</value>
   </data>
   <data name="AudioMedia" xml:space="preserve">
-    <value>Media</value>
+    <value>メディア</value>
   </data>
   <data name="AudioNotification" xml:space="preserve">
-    <value>Notification</value>
+    <value>通知</value>
   </data>
   <data name="AudioCall" xml:space="preserve">
     <value>通話</value>
@@ -693,25 +693,25 @@ input text %pwd%</value>
     <value>アラーム</value>
   </data>
   <data name="AdbSettingsDescription" xml:space="preserve">
-    <value>Configure ADB connection</value>
+    <value>ADB 接続を構成</value>
   </data>
   <data name="ScreenMirrorSettingsDescription" xml:space="preserve">
-    <value>Configure scrcpy flags and screen mirroring options</value>
+    <value>scrcpy フラグとスクリーンミラーリングのオプションを構成します</value>
   </data>
   <data name="MediaSessionDescription" xml:space="preserve">
-    <value>Sync media playback information with this device</value>
+    <value>メディア再生情報をこのデバイスと同期します</value>
   </data>
   <data name="AudioControl" xml:space="preserve">
-    <value>Audio device control</value>
+    <value>オーディオ デバイス コントロール</value>
   </data>
   <data name="MediaSession" xml:space="preserve">
     <value>メディア再生セッション</value>
   </data>
   <data name="AudioControlDescription" xml:space="preserve">
-    <value>Allow audio device control with this device</value>
+    <value>このデバイスでオーディオ デバイスのコントロールを許可</value>
   </data>
   <data name="ClipboardIncludeImagesDescription" xml:space="preserve">
-    <value>Enable image synchronization through clipboard</value>
+    <value>クリップボード経由での画像同期を有効化します</value>
   </data>
   <data name="ClipboardIncludeImages" xml:space="preserve">
     <value>クリップボードの監視に画像を含める</value>
@@ -720,7 +720,7 @@ input text %pwd%</value>
     <value>言語</value>
   </data>
   <data name="LanguageDescription" xml:space="preserve">
-    <value>Choose your preferred display language</value>
+    <value>お好みの表示言語を選択してください</value>
   </data>
   <data name="UseSystemSetting" xml:space="preserve">
     <value>システム設定を使用する</value>
