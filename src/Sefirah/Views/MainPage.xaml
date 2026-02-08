@@ -1,4 +1,4 @@
-<Page
+﻿<Page
     x:Class="Sefirah.Views.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -188,7 +188,8 @@
                             Orientation="Horizontal"
                             Spacing="4"
                             Visibility="{x:Bind ViewModel.Device.IsConnected, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
-                            <!--  Audio Mode Button  -->
+
+                            <!--  Audio Button  -->
                             <Button
                                 Grid.Column="2"
                                 Padding="4"
@@ -203,9 +204,14 @@
                                                 <Setter Property="MinWidth" Value="280" />
                                             </Style>
                                         </Flyout.FlyoutPresenterStyle>
-                                        <StackPanel Spacing="12">
+                                        <Grid RowSpacing="12">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
                                             <!--  Volume Sliders  -->
-                                            <ItemsRepeater ItemsSource="{x:Bind ViewModel.Device.Streams, Mode=OneWay}" HorizontalAlignment="Stretch">
+                                            <ItemsRepeater Grid.Row="0" ItemsSource="{x:Bind ViewModel.Device.Streams, Mode=OneWay}" HorizontalAlignment="Stretch">
                                                 <ItemsRepeater.Layout>
                                                     <UniformGridLayout
                                                         ItemsStretch="Fill"
@@ -229,16 +235,15 @@
                                                                 Text="{x:Bind Label}"
                                                                 FontSize="12"
                                                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                                TextWrapping="Wrap"
                                                                 HorizontalAlignment="Stretch"
                                                                 TextAlignment="Center" />
                                                         </StackPanel>
                                                     </DataTemplate>
                                                 </ItemsRepeater.ItemTemplate>
                                             </ItemsRepeater>
-
+                                            
                                             <!--  Ringer Mode Selector  -->
-                                            <wuc:Segmented HorizontalAlignment="Stretch" SelectedIndex="{x:Bind ViewModel.Device.RingerMode, Mode=OneWay}" SelectionChanged="RingerModeSegmented_SelectionChanged">
+                                            <wuc:Segmented Grid.Row="1" HorizontalAlignment="Stretch" SelectedIndex="{x:Bind ViewModel.Device.RingerMode, Mode=OneWay}" SelectionChanged="RingerModeSegmented_SelectionChanged">
                                                 <wuc:SegmentedItem Content="{helpers:ResourceString Name=AudioSilent}">
                                                     <wuc:SegmentedItem.Icon>
                                                         <FontIcon Glyph="&#xE7ED;" />
@@ -255,7 +260,7 @@
                                                     </wuc:SegmentedItem.Icon>
                                                 </wuc:SegmentedItem>
                                             </wuc:Segmented>
-                                        </StackPanel>
+                                        </Grid>
                                     </Flyout>
                                 </Button.Flyout>
                             </Button>
@@ -270,7 +275,6 @@
                                 <TextBlock FontWeight="SemiBold" Text="{x:Bind ViewModel.Device.BatteryStatus.BatteryLevel, Mode=OneWay}" />
                                 <TextBlock FontWeight="SemiBold" Text="%" />
                             </StackPanel>
-
                         </StackPanel>
 
                         <!--  Connection Status Card  -->
@@ -339,7 +343,7 @@
                             x:Name="MediaSessionFlipView"
                             x:Load="{x:Bind ViewModel.Device.RemotePlaybackSessions.Count, Converter={StaticResource InverseCountToBooleanConverter}, Mode=OneWay}"
                             Background="Transparent"
-                            MaxHeight="150"
+                            Height="150"
                             ItemsSource="{x:Bind ViewModel.Device.RemotePlaybackSessions, Mode=OneWay}">
                         <FlipView.ItemTemplate>
                             <DataTemplate x:DataType="models:MediaSession">
