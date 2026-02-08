@@ -15,10 +15,10 @@ public partial class AudioStream(AudioStreamType streamType) : ObservableObject
     public string IconGlyph => StreamType switch
     {
         AudioStreamType.Media => "\uE8D6",
-        AudioStreamType.Ring => "\uE717",
-        AudioStreamType.Notification => "\uF2A3",
+        AudioStreamType.Ring => "\uE77E",
+        AudioStreamType.Notification => "\uE91C",
         AudioStreamType.Alarm => "\uE823",
-        AudioStreamType.VoiceCall => "\uF715",
+        AudioStreamType.VoiceCall => "\uE717",
         _ => "\uE767"
     };
 

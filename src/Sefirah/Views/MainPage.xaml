@@ -412,7 +412,7 @@
                                                         Background="Transparent"
                                                         BorderBrush="Transparent"
                                                         Click="PlayPauseButton_Click">
-                                                        <FontIcon FontSize="14"  Glyph="{x:Bind IsPlaying, Converter={StaticResource BoolToPlayPauseGlyphConverter}, Mode=OneWay}" />
+                                                        <FontIcon FontSize="14" Glyph="{x:Bind PlayPauseGlyph, Mode=OneWay}" />
                                                     </Button>
                                                     <Button
                                                         Background="Transparent"
@@ -480,7 +480,7 @@
                                                 VerticalAlignment="Center"
                                                 HorizontalAlignment="Left"
                                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                Text="{x:Bind Position, Converter={StaticResource MillisecondsToTimeConverter}, Mode=OneWay}" />
+                                                Text="{x:Bind PositionText, Mode=OneWay}" />
                                             <Slider
                                                 Grid.Column="1"
                                                 Minimum="{x:Bind MinSeekTime, Mode=OneWay}"

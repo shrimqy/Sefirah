@@ -21,7 +21,10 @@ public partial class MediaSession : ObservableObject
     public partial string? Artist { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PlayPauseGlyph))]
     public partial bool IsPlaying { get; set; }
+
+    public string PlayPauseGlyph => IsPlaying ? "\uE769" : "\uE768";
 
     [ObservableProperty]
     public partial bool? IsShuffleActive { get; set; }
@@ -33,11 +36,26 @@ public partial class MediaSession : ObservableObject
     public partial double? PlaybackRate { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PositionText))]
     public partial double Position { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(MaxSeekTimeText))]
     public partial double MaxSeekTime { get; set; }
-        
+
+    public string PositionText => FormatMillisecondsAsTime(Position);
+
+    public string MaxSeekTimeText => FormatMillisecondsAsTime(MaxSeekTime);
+
+    private static string FormatMillisecondsAsTime(double milliseconds)
+    {
+        if (milliseconds < 0) return "0:00";
+        var ts = TimeSpan.FromMilliseconds(milliseconds);
+        if (ts.TotalHours >= 1)
+            return $"{(int)ts.TotalHours}:{ts.Minutes:D2}:{ts.Seconds:D2}";
+        return $"{ts.Minutes}:{ts.Seconds:D2}";
+    }
+
     [ObservableProperty]
     public partial double MinSeekTime { get; set; }
 
