@@ -129,13 +129,13 @@ internal sealed partial class GeneralSettingsService : BaseObservableJsonSetting
         set => Set(value);
     }
 
-    public string? ScrcpyPath
+    public string ScrcpyPath
     {
         get => Get(string.Empty);
         set => Set(value);
     }
 
-    public string? AdbPath
+    public string AdbPath
     {
         get => Get(string.Empty);
         set => Set(value);

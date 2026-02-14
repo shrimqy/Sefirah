@@ -100,10 +100,10 @@ public class AdbService(
     {
         try
         {
-            if (IsMonitoring) return;
+            var adbPath = userSettingsService.GeneralSettingsService.AdbPath;
+            if (IsMonitoring || string.IsNullOrEmpty(adbPath)) return;
 
             cts = new CancellationTokenSource();
-            string adbPath = $"{userSettingsService.GeneralSettingsService.AdbPath}";
 
             StartServerResult startServerResult = await AdbServer.Instance.StartServerAsync(adbPath, false, cts.Token);
 
