@@ -1,4 +1,4 @@
-<Page
+﻿<Page
     x:Class="Sefirah.Views.AppsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -185,7 +185,6 @@
                         x:Name="PinnedAppsGridView"
                         HorizontalAlignment="Stretch"
                         IsItemClickEnabled="True"
-                        IsRightTapEnabled="True"
                         ItemClick="AppsGridView_ItemClick"
                         ItemContainerStyle="{StaticResource AppItemContainerStyle}"
                         ItemTemplate="{StaticResource AppItemTemplate}"
@@ -213,7 +212,6 @@
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         IsItemClickEnabled="True"
-                        IsRightTapEnabled="True"
                         ItemClick="AppsGridView_ItemClick"
                         ItemContainerStyle="{StaticResource AppItemContainerStyle}"
                         ItemTemplate="{StaticResource AppItemTemplate}"
