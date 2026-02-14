@@ -20,6 +20,7 @@ public sealed partial class MainPageViewModel : BaseViewModel
 
     #region Properties
     public ObservableCollection<PairedDevice> PairedDevices => DeviceManager.PairedDevices;
+
     public PairedDevice? Device => DeviceManager.ActiveDevice;
 
     [ObservableProperty]
@@ -215,10 +216,9 @@ public sealed partial class MainPageViewModel : BaseViewModel
 
     public MainPageViewModel()
     {
-        ((INotifyPropertyChanged)DeviceManager).PropertyChanged += (s, e) =>
+        DeviceManager.ActiveDeviceChanged += (s, e) =>
         {
-            if (e.PropertyName is nameof(IDeviceManager.ActiveDevice))
-                OnPropertyChanged(nameof(Device));
+           OnPropertyChanged(nameof(Device));
         };
     }
 }
