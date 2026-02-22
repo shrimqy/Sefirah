@@ -244,7 +244,9 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
     {
         try
         {
-            logger.LogInformation("Notification invoked - Arguments: {Arguments}", string.Join(", ", args.Arguments.Select(x => $"{x.Key}={x.Value}")));
+            logger.LogInformation("Notification invoked - ArgumentCount: {ArgumentCount}, Keys: {Keys}",
+                args.Arguments.Count,
+                string.Join(", ", args.Arguments.Keys));
 
             if (!args.Arguments.TryGetValue("notificationType", out var notificationType)) return;
             
