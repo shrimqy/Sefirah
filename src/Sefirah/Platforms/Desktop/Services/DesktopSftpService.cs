@@ -10,8 +10,8 @@ public class DesktopSftpService(ILogger<DesktopSftpService> logger) : ISftpServi
 
     public async Task InitializeAsync(PairedDevice device, SftpServerInfo info)
     {
-        logger.LogInformation("Initializing SFTP service for device {DeviceName}, IP: {IpAddress}, Port: {Port}, Password: {Password}", 
-            device.Name, info.IpAddress, info.Port, info.Password);
+        logger.LogInformation("Initializing SFTP service for device {DeviceName}, IP: {IpAddress}, Port: {Port}",
+            device.Name, info.IpAddress, info.Port);
 
         var sftpUri = $"sftp://{info.Username}@{info.IpAddress}:{info.Port}/";
         
