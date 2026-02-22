@@ -34,19 +34,31 @@ public class DatabaseContext
 
         int? storedSchemaVersion = db.Table<SchemaVersionEntity>().FirstOrDefault()?.Version;
 
-        // If schema version doesn't match or doesn't exist, run migrations or recreate
+        // If schema version doesn't match, run migrations when they exist; otherwise destructive fallback
         if (storedSchemaVersion != CurrentSchemaVersion)
         {
             if (storedSchemaVersion.HasValue && storedSchemaVersion < CurrentSchemaVersion)
             {
-                RunMigrations(db, storedSchemaVersion.Value, logger);
+                var migrationsToRun = Migrations
+                    .Where(m => m.TargetVersion > storedSchemaVersion.Value && m.TargetVersion <= CurrentSchemaVersion)
+                    .OrderBy(m => m.TargetVersion)
+                    .ToArray();
+
+                if (migrationsToRun.Length == 0)
+                {
+                    // No migration path exists (e.g. no migration to current version) → destructive fallback
+                    DestructiveFallback(db);
+                }
+                else
+                {
+                    RunMigrations(db, migrationsToRun, logger);
+                }
             }
             else
             {
-                // New database
                 DestructiveFallback(db);
             }
-            
+
             SetSchemaVersion(db, CurrentSchemaVersion);
             logger.LogInformation("Database schema updated successfully");
         }
@@ -69,13 +81,8 @@ public class DatabaseContext
         CreateAllTables(db);
     }
 
-    private static void RunMigrations(SQLiteConnection db, int fromVersion, ILogger logger)
+    private static void RunMigrations(SQLiteConnection db, IMigration[] migrationsToRun, ILogger logger)
     {
-        var migrationsToRun = Migrations
-            .Where(m => m.TargetVersion > fromVersion && m.TargetVersion <= CurrentSchemaVersion)
-            .OrderBy(m => m.TargetVersion)
-            .ToArray();
-
         foreach (var migration in migrationsToRun)
         {
             try
@@ -106,7 +113,7 @@ public class DatabaseContext
         db.CreateTable<NotificationEntity>();
     }
 
-    private static void DropAllTables(SQLiteConnection db)
+    public static void DropAllTables(SQLiteConnection db)
     {
         db.DropTable<LocalDeviceEntity>();
         db.DropTable<PairedDeviceEntity>();
@@ -118,5 +125,4 @@ public class DatabaseContext
         db.DropTable<NotificationEntity>();
         db.DropTable<SchemaVersionEntity>();
     }
-
 }
