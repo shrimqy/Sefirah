@@ -27,8 +27,9 @@
 - Due to Android's restrictions, sensitive notifications are no longer visible from Android 15 onwards.
 - To work around this limitation, you can grant the necessary permission using ADB. Run the following command:
 
-  ```sh
-  adb shell appops set com.castle.sefirah RECEIVE_SENSITIVE_NOTIFICATIONS allow
+```sh
+adb shell appops set com.castle.sefirah RECEIVE_SENSITIVE_NOTIFICATIONS allow
+```
 
 ## Installation
 
