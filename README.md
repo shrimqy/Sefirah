@@ -78,7 +78,7 @@
 7. **Screen Mirroring using [Scrcpy](https://github.com/Genymobile/scrcpy)**:
     - You would need to [download](https://github.com/Genymobile/scrcpy/releases), extract and set the scrcpy location in App settings. 
     - You can specify your preferences for the scrcpy to launch with in the screen mirroring section. 
-    - For initiating screen mirroring, the easiest way would be to plug your device through usb and start using the button next to the ringer mode (In the arugments text box add "--tcpip" if you want to make the connection wireless and you don't need to specify anymore arugments if you don't know what you're doing).
+    - For initiating screen mirroring, the easiest way would be to plug your device through usb and start using the button next to the ringer mode (In the arguments text box add "--tcpip" if you want to make the connection wireless and you don't need to specify anymore arguments if you don't know what you're doing).
     - Sefirah will try to connect to your device if the default tcpip port is open for subsequent connections.
     - If you have any doubts or problems in connecting scrcpy, refer [scrcpy docs](https://github.com/Genymobile/scrcpy/blob/master/doc/connection.md) and [Scrcpy FAQ](https://github.com/Genymobile/scrcpy/blob/master/FAQ.md).
     - If you like their project, please consider supporting the author [rom1v](https://blog.rom1v.com/about/#support-my-open-source-work)

@@ -103,7 +103,7 @@ public class NetworkService(
         }
         catch (Exception ex)
         {
-            logger.Error("Excetpion occured while sending device info", ex);
+            logger.Error("Exception occurred while sending device info", ex);
         }
     }
 
