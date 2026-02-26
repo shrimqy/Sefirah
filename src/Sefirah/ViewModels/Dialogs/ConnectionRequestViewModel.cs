@@ -11,31 +11,29 @@ public partial class ConnectionRequestViewModel : ObservableObject
         set => SetProperty(ref deviceName, value);
     }
 
-    private string passkey = string.Empty;
-    public string Passkey
+    private string verificationKey = string.Empty;
+    public string VerificationKey
     {
-        get => passkey;
-        set => SetProperty(ref passkey, value);
+        get => verificationKey;
+        set => SetProperty(ref verificationKey, value);
     }
 
-    private readonly Frame _frame;
+    private readonly Frame frame;
 
-    public ConnectionRequestViewModel(string deviceName, byte[] hashedKey, Frame frame)
+    public ConnectionRequestViewModel(string deviceName, string verificationKey, Frame frame)
     {
         DeviceName = deviceName;
-        var derivedKeyInt = BitConverter.ToInt32(hashedKey, 0);
-        derivedKeyInt = Math.Abs(derivedKeyInt) % 1_000_000;
-        Passkey = derivedKeyInt.ToString().PadLeft(6, '0');
-        _frame = frame;
+        VerificationKey = verificationKey;
+        this.frame = frame;
     }
 
     public void OnConnectClick()
     {
         // If we're on the onboarding pages, navigate to main page
-        if (_frame.Content is not MainPage)
+        if (frame.Content is not MainPage)
         {
             ApplicationData.Current.LocalSettings.Values["HasCompletedOnboarding"] = true;
-            _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+            frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
         }
     }
 }

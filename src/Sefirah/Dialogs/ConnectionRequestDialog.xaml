@@ -54,34 +54,27 @@
         <!--  Description  -->
         <TextBlock
             Grid.Row="1"
-            Margin="0,0,0,8"
             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
             Style="{ThemeResource BodyTextBlockStyle}"
             Text="{helpers:ResourceString Name=ConnectionRequest/Subtitle}"
             TextAlignment="Center"
             TextWrapping="Wrap" />
 
-        <!--  Passkey Display  -->
+        <!--  Display  -->
         <Border
             Grid.Row="2"
-            Margin="0,0,0,8"
-            Padding="24,20"
+            Padding="16"
             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
             BorderThickness="1"
             CornerRadius="8">
             <StackPanel HorizontalAlignment="Center" Spacing="8">
                 <TextBlock
-                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                    Style="{ThemeResource CaptionTextBlockStyle}"
-                    Text="{helpers:ResourceString Name=ConnectionRequestPasskey/Text}"
-                    TextAlignment="Center" />
-                <TextBlock
                     FontFamily="Cascadia Code"
                     FontSize="28"
                     FontWeight="SemiBold"
                     Style="{ThemeResource SubtitleTextBlockStyle}"
-                    Text="{x:Bind ViewModel.Passkey, Mode=OneWay}"
+                    Text="{x:Bind ViewModel.VerificationKey, Mode=OneWay}"
                     TextAlignment="Center" />
             </StackPanel>
         </Border>
