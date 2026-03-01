@@ -5,7 +5,7 @@ namespace Sefirah.Data.AppDatabase;
 
 public class DatabaseContext
 {
-    private const int CurrentSchemaVersion = 2;
+    private const int CurrentSchemaVersion = 3;
 
     private static readonly IMigration[] Migrations = [new SchemaVersion2Migration()];
 

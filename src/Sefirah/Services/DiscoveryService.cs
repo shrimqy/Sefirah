@@ -40,12 +40,13 @@ public class DiscoveryService(
             {
                 DeviceId = localDevice.DeviceId,
                 DeviceName = name,
-                PublicKey = Convert.ToBase64String(localDevice.PublicKey),
                 Port = NetworkService.ServerPort
             };
 
             mdnsService.AdvertiseService(BroadcastMessage, port);
             mdnsService.StartDiscovery();
+            mdnsService.DiscoveredMdnsService += OnDiscoveredMdnsService;
+
             broadcastEndpoints = [.. localAddresses.Select(ipInfo =>
             {
                 var network = new Data.Models.IPNetwork(ipInfo.Address, ipInfo.SubnetMask);
@@ -84,14 +85,16 @@ public class DiscoveryService(
             {
                 logger.LogError("Failed to connect UDP client");
             }
-
-            mdnsService.DiscoveredMdnsService += OnDiscoveredMdnsService;
-
         }
         catch (Exception ex)
         {
             logger.LogError("Discovery initialization failed: {message}", ex.Message);
         }
+    }
+
+    private async void OnDiscoveredMdnsService(object? sender, DiscoveredMdnsServiceArgs e)
+    {
+        await sessionManager.ConnectTo(e.DeviceId, e.Address, e.Port);
     }
 
     private async void BroadcastDeviceInfoAsync(UdpBroadcast udpBroadcast)
@@ -115,23 +118,17 @@ public class DiscoveryService(
         
     }
 
-    private async void OnDiscoveredMdnsService(object? sender, DiscoveredMdnsServiceArgs service)
-    {        
-        await sessionManager.ConnectTo(service.DeviceId, service.Address, service.Port, service.PublicKey);
-    }
-
     public async void OnReceived(EndPoint endpoint, byte[] buffer, long offset, long size)
     {
         try
         {
             var message = Encoding.UTF8.GetString(buffer, (int)offset, (int)size);
-
             var address = ((IPEndPoint)endpoint).Address;
             if (JsonMessageSerializer.DeserializeMessage(message) is not UdpBroadcast broadcast) return;
 
             if (broadcast.DeviceId == localDevice?.DeviceId || address is null) return;
 
-            await sessionManager.ConnectTo(broadcast.DeviceId, address.ToString(), broadcast.Port, broadcast.PublicKey);
+            await sessionManager.ConnectTo(broadcast.DeviceId, address.ToString(), broadcast.Port);
         }
         catch (Exception ex)
         {
@@ -143,9 +140,10 @@ public class DiscoveryService(
     {
         try
         {
+            mdnsService.DiscoveredMdnsService -= OnDiscoveredMdnsService;
+            mdnsService.UnAdvertiseService();
             udpClient?.Dispose();
             udpClient = null;
-            mdnsService.UnAdvertiseService();
         }
         catch (Exception ex)
         {
@@ -171,8 +169,7 @@ public class DiscoveryService(
                 Addresses = addresses,
                 broadcast.Port,
                 broadcast.DeviceId,
-                broadcast.DeviceName,
-                broadcast.PublicKey
+                broadcast.DeviceName
             };
 
             var jsonData = JsonMessageSerializer.Serialize(connectionInfo);

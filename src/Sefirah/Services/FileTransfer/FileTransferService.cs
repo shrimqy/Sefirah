@@ -61,10 +61,17 @@ public class FileTransferService(
 
     public async Task ReceiveFiles(FileTransferInfo data, PairedDevice device)
     {
+        if (device.Certificate is null || device.Certificate.Length == 0)
+        {
+            logger.Error("Cannot receive files: device has no pinned certificate. Re-pair the device.");
+            return;
+        }
+
         var handler = new ReceiveFileHandler(
             data.Files,
             data.ServerInfo,
             device,
+            device.Certificate,
             StorageLocation,
             logger,
             notificationHandler);
@@ -133,12 +140,19 @@ public class FileTransferService(
 
     public async Task SendFiles(StorageFile[] files, PairedDevice device, bool isClipboard = false)
     {
+        if (device.Certificate is null || device.Certificate.Length == 0)
+        {
+            logger.Error("Cannot send files: device has no pinned certificate. Re-pair the device.");
+            return;
+        }
+
         var fileMetadataList = await Task.WhenAll(files.Select(file => file.ToFileMetadata()));
 
         var handler = new SendFileHandler(
             files,
             fileMetadataList.ToList(),
             device,
+            device.Certificate,
             serverInfo => device.SendMessage(new FileTransferInfo
             {
                 Files = [.. fileMetadataList],
@@ -162,9 +176,9 @@ public class FileTransferService(
         }
     }
 
-    private async Task<List<PairedDevice>> ShowDeviceSelectionDialog(List<PairedDevice> onlineDevices)
+    private static async Task<List<PairedDevice>> ShowDeviceSelectionDialog(List<PairedDevice> onlineDevices)
     {
-        List<PairedDevice> selectedDevices = new();
+        List<PairedDevice> selectedDevices = [];
 
         await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
         {
@@ -182,7 +196,7 @@ public class FileTransferService(
 
             var result = await dialog.ShowAsync();
 
-            if (result == ContentDialogResult.Primary)
+            if (result is ContentDialogResult.Primary)
             {
                 selectedDevices = deviceSelectorDialog.ViewModel.SelectedDevices;
             }

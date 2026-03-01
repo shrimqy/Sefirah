@@ -21,5 +21,5 @@ public interface ISessionManager
 
     Task Pair(DiscoveredDevice device);
 
-    Task ConnectTo(string deviceId, string host, int port, string publicKey);
+    Task ConnectTo(string deviceId, string host, int port);
 }

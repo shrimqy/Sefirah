@@ -34,6 +34,8 @@ public partial class PairedDevice : BaseRemoteDevice
 
     public int Port { get; set; } = 5150;
 
+    public byte[] Certificate { get; set; } = [];
+
     public List<PhoneNumber> PhoneNumbers { get; set; } = [];
 
     private ImageSource? wallpaper;

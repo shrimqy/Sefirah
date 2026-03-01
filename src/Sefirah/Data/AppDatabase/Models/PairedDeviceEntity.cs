@@ -14,7 +14,7 @@ public class PairedDeviceEntity
 
     public string Model { get; set; } = string.Empty;
 
-    public byte[] SharedSecret { get; set; } = null!;
+    public byte[] Certificate { get; set; } = [];
 
     public byte[]? WallpaperBytes { get; set; }
 
@@ -48,6 +48,7 @@ public class PairedDeviceEntity
         {
             Name = Name,
             Model = Model,
+            Certificate = Certificate,
             Addresses = Addresses,
             PhoneNumbers = PhoneNumbers,
             Wallpaper = await ImageHelper.ToBitmapAsync(WallpaperBytes),

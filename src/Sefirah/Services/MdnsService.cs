@@ -11,7 +11,6 @@ public class MdnsService(ILogger logger) : IMdnsService
 {
     private const string ServiceType = "_sefirah._udp";
     private const string DeviceNameProperty = "deviceName";
-    private const string PublicKeyProperty = "publicKey";
     private const string ServerPortProperty = "serverPort";
 
     private MulticastService? multicastService;
@@ -29,7 +28,6 @@ public class MdnsService(ILogger logger) : IMdnsService
             // Set up the service profile
             serviceProfile = new ServiceProfile(broadcast.DeviceId, ServiceType, (ushort)port);
             serviceProfile.AddProperty("deviceName", broadcast.DeviceName);
-            serviceProfile.AddProperty("publicKey", broadcast.PublicKey);
             serviceProfile.AddProperty("serverPort", broadcast.Port.ToString());
 
             // Advertise the service
@@ -115,7 +113,6 @@ public class MdnsService(ILogger logger) : IMdnsService
                 foreach (var txtRecord in txtRecords)
                 {
                     string? deviceName = null;
-                    string? publicKey = null;
                     int? port = null;
 
                     // Only process _sefirah._udp services
@@ -124,35 +121,32 @@ public class MdnsService(ILogger logger) : IMdnsService
                     foreach (var txtData in txtRecord.Strings)
                     {
                         var cleanTxtData = txtData.Trim();
-                        var parts = cleanTxtData.Split(['='], 2); // Split at first '=' 
+                        var parts = cleanTxtData.Split(['='], 2); // Split at first '='
                         if (parts.Length == 2)
                         {
                             if (parts[0] == DeviceNameProperty)
                                 deviceName = parts[1];
-                            else if (parts[0] == PublicKeyProperty)
-                                publicKey = parts[1];
                             else if (parts[0] == ServerPortProperty && int.TryParse(parts[1], out var parsedPort))
                                 port = parsedPort;
                         }
                     }
 
-                    if (!string.IsNullOrEmpty(deviceName) && !string.IsNullOrEmpty(publicKey) && txtRecord.CanonicalName != serviceProfile!.FullyQualifiedName)
+                    if (!string.IsNullOrEmpty(deviceName) && txtRecord.CanonicalName != serviceProfile!.FullyQualifiedName)
                     {
                         var deviceId = txtRecord.CanonicalName.Split('.')[0];
-                        
+
                         // Get hostname from SRV record, then find matching A record
                         var srvRecord = srvRecords.FirstOrDefault(s => s.CanonicalName.Contains(deviceId));
                         if (srvRecord?.Target is not null)
                         {
                             var hostname = srvRecord.Target.ToString();
-                            var aRecord = aRecords.FirstOrDefault(a => 
+                            var aRecord = aRecords.FirstOrDefault(a =>
                                 a.CanonicalName.ToString().Equals(hostname.ToString(), StringComparison.OrdinalIgnoreCase));
                             if (aRecord?.Address is not null)
                             {
                                 var address = aRecord.Address.ToString();
-                                // Use SRV port as fallback if serverPort not in TXT
                                 var finalPort = port ?? srvRecord.Port;
-                                DiscoveredMdnsService?.Invoke(this, new(deviceId, deviceName, publicKey, address, finalPort));
+                                DiscoveredMdnsService?.Invoke(this, new(deviceId, deviceName, address, finalPort));
                             }
                         }
                     }

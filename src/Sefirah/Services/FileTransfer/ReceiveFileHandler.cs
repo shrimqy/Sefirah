@@ -11,6 +11,7 @@ public partial class ReceiveFileHandler(
     List<FileMetadata> files,
     ServerInfo serverInfo,
     PairedDevice device,
+    byte[] expectedCert,
     string storageLocation,
     ILogger logger,
     IPlatformNotificationHandler notificationHandler) : ITcpClientProvider, IDisposable
@@ -38,7 +39,8 @@ public partial class ReceiveFileHandler(
     /// <returns>The transfer ID for tracking this transfer.</returns>
     public async Task<Guid> ConnectAsync()
     {
-        client = new Client(CertificateHelper.SslContext, device.Address, serverInfo.Port, this);
+        var clientContext = SslHelper.CreateSslContext(expectedCert);
+        client = new Client(clientContext, device.Address, serverInfo.Port, this);
         TransferId = client.Id;
 
         if (!client.ConnectAsync())
@@ -50,10 +52,6 @@ public partial class ReceiveFileHandler(
             handshakeTcs = new TaskCompletionSource<bool>();
             await handshakeTcs.Task.WaitAsync(TimeSpan.FromSeconds(10));
         }
-
-        // Send password to authenticate
-        var passwordBytes = Encoding.UTF8.GetBytes(serverInfo.Password + "\n");
-        client.SendAsync(passwordBytes);
 
         return TransferId;
     }

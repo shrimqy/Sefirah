@@ -12,6 +12,7 @@ public partial class SendFileHandler(
     StorageFile[] storageFiles,
     List<FileMetadata> files,
     PairedDevice device,
+    byte[] expectedClientCert,
     Action<ServerInfo> sendTransferMessage,
     ILogger logger,
     IPlatformNotificationHandler notificationHandler) : ITcpServerProvider, IDisposable
@@ -190,19 +191,19 @@ public partial class SendFileHandler(
 
     private ServerInfo InitializeServer()
     {
+        var sslContext = SslHelper.CreateSslContext(expectedClientCert);
         foreach (int port in FileTransferService.PortRange)
         {
             try
             {
-                server = new Server(CertificateHelper.SslContext, IPAddress.Any, port, this, logger)
+                server = new Server(sslContext, IPAddress.Any, port, this, logger)
                 {
                     OptionDualMode = true,
                 };
                 server.Start();
 
-                var serverInfo = new ServerInfo(port, EcdhHelper.GenerateRandomPassword());
-
-                logger.Info($"File transfer server initialized at {serverInfo.Port}");
+                serverInfo = new ServerInfo(port);
+                logger.Info($"File transfer server initialized at {serverInfo.Port} (cert-only auth)");
                 return serverInfo;
             }
             catch (Exception ex)
@@ -221,6 +222,8 @@ public partial class SendFileHandler(
     public void OnConnected(ServerSession session)
     {
         logger.Info($"Client connected to file transfer server: {session.Id}");
+        if (connectionSource?.Task.IsCompleted is false)
+            connectionSource.SetResult(session);
     }
 
     public void OnDisconnected(ServerSession session)
@@ -236,21 +239,12 @@ public partial class SendFileHandler(
     {
         string message = Encoding.UTF8.GetString(buffer, (int)offset, (int)size);
 
-        // Check if this is a password for authentication
-        if (serverInfo is not null && message == serverInfo.Password && connectionSource?.Task.IsCompleted is false)
-        {
-            connectionSource.SetResult(session);
-            return;
-        }
-
-        // Check for start message
         if (message == FileTransferService.StartMessage && startMessageSource?.Task.IsCompleted is false)
         {
             startMessageSource.TrySetResult(true);
             return;
         }
 
-        // Check for completion message
         if (message == FileTransferService.CompleteMessage)
         {
             transferCompletionSource?.TrySetResult(true);

@@ -1,6 +1,4 @@
-using Sefirah.Data.AppDatabase.Models;
 using Sefirah.Data.Models.Messages;
-using Sefirah.Helpers;
 
 namespace Sefirah.Data.Models;
 
@@ -10,9 +8,9 @@ public partial class DiscoveredDevice : BaseRemoteDevice
 
     public bool IsPairing { get; set; }
 
-    public byte[] SharedSecret { get; set; } = [];
-    
-    public string VerificationKey => EcdhHelper.FormatSharedSecret(SharedSecret);
+    public byte[] Certificate { get; set; } = [];
+
+    public string VerificationKey { get; set; } = "00000000";
 
     internal PairedDevice ToPairedDevice()
     {
@@ -20,6 +18,7 @@ public partial class DiscoveredDevice : BaseRemoteDevice
         {
             Name = Name,
             Model = Model,
+            Certificate = Certificate,
             Session = Session,
             Client = Client,
             Addresses = [new AddressEntry { Address = Address, IsEnabled = true, Priority = 0 }],

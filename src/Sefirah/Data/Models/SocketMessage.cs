@@ -50,10 +50,6 @@ public class Authentication : SocketMessage
 
     public required string PublicKey { get; set; }
 
-    public required string Nonce { get; set; }
-
-    public required string Proof { get; set; }
-
     public required string Model { get; set; }
 }
 
@@ -69,8 +65,6 @@ public class UdpBroadcast : SocketMessage
     public required string DeviceId { get; set; }
 
     public required string DeviceName { get; set; }
-
-    public required string PublicKey { get; set; }
 }
 
 public class DeviceInfo : SocketMessage

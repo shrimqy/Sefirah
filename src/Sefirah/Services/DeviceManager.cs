@@ -1,5 +1,4 @@
 using CommunityToolkit.WinUI;
-using Org.BouncyCastle.Crypto.Parameters;
 using Sefirah.Data.AppDatabase.Models;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
@@ -64,7 +63,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
             Name = device.Name,
             LastConnected = DateTime.Now,
             Model = device.Model,
-            SharedSecret = device.SharedSecret,
+            Certificate = device.Certificate,
             WallpaperBytes = null,
             Addresses = [new AddressEntry { Address = device.Address, IsEnabled = true, Priority = 0 }],
             PhoneNumbers = []
@@ -80,13 +79,10 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
             if (localDevice is null)
             {
                 var name = await UserInformation.GetCurrentUserNameAsync();
-                var keyPair = EcdhHelper.GetKeyPair();
                 localDevice = new LocalDeviceEntity
                 {
                     DeviceId = Guid.NewGuid().ToString(),
                     DeviceName = name,
-                    PublicKey = ((ECPublicKeyParameters)keyPair.Public).Q.GetEncoded(false),
-                    PrivateKey = ((ECPrivateKeyParameters)keyPair.Private).D.ToByteArrayUnsigned(),
                 };
 
                 repository.AddOrUpdateLocalDevice(localDevice);
