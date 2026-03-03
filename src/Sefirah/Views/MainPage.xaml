@@ -849,6 +849,10 @@
                     SelectionChanged="NavigationView_SelectionChanged">
                     <NavigationView.Resources>
                         <SolidColorBrush x:Key="NavigationViewContentGridBorderBrush" Color="Transparent" />
+
+                        <Style TargetType="NavigationViewItem" x:Key="CompactFooterNavigationViewItemStyle">
+                            <Setter Property="Height" Value="40" />
+                        </Style>
                     </NavigationView.Resources>
 
                     <NavigationView.MenuItems>
@@ -869,14 +873,24 @@
 
                     <NavigationView.FooterMenuItems>
                         <NavigationViewItem
-                            x:Name="UpdateButton"
+                            Style="{StaticResource CompactFooterNavigationViewItemStyle}"
                             SelectsOnInvoked="False"
                             utu:CommandExtensions.Command="{x:Bind ViewModel.UpdateCommand}"
-                            ToolTipService.ToolTip="Update Available"
-                            Visibility="{x:Bind ViewModel.IsUpdateAvailable, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
-                            <NavigationViewItem.Icon>
-                                <FontIcon Foreground="{StaticResource AccentFillColorDefaultBrush}" Glyph="&#xEDAB;" />
-                            </NavigationViewItem.Icon>
+                            ToolTipService.ToolTip="Update"
+                            Visibility="{x:Bind ViewModel.IsUpdateAvailableOrUpdating, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <Grid>
+                                <FontIcon
+                                    FontSize="16"
+                                    Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                                    Glyph="&#xEDAB;"
+                                    Visibility="{x:Bind ViewModel.IsUpdating, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                                <ProgressRing
+                                    x:Name="loadingicon"
+                                    Width="16"
+                                    Height="16"
+                                    IsIndeterminate="True"
+                                    x:Load="{x:Bind ViewModel.IsUpdating, Mode=OneWay}" />
+                            </Grid>
                         </NavigationViewItem>
                     </NavigationView.FooterMenuItems>
                 </NavigationView>

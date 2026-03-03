@@ -26,7 +26,13 @@ public sealed partial class MainPageViewModel : BaseViewModel
     [ObservableProperty]
     public partial bool LoadingScrcpy { get; set; } = false;
 
-    public bool IsUpdateAvailable => UpdateService.IsUpdateAvailable;
+    private bool _isUpdateAvailable;
+    public bool IsUpdateAvailable { get => _isUpdateAvailable; set => SetProperty(ref _isUpdateAvailable, value); }
+
+    private bool _isUpdating;
+    public bool IsUpdating { get => _isUpdating; set => SetProperty(ref _isUpdating, value); }
+
+    public bool IsUpdateAvailableOrUpdating => IsUpdateAvailable || IsUpdating;
 
     /// <summary>
     /// Active device's notifications
@@ -220,5 +226,17 @@ public sealed partial class MainPageViewModel : BaseViewModel
         {
            OnPropertyChanged(nameof(Device));
         };
+
+        IsUpdateAvailable = UpdateService.IsUpdateAvailable;
+        IsUpdating = UpdateService.IsUpdating;
+
+        UpdateService.PropertyChanged += UpdateService_OnPropertyChanged;
+    }
+
+    private void UpdateService_OnPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        IsUpdateAvailable = UpdateService.IsUpdateAvailable;
+        IsUpdating = UpdateService.IsUpdating;
+        OnPropertyChanged(nameof(IsUpdateAvailableOrUpdating));
     }
 }

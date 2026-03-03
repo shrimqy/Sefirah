@@ -1,7 +1,6 @@
 using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
 using Sefirah.Data.Contracts;
-using Sefirah.Data.Models;
 using Sefirah.Services;
 using Sefirah.Utils;
 using Windows.System;
@@ -261,6 +260,10 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
                 case ToastNotificationType.Clipboard:
                     HandleClipboardNotification(args);
                     break;
+
+                case ToastNotificationType.Update:
+                    HandleUpdateNotification(args);
+                    break;
                 
                 default:
                     logger.LogWarning("Unhandled notification type: {NotificationType}", notificationType);
@@ -278,6 +281,15 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
         if (args.Arguments.TryGetValue("uri", out var uriString) && Uri.TryCreate(uriString, UriKind.Absolute, out Uri? uri) && ClipboardService.IsValidWebUrl(uri))
         {
             await Launcher.LaunchUriAsync(uri);
+        }
+    }
+
+    private static async void HandleUpdateNotification(AppNotificationActivatedEventArgs args)
+    {
+        if (args.Arguments.TryGetValue("action", out var action) && action == "download")
+        {
+            var updateService = Ioc.Default.GetRequiredService<IUpdateService>();
+            await updateService.DownloadUpdatesAsync();
         }
     }
 

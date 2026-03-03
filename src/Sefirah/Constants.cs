@@ -11,6 +11,7 @@ public static class Constants
         public const string FileTransfer = "FileTransfer";
         public const string RemoteNotification = "RemoteNotification";
         public const string Clipboard = "Clipboard";
+        public const string Update = "Update";
     }
     public static class LocalSettings
     {
