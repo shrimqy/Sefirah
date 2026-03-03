@@ -152,7 +152,7 @@ public partial class ReceiveFileHandler(
         var progressTitle = $"{fileName} ({currentFileIndex + 1}/{files.Count})";
 
         // Subtitle: Receiving/Sending message
-        var notifcationTitle = IsBulkTransfer
+        var notificationTitle = IsBulkTransfer
             ? string.Format("FileTransferNotification.ReceivingBulk".GetLocalizedResource(), files.Count, device.Name)
             : string.Format("FileTransferNotification.Receiving".GetLocalizedResource(), device.Name);
 
@@ -162,7 +162,7 @@ public partial class ReceiveFileHandler(
         var status = $"{transferredFormatted} / {totalFormatted}";
 
         notificationHandler.ShowFileTransferNotification(
-            notifcationTitle,
+            notificationTitle,
             progressTitle,
             status,
             TransferId.ToString(),
