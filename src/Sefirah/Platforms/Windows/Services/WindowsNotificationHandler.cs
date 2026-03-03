@@ -175,6 +175,38 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
 
 
     /// <inheritdoc />
+    public Task ShowCallNotification(string title, string text, string tag, Data.Enums.CallState callState, Uri? icon = null)
+    {
+        try
+        {
+            var soundEvent = callState is Data.Enums.CallState.MissedCall
+                ? AppNotificationSoundEvent.Default
+                : AppNotificationSoundEvent.Call;
+
+            var builder = new AppNotificationBuilder()
+                .AddText(title)
+                .AddText(text)
+                .SetTag(tag)
+                .SetAudioEvent(soundEvent);
+
+            if (icon is not null)
+            {
+                builder.SetAppLogoOverride(icon, AppNotificationImageCrop.Circle);
+            }
+
+            var notification = builder.BuildNotification();
+            notification.ExpiresOnReboot = true;
+            AppNotificationManager.Default.Show(notification);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to show call notification");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    /// <inheritdoc />
     public void ShowClipboardNotification(string title, string text, string? iconPath = null)
     {
         try

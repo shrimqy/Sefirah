@@ -64,6 +64,14 @@ public enum ConversationInfoType
     New
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum CallState
+{
+    Ringing,
+    InProgress,
+    MissedCall
+}
+
 /// <summary>
 /// Android AudioManager stream type constants.
 /// </summary>

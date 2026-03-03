@@ -139,6 +139,7 @@ public static class AppLifecycleHelper
                 .AddSingleton<IClipboardService, ClipboardService>()
                 .AddSingleton<IRemoteMediaHandler, RemoteMediaHandler>()
                 .AddSingleton<SmsHandlerService>()
+                .AddSingleton<ICallHandler, CallHandlerService>()
 
                 .AddSingleton<IMessageHandler, MessageHandler>()
                 .AddSingleton<Lazy<IMessageHandler>>(sp => new Lazy<IMessageHandler>(() => sp.GetRequiredService<IMessageHandler>()))

@@ -16,6 +16,7 @@ public class MessageHandler(
     IActionService actionService,
     ISftpService sftpService,
     ISessionManager sessionManager,
+    ICallHandler callHandler,
     ILogger<MessageHandler> logger) : IMessageHandler
 {
     public async void HandleMessageAsync(PairedDevice device, SocketMessage message)
@@ -87,6 +88,10 @@ public class MessageHandler(
 
                 case DeviceInfo deviceInfo:
                     await deviceManager.UpdateDeviceInfo(device, deviceInfo);
+                    break;
+
+                case CallInfo callInfo:
+                    await callHandler.HandleCallInfoAsync(device, callInfo);
                     break;
 
                 case Disconnect:

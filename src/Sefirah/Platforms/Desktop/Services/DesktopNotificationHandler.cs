@@ -11,7 +11,6 @@ namespace Sefirah.Platforms.Desktop.Services;
 /// </summary>
 public class DesktopNotificationHandler(
     ILogger<DesktopNotificationHandler> logger,
-    ISessionManager sessionManager,
     IDeviceManager deviceManager) : IPlatformNotificationHandler, IDisposable
 {
     private Connection? _connection;
@@ -137,6 +136,42 @@ public class DesktopNotificationHandler(
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to show remote notification");
+        }
+    }
+
+    public async Task ShowCallNotification(string title, string text, string tag, Data.Enums.CallState callState, Uri? icon = null)
+    {
+        if (!await EnsureInitializedAsync() || _notifications is null)
+            return;
+
+        try
+        {
+            var hints = new Dictionary<string, VariantValue>();
+            var categoryHint = NotificationHints.Category("phone");
+            var urgencyHint = NotificationHints.NormalUrgency();
+            var soundHint = NotificationHints.SuppressSound(false);
+            hints.Add(categoryHint.Key, categoryHint.Value);
+            hints.Add(urgencyHint.Key, urgencyHint.Value);
+            hints.Add(soundHint.Key, soundHint.Value);
+
+            var appIcon = "call-start";
+
+            var replacesId = _notificationIds.GetValueOrDefault(tag, 0u);
+            var notificationId = await _notifications.NotifyAsync(
+                appName: "Sefirah",
+                replacesId: replacesId,
+                appIcon: appIcon,
+                summary: title,
+                body: text,
+                actions: [],
+                hints: hints,
+                expireTimeout: 10000
+            );
+            _notificationIds[tag] = notificationId;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to show call notification");
         }
     }
 
