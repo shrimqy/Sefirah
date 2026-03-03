@@ -265,9 +265,6 @@ page.</value>
   <data name="NoDevicesFound" xml:space="preserve">
     <value>No devices found</value>
   </data>
-  <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
-    <value>PASSKEY</value>
-  </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
     <value>Open links in browser</value>
   </data>

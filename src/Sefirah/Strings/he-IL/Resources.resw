@@ -264,9 +264,6 @@
   <data name="NoDevicesFound" xml:space="preserve">
     <value>לא נמצאו התקנים</value>
   </data>
-  <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
-    <value>קוד</value>
-  </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
     <value>פתח קישורים בדפדפן באופן אוטומטי</value>
   </data>

@@ -264,9 +264,6 @@
   <data name="NoDevicesFound" xml:space="preserve">
     <value>Устройств не найдено</value>
   </data>
-  <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
-    <value>Ключ доступа</value>
-  </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
     <value>Открывать ссылки в браузере</value>
   </data>

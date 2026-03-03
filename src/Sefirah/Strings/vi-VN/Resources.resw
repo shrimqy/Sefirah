@@ -265,9 +265,6 @@ page.</value>
   <data name="NoDevicesFound" xml:space="preserve">
     <value>Không tìm thấy thiết bị nào</value>
   </data>
-  <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
-    <value>PASSKEY</value>
-  </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
     <value>Mở liên kết trong trình duyệt</value>
   </data>

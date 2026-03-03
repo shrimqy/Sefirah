@@ -265,9 +265,6 @@ page.</value>
   <data name="NoDevicesFound" xml:space="preserve">
     <value>기기를 찾을 수 없음</value>
   </data>
-  <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
-    <value>패스키</value>
-  </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
     <value>브라우저에서 링크 열기</value>
   </data>

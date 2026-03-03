@@ -264,9 +264,6 @@
   <data name="NoDevicesFound" xml:space="preserve">
     <value>デバイスが見つかりません</value>
   </data>
-  <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
-    <value>パスキー</value>
-  </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
     <value>ブラウザーでリンクを開く</value>
   </data>

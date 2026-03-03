@@ -264,9 +264,6 @@
   <data name="NoDevicesFound" xml:space="preserve">
     <value>Aucun appareil trouvé</value>
   </data>
-  <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
-    <value>PASSKEY</value>
-  </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
     <value>Ouvrir les liens dans le navigateur</value>
   </data>
