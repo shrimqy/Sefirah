@@ -254,7 +254,7 @@ public class ClipboardService(
 
                 Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dataPackage);
                 await Task.Delay(50);
-                logger.LogInformation("Clipboard content set: {Content}", content);
+                logger.LogInformation("Clipboard content set. Type: {ContentType}", content.GetType().Name);
 
                 if (sourceDevice.DeviceSettings.ShowClipboardToast && content is not string)
                 {

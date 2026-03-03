@@ -28,8 +28,8 @@ public class WindowsSftpService(
         {
             if (!StorageProviderSyncRootManager.IsSupported()) return;
 
-            logger.LogInformation("Initializing SFTP service, IP: {ip}, Port: {port}, Password: {pass}, Username: {name}",
-                info.IpAddress, info.Port, info.Password, info.Username);
+            logger.LogInformation("Initializing SFTP service, IP: {ip}, Port: {port}, Username: {name}",
+                info.IpAddress, info.Port, info.Username);
 
             var sftpContext = new SftpContext
             {
