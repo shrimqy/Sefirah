@@ -264,9 +264,6 @@
   <data name="NoDevicesFound" xml:space="preserve">
     <value>デバイスが見つかりません</value>
   </data>
-  <data name="ConnectionRequestPasskey.Text" xml:space="preserve">
-    <value>パスキー</value>
-  </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
     <value>ブラウザーでリンクを開く</value>
   </data>
@@ -730,5 +727,20 @@ input text %pwd%</value>
   </data>
   <data name="AdbLocation" xml:space="preserve">
     <value>Adb の場所</value>
+  </data>
+  <data name="CallNotification.IncomingCall" xml:space="preserve">
+    <value>Incoming call</value>
+  </data>
+  <data name="CallNotification.MissedCall" xml:space="preserve">
+    <value>Missed call</value>
+  </data>
+  <data name="UpdateNotification.Title" xml:space="preserve">
+    <value>Update available</value>
+  </data>
+  <data name="UpdateNotification.Action" xml:space="preserve">
+    <value>Download update</value>
+  </data>
+  <data name="UpdateNotification.Subtitle" xml:space="preserve">
+    <value>A new version is available</value>
   </data>
 </root>
