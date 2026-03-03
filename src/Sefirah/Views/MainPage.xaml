@@ -494,7 +494,7 @@
                                                 VerticalAlignment="Center"
                                                 FontSize="12"
                                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                Text="{x:Bind MaxSeekTime, Converter={StaticResource MillisecondsToTimeConverter}, Mode=OneWay}" />
+                                                Text="{x:Bind MaxSeekTimeText, Converter={StaticResource MillisecondsToTimeConverter}, Mode=OneWay}" />
                                         </Grid>
                                     </Grid>
                                 </Border>
