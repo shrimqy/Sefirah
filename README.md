@@ -3,10 +3,9 @@
 </p>
 
 <p align="center">
-  <a style="text-decoration:none" href="https://crowdin.com/project/sefirah">
-    <img src="https://badges.crowdin.net/sefirah/localized.svg" alt="Sefirah Desktop Localization Status" /></a>
-  <a style="text-decoration:none" href="https://discord.gg/MuvMqv4MES">
-    <img src="https://img.shields.io/discord/1310140719138340925?label=Discord&color=7289da" alt="Sefirah Discord" /></a>
+  <a style="text-decoration:none" href="https://crowdin.com/project/sefirah"><img src="https://badges.crowdin.net/sefirah/localized.svg" alt="Sefirah Desktop Localization Status" /></a>
+  <a style="text-decoration:none" href="https://github.com/shrimqy/Sefirah-Android"><img src="https://img.shields.io/badge/android-repo-sefirah?logo=github" alt="Sefirah-Android" /></a>
+  <a style="text-decoration:none" href="https://discord.gg/MuvMqv4MES"><img src="https://img.shields.io/discord/1310140719138340925?label=Discord&color=7289da" alt="Sefirah Discord" /></a>
 </p>
 
 
@@ -46,14 +45,12 @@ adb shell appops set com.castle.sefirah RECEIVE_SENSITIVE_NOTIFICATIONS allow
 
 ### Android App
 
-[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" alt="Get it on IzzyOnDroid" width="220">](https://apt.izzysoft.de/fdroid/index/apk/com.castle.sefirah)
-
+[<img alt="Get it on Google Play" height="80" src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png">](https://play.google.com/store/apps/details?id=com.castle.sefirah)
+[<img alt="Get it on IzzyOnDroid" height="80" src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png">](https://apt.izzysoft.de/fdroid/index/apk/com.castle.sefirah)
 
 ## How to Use
 
-1. **Download and Install the [Android app](https://github.com/shrimqy/Sefirah-Android)**
-
-2. **Setting Up**:
+1. **Setting Up**:
     - On the Android device, allow the necessary permissions on the onboarding page. (**Note:** Allow restricted settings from App Info after attempting to grant notification access or accessibility permission, as Android blocks side-loaded apps from requesting sensitive permissions.)
     - Ensure both your Android device and Windows PC are connected to the same network.
     - Launch the app on your Windows PC and wait for the devices to show up on both.
@@ -63,20 +60,20 @@ adb shell appops set com.castle.sefirah RECEIVE_SENSITIVE_NOTIFICATIONS allow
 
     **Note:** If the devices can't connect even though both discover each other, make sure to check your firewall settings and these ports are open; 5149 to 5169. 
 
-3. **Clipboard Sharing**:
+2. **Clipboard Sharing**:
     - When you copy content on your desktop, it will automatically sync with your Android device (provided you have enabled this feature in the settings). If you have also enabled image syncing, images should be sent as well. **Note:** You must enable the 'add received images to clipboard' option for image syncing to work.
     - To automatically share the clipboard, enable the corresponding preference in the settings (accessibility permission is required). **Note:** This method may not work in every scenario.
     - To manually share the clipboard, there are two primary methods: using the persistent device status notification or the share sheet.
-4. **File Transfer**:
+3. **File Transfer**:
     - Use the share sheet on your Android or Windows device and select the app to share files between the devices.
-5. **Android Storage**:
+4. **Android Storage**:
     - You would need Android 11 or higher
     - Enable storage access permission in Android app's settings and the desktop app will create a link to the Android storage in the File Explorer.
     - **Note:** This feature is still a bit experimental and may not work on all Windows versions especially older versions of Windows 10 and other unofficial debloated Windows 11 versions. 
     - **WARNING**: DO NOT set the remote storage location to a pre-existing folder as it will delete the contents of that folder.
-6. **SMS Texting**:
+5. **SMS Texting**:
     - Grant all the permissions required from the permissions page in Android. After that, reconnect and the messages should appear in the Messages tab in the Desktop app. You can now view and send texts as sms. You can also switch sims if your device has dual sims. Attachments have not been implemented yet.
-7. **Screen Mirroring using [Scrcpy](https://github.com/Genymobile/scrcpy)**:
+6. **Screen Mirroring using [Scrcpy](https://github.com/Genymobile/scrcpy)**:
     - You would need to [download](https://github.com/Genymobile/scrcpy/releases), extract and set the scrcpy location in App settings. 
     - You can specify your preferences for the scrcpy to launch with in the screen mirroring section. 
     - For initiating screen mirroring, the easiest way would be to plug your device through usb and start using the button next to the ringer mode (In the arguments text box add "--tcpip" if you want to make the connection wireless and you don't need to specify anymore arguments if you don't know what you're doing).
