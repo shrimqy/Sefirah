@@ -92,9 +92,9 @@ public class DiscoveryService(
         }
     }
 
-    private async void OnDiscoveredMdnsService(object? sender, DiscoveredMdnsServiceArgs e)
+    private void OnDiscoveredMdnsService(object? sender, DiscoveredMdnsServiceArgs e)
     {
-        await sessionManager.ConnectTo(e.DeviceId, e.Address, e.Port);
+        sessionManager.ConnectTo(e.DeviceId, e.Address, e.Port);
     }
 
     private async void BroadcastDeviceInfoAsync(UdpBroadcast udpBroadcast)
@@ -107,7 +107,6 @@ public class DiscoveryService(
         {
             try
             {
-                logger.LogInformation("Sending UDP message to {endpoint}", endPoint);
                 udpClient.Socket.SendTo(messageBytes, endPoint);
             }
             catch
@@ -115,7 +114,6 @@ public class DiscoveryService(
                 // ignore
             }
         }
-        
     }
 
     public async void OnReceived(EndPoint endpoint, byte[] buffer, long offset, long size)
@@ -128,7 +126,7 @@ public class DiscoveryService(
 
             if (broadcast.DeviceId == localDevice?.DeviceId || address is null) return;
 
-            await sessionManager.ConnectTo(broadcast.DeviceId, address.ToString(), broadcast.Port);
+            sessionManager.ConnectTo(broadcast.DeviceId, address.ToString(), broadcast.Port);
         }
         catch (Exception ex)
         {

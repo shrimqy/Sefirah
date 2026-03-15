@@ -27,6 +27,8 @@ public abstract partial class BaseRemoteDevice : ObservableObject
         set => SetProperty(ref model, value);
     }
 
+    public byte[] Certificate { get; set; } = null!;
+
     public string Address { get; set; } = string.Empty;
 
     private ServerSession? session;

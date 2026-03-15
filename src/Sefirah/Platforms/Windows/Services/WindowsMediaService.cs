@@ -275,9 +275,7 @@ public class WindowsMediaService(
     {
         try
         {
-            logger.LogInformation("Media properties changed for {SourceAppUserModelId}", session.SourceAppUserModelId);
             await UpdatePlaybackDataAsync(session);
-
         }
         catch (Exception ex)
         {
@@ -539,7 +537,7 @@ public class WindowsMediaService(
 
     public void OnDeviceStateChanged(string deviceId, DeviceState newState)
     {
-        logger.LogInformation("Device state changed: {DeviceId} - {NewState}", deviceId, newState);
+        //logger.LogInformation("Device state changed: {DeviceId} - {NewState}", deviceId, newState);
     }
 
     public void OnDeviceAdded(string pwstrDeviceId)

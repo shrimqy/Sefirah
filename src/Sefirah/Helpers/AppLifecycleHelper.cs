@@ -48,20 +48,21 @@ public static class AppLifecycleHelper
         await windowsNotificationHandler.RegisterForNotifications();
 #endif
 
-        await Task.WhenAll(
-            deviceManager.Initialize(),
-            networkService.StartServerAsync()
-        );
-        
-        await discoveryService.StartDiscoveryAsync();
-        
+        await deviceManager.Initialize();
+
         await Task.WhenAll(
             playbackService.InitializeAsync(),
             actionService.InitializeAsync(),
-            adbService.StartAsync(),
-            updateService.CheckForUpdatesAsync(),
             notificationService.Initialize(),
             clipboardService.Initialize()
+        );
+
+        await networkService.StartServerAsync();
+        await discoveryService.StartDiscoveryAsync();
+
+        await Task.WhenAll(
+            adbService.StartAsync(),
+            updateService.CheckForUpdatesAsync()
         );
 
         App.SplashScreenLoadingTCS?.TrySetResult();

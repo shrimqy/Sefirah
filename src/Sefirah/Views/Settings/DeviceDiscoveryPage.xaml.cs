@@ -47,17 +47,11 @@ public sealed partial class DeviceDiscoveryPage : Page
     {
         if (sender is Button button && button.Tag is DiscoveredDevice device)
         {
-            try
-            {
-                await SessionManager.Pair(device);
-            }
-            catch (Exception)
-            {
-            }
+            SessionManager.Pair(device);
         }
     }
 
-        private async void QrCodeButton_Click(object sender, RoutedEventArgs e)
+    private async void QrCodeButton_Click(object sender, RoutedEventArgs e)
     {
         var bitmapImage = await DiscoveryService.GenerateQrCodeAsync();
         

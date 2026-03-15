@@ -184,6 +184,21 @@ public class NetworkService(
         return messages;
     }
 
+    public async void SendAuthenticationMessage(Action<SocketMessage> send)
+    {
+        var localDevice = await deviceManager.GetLocalDeviceAsync();
+
+        var authResponse = new Authentication
+        {
+            DeviceId = localDevice.DeviceId,
+            DeviceName = localDevice.DeviceName,
+            PublicKey = SslHelper.DevicePublicKeyString,
+            Model = Environment.MachineName
+        };
+
+        send(authResponse);
+    }
+
     #region Server events
     public void OnConnected(ServerSession session) 
     {
@@ -228,47 +243,36 @@ public class NetworkService(
     /// <summary>
     /// Routes a deserialized message from a client and server to the appropriate handler
     /// </summary>
-    private async void RouteMessage(Guid guid, SocketMessage message)
+    private void RouteMessage(Guid guid, SocketMessage message)
     {
-        try
+        var pairedDevice = PairedDevices.FirstOrDefault(d => (d.Client?.Id == guid || d.Session?.Id == guid));
+        if (pairedDevice is not null)
         {
-            // Check if this is from a connected paired device
-            var pairedDevice = PairedDevices.FirstOrDefault(d => (d.Client?.Id == guid || d.Session?.Id == guid) && d.IsConnected);
-            if (pairedDevice is not null)
+            if (message is ConnectionAck)
             {
-                if (message is ConnectionAck)
-                {
-                    ConnectionStatusChanged?.Invoke(this, pairedDevice);
-                    return;
-                }
-                messageHandler.Value.HandleMessageAsync(pairedDevice, message);
+                ConnectionStatusChanged?.Invoke(this, pairedDevice);
                 return;
             }
-
-            var discoveredDevice = DiscoveredDevices.FirstOrDefault(d => d.Client?.Id == guid || d.Session?.Id == guid);
-            if (discoveredDevice is not null && message is PairMessage pairMessage)
-            {
-                HandlePairMessage(discoveredDevice, pairMessage);
-            }
-
-            logger.Warn("Received message from unknown client");
+            messageHandler.Value.HandleMessageAsync(pairedDevice, message);
+            return;
         }
-        catch (Exception ex)
+
+        var discoveredDevice = DiscoveredDevices.FirstOrDefault(d => d.Client?.Id == guid || d.Session?.Id == guid);
+        if (discoveredDevice is not null && message is PairMessage pairMessage)
         {
-            logger.Error($"Error routing client message: {ex}");
+            HandlePairMessage(discoveredDevice, pairMessage);
+            return;
         }
+
+        logger.Warn("Received message from unknown client");
     }
 
-    private async void HandlePairMessage(DiscoveredDevice device, PairMessage pairMessage)
+    private void HandlePairMessage(DiscoveredDevice device, PairMessage pairMessage)
     {
         if (device.IsPairing)
-        {
-            await HandlePairResponse(device, pairMessage);
-        }
+            HandlePairResponse(device, pairMessage);
         else if (pairMessage.Pair)
-        {
-            await HandlePairRequest(device);
-        }
+            HandlePairRequest(device);
     }
 
     #endregion
@@ -304,7 +308,7 @@ public class NetworkService(
                 return;
             }
 
-            await AuthenticateNewDeviceClient(session, authMessage, address, cert);
+            await AddDiscoveredDevice(session, authMessage, address, cert);
         }
         catch (Exception ex)
         {
@@ -322,11 +326,12 @@ public class NetworkService(
             DisconnectSession(pairedDevice.Session);
         }
 
+        pairedDevice.Session = session;
+        pairedDevice.Address = address;
+
         await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {
-            pairedDevice.Session = session;
             pairedDevice.ConnectionStatus = new Connected();
-            pairedDevice.Address = address;
             if (!pairedDevice.Addresses.Any(a => a.Address == address))
             {
                 var newEntry = new AddressEntry
@@ -341,51 +346,31 @@ public class NetworkService(
         });
     }
 
-    private async Task AuthenticateNewDeviceClient(ServerSession session, Authentication authMessage, string address, byte[] certificate)
+    private async Task AddDiscoveredDevice(ServerSession session, Authentication authMessage, string address, byte[] certificate)
     {
-        await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+        var existingDevice = DiscoveredDevices.FirstOrDefault(d => d.Id == authMessage.DeviceId);
+        if (existingDevice is not null && existingDevice.Session is not null)
         {
-            var existingDiscovered = DiscoveredDevices.FirstOrDefault(d => d.Id == authMessage.DeviceId);
-            if (existingDiscovered is not null)
-            {
-                logger.Info("Device already in DiscoveredDevices, updating session");
-                existingDiscovered.Name = authMessage.DeviceName;
-                existingDiscovered.Model = authMessage.Model;
-                existingDiscovered.Address = address;
-                existingDiscovered.Certificate = certificate;
-                existingDiscovered.VerificationKey = SslHelper.GetVerificationCode(authMessage.PublicKey);
-                existingDiscovered.Session = session;
-            }
-            else
-            {
-                logger.Info($"Adding device {authMessage.DeviceId} as DiscoveredDevice");
-                DiscoveredDevices.Add(new DiscoveredDevice
-                {
-                    Id = authMessage.DeviceId,
-                    Name = authMessage.DeviceName,
-                    Model = authMessage.Model,
-                    Address = address,
-                    Certificate = certificate,
-                    VerificationKey = SslHelper.GetVerificationCode(authMessage.PublicKey),
-                    Session = session
-                });
-            }
-        });
+            DisconnectSession(existingDevice.Session);
+        }
 
-        var localDevice = await deviceManager.GetLocalDeviceAsync();
-
-        var authResponse = new Authentication
+        var device = new DiscoveredDevice
         {
-            DeviceId = localDevice.DeviceId,
-            DeviceName = localDevice.DeviceName,
-            PublicKey = SslHelper.DevicePublicKeyString,
-            Model = Environment.MachineName
+            Id = authMessage.DeviceId,
+            Name = authMessage.DeviceName,
+            Model = authMessage.Model,
+            Address = address,
+            Certificate = certificate,
+            VerificationKey = SslHelper.GetVerificationCode(authMessage.PublicKey),
+            Session = session
         };
 
-        SendMessage(session, authResponse);
+        await App.MainWindow.DispatcherQueue.EnqueueAsync(() => DiscoveredDevices.Add(device));
+
+        SendAuthenticationMessage(m => SendMessage(session, m));
     }
 
-    private async Task HandlePairRequest(DiscoveredDevice device)
+    private async void HandlePairRequest(DiscoveredDevice device)
     {
         logger.Info($"Received pairing request from {device.Name}");
 
@@ -416,7 +401,7 @@ public class NetworkService(
         if (accepted) await deviceManager.AddDevice(device);
     }
 
-    private async Task HandlePairResponse(DiscoveredDevice device, PairMessage pairMessage)
+    private async void HandlePairResponse(DiscoveredDevice device, PairMessage pairMessage)
     {
         if (!pairMessage.Pair)
         {
@@ -446,7 +431,6 @@ public class NetworkService(
                 pairedDevice.Session = null;
                 App.MainWindow.DispatcherQueue.EnqueueAsync(() => pairedDevice.ConnectionStatus = new Disconnected(forcedDisconnect));
 
-                logger.Info($"Device {pairedDevice.Name} session disconnected, status updated");
                 ConnectionStatusChanged?.Invoke(this, pairedDevice);
             }
             else
@@ -496,7 +480,7 @@ public class NetworkService(
 
     #region Client
 
-    public async Task ConnectTo(string deviceId, string address, int port)
+    public async void ConnectTo(string deviceId, string address, int port)
     {
         var existingDevice = PairedDevices.FirstOrDefault(d => d.Id == deviceId);
         if (existingDevice is not null && (existingDevice.IsConnectedOrConnecting || existingDevice.IsForcedDisconnect))
@@ -512,18 +496,9 @@ public class NetworkService(
 
         try
         {
-            logger.Info($"Connecting to {address}:{port} (discovery, accept and stash server cert)");
+            logger.Info($"Connecting to {address}:{port}");
 
             var client = new Client(SslHelper.GetSslContext(), address, port, this);
-
-            var localDevice = await deviceManager.GetLocalDeviceAsync();
-            var authMessage = new Authentication
-            {
-                DeviceId = localDevice.DeviceId,
-                DeviceName = localDevice.DeviceName,
-                PublicKey = SslHelper.DevicePublicKeyString,
-                Model = Environment.MachineName
-            };
 
             try
             {
@@ -542,7 +517,7 @@ public class NetworkService(
                             handshakeCompletion.TryRemove(client.Id, out _);
                         }
                     }
-                    SendMessage(client, authMessage);
+                    SendAuthenticationMessage(m => SendMessage(client, m));
                 }
             }
             catch (Exception ex)
@@ -559,7 +534,7 @@ public class NetworkService(
         }
     }
 
-    public async Task ConnectTo(PairedDevice device)
+    public async void ConnectTo(PairedDevice device)
     {
         if (connectionCancellationTokens.TryRemove(device.Id, out var removedCts))
         {
@@ -576,15 +551,6 @@ public class NetworkService(
 
         try
         {
-            var localDevice = await deviceManager.GetLocalDeviceAsync();
-            var authMessage = new Authentication
-            {
-                DeviceId = localDevice.DeviceId,
-                DeviceName = localDevice.DeviceName,
-                PublicKey = SslHelper.DevicePublicKeyString,
-                Model = Environment.MachineName
-            };
-
             foreach (var address in device.GetEnabledAddresses())
             {
                 cts.Token.ThrowIfCancellationRequested();
@@ -618,8 +584,8 @@ public class NetworkService(
                         }
                         
                         cts.Token.ThrowIfCancellationRequested();
-                        
-                        SendMessage(client, authMessage);
+
+                        SendAuthenticationMessage(m => SendMessage(client, m));
                         device.Client = client;
                         return;
                     }
@@ -650,7 +616,7 @@ public class NetworkService(
         }
     }
 
-    public async Task Pair(DiscoveredDevice device)
+    public void Pair(DiscoveredDevice device)
     {
         device.SendMessage(new PairMessage { Pair = true });
         device.IsPairing = true;
@@ -673,10 +639,8 @@ public class NetworkService(
     {
         if (handshakeCompletion.TryRemove(client.Id, out var tcs))
             tcs.TrySetException(new IOException("Disconnected before TLS handshake completed"));
-        if (!connectionBuffers.ContainsKey(client.Id))
-        {
-            return;
-        }
+
+        if (!connectionBuffers.ContainsKey(client.Id)) return;
         
         DisconnectClient(client);
     }
@@ -729,7 +693,7 @@ public class NetworkService(
             var pairedDevice = PairedDevices.FirstOrDefault(d => d.Id == authMessage.DeviceId);
             if (pairedDevice is not null)
             {
-                await AuthenticatePairedDeviceServer(client, pairedDevice, address, authMessage);
+                await AuthenticatePairedDeviceServer(client, pairedDevice, address);
             }
             else
             {
@@ -739,7 +703,7 @@ public class NetworkService(
                 {
                     throw new Exception("No server certificate or PublicKey mismatch; rejecting");
                 }
-                await AuthenticateNewDeviceServer(client, authMessage, address, endPoint?.Port ?? 5150, certificate);
+                await AddDiscoveredDevice(client, authMessage, address, endPoint?.Port ?? 5150, certificate);
             }
         }
         catch (Exception ex)
@@ -749,7 +713,7 @@ public class NetworkService(
         }
     }
 
-    private async Task AuthenticatePairedDeviceServer(Client client, PairedDevice pairedDevice, string address, Authentication authMessage)
+    private async Task AuthenticatePairedDeviceServer(Client client, PairedDevice pairedDevice, string address)
     {
         if (pairedDevice.IsConnected && pairedDevice.Client is not null)
         {
@@ -757,10 +721,12 @@ public class NetworkService(
             DisconnectClient(pairedDevice.Client);
         }
 
+        pairedDevice.Client = client;
+        pairedDevice.Address = address;
+        pairedDevice.Port = client.Port;
+
         await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {
-            pairedDevice.Client = client;
-            pairedDevice.Address = address;
             pairedDevice.ConnectionStatus = new Connected();
             deviceManager.ActiveDevice = pairedDevice;
         });
@@ -768,39 +734,29 @@ public class NetworkService(
         logger.Info($"Paired device {pairedDevice.Name} connected successfully");
     }
 
-    private async Task AuthenticateNewDeviceServer(Client client, Authentication authMessage, string address, int port, byte[] certificate)
+    private async Task AddDiscoveredDevice(Client client, Authentication authMessage, string address, int port, byte[] certificate)
     {
         var verificationKey = SslHelper.GetVerificationCode(authMessage.PublicKey);
-        await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+
+        var existingDevice = DiscoveredDevices.FirstOrDefault(d => d.Id == authMessage.DeviceId);
+        if (existingDevice is not null && existingDevice.Session is not null)
         {
-            var existingDiscovered = DiscoveredDevices.FirstOrDefault(d => d.Address == address);
-            if (existingDiscovered is not null)
-            {
-                logger.Info($"Device with address {address} already in DiscoveredDevices, updating client");
-                existingDiscovered.Id = authMessage.DeviceId;
-                existingDiscovered.Name = authMessage.DeviceName;
-                existingDiscovered.Model = authMessage.Model;
-                existingDiscovered.Address = address;
-                existingDiscovered.Port = port;
-                existingDiscovered.Certificate = certificate;
-                existingDiscovered.VerificationKey = verificationKey;
-                existingDiscovered.Client = client;
-            }
-            else
-            {
-                DiscoveredDevices.Add(new DiscoveredDevice
-                {
-                    Id = authMessage.DeviceId,
-                    Name = authMessage.DeviceName,
-                    Model = authMessage.Model,
-                    Address = address,
-                    Port = port,
-                    Certificate = certificate,
-                    VerificationKey = verificationKey,
-                    Client = client
-                });
-            }
-        });
+            DisconnectSession(existingDevice.Session);
+        }
+
+        var device = new DiscoveredDevice
+        {
+            Id = authMessage.DeviceId,
+            Name = authMessage.DeviceName,
+            Model = authMessage.Model,
+            Address = address,
+            Port = port,
+            Certificate = certificate,
+            VerificationKey = verificationKey,
+            Client = client
+        };
+
+        await App.MainWindow.DispatcherQueue.EnqueueAsync(() => DiscoveredDevices.Add(device));
     }
     #endregion
 

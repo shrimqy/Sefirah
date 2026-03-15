@@ -60,13 +60,7 @@ public sealed partial class SyncPage : Page
     {
         if (sender is Button button && button.Tag is DiscoveredDevice device)
         {
-            try
-            {
-                await SessionManager.Pair(device);
-            }
-            catch (Exception ex)
-            {
-            }
+            SessionManager.Pair(device);
         }
     }
 }

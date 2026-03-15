@@ -8,8 +8,6 @@ public partial class DiscoveredDevice : BaseRemoteDevice
 
     public bool IsPairing { get; set; }
 
-    public byte[] Certificate { get; set; } = [];
-
     public string VerificationKey { get; set; } = "00000000";
 
     internal PairedDevice ToPairedDevice()
@@ -23,6 +21,7 @@ public partial class DiscoveredDevice : BaseRemoteDevice
             Client = Client,
             Addresses = [new AddressEntry { Address = Address, IsEnabled = true, Priority = 0 }],
             ConnectionStatus = new Connected(),
+            Port = Port,
         };
     }
 }

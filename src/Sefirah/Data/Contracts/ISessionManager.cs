@@ -17,9 +17,9 @@ public interface ISessionManager
 
     void DisconnectDevice(PairedDevice device, bool forcedDisconnect = false);
 
-    Task ConnectTo(PairedDevice device);
+    void ConnectTo(PairedDevice device);
 
-    Task Pair(DiscoveredDevice device);
+    void Pair(DiscoveredDevice device);
 
-    Task ConnectTo(string deviceId, string host, int port);
+    void ConnectTo(string deviceId, string host, int port);
 }

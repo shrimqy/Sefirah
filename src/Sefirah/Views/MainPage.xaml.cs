@@ -225,11 +225,7 @@ public sealed partial class MainPage : Page
     {
         if (sender is Button button && button.Tag is DiscoveredDevice device)
         {
-            try
-            {
-                await SessionManager.Pair(device);
-            }
-            catch (Exception) {}
+            SessionManager.Pair(device);
         }
     }
 
