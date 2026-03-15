@@ -74,6 +74,9 @@ public partial class App : Application
                 await AppLifecycleHelper.HandleStartupTaskAsync(true);
                 ApplicationData.Current.LocalSettings.Values["isStartupRegistered"] = true;
             }
+
+            if (appActivationArguments.Data is ProtocolActivatedEventArgs protocolArgs)
+                HandleProtocolActivationArgs(protocolArgs);
 #endif
             var rootFrame = EnsureWindowIsInitialized();
             if (rootFrame is null)
@@ -104,7 +107,7 @@ public partial class App : Application
                         break;
                 };
             }
-            else 
+            else
             {
                 MainWindow.Activate();
                 // Wait for the Window to initialize
@@ -172,12 +175,24 @@ public partial class App : Application
         await MainWindow.DispatcherQueue.EnqueueAsync(() => InitializeApplicationAsync(activatedEventArgs));
     }
 
+    /// <summary>Parses sefirah://&lt;package&gt; and launches scrcpy for that package.</summary>
+    private static async void HandleProtocolActivationArgs(ProtocolActivatedEventArgs protocolArgs)
+    {
+        var package = protocolArgs.Uri.Host;
+        if (string.IsNullOrEmpty(package)) return;
+        var screenMirror = Ioc.Default.GetRequiredService<IScreenMirrorService>();
+        screenMirror.LaunchAppByPackage(package);
+    }
+
     public static async Task InitializeApplicationAsync(AppActivationArguments activatedEventArgs)
     {
         try
         {
             switch (activatedEventArgs.Data)
             {
+                case ProtocolActivatedEventArgs protocolArgs:
+                    HandleProtocolActivationArgs(protocolArgs);
+                    break;
                 case ShareTargetActivatedEventArgs shareArgs:
                     MainWindow.AppWindow.Show();
                     MainWindow.Activate();

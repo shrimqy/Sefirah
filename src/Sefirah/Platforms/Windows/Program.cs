@@ -1,7 +1,8 @@
 using Microsoft.UI.Dispatching;
 using Microsoft.Windows.AppLifecycle;
-using Sefirah.Extensions;
 using Sefirah.Platforms.Windows.Interop;
+using Sefirah.Platforms.Windows.Services;
+using Windows.System;
 using AppInstance = Microsoft.Windows.AppLifecycle.AppInstance;
 
 namespace Sefirah.Platforms.Windows;
@@ -19,7 +20,16 @@ internal class Program
         // Get app activation arguments
         var activatedArgs = AppInstance.GetCurrent().GetActivatedEventArgs();
 
-        // Get current active PID
+        // Only the hosted app process has package identity containing ".Hosted."
+        var isHostedAppProcess = Package.Current.Id.Name.Contains(".Hosted.", StringComparison.OrdinalIgnoreCase);
+
+        if (isHostedAppProcess)
+        {
+            HandleHostedAppLaunch(args);
+            return;
+        }
+
+        // Get active process PID
         var activePid = ApplicationData.Current.LocalSettings.Values.Get("INSTANCE_ACTIVE", -1);
 
         // Get current active PID's instance
@@ -47,7 +57,7 @@ internal class Program
         // Start WinUI
         Application.Start((p) =>
         {
-            var context = new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread());
+            var context = new DispatcherQueueSynchronizationContext(Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread());
             SynchronizationContext.SetSynchronizationContext(context);
 
             _ = new App();
@@ -79,5 +89,24 @@ internal class Program
             await thisApp.OnActivatedAsync(args);
         }
     }
-}
 
+    private static void HandleHostedAppLaunch(string[] args)
+    {
+        var package = GetHostedAppPackage(args);
+        if (string.IsNullOrEmpty(package)) return;
+        var uri = new Uri($"sefirah://{package}");
+        Launcher.LaunchUriAsync(uri).AsTask().GetAwaiter().GetResult();
+    }
+
+    private static string? GetHostedAppPackage(string[] args)
+    {
+        var prefix = WindowsAppShortcutService.HostedPackageParamPrefix;
+        foreach (var arg in args)
+        {
+            if (string.IsNullOrWhiteSpace(arg)) continue;
+            if (arg.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                return arg[prefix.Length..].Trim();
+        }
+        return null;
+    }
+}

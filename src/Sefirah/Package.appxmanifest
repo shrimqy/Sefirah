@@ -59,6 +59,11 @@
                 <uap:SplashScreen Image="Assets\AppTiles\SplashScreen.png" />
             </uap:VisualElements >
             <Extensions>
+                <uap:Extension Category="windows.protocol">
+                    <uap:Protocol Name="sefirah">
+                        <uap:DisplayName>Sefirah</uap:DisplayName>
+                    </uap:Protocol>
+                </uap:Extension>
                 <uap:Extension Category="windows.shareTarget">
                     <uap:ShareTarget>
                         <uap:SupportedFileTypes>
@@ -117,11 +122,15 @@
                 <desktop2:Rule Direction="out" IPProtocol="UDP" LocalPortMin="5149" LocalPortMax="5169" Profile="all"/>
             </desktop2:FirewallRules>
         </desktop2:Extension>
+        <uap10:Extension Category="windows.hostRuntime" Executable="Sefirah.exe" uap10:RuntimeBehavior="packagedClassicApp">
+            <uap10:HostRuntime Id="SefirahHost"/>
+        </uap10:Extension>
     </Extensions>
 
     <Capabilities>
         <Capability Name="internetClient" />
         <rescap:Capability Name="runFullTrust" />
+        <rescap:Capability Name="packageManagement"/>
         <rescap:Capability Name="appDiagnostics"/>
         <uap3:Capability Name="backgroundMediaPlayback"/>
         <Capability Name="internetClientServer"/>

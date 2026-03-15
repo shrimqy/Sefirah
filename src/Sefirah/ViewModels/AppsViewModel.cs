@@ -1,11 +1,11 @@
 using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
-using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using static Sefirah.Utils.IconUtils;
 
 namespace Sefirah.ViewModels;
+
 public sealed partial class AppsViewModel : BaseViewModel
 {
     #region Services
@@ -13,6 +13,7 @@ public sealed partial class AppsViewModel : BaseViewModel
     private IScreenMirrorService ScreenMirrorService { get; } = Ioc.Default.GetRequiredService<IScreenMirrorService>();
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
     private IAdbService AdbService { get; } = Ioc.Default.GetRequiredService<IAdbService>();
+    private IAppShortcutService AppShortcutService { get; } = Ioc.Default.GetRequiredService<IAppShortcutService>();
     #endregion
 
     #region Properties
@@ -44,18 +45,20 @@ public sealed partial class AppsViewModel : BaseViewModel
         DeviceManager.ActiveDevice.SendMessage(new RequestApplicationList());
     }
 
-    public void PinApp(ApplicationItem app)
+    public async Task PinApp(ApplicationItem app)
     {
         try
         {
             if (app.DeviceInfo.Pinned)
             {
+                await AppShortcutService.RemoveAppShortcutAsync(app.PackageName);
                 app.DeviceInfo.Pinned = false;
                 RemoteAppsRepository.UnpinApp(app, DeviceManager.ActiveDevice!.Id);
                 PinnedApps.Remove(app);
             }
             else
             {
+                await AppShortcutService.CreateAppShortcutAsync(app);
                 app.DeviceInfo.Pinned = true;
                 RemoteAppsRepository.PinApp(app, DeviceManager.ActiveDevice!.Id);
                 PinnedApps.Add(app);
@@ -64,7 +67,7 @@ public sealed partial class AppsViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error pinning app: {AppPackage}", app?.PackageName);
+            Logger.LogError(ex, "Error on pin toggle: {AppPackage}", app?.PackageName);
         }
     }
 
@@ -75,10 +78,11 @@ public sealed partial class AppsViewModel : BaseViewModel
             var result = await AdbService.UninstallApp(DeviceManager.ActiveDevice!.Id, app.PackageName);
             if (!result) return;
 
-            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
             {
                 Apps.Remove(app);
                 PinnedApps.Remove(app);
+                _ = AppShortcutService.RemoveAppShortcutAsync(app.PackageName);
                 OnPropertyChanged(nameof(IsEmpty));
                 OnPropertyChanged(nameof(HasPinnedApps));
             });
@@ -138,7 +142,7 @@ public sealed partial class AppsViewModel : BaseViewModel
         // Only update if this is for the active device
         if (DeviceManager.ActiveDevice?.Id != deviceId || IsLoading) return;
 
-        App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+        App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
         {
             if (appInfo is null && packageName is not null)
             {
@@ -148,6 +152,7 @@ public sealed partial class AppsViewModel : BaseViewModel
                 {
                     Apps.Remove(appToRemove);
                     PinnedApps.Remove(appToRemove);
+                    _ = AppShortcutService.RemoveAppShortcutAsync(appToRemove.PackageName);
                 }
             }
             else if (appInfo is not null)
@@ -170,6 +175,7 @@ public sealed partial class AppsViewModel : BaseViewModel
                     else if (!appInfo.DeviceInfo.Pinned && PinnedApps.Contains(existingApp))
                     {
                         PinnedApps.Remove(existingApp);
+                        _ = AppShortcutService.RemoveAppShortcutAsync(existingApp.PackageName);
                     }
                 }
                 else

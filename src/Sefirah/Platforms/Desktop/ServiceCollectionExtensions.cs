@@ -10,11 +10,13 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddDesktopServices(this IServiceCollection services)
     {
+
         services.AddSingleton<IPlatformNotificationHandler, DesktopNotificationHandler>();
         services.AddSingleton<IMediaService, DesktopMediaService>();
         services.AddSingleton<IActionService, DesktopActionService>();
         services.AddSingleton<IUpdateService, DesktopUpdateService>();
         services.AddSingleton<ISftpService, DesktopSftpService>();
+        services.AddSingleton<IAppShortcutService, DesktopAppShortcutService>();
         return services;
     }
 } 

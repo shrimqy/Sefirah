@@ -13,7 +13,8 @@ namespace Sefirah.Services;
 public class ScreenMirrorService(
     ILogger<ScreenMirrorService> logger,
     IUserSettingsService userSettingsService,
-    IAdbService adbService
+    IAdbService adbService,
+    IDeviceManager deviceManager
 ) : IScreenMirrorService
 {
     private readonly ObservableCollection<AdbDevice> devices = adbService.AdbDevices;
@@ -24,7 +25,15 @@ public class ScreenMirrorService(
     
     // Password cache: deviceId -> (password, cachedTime, timeoutMinutes)
     private readonly Dictionary<string, (string Password, DateTime CachedAt, int TimeoutMinutes)> passwordCache = [];
-    
+
+    public async void LaunchAppByPackage(string package)
+    {
+        var device = deviceManager.ActiveDevice;
+        if (device is null) return;
+        var iconPath = IconUtils.GetAppIconFilePath(package);
+        await StartScrcpy(device, $"--start-app={package}", iconPath);
+    }
+
     public async Task<bool> StartScrcpy(PairedDevice device, string? customArgs = null, string? iconPath = null)
     {
         Process? process = null;
