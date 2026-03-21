@@ -16,7 +16,7 @@ using Windows.Media.Control;
 namespace Sefirah.Platforms.Windows.Services;
 
 public class WindowsMediaService(
-    ILogger<WindowsMediaService> logger,
+    ILogger logger,
     ISessionManager sessionManager,
     IDeviceManager deviceManager) : IMediaService, IMMNotificationClient
 {
@@ -65,7 +65,7 @@ public class WindowsMediaService(
         {
             foreach (var session in activeSessions.Values)
             {
-                await UpdatePlaybackDataAsync(session);
+                UpdatePlaybackDataAsync(session);
             }
         }
 
@@ -90,7 +90,7 @@ public class WindowsMediaService(
 
     public async Task HandleMediaActionAsync(MediaAction mediaAction)
     {
-        if (!activeSessions.TryGetValue(mediaAction.Source, out var session)) return;
+        activeSessions.TryGetValue(mediaAction.Source, out var session);
         
         await dispatcher.EnqueueAsync(async () =>
         {
@@ -99,38 +99,38 @@ public class WindowsMediaService(
                 switch (mediaAction.ActionType)
                 {
                     case MediaActionType.Play:
-                        await session.TryPlayAsync();
+                        await session?.TryPlayAsync();
                         break;
                     case MediaActionType.Pause:
-                        await session.TryPauseAsync();
+                        await session?.TryPauseAsync();
                         break;
                     case MediaActionType.Next:
-                        await session.TrySkipNextAsync();
+                        await session?.TrySkipNextAsync();
                         break;
                     case MediaActionType.Previous:
-                        await session.TrySkipPreviousAsync();
+                        await session?.TrySkipPreviousAsync();
                         break;
                     case MediaActionType.Seek:
                         if (mediaAction.Value.HasValue)
                         {
                             // We need to use Ticks here
                             TimeSpan position = TimeSpan.FromMilliseconds(mediaAction.Value.Value);
-                            await session.TryChangePlaybackPositionAsync(position.Ticks);
+                            await session?.TryChangePlaybackPositionAsync(position.Ticks);
                         }
                         break;
                     case MediaActionType.Shuffle:
-                        await session.TryChangeShuffleActiveAsync(true);
+                        await session?.TryChangeShuffleActiveAsync(true);
                         break;
                     case MediaActionType.Repeat:
                         if (mediaAction.Value.HasValue)
                         {
                             if (mediaAction.Value == 1.0)
                             {
-                                await session.TryChangeAutoRepeatModeAsync(MediaPlaybackAutoRepeatMode.List);
+                                await session?.TryChangeAutoRepeatModeAsync(MediaPlaybackAutoRepeatMode.List);
                             }
                             else if (mediaAction.Value == 2.0)
                             {
-                                await session.TryChangeAutoRepeatModeAsync(MediaPlaybackAutoRepeatMode.Track);
+                                await session?.TryChangeAutoRepeatModeAsync(MediaPlaybackAutoRepeatMode.Track);
                             }
                         }
                         break;
@@ -271,16 +271,9 @@ public class WindowsMediaService(
         SendPlaybackData(playbackSession);
     }
 
-    private async void Session_MediaPropertiesChanged(GlobalSystemMediaTransportControlsSession session, MediaPropertiesChangedEventArgs args)
+    private void Session_MediaPropertiesChanged(GlobalSystemMediaTransportControlsSession session, MediaPropertiesChangedEventArgs args)
     {
-        try
-        {
-            await UpdatePlaybackDataAsync(session);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error updating playback data for {SourceAppUserModelId}", session.SourceAppUserModelId);
-        }
+        UpdatePlaybackDataAsync(session);
     }
 
     private void Session_PlaybackInfoChanged(GlobalSystemMediaTransportControlsSession sender, PlaybackInfoChangedEventArgs args)
@@ -305,7 +298,7 @@ public class WindowsMediaService(
         }
     }
 
-    private async Task UpdatePlaybackDataAsync(GlobalSystemMediaTransportControlsSession session)
+    private async void UpdatePlaybackDataAsync(GlobalSystemMediaTransportControlsSession session)
     {
         try
         {
