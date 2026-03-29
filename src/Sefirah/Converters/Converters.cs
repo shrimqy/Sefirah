@@ -509,25 +509,3 @@ internal sealed partial class SubscriptionToIconConverter : IValueConverter
         throw new NotImplementedException();
     }
 }
-
-internal sealed partial class MillisecondsToTimeConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, string language)
-    {
-        if (value is double milliseconds && milliseconds >= 0)
-        {
-            var timeSpan = TimeSpan.FromMilliseconds(milliseconds);
-            if (timeSpan.TotalHours >= 1)
-            {
-                return $"{(int)timeSpan.TotalHours}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
-            }
-            return $"{timeSpan.Minutes}:{timeSpan.Seconds:D2}";
-        }
-        return "0:00";
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        throw new NotImplementedException();
-    }
-}

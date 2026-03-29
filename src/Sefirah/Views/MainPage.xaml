@@ -41,7 +41,6 @@
         <converters:DateTimeConverter x:Key="DateTimeConverter" />
         <converters:RingerModeToIconConverter x:Key="RingerModeToIconConverter" />
         <converters:BatteryStatusToIconConverter x:Key="BatteryStatusToIconConverter" />
-        <converters:MillisecondsToTimeConverter x:Key="MillisecondsToTimeConverter" />
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" Inverse="True" />
         <converters:EmptyObjectToVisibilityConverter x:Key="EmptyObjectToVisibilityConverter" />
@@ -494,7 +493,7 @@
                                                 VerticalAlignment="Center"
                                                 FontSize="12"
                                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                Text="{x:Bind MaxSeekTimeText, Converter={StaticResource MillisecondsToTimeConverter}, Mode=OneWay}" />
+                                                Text="{x:Bind MaxSeekTimeText, Mode=OneWay}" />
                                         </Grid>
                                     </Grid>
                                 </Border>
