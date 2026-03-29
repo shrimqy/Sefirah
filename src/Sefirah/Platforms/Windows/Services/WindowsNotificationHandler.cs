@@ -207,28 +207,7 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
     }
 
     /// <inheritdoc />
-    public void ShowClipboardNotification(string title, string text, string? iconPath = null)
-    {
-        try
-        {
-            var builder = new AppNotificationBuilder()
-                .AddText(title)
-                .AddText(text)
-                .SetTag($"clipboard_{DateTime.Now.Ticks}")
-                .SetGroup("clipboard");
-
-            var notification = builder.BuildNotification();
-            notification.ExpiresOnReboot = true;
-            AppNotificationManager.Default.Show(notification);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to show simple notification");
-        }
-    }
-
-    /// <inheritdoc />
-    public void ShowClipboardNotificationWithActions(string title, string text, string? actionLabel = null, string? actionData = null)
+    public void ShowClipboardNotification(string title, string text, string? actionLabel = null, string? actionData = null)
     {
         try
         {

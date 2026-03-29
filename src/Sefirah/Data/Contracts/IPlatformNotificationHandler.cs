@@ -16,23 +16,10 @@ public interface IPlatformNotificationHandler
     Task ShowRemoteNotification(NotificationInfo message, string deviceId);
     
     /// <summary>
-    /// Shows a simple notification with title and text
+    /// Shows a clipboard sync notification. When <paramref name="actionLabel"/> and
+    /// <paramref name="actionData"/> are both set, adds a button to the notification.
     /// </summary>
-    /// <param name="title">Notification title</param>
-    /// <param name="text">Notification text</param>
-    /// <param name="iconPath">Optional path to icon file</param>
-    /// <returns>Task that completes when the notification is displayed</returns>
-    void ShowClipboardNotification(string title, string text, string? iconPath = null);
-    
-    /// <summary>
-    /// Shows a clipboard notification with optional action button
-    /// </summary>
-    /// <param name="title">Notification title</param>
-    /// <param name="text">Notification text</param>
-    /// <param name="actionLabel">Label for action button (optional)</param>
-    /// <param name="actionData">Data to pass with action (optional)</param>
-    /// <returns>Task that completes when the notification is displayed</returns>
-    void ShowClipboardNotificationWithActions(string title, string text, string? actionLabel = null, string? actionData = null);
+    void ShowClipboardNotification(string title, string text, string? actionLabel = null, string? actionData = null);
     
     /// <summary>
     /// Shows a file transfer notification
@@ -41,7 +28,6 @@ public interface IPlatformNotificationHandler
     /// <param name="text">Notification text</param>
     /// <param name="filePath">Path to the transferred file (optional)</param>
     /// <param name="folderPath">Path to the folder containing the file (optional)</param>
-    /// <returns>Task that completes when the notification is displayed</returns>
     void ShowCompletedFileTransferNotification(string subtitle, string transferId, string? filePath = null, string? folderPath = null);
 
     void ShowFileTransferNotification(string notificationTitle, string progressTitle, string status, string transferId, uint notificationSequence, double progress);

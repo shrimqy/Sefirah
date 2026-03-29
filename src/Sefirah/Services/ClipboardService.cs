@@ -9,7 +9,7 @@ using DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue;
 namespace Sefirah.Services;
 
 public class ClipboardService(
-    ILogger<ClipboardService> logger,
+    ILogger logger,
     ISessionManager sessionManager,
     IPlatformNotificationHandler platformNotificationHandler,
     IDeviceManager deviceManager,
@@ -50,8 +50,7 @@ public class ClipboardService(
     private void OnConnectionStatusChanged(object? sender, PairedDevice device)
     {
         var devicesWithClipboardSync = deviceManager.PairedDevices
-            .Where(device => device.IsConnected &&
-                device.DeviceSettings.ClipboardSend);
+            .Where(device => device.IsConnected && device.DeviceSettings.ClipboardSend);
 
         dispatcher.EnqueueAsync(() =>
         {
@@ -59,13 +58,13 @@ public class ClipboardService(
             {
                 if (!devicesWithClipboardSync.Any() && isMonitoring)
                 {
-                    Windows.ApplicationModel.DataTransfer.Clipboard.ContentChanged -= OnClipboardContentChanged;
+                    Clipboard.ContentChanged -= OnClipboardContentChanged;
                     logger.LogInformation("Clipboard monitoring stopped");
                     isMonitoring = false;
                 }
                 else if (!isMonitoring)
                 {
-                    Windows.ApplicationModel.DataTransfer.Clipboard.ContentChanged += OnClipboardContentChanged;
+                    Clipboard.ContentChanged += OnClipboardContentChanged;
                     logger.LogInformation("Clipboard monitoring started");
                     isMonitoring = true;
                 }
@@ -79,8 +78,7 @@ public class ClipboardService(
 
     private async void OnClipboardContentChanged(object? sender, object? e)
     {
-        if (isInternalUpdate)
-            return;
+        if (isInternalUpdate) return;
 
         await dispatcher.EnqueueAsync(async () =>
         {
@@ -88,15 +86,14 @@ public class ClipboardService(
             {
                 // Check if any connected devices have clipboard send enabled
                 var devicesWithClipboardSync = deviceManager.PairedDevices
-                    .Where(device => device.IsConnected &&
-                        device.DeviceSettings.ClipboardSend)
+                    .Where(device => device.IsConnected && device.DeviceSettings.ClipboardSend)
                     .ToList();
 
                 if (devicesWithClipboardSync.Count == 0) return;
 
                 logger.LogDebug("Sending clipboard content");
 
-                var dataPackageView = Windows.ApplicationModel.DataTransfer.Clipboard.GetContent();
+                var dataPackageView = Clipboard.GetContent();
 
                 if (dataPackageView.Contains(StandardDataFormats.Text))
                 {
@@ -176,39 +173,26 @@ public class ClipboardService(
         // Convert Windows CRLF to Unix LF 
         text = text.Replace("\r\n", "\n");
         
-        var message = new Data.Models.ClipboardInfo { Content = text, ClipboardType = "text/plain" };
+        var message = new ClipboardInfo { Content = text, ClipboardType = "text/plain" };
 
-        foreach (var device in devices)
-        {
-            device.SendMessage(message);
-        }
-        return;
+        devices.ForEach(d => d.SendMessage(message));
     }
 
     private async Task HandleLargeImageTransfer(StorageFile file, string fileType, string mimeType, List<PairedDevice> devices)
     {
         var metadata = new FileMetadata($"sefirah_clipboard_image.{fileType}", mimeType, (long)(await file.GetBasicPropertiesAsync()).Size);
 
-        await Task.Run(async() =>
-        {
-            foreach (var device in devices)
-            {
-                await fileTransferService.SendFiles([file], device, isClipboard: true);
-            }
-        });
+        devices.ForEach(d => fileTransferService.SendFiles([file], d, true));
     }
 
-    private async Task HandleSmallImageTransfer(Stream stream, string mimeType, List<PairedDevice> devices)
+    private static async Task HandleSmallImageTransfer(Stream stream, string mimeType, List<PairedDevice> devices)
     {
         stream.Position = 0;
         byte[] buffer = new byte[stream.Length];
         await stream.ReadExactlyAsync(buffer);
 
-        var message = new Data.Models.ClipboardInfo { Content = Convert.ToBase64String(buffer), ClipboardType = mimeType };
-        foreach (var device in devices)
-        {
-            device.SendMessage(message);
-        }
+        var message = new ClipboardInfo { Content = Convert.ToBase64String(buffer), ClipboardType = mimeType };
+        devices.ForEach(d => d.SendMessage(message));
     }
 
     public async Task SetContentAsync(object content, PairedDevice sourceDevice)
@@ -226,8 +210,7 @@ public class ClipboardService(
                 {
                     case StorageFile file:
                         // Set package family name for proper file handling
-                        dataPackage.Properties.PackageFamilyName =
-                            Package.Current.Id.FamilyName;
+                        dataPackage.Properties.PackageFamilyName = Package.Current.Id.FamilyName;
                         // Pass false as second parameter to indicate the app isn't taking ownership of the files
                         dataPackage.SetStorageItems([file], false);
                         break;
@@ -235,33 +218,30 @@ public class ClipboardService(
                         dataPackage.SetText(textContent);
                         Uri.TryCreate(textContent, UriKind.Absolute, out Uri? uri);
                         bool isValidUri = IsValidWebUrl(uri);
+
                         if (sourceDevice.DeviceSettings.OpenLinksInBrowser && isValidUri)
                         {
                             await Launcher.LaunchUriAsync(uri);
                         }
-                        else if (isValidUri && sourceDevice.DeviceSettings.ShowClipboardToast)
+                        else if (sourceDevice.DeviceSettings.ShowClipboardToast)
                         {
-                            platformNotificationHandler.ShowClipboardNotificationWithActions(
-                                "Clipboard data received",
-                                "Click to open link in browser",
-                                "Open in browser",
-                                textContent);
+                            var preview = textContent.Trim();
+                            if (preview.Length > 50)
+                                preview = $"{preview[..50]}…";
+
+                            platformNotificationHandler.ShowClipboardNotification(
+                                "ClipboardNotification.Title".GetLocalizedResource(),
+                                preview,
+                                isValidUri ? "OpenInBrowser".GetLocalizedResource() : null,
+                                isValidUri ? textContent : null);
                         }
                         break;
                     default:
                         throw new ArgumentException($"Unsupported content type: {content.GetType()}");
                 }
 
-                Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dataPackage);
-                await Task.Delay(50);
+                Clipboard.SetContent(dataPackage);
                 logger.LogInformation("Clipboard content set. Type: {ContentType}", content.GetType().Name);
-
-                if (sourceDevice.DeviceSettings.ShowClipboardToast && content is not string)
-                {
-                    platformNotificationHandler.ShowClipboardNotification(
-                        "Clipboard data received",
-                        $"Content type: {content.GetType().Name}");
-                }
             }
             catch (Exception ex)
             {
@@ -269,14 +249,16 @@ public class ClipboardService(
             }
             finally
             {
-                isInternalUpdate = false;
+                // Let any ContentChanged run first
+                // avoids echoing remote clipboard back out
+                dispatcher.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () => isInternalUpdate = false);
             }
         });
     }
 
     public static bool IsValidWebUrl(Uri? uri)
     {
-        return uri != null && 
+        return uri is not null && 
                (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps) && 
                !string.IsNullOrWhiteSpace(uri.Host) &&
                uri.Host.Contains('.');

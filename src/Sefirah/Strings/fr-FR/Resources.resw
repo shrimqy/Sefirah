@@ -743,4 +743,10 @@ input text %pwd%</value>
   <data name="UpdateNotification.Subtitle" xml:space="preserve">
     <value>A new version is available</value>
   </data>
+  <data name="ClipboardNotification.Title" xml:space="preserve">
+    <value>Clipboard received</value>
+  </data>
+  <data name="OpenInBrowser" xml:space="preserve">
+    <value>Open in browser</value>
+  </data>
 </root>

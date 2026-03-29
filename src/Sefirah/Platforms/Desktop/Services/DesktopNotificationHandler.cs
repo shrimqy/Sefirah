@@ -175,27 +175,42 @@ public class DesktopNotificationHandler(
         }
     }
 
-    public async void ShowClipboardNotification(string title, string text, string? iconPath = null)
+    public async void ShowClipboardNotification(string title, string text, string? actionLabel = null, string? actionData = null)
     {
-        if (!await EnsureInitializedAsync() || _notifications == null)
-            return;
+        if (!await EnsureInitializedAsync() || _notifications is null) return;
+
+        var hasAction = !string.IsNullOrEmpty(actionLabel) && !string.IsNullOrEmpty(actionData);
 
         try
         {
             var hints = new Dictionary<string, VariantValue>();
-            var categoryHint = NotificationHints.Category("");
+            var categoryHint = NotificationHints.Category(hasAction ? "clipboard.action" : "");
+            hints.Add(categoryHint.Key, categoryHint.Value);
             var urgencyHint = NotificationHints.NormalUrgency();
             var soundHint = NotificationHints.SuppressSound(false);
-            
-            hints.Add(categoryHint.Key, categoryHint.Value);
             hints.Add(urgencyHint.Key, urgencyHint.Value);
             hints.Add(soundHint.Key, soundHint.Value);
 
-            string appIcon = "dialog-information";
-            if (!string.IsNullOrEmpty(iconPath))
+            var appIcon = hasAction ? "edit-copy" : "dialog-information";
+
+            var actions = new List<string>();
+            var notificationActionData = new NotificationActionData
             {
-                // Try to use the provided icon path, fallback to default if needed
-                appIcon = iconPath.StartsWith("/") ? $"file://{iconPath}" : iconPath;
+                NotificationType = "Clipboard",
+                Actions = []
+            };
+
+            if (hasAction)
+            {
+                actions.Add("clipboard_action");
+                actions.Add(actionLabel!);
+                notificationActionData.Actions.Add(new NotificationActionInfo
+                {
+                    ActionId = "clipboard_action",
+                    ActionIndex = 0,
+                    Label = actionLabel!,
+                    Data = actionData
+                });
             }
 
             var notificationId = await _notifications.NotifyAsync(
@@ -204,76 +219,14 @@ public class DesktopNotificationHandler(
                 appIcon: appIcon,
                 summary: title,
                 body: text,
-                actions: [],
+                actions: actions.ToArray(),
                 hints: hints,
-                expireTimeout: 5000 // 5 seconds
-            );
+                expireTimeout: 5000);
 
-            logger.LogDebug("Simple notification sent with ID: {NotificationId}", notificationId);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to show simple notification");
-        }
-    }
-
-    public async void ShowClipboardNotificationWithActions(string title, string text, string? actionLabel = null, string? actionData = null)
-    {
-        if (!await EnsureInitializedAsync() || _notifications == null)
-            return;
-
-        try
-        {
-            var hints = new Dictionary<string, VariantValue>();
-            var categoryHint = NotificationHints.Category("clipboard.action");
-            var urgencyHint = NotificationHints.NormalUrgency();
-            var soundHint = NotificationHints.SuppressSound(false);
-            
-            hints.Add(categoryHint.Key, categoryHint.Value);
-            hints.Add(urgencyHint.Key, urgencyHint.Value);
-            hints.Add(soundHint.Key, soundHint.Value);
-
-            // Prepare actions for clipboard
-            var actions = new List<string>();
-            var notificationActionData = new NotificationActionData
-            {
-                NotificationType = "Clipboard",
-                Actions = []
-            };
-
-            if (!string.IsNullOrEmpty(actionLabel) && !string.IsNullOrEmpty(actionData))
-            {
-                actions.Add("clipboard_action");
-                actions.Add(actionLabel);
-
-                notificationActionData.Actions.Add(new NotificationActionInfo
-                {
-                    ActionId = "clipboard_action",
-                    ActionIndex = 0,
-                    Label = actionLabel,
-                    Data = actionData
-                });
-            }
-
-            var notificationId = await _notifications.NotifyAsync(
-                appName: "Sefirah",
-                replacesId: 0,
-                appIcon: "edit-copy", 
-                summary: title,
-                body: text,
-                actions: actions.ToArray(), 
-                hints: hints,
-                expireTimeout: 4000 
-            );
-
-            // Store action data for this notification
             if (notificationActionData.Actions.Count > 0)
-            {
                 _notificationActions[notificationId] = notificationActionData;
-            }
 
-            logger.LogDebug("Clipboard notification sent with ID: {NotificationId}, Actions: {ActionCount}", 
-                notificationId, notificationActionData.Actions.Count);
+            logger.LogDebug("Clipboard notification sent with ID: {NotificationId}, Actions: {ActionCount}", notificationId, notificationActionData.Actions.Count);
         }
         catch (Exception ex)
         {
@@ -283,7 +236,7 @@ public class DesktopNotificationHandler(
 
     public async void ShowCompletedFileTransferNotification(string subtitle, string transferId, string? filePath = null, string? folderPath = null)
     {
-        if (!await EnsureInitializedAsync() || _notifications == null)
+        if (!await EnsureInitializedAsync() || _notifications is null)
             return;
 
         try
