@@ -78,6 +78,31 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
         context.Database.Update(app);
     }
 
+    public void UpdateAllAppNotificationFilters(string deviceId, NotificationFilter filter)
+    {
+        var appsToUpdate = context.Database.Table<ApplicationEntity>()
+            .ToList()
+            .Where(app => HasDevice(app, deviceId))
+            .ToList();
+
+        if (appsToUpdate.Count == 0)
+        {
+            return;
+        }
+
+        context.Database.RunInTransaction(() =>
+        {
+            foreach (var app in appsToUpdate)
+            {
+                var deviceInfoList = app.AppDeviceInfoList;
+                var deviceInfo = deviceInfoList.First(d => d.DeviceId == deviceId);
+                deviceInfo.Filter = filter;
+                app.AppDeviceInfoJson = JsonSerializer.Serialize(deviceInfoList);
+                context.Database.Update(app);
+            }
+        });
+    }
+
     public async Task RemoveDeviceFromApplication(string appPackage, string deviceId)
     {
         var app = context.Database.Find<ApplicationEntity>(appPackage);
