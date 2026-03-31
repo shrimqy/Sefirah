@@ -11,7 +11,6 @@ public sealed class BatteryAlertService : IBatteryAlertService
 {
     private const int LowBatteryThreshold = 20;
 
-    private readonly ConcurrentDictionary<string, bool> activeAlerts = [];
     private readonly ConcurrentDictionary<string, SemaphoreSlim> deviceLocks = [];
     private readonly ConcurrentDictionary<string, PropertyChangedEventHandler> settingsChangedHandlers = [];
     private readonly ConcurrentDictionary<string, byte> trackedDevices = [];
@@ -43,14 +42,14 @@ public sealed class BatteryAlertService : IBatteryAlertService
             await App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.BatteryStatus = batteryState);
 
             var notificationTag = BuildNotificationTag(device.Id);
-            if (!device.DeviceSettings.LowBatteryAlertsEnabled || !ShouldShowLowBatteryAlert(batteryState))
+            if (!ShouldShowLowBatteryAlert(batteryState))
             {
-                activeAlerts.TryRemove(device.Id, out _);
+                device.DeviceSettings.LowBatteryAlertShown = false;
                 await platformNotificationHandler.RemoveNotificationByTag(notificationTag);
                 return;
             }
 
-            if (!activeAlerts.TryAdd(device.Id, true))
+            if (!device.DeviceSettings.LowBatteryAlertsEnabled || device.DeviceSettings.LowBatteryAlertShown)
             {
                 return;
             }
@@ -59,6 +58,7 @@ public sealed class BatteryAlertService : IBatteryAlertService
             var text = string.Format("BatteryNotification.Text".GetLocalizedResource(), device.Name, batteryState.BatteryLevel);
 
             await platformNotificationHandler.ShowBatteryNotification(title, text, notificationTag);
+            device.DeviceSettings.LowBatteryAlertShown = true;
             logger.LogInformation("Displayed low battery notification for device {DeviceId} at {BatteryLevel}%", device.Id, batteryState.BatteryLevel);
         }
         finally
@@ -74,7 +74,6 @@ public sealed class BatteryAlertService : IBatteryAlertService
             return;
         }
 
-        activeAlerts.TryRemove(device.Id, out _);
         await platformNotificationHandler.RemoveNotificationByTag(BuildNotificationTag(device.Id));
     }
 
@@ -108,7 +107,6 @@ public sealed class BatteryAlertService : IBatteryAlertService
             return;
         }
 
-        activeAlerts.TryRemove(device.Id, out _);
         _ = platformNotificationHandler.RemoveNotificationByTag(BuildNotificationTag(device.Id));
     }
 
@@ -120,7 +118,6 @@ public sealed class BatteryAlertService : IBatteryAlertService
         }
 
         trackedDevices.TryRemove(device.Id, out _);
-        activeAlerts.TryRemove(device.Id, out _);
         deviceLocks.TryRemove(device.Id, out _);
     }
 
