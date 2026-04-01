@@ -40,11 +40,11 @@ public sealed class BatteryAlertService : IBatteryAlertService
             return;
         }
 
-        device.DeviceSettings.LowBatteryAlertShown = true;
         var title = "BatteryNotification.Title".GetLocalizedResource();
         var text = string.Format("BatteryNotification.Text".GetLocalizedResource(), device.Name, batteryState.BatteryLevel);
 
         await platformNotificationHandler.ShowBatteryNotification(title, text, notificationTag);
+        device.DeviceSettings.LowBatteryAlertShown = true;
         logger.LogInformation("Displayed low battery notification for device {DeviceId} at {BatteryLevel}%", device.Id, batteryState.BatteryLevel);
     }
 
