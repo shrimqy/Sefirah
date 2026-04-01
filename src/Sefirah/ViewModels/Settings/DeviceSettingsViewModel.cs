@@ -130,6 +130,12 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
             if (DeviceSettings.LowBatteryAlertsEnabled != value)
             {
                 DeviceSettings.LowBatteryAlertsEnabled = value;
+
+                if (!value)
+                {
+                    _ = platformNotificationHandler.RemoveNotificationByTag(Constants.Notification.GetBatteryTag(Device.Id));
+                }
+
                 OnPropertyChanged();
             }
         }
@@ -652,6 +658,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     private readonly ISftpService sftpService = Ioc.Default.GetRequiredService<ISftpService>();
     private readonly IAdbService AdbService = Ioc.Default.GetRequiredService<IAdbService>();
+    private readonly IPlatformNotificationHandler platformNotificationHandler = Ioc.Default.GetRequiredService<IPlatformNotificationHandler>();
     private readonly IDeviceSettingsService DeviceSettings;
     public PairedDevice Device;
 

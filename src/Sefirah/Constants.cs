@@ -5,6 +5,8 @@ public static class Constants
     {
         public const string FileTransferGroup = "file-transfer";
         public const string BatteryGroup = "battery";
+
+        public static string GetBatteryTag(string deviceId) => $"battery_{deviceId}";
     }
 
     public static class ToastNotificationType

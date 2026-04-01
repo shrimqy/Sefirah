@@ -18,7 +18,6 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
     public partial PairedDevice? ActiveDevice { get; set; }
 
     public event EventHandler<PairedDevice?>? ActiveDeviceChanged;
-    public event EventHandler<PairedDevice>? DeviceRemoved;
 
     partial void OnActiveDeviceChanged(PairedDevice? value) => ActiveDeviceChanged?.Invoke(this, value);
 
@@ -49,8 +48,6 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
                 ActiveDevice = PairedDevices.FirstOrDefault();
             }
         });
-
-        DeviceRemoved?.Invoke(this, device);
     }
 
     public Task UpdateDevice(PairedDeviceEntity device)

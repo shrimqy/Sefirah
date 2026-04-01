@@ -26,11 +26,6 @@ public interface IDeviceManager
     event EventHandler<PairedDevice?>? ActiveDeviceChanged;
 
     /// <summary>
-    /// Event raised when a paired device is removed.
-    /// </summary>
-    event EventHandler<PairedDevice>? DeviceRemoved;
-
-    /// <summary>
     /// Finds a device session by device ID
     /// </summary>
     PairedDevice? FindDeviceById(string deviceId);
