@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using CommunityToolkit.WinUI;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
@@ -9,6 +10,7 @@ public sealed class BatteryAlertService : IBatteryAlertService
 {
     private const int LowBatteryThreshold = 20;
 
+    private readonly ConcurrentDictionary<string, SemaphoreSlim> deviceLocks = [];
     private readonly IPlatformNotificationHandler platformNotificationHandler;
     private readonly ILogger<BatteryAlertService> logger;
 
@@ -25,27 +27,37 @@ public sealed class BatteryAlertService : IBatteryAlertService
 
     public async Task HandleBatteryStateAsync(PairedDevice device, BatteryState batteryState)
     {
-        await App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.BatteryStatus = batteryState);
+        var deviceLock = deviceLocks.GetOrAdd(device.Id, _ => new SemaphoreSlim(1, 1));
+        await deviceLock.WaitAsync();
 
-        var notificationTag = Constants.Notification.GetBatteryTag(device.Id);
-        if (!ShouldShowLowBatteryAlert(batteryState))
+        try
         {
-            device.DeviceSettings.LowBatteryAlertShown = false;
-            await platformNotificationHandler.RemoveNotificationByTag(notificationTag);
-            return;
-        }
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.BatteryStatus = batteryState);
 
-        if (!device.DeviceSettings.LowBatteryAlertsEnabled || device.DeviceSettings.LowBatteryAlertShown)
+            var notificationTag = Constants.Notification.GetBatteryTag(device.Id);
+            if (!ShouldShowLowBatteryAlert(batteryState))
+            {
+                device.DeviceSettings.LowBatteryAlertShown = false;
+                await platformNotificationHandler.RemoveNotificationByTag(notificationTag);
+                return;
+            }
+
+            if (!device.DeviceSettings.LowBatteryAlertsEnabled || device.DeviceSettings.LowBatteryAlertShown)
+            {
+                return;
+            }
+
+            var title = "BatteryNotification.Title".GetLocalizedResource();
+            var text = string.Format("BatteryNotification.Text".GetLocalizedResource(), device.Name, batteryState.BatteryLevel);
+
+            await platformNotificationHandler.ShowBatteryNotification(title, text, notificationTag);
+            device.DeviceSettings.LowBatteryAlertShown = true;
+            logger.LogInformation("Displayed low battery notification for device {DeviceId} at {BatteryLevel}%", device.Id, batteryState.BatteryLevel);
+        }
+        finally
         {
-            return;
+            deviceLock.Release();
         }
-
-        var title = "BatteryNotification.Title".GetLocalizedResource();
-        var text = string.Format("BatteryNotification.Text".GetLocalizedResource(), device.Name, batteryState.BatteryLevel);
-
-        await platformNotificationHandler.ShowBatteryNotification(title, text, notificationTag);
-        device.DeviceSettings.LowBatteryAlertShown = true;
-        logger.LogInformation("Displayed low battery notification for device {DeviceId} at {BatteryLevel}%", device.Id, batteryState.BatteryLevel);
     }
 
     private async void OnConnectionStatusChanged(object? sender, PairedDevice device)
