@@ -56,31 +56,6 @@
                     Description="{helpers:ResourceString Name=DisplayToastNotifications}"
                     Header="{helpers:ResourceString Name=AppSpecificSettings}"
                     ItemsSource="{x:Bind ViewModel.RemoteApps}">
-                    <wuc:SettingsExpander.ItemsHeader>
-                        <wuc:SettingsCard
-                            Description="{helpers:ResourceString Name=SetAllAppsDescription}"
-                            Header="{helpers:ResourceString Name=SetAllApps}"
-                            Visibility="{x:Bind ViewModel.RemoteApps.Count, Mode=OneWay, Converter={StaticResource CountToVisibilityConverter}}">
-                            <Button Content="{helpers:ResourceString Name=SetAll}">
-                                <Button.Flyout>
-                                    <MenuFlyout>
-                                        <MenuFlyoutItem
-                                            Click="OnSetAllMenuFlyoutItemClick"
-                                            Tag="ToastFeed"
-                                            Text="{helpers:ResourceString Name=NotificationFilterToastFeed/Content}" />
-                                        <MenuFlyoutItem
-                                            Click="OnSetAllMenuFlyoutItemClick"
-                                            Tag="Feed"
-                                            Text="{helpers:ResourceString Name=NotificationFilterFeed/Content}" />
-                                        <MenuFlyoutItem
-                                            Click="OnSetAllMenuFlyoutItemClick"
-                                            Tag="Disabled"
-                                            Text="{helpers:ResourceString Name=NotificationFilterDisabled/Content}" />
-                                    </MenuFlyout>
-                                </Button.Flyout>
-                            </Button>
-                        </wuc:SettingsCard>
-                    </wuc:SettingsExpander.ItemsHeader>
                     <wuc:SettingsExpander.ItemTemplate>
                         <DataTemplate x:DataType="models:ApplicationItem">
                             <wuc:SettingsCard>
@@ -120,6 +95,30 @@
                     <wuc:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE7F4;" />
                     </wuc:SettingsExpander.HeaderIcon>
+                    <Grid
+                        Padding="0,8,20,4"
+                        Visibility="{x:Bind ViewModel.RemoteApps.Count, Mode=OneWay, Converter={StaticResource CountToVisibilityConverter}}">
+                        <Button
+                            HorizontalAlignment="Right"
+                            Content="{helpers:ResourceString Name=ApplyToListedApps}">
+                            <Button.Flyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem
+                                        Click="OnSetAllMenuFlyoutItemClick"
+                                        Tag="ToastFeed"
+                                        Text="{helpers:ResourceString Name=NotificationFilterToastFeed/Content}" />
+                                    <MenuFlyoutItem
+                                        Click="OnSetAllMenuFlyoutItemClick"
+                                        Tag="Feed"
+                                        Text="{helpers:ResourceString Name=NotificationFilterFeed/Content}" />
+                                    <MenuFlyoutItem
+                                        Click="OnSetAllMenuFlyoutItemClick"
+                                        Tag="Disabled"
+                                        Text="{helpers:ResourceString Name=NotificationFilterDisabled/Content}" />
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
+                    </Grid>
                     <wuc:SettingsExpander.Items />
                 </wuc:SettingsExpander>
 
