@@ -289,14 +289,8 @@ page.</value>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>App-specific Settings</value>
   </data>
-  <data name="SetAll" xml:space="preserve">
-    <value>Alles instellen</value>
-  </data>
-  <data name="SetAllApps" xml:space="preserve">
+  <data name="ApplyToListedApps" xml:space="preserve">
     <value>Alle apps instellen</value>
-  </data>
-  <data name="SetAllAppsDescription" xml:space="preserve">
-    <value>Pas hetzelfde meldingsgedrag toe op elke vermelde app</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>Send</value>

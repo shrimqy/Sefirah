@@ -288,14 +288,8 @@
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>Réglages spécifiques à l'application</value>
   </data>
-  <data name="SetAll" xml:space="preserve">
-    <value>Tout définir</value>
-  </data>
-  <data name="SetAllApps" xml:space="preserve">
+  <data name="ApplyToListedApps" xml:space="preserve">
     <value>Définir toutes les applis</value>
-  </data>
-  <data name="SetAllAppsDescription" xml:space="preserve">
-    <value>Appliquer le même comportement de notification à chaque application listée</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>Envoyer</value>

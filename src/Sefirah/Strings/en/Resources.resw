@@ -289,14 +289,8 @@ page.</value>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>App-specific Settings</value>
   </data>
-  <data name="SetAll" xml:space="preserve">
-    <value>Set all</value>
-  </data>
-  <data name="SetAllApps" xml:space="preserve">
-    <value>Set all apps</value>
-  </data>
-  <data name="SetAllAppsDescription" xml:space="preserve">
-    <value>Apply the same notification behavior to every listed app</value>
+  <data name="ApplyToListedApps" xml:space="preserve">
+    <value>Apply to listed apps</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>Send</value>

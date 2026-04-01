@@ -288,14 +288,8 @@
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>アプリ固有の設定</value>
   </data>
-  <data name="SetAll" xml:space="preserve">
-    <value>すべて設定</value>
-  </data>
-  <data name="SetAllApps" xml:space="preserve">
+  <data name="ApplyToListedApps" xml:space="preserve">
     <value>すべてのアプリを設定</value>
-  </data>
-  <data name="SetAllAppsDescription" xml:space="preserve">
-    <value>一覧にあるすべてのアプリに同じ通知動作を適用します</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>送信</value>

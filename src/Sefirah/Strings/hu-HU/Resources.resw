@@ -289,14 +289,8 @@ page.</value>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>App-specific Settings</value>
   </data>
-  <data name="SetAll" xml:space="preserve">
-    <value>Összes beállítása</value>
-  </data>
-  <data name="SetAllApps" xml:space="preserve">
+  <data name="ApplyToListedApps" xml:space="preserve">
     <value>Összes alkalmazás beállítása</value>
-  </data>
-  <data name="SetAllAppsDescription" xml:space="preserve">
-    <value>Ugyanazt az értesítési viselkedést alkalmazza az összes felsorolt alkalmazásra</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>Küldés</value>

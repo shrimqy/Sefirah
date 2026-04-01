@@ -289,14 +289,8 @@ page.</value>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>App-specific Settings</value>
   </data>
-  <data name="SetAll" xml:space="preserve">
-    <value>सभी सेट करें</value>
-  </data>
-  <data name="SetAllApps" xml:space="preserve">
+  <data name="ApplyToListedApps" xml:space="preserve">
     <value>सभी ऐप्स सेट करें</value>
-  </data>
-  <data name="SetAllAppsDescription" xml:space="preserve">
-    <value>सूचीबद्ध हर ऐप पर एक जैसा अधिसूचना व्यवहार लागू करें</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>Send</value>

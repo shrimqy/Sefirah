@@ -288,14 +288,8 @@
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>Настройки для отдельных приложений</value>
   </data>
-  <data name="SetAll" xml:space="preserve">
-    <value>Настроить все</value>
-  </data>
-  <data name="SetAllApps" xml:space="preserve">
+  <data name="ApplyToListedApps" xml:space="preserve">
     <value>Настроить все приложения</value>
-  </data>
-  <data name="SetAllAppsDescription" xml:space="preserve">
-    <value>Применить одинаковое поведение уведомлений ко всем приложениям в списке</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>Отправить</value>

@@ -289,14 +289,8 @@ page.</value>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>App-specific Settings</value>
   </data>
-  <data name="SetAll" xml:space="preserve">
-    <value>Dat tat ca</value>
-  </data>
-  <data name="SetAllApps" xml:space="preserve">
+  <data name="ApplyToListedApps" xml:space="preserve">
     <value>Dat tat ca ung dung</value>
-  </data>
-  <data name="SetAllAppsDescription" xml:space="preserve">
-    <value>Ap dung cung mot cach xu ly thong bao cho moi ung dung trong danh sach</value>
   </data>
   <data name="SendButton" xml:space="preserve">
     <value>Send</value>
