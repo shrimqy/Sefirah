@@ -289,6 +289,15 @@ page.</value>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>앱별 설정</value>
   </data>
+  <data name="SetAll" xml:space="preserve">
+    <value>모두 설정</value>
+  </data>
+  <data name="SetAllApps" xml:space="preserve">
+    <value>모든 앱 설정</value>
+  </data>
+  <data name="SetAllAppsDescription" xml:space="preserve">
+    <value>목록에 있는 모든 앱에 동일한 알림 동작을 적용합니다</value>
+  </data>
   <data name="SendButton" xml:space="preserve">
     <value>전송</value>
   </data>

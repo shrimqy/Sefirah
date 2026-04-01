@@ -288,6 +288,15 @@
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>הגדרות יישום ספציפיות</value>
   </data>
+  <data name="SetAll" xml:space="preserve">
+    <value>הגדר הכל</value>
+  </data>
+  <data name="SetAllApps" xml:space="preserve">
+    <value>הגדר את כל האפליקציות</value>
+  </data>
+  <data name="SetAllAppsDescription" xml:space="preserve">
+    <value>החל את אותה התנהגות התראות על כל אפליקציה שמופיעה ברשימה</value>
+  </data>
   <data name="SendButton" xml:space="preserve">
     <value>שלח</value>
   </data>
