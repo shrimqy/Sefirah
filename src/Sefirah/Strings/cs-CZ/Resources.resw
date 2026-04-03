@@ -1,0 +1,761 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About" xml:space="preserve">
+    <value>O aplikaci</value>
+  </data>
+  <data name="General" xml:space="preserve">
+    <value>Obecné</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Nastavení</value>
+  </data>
+  <data name="PrivacyPolicy" xml:space="preserve">
+    <value>Zásady ochrany soukromí</value>
+  </data>
+  <data name="SupportDevelopment" xml:space="preserve">
+    <value>Podpořit vývoj</value>
+  </data>
+  <data name="OpenLogs" xml:space="preserve">
+    <value>Otevřít logy</value>
+  </data>
+  <data name="GitHubRepository" xml:space="preserve">
+    <value>GitHub repozitář</value>
+  </data>
+  <data name="AndroidGitHubRepository" xml:space="preserve">
+    <value>Android GitHub repozitář</value>
+  </data>
+  <data name="Feedback" xml:space="preserve">
+    <value>Zpětná vazba</value>
+  </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>Oznámení</value>
+  </data>
+  <data name="ThirdPartyLibraries" xml:space="preserve">
+    <value>Knihovny třetích stran</value>
+  </data>
+  <data name="SaveLocation" xml:space="preserve">
+    <value>Umístění pro ukládání</value>
+  </data>
+  <data name="RemoteStorageLocation" xml:space="preserve">
+    <value>Umístění vzdáleného úložiště</value>
+  </data>
+  <data name="ShowClipboardToast" xml:space="preserve">
+    <value>Zobrazovat toast oznámení schránky</value>
+  </data>
+  <data name="ClipboardFiles" xml:space="preserve">
+    <value>Přidávat přijaté soubory do schránky</value>
+  </data>
+  <data name="GeneralSettings" xml:space="preserve">
+    <value>Obecná nastavení</value>
+  </data>
+  <data name="ShowNotificationToast" xml:space="preserve">
+    <value>Zobrazovat toast oznámení</value>
+  </data>
+  <data name="IgnoreWindowsApps" xml:space="preserve">
+    <value>Ignorovat vzdálená oznámení z aktivních aplikací Windows</value>
+  </data>
+  <data name="NotificationFilterDisabled.Content" xml:space="preserve">
+    <value>Vypnuto</value>
+  </data>
+  <data name="NotificationFilterFeed.Content" xml:space="preserve">
+    <value>Přehled oznámení</value>
+  </data>
+  <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
+    <value>Přehled oznámení + toast</value>
+  </data>
+  <data name="AvailableDevices.Title" xml:space="preserve">
+    <value>Dostupná zařízení</value>
+  </data>
+  <data name="AvailableDevices.Subtitle" xml:space="preserve">
+    <value>Android zařízení, na kterých běží aplikace ve stejné síti, se zobrazí níže</value>
+  </data>
+  <data name="StartupOption" xml:space="preserve">
+    <value>Možnost spuštění</value>
+  </data>
+  <data name="StartupOptionDescription" xml:space="preserve">
+    <value>Vyberte, jak se aplikace spustí po startu Windows</value>
+  </data>
+  <data name="StartupOptionMinimized.Content" xml:space="preserve">
+    <value>Spustit minimalizovaně</value>
+  </data>
+  <data name="StartupOptionMaximized.Content" xml:space="preserve">
+    <value>Spustit maximalizovaně</value>
+  </data>
+  <data name="StartupOptionSystemTray.Content" xml:space="preserve">
+    <value>Spustit v oznamovací oblasti</value>
+  </data>
+  <data name="StartupOptionDisabled.Content" xml:space="preserve">
+    <value>Vypnuto</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Motiv</value>
+  </data>
+  <data name="ThemeDescription" xml:space="preserve">
+    <value>Vyberte výchozí motiv aplikace</value>
+  </data>
+  <data name="Default" xml:space="preserve">
+    <value>Výchozí</value>
+  </data>
+  <data name="ThemeLight.Content" xml:space="preserve">
+    <value>Světlý</value>
+  </data>
+  <data name="ThemeDark.Content" xml:space="preserve">
+    <value>Tmavý</value>
+  </data>
+  <data name="RemoveDeviceDialogTitle" xml:space="preserve">
+    <value>Odebrat zařízení</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Odebrat</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Zrušit</value>
+  </data>
+  <data name="OnboardingWelcome.Title" xml:space="preserve">
+    <value>Vítejte v Sefirah</value>
+  </data>
+  <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
+    <value>Chcete-li začít, stáhněte a nainstalujte doprovodnou aplikaci z příslušné stránky na GitHubu.</value>
+  </data>
+  <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
+    <value>Začít</value>
+  </data>
+  <data name="OnboardingSkip" xml:space="preserve">
+    <value>Prozatím přeskočit</value>
+  </data>
+  <data name="OnboardingDevice.Title" xml:space="preserve">
+    <value>Připojte své zařízení</value>
+  </data>
+  <data name="OnboardingDevice.Subtitle" xml:space="preserve">
+    <value>Naskenujte QR kód nebo zařízení spárujte přímo z níže nalezených zařízení</value>
+  </data>
+  <data name="ConnectionRequest.Title" xml:space="preserve">
+    <value>Požadavek na připojení zařízení</value>
+  </data>
+  <data name="ConnectionRequest.Subtitle" xml:space="preserve">
+    <value>Ověřte, že bezpečnostní kód souhlasí na obou zařízeních:</value>
+  </data>
+  <data name="ConnectionRequestRejectButton" xml:space="preserve">
+    <value>Odmítnout</value>
+  </data>
+  <data name="NotificationsClearButton" xml:space="preserve">
+    <value>Vymazat vše</value>
+  </data>
+  <data name="ConnectionRequestAcceptButton" xml:space="preserve">
+    <value>Přijmout</value>
+  </data>
+  <data name="NoDevicesFound" xml:space="preserve">
+    <value>Nebyla nalezena žádná zařízení</value>
+  </data>
+  <data name="OpenLinksInBrowser" xml:space="preserve">
+    <value>Otevřít odkazy v prohlížeči</value>
+  </data>
+  <data name="Connected.Text" xml:space="preserve">
+    <value>Připojeno</value>
+  </data>
+  <data name="Disconnected.Text" xml:space="preserve">
+    <value>Odpojeno</value>
+  </data>
+  <data name="ShowHideWindow" xml:space="preserve">
+    <value>Zobrazit/skrýt okno</value>
+  </data>
+  <data name="Exit" xml:space="preserve">
+    <value>Ukončit</value>
+  </data>
+  <data name="SelectLocation" xml:space="preserve">
+    <value>Vybrat umístění</value>
+  </data>
+  <data name="RemoveDeviceDialogSubtitle" xml:space="preserve">
+    <value>Opravdu chcete odebrat '{0}'? Tuto akci nelze vrátit zpět.</value>
+  </data>
+  <data name="AppSpecificSettings" xml:space="preserve">
+    <value>Nastavení pro jednotlivé aplikace</value>
+  </data>
+  <data name="SetAll" xml:space="preserve">
+    <value>Nastavit vše</value>
+  </data>
+  <data name="SetAllApps" xml:space="preserve">
+    <value>Nastavit všechny aplikace</value>
+  </data>
+  <data name="SetAllAppsDescription" xml:space="preserve">
+    <value>Použít stejné chování oznámení pro všechny uvedené aplikace</value>
+  </data>
+  <data name="SendButton" xml:space="preserve">
+    <value>Odeslat</value>
+  </data>
+  <data name="ReplyPlaceholder" xml:space="preserve">
+    <value>Napište odpověď</value>
+  </data>
+  <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
+    <value>Otevřít soubor</value>
+  </data>
+  <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
+    <value>Otevřít složku</value>
+  </data>
+  <data name="NotificationFilterButton" xml:space="preserve">
+    <value>Vypnout oznámení z aplikace {0}</value>
+  </data>
+  <data name="SubmitBugReport" xml:space="preserve">
+    <value>Nahlásit chybu</value>
+  </data>
+  <data name="SubmitFeatureRequest" xml:space="preserve">
+    <value>Návrh funkce</value>
+  </data>
+  <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
+    <value>Nezobrazovat toast oznámení, když je telefon v režimu Nerušit</value>
+  </data>
+  <data name="Devices.Title" xml:space="preserve">
+    <value>Zařízení</value>
+  </data>
+  <data name="AudioSilent" xml:space="preserve">
+    <value>Tichý</value>
+  </data>
+  <data name="AudioVibrate" xml:space="preserve">
+    <value>Vibrace</value>
+  </data>
+  <data name="Pin" xml:space="preserve">
+    <value>Připnout</value>
+  </data>
+  <data name="Unpin" xml:space="preserve">
+    <value>Odepnout</value>
+  </data>
+  <data name="VideoSettings" xml:space="preserve">
+    <value>Nastavení videa</value>
+  </data>
+  <data name="AudioSettings" xml:space="preserve">
+    <value>Nastavení zvuku</value>
+  </data>
+  <data name="OpenApp" xml:space="preserve">
+    <value>Otevřít v aplikaci</value>
+  </data>
+  <data name="ScreenOff" xml:space="preserve">
+    <value>Ponechat obrazovku zařízení při zrcadlení vypnutou</value>
+  </data>
+  <data name="PhysicalKeyboard" xml:space="preserve">
+    <value>Vypnout klávesnici na obrazovce</value>
+  </data>
+  <data name="Bitrate" xml:space="preserve">
+    <value>Datový tok</value>
+  </data>
+  <data name="Resolution" xml:space="preserve">
+    <value>Rozlišení</value>
+  </data>
+  <data name="Buffer" xml:space="preserve">
+    <value>Vyrovnávací paměť</value>
+  </data>
+  <data name="Messages" xml:space="preserve">
+    <value>Zprávy</value>
+  </data>
+  <data name="EmptyMessages" xml:space="preserve">
+    <value>Začněte nový rozhovor nebo vyberte existující a odpovězte</value>
+  </data>
+  <data name="MessagePlaceholder" xml:space="preserve">
+    <value>Napište zprávu</value>
+  </data>
+  <data name="Apps" xml:space="preserve">
+    <value>Aplikace</value>
+  </data>
+  <data name="NewMessage" xml:space="preserve">
+    <value>Nová zpráva</value>
+  </data>
+  <data name="SearchMessages" xml:space="preserve">
+    <value>Hledat zprávy</value>
+  </data>
+  <data name="AddressInputPlaceholder" xml:space="preserve">
+    <value>Komu</value>
+  </data>
+  <data name="RemoveAddress" xml:space="preserve">
+    <value>Odebrat adresu</value>
+  </data>
+  <data name="CopyMessage" xml:space="preserve">
+    <value>Kopírovat zprávu</value>
+  </data>
+  <data name="NoApps" xml:space="preserve">
+    <value>Nebyly nalezeny žádné aplikace</value>
+  </data>
+  <data name="AdditionalArguments" xml:space="preserve">
+    <value>Další argumenty</value>
+  </data>
+  <data name="AdbDeviceOffline" xml:space="preserve">
+    <value>Zařízení ADB je offline</value>
+  </data>
+  <data name="AdbDeviceOfflineDescription" xml:space="preserve">
+    <value>Připojte zařízení přes USB se zapnutým laděním USB a zkuste to znovu.</value>
+  </data>
+  <data name="Dismiss" xml:space="preserve">
+    <value>Zavřít</value>
+  </data>
+  <data name="ScrcpyNotFound" xml:space="preserve">
+    <value>Program scrcpy nebyl nalezen</value>
+  </data>
+  <data name="ScrcpyNotFoundDescription" xml:space="preserve">
+    <value>Vyberte složku, ve které je umístěn scrcpy</value>
+  </data>
+  <data name="SearchApps" xml:space="preserve">
+    <value>Hledat aplikace</value>
+  </data>
+  <data name="DisableVideoForwarding" xml:space="preserve">
+    <value>Vypnout přeposílání videa</value>
+  </data>
+  <data name="VideoCodec" xml:space="preserve">
+    <value>Video kodek</value>
+  </data>
+  <data name="FrameRate" xml:space="preserve">
+    <value>Snímková frekvence</value>
+  </data>
+  <data name="Crop" xml:space="preserve">
+    <value>Oříznutí</value>
+  </data>
+  <data name="Display" xml:space="preserve">
+    <value>Displej</value>
+  </data>
+  <data name="VirtualDisplaySize" xml:space="preserve">
+    <value>Velikost virtuálního displeje</value>
+  </data>
+  <data name="DisplayOrientation" xml:space="preserve">
+    <value>Orientace displeje</value>
+  </data>
+  <data name="RotationAngle" xml:space="preserve">
+    <value>Úhel otočení</value>
+  </data>
+  <data name="AudioOutputMode" xml:space="preserve">
+    <value>Zvukový výstup</value>
+  </data>
+  <data name="ForwardMicrophone" xml:space="preserve">
+    <value>Přesměrovat mikrofon</value>
+  </data>
+  <data name="AudioOutputBuffer" xml:space="preserve">
+    <value>Vyrovnávací paměť zvukového výstupu</value>
+  </data>
+  <data name="AudioCodec" xml:space="preserve">
+    <value>Zvukový kodek</value>
+  </data>
+  <data name="AdbSettings" xml:space="preserve">
+    <value>Nastavení ADB</value>
+  </data>
+  <data name="AutoConnect" xml:space="preserve">
+    <value>Připojit automaticky</value>
+  </data>
+  <data name="Both" xml:space="preserve">
+    <value>Obě</value>
+  </data>
+  <data name="DesktopDevice" xml:space="preserve">
+    <value>Počítač</value>
+  </data>
+  <data name="RemoteDevice" xml:space="preserve">
+    <value>Vzdálené zařízení</value>
+  </data>
+  <data name="SelectDevice" xml:space="preserve">
+    <value>Vyberte zařízení</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Spustit</value>
+  </data>
+  <data name="ScrcpyDevicePreference" xml:space="preserve">
+    <value>Preference zařízení</value>
+  </data>
+  <data name="AskEverytime" xml:space="preserve">
+    <value>Zeptat se pokaždé</value>
+  </data>
+  <data name="Auto" xml:space="preserve">
+    <value>Automaticky</value>
+  </data>
+  <data name="ScrcpyErrorTitle" xml:space="preserve">
+    <value>Nepodařilo se spustit scrcpy</value>
+  </data>
+  <data name="CopyError" xml:space="preserve">
+    <value>Kopírovat chybu</value>
+  </data>
+  <data name="DeviceName" xml:space="preserve">
+    <value>Název zařízení</value>
+  </data>
+  <data name="EnableVirtualDisplay" xml:space="preserve">
+    <value>Povolit virtuální displej</value>
+  </data>
+  <data name="Uninstall" xml:space="preserve">
+    <value>Odinstalovat</value>
+  </data>
+  <data name="UnlockDeviceHelpTitle" xml:space="preserve">
+    <value>Nápověda k příkazům shellu</value>
+  </data>
+  <data name="UnlockDeviceHelpDescription" xml:space="preserve">
+    <value>Příkazy shellu v textovém poli budou spuštěny před spuštěním scrcpy. Zadejte příkazy, které fungují na vašem zařízení, každý na samostatný řádek. Pokud chcete být vyzváni k zadání hesla, použijte %pwd% jako zástupný symbol hesla.</value>
+  </data>
+  <data name="UnlockDeviceHelpExample" xml:space="preserve">
+    <value>Příklad:</value>
+  </data>
+  <data name="PinnedApps" xml:space="preserve">
+    <value>Připnuté aplikace</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Akce</value>
+  </data>
+  <data name="ActionsDescription" xml:space="preserve">
+    <value>Nastavte vlastní akce a spustitelné příkazy</value>
+  </data>
+  <data name="AdbNoDevice" xml:space="preserve">
+    <value>Nejsou připojena žádná zařízení ADB</value>
+  </data>
+  <data name="AdbNoDeviceSubtitle" xml:space="preserve">
+    <value>Zapněte ADB a připojte zařízení přes USB nebo Wi-Fi, aby se zde zobrazilo.</value>
+  </data>
+  <data name="ClipboardSettings" xml:space="preserve">
+    <value>Nastavení schránky</value>
+  </data>
+  <data name="DeviceSettings" xml:space="preserve">
+    <value>Nastavení zařízení</value>
+  </data>
+  <data name="NotificationSettings" xml:space="preserve">
+    <value>Nastavení oznámení</value>
+  </data>
+  <data name="ScreenMirrorSettings" xml:space="preserve">
+    <value>Nastavení zrcadlení obrazovky</value>
+  </data>
+  <data name="OpenLinksInBrowserDescription" xml:space="preserve">
+    <value>Automaticky otevírat odkazy ze schránky ve výchozím prohlížeči</value>
+  </data>
+  <data name="ShowClipboardToastDescription" xml:space="preserve">
+    <value>Zobrazovat toast oznámení při změnách schránky</value>
+  </data>
+  <data name="ClipboardFilesDescription" xml:space="preserve">
+    <value>Povolit synchronizaci souborů přes schránku</value>
+  </data>
+  <data name="AutoConnectDescription" xml:space="preserve">
+    <value>Automaticky se připojit k ADB po připojení zařízení</value>
+  </data>
+  <data name="SyncClipboardChanges" xml:space="preserve">
+    <value>Synchronizovat změny schránky s tímto zařízením</value>
+  </data>
+  <data name="ConfigureNotificationSettings" xml:space="preserve">
+    <value>Nastavit oznámení</value>
+  </data>
+  <data name="DisplayToastNotifications" xml:space="preserve">
+    <value>Zobrazovat toast oznámení na tomto počítači</value>
+  </data>
+  <data name="ShowBadge" xml:space="preserve">
+    <value>Zobrazit odznak</value>
+  </data>
+  <data name="ShowBadgeDescription" xml:space="preserve">
+    <value>Zobrazit odznak oznámení na hlavním panelu</value>
+  </data>
+  <data name="IgnoreDuringDoNotDisturb" xml:space="preserve">
+    <value>Ignorovat během režimu Nerušit</value>
+  </data>
+  <data name="IgnoreDuringDoNotDisturbDescription" xml:space="preserve">
+    <value>Nezobrazovat oznámení, když je zapnutý režim Nerušit</value>
+  </data>
+  <data name="ConnectionPreference" xml:space="preserve">
+    <value>Preference připojení</value>
+  </data>
+  <data name="AddAction" xml:space="preserve">
+    <value>Přidat akci</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Upravit</value>
+  </data>
+  <data name="NoActionsConfigured" xml:space="preserve">
+    <value>Nejsou nastaveny žádné akce</value>
+  </data>
+  <data name="ActionName" xml:space="preserve">
+    <value>Název akce</value>
+  </data>
+  <data name="ExecutablePath" xml:space="preserve">
+    <value>Cesta ke spustitelnému souboru</value>
+  </data>
+  <data name="Arguments" xml:space="preserve">
+    <value>Argumenty</value>
+  </data>
+  <data name="StartInDirectory" xml:space="preserve">
+    <value>Spustit ve složce</value>
+  </data>
+  <data name="EnterActionName" xml:space="preserve">
+    <value>Zadejte název akce</value>
+  </data>
+  <data name="PathToExecutable" xml:space="preserve">
+    <value>Cesta ke spustitelnému souboru</value>
+  </data>
+  <data name="CommandLineArguments" xml:space="preserve">
+    <value>Argumenty příkazové řádky (volitelné)</value>
+  </data>
+  <data name="EnterPassword" xml:space="preserve">
+    <value>Zadejte heslo</value>
+  </data>
+  <data name="Reply" xml:space="preserve">
+    <value>Odpovědět</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Zpět</value>
+  </data>
+  <data name="Browse" xml:space="preserve">
+    <value>Procházet</value>
+  </data>
+  <data name="EnterAddressesAndCompose" xml:space="preserve">
+    <value>Zadejte výše adresy a níže napište zprávu</value>
+  </data>
+  <data name="UseTcpIpMode" xml:space="preserve">
+    <value>Použít režim TCP/IP</value>
+  </data>
+  <data name="UseTcpIpModeDescription" xml:space="preserve">
+    <value>Povolit bezdrátová ADB připojení</value>
+  </data>
+  <data name="WorkingDirectory" xml:space="preserve">
+    <value>Pracovní adresář (volitelné)</value>
+  </data>
+  <data name="UnlockDeviceBeforeLaunch" xml:space="preserve">
+    <value>Odemknout zařízení před spuštěním scrcpy</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Uložit</value>
+  </data>
+  <data name="FileTransferNotification.Receiving" xml:space="preserve">
+    <value>Přijímání od {0}</value>
+  </data>
+  <data name="FileTransferNotification.Sending" xml:space="preserve">
+    <value>Odesílání do {0}</value>
+  </data>
+  <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
+    <value>Přijímání {0} souborů od {1}</value>
+  </data>
+  <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
+    <value>Odesílání {0} souborů do {1}</value>
+  </data>
+  <data name="FileTransferNotification.Completed" xml:space="preserve">
+    <value>Přenos souborů dokončen</value>
+  </data>
+  <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
+    <value>Přijato {0} od {1}</value>
+  </data>
+  <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
+    <value>Přijato {0} souborů od {1}</value>
+  </data>
+  <data name="FileTransferNotification.SentSingle" xml:space="preserve">
+    <value>Odesláno {0} do {1}</value>
+  </data>
+  <data name="FileTransferNotification.SentBulk" xml:space="preserve">
+    <value>Odesláno {0} souborů do {1}</value>
+  </data>
+  <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
+    <value>Zrušit</value>
+  </data>
+  <data name="NoPairedDevices" xml:space="preserve">
+    <value>Žádná spárovaná zařízení</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Přidat</value>
+  </data>
+  <data name="HostnamePlaceholder" xml:space="preserve">
+    <value>Zadejte název hostitele nebo IP adresu</value>
+  </data>
+  <data name="UnlockCommandsPlaceholder" xml:space="preserve">
+    <value>input keyevent 26
+input keyevent 66
+input text %pwd%</value>
+  </data>
+  <data name="FileDropCaption" xml:space="preserve">
+    <value>Přetáhněte soubory k odeslání</value>
+  </data>
+  <data name="DeviceAddresses" xml:space="preserve">
+    <value>Adresy zařízení</value>
+  </data>
+  <data name="ManageAddressesAndPriority" xml:space="preserve">
+    <value>Spravovat adresy a prioritu připojení</value>
+  </data>
+  <data name="StorageAccess" xml:space="preserve">
+    <value>Zobrazit zařízení v Průzkumníku souborů</value>
+  </data>
+  <data name="StorageAccessDescription" xml:space="preserve">
+    <value>Povolí nebo zakáže přístup k úložišti tohoto zařízení v Průzkumníku souborů</value>
+  </data>
+  <data name="AudioRing" xml:space="preserve">
+    <value>Vyzvánění</value>
+  </data>
+  <data name="AudioMedia" xml:space="preserve">
+    <value>Média</value>
+  </data>
+  <data name="AudioNotification" xml:space="preserve">
+    <value>Oznámení</value>
+  </data>
+  <data name="AudioCall" xml:space="preserve">
+    <value>Hovor</value>
+  </data>
+  <data name="AudioAlarm" xml:space="preserve">
+    <value>Budík</value>
+  </data>
+  <data name="AdbSettingsDescription" xml:space="preserve">
+    <value>Nastavit připojení ADB</value>
+  </data>
+  <data name="ScreenMirrorSettingsDescription" xml:space="preserve">
+    <value>Nastavit parametry scrcpy a možnosti zrcadlení obrazovky</value>
+  </data>
+  <data name="MediaSessionDescription" xml:space="preserve">
+    <value>Synchronizovat informace o přehrávání médií s tímto zařízením</value>
+  </data>
+  <data name="AudioControl" xml:space="preserve">
+    <value>Ovládání zvukového zařízení</value>
+  </data>
+  <data name="MediaSession" xml:space="preserve">
+    <value>Relace přehrávání médií</value>
+  </data>
+  <data name="AudioControlDescription" xml:space="preserve">
+    <value>Povolit ovládání zvukového zařízení tímto zařízením</value>
+  </data>
+  <data name="ClipboardIncludeImagesDescription" xml:space="preserve">
+    <value>Povolit synchronizaci obrázků přes schránku</value>
+  </data>
+  <data name="ClipboardIncludeImages" xml:space="preserve">
+    <value>Zahrnout obrázky do sledování schránky</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Jazyk</value>
+  </data>
+  <data name="LanguageDescription" xml:space="preserve">
+    <value>Vyberte preferovaný jazyk zobrazení</value>
+  </data>
+  <data name="UseSystemSetting" xml:space="preserve">
+    <value>Použít systémové nastavení</value>
+  </data>
+  <data name="ScrcpyLocation" xml:space="preserve">
+    <value>Umístění scrcpy</value>
+  </data>
+  <data name="AdbLocation" xml:space="preserve">
+    <value>Umístění adb</value>
+  </data>
+  <data name="CallNotification.IncomingCall" xml:space="preserve">
+    <value>Příchozí hovor</value>
+  </data>
+  <data name="CallNotification.MissedCall" xml:space="preserve">
+    <value>Zmeškaný hovor</value>
+  </data>
+  <data name="UpdateNotification.Title" xml:space="preserve">
+    <value>Je k dispozici aktualizace</value>
+  </data>
+  <data name="UpdateNotification.Action" xml:space="preserve">
+    <value>Stáhnout aktualizaci</value>
+  </data>
+  <data name="UpdateNotification.Subtitle" xml:space="preserve">
+    <value>K dispozici je nová verze</value>
+  </data>
+  <data name="ClipboardNotification.Title" xml:space="preserve">
+    <value>Přijata data do schránky</value>
+  </data>
+  <data name="OpenInBrowser" xml:space="preserve">
+    <value>Otevřít v prohlížeči</value>
+  </data>
+</root>
