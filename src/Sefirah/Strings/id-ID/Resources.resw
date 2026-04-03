@@ -748,4 +748,7 @@ page.</value>
   <data name="OpenInBrowser" xml:space="preserve">
     <value>Open in browser</value>
   </data>
+  <data name="PhoneFrameScrollTip" xml:space="preserve">
+    <value>Scroll on the phone preview to change the active device</value>
+  </data>
 </root>
