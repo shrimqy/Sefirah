@@ -903,6 +903,15 @@
                     CornerRadius="10,0,0,0" />
             </Grid>
         </Grid>
+
+        <TeachingTip
+            x:Name="PhoneFrameScrollTeachingTip"
+            Closed="PhoneFrameScrollTeachingTip_Closed"
+            IsLightDismissEnabled="True"
+            PreferredPlacement="Right"
+            Subtitle="{helpers:ResourceString Name=PhoneFrameScrollTip}"
+            Target="{x:Bind PhoneFrameGrid}"
+            Title="Switch devices" />
         <win:Grid>
             <userControls:TrayIconControl />
         </win:Grid>

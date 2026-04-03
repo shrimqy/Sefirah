@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using CommunityToolkit.WinUI.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -18,11 +19,42 @@ public sealed partial class MainPage : Page
     public DevicesViewModel DevicesViewModel { get; }
     private readonly ISessionManager SessionManager = Ioc.Default.GetRequiredService<ISessionManager>();
 
+    private static bool IsPhoneFrameScrollTeachingTipShown 
+    {
+        get => ApplicationData.Current.LocalSettings.Values[Constants.LocalSettings.PhoneFrameScrollTeachingTipShown] is true;
+        set => ApplicationData.Current.LocalSettings.Values[Constants.LocalSettings.PhoneFrameScrollTeachingTipShown] = value;
+    }
+
     public MainPage()
     {
         InitializeComponent();
         ViewModel = Ioc.Default.GetRequiredService<MainPageViewModel>();
         DevicesViewModel = Ioc.Default.GetRequiredService<DevicesViewModel>();
+        ViewModel.PairedDevices.CollectionChanged += OnPairedDevicesCollectionChanged;
+        Unloaded += MainPage_Unloaded;
+    }
+
+    private void MainPage_Unloaded(object sender, RoutedEventArgs e)
+    {
+        ViewModel.PairedDevices.CollectionChanged -= OnPairedDevicesCollectionChanged;
+    }
+
+    private void OnPairedDevicesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) => TryShowPhoneFrameScrollTeachingTip();
+
+    private void TryShowPhoneFrameScrollTeachingTip()
+    {
+        if (IsPhoneFrameScrollTeachingTipShown) return;
+
+        if (ViewModel.PairedDevices.Count <= 1) return;
+
+        if (PhoneFrameScrollTeachingTip.IsOpen) return;
+
+        PhoneFrameScrollTeachingTip.IsOpen = true;
+    }
+
+    private void PhoneFrameScrollTeachingTip_Closed(TeachingTip sender, TeachingTipClosedEventArgs args)
+    {
+        IsPhoneFrameScrollTeachingTipShown = true;
     }
 
     private readonly Dictionary<string, Type> Pages = new()
