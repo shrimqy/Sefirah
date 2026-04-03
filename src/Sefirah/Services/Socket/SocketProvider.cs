@@ -29,11 +29,10 @@ public partial class ServerSession(SslServer server, ITcpServerProvider socketPr
     }
 }
 
-public partial class Server(SslContext context, IPAddress address, int port, ITcpServerProvider socketProvider, ILogger logger) : SslServer(context, address, port)
+public partial class Server(SslContext context, IPAddress address, int port, ITcpServerProvider socketProvider) : SslServer(context, address, port)
 {
     protected override SslSession CreateSession()
     {
-        logger.LogDebug("Creating new session");
         return new ServerSession(this, socketProvider);
     }
 

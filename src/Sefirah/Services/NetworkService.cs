@@ -50,7 +50,7 @@ public class NetworkService(
         {
             try
             {
-                server = new Server(SslHelper.GetSslContext(), IPAddress.Any, port, this, logger)
+                server = new Server(SslHelper.GetSslContext(), IPAddress.Any, port, this)
                 {
                     OptionReuseAddress = true,
                 };
@@ -88,7 +88,6 @@ public class NetworkService(
     {
         try
         {
-            logger.Info("Sending deviceInfo");
             var localDevice = await deviceManager.GetLocalDeviceAsync();
             var avatar = await UserInformation.GetCurrentUserAvatarAsync();
             device.SendMessage(new DeviceInfo { DeviceName = localDevice.DeviceName, Avatar = avatar });
@@ -202,11 +201,13 @@ public class NetworkService(
     #region Server events
     public void OnConnected(ServerSession session) 
     {
+        logger.Debug($"New session connected: {session.Id}");
         connectionBuffers[session.Id] = new StringBuilder();
     }
 
     public void OnDisconnected(ServerSession session)
     {
+        logger.Debug($"Session disconnected: {session.Id}");
         if (!connectionBuffers.ContainsKey(session.Id)) return;
 
         DisconnectSession(session);
@@ -418,7 +419,7 @@ public class NetworkService(
 
     public void DisconnectSession(ServerSession session, bool forcedDisconnect = false)
     {
-        logger.Debug($"disconnecing session: {forcedDisconnect}");
+        logger.Debug($"disconnecing session: {session.Id}");
         try
         {
             connectionBuffers.TryRemove(session.Id, out _);
@@ -452,7 +453,7 @@ public class NetworkService(
     {
         try
         {
-            logger.Debug($"disconnecing session, forcedDisconnect: {forcedDisconnect}");
+            logger.Debug($"disconnecing client session: {client.Id}");
             connectionBuffers.TryRemove(client.Id, out _);
 
             client.Disconnect();
