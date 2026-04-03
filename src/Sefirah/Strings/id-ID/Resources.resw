@@ -656,7 +656,9 @@ page.</value>
     <value>Enter hostname or IP address</value>
   </data>
   <data name="UnlockCommandsPlaceholder" xml:space="preserve">
-    <value />
+    <value>input keyevent 26
+input keyevent 66
+input text %pwd%</value>
   </data>
   <data name="FileDropCaption" xml:space="preserve">
     <value>Drop files to send</value>
@@ -747,5 +749,8 @@ page.</value>
   </data>
   <data name="OpenInBrowser" xml:space="preserve">
     <value>Open in browser</value>
+  </data>
+  <data name="PhoneFrameScrollTip" xml:space="preserve">
+    <value>Scroll on the phone preview to change the active device</value>
   </data>
 </root>

@@ -288,15 +288,6 @@
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>Nastavení pro jednotlivé aplikace</value>
   </data>
-  <data name="SetAll" xml:space="preserve">
-    <value>Nastavit vše</value>
-  </data>
-  <data name="SetAllApps" xml:space="preserve">
-    <value>Nastavit všechny aplikace</value>
-  </data>
-  <data name="SetAllAppsDescription" xml:space="preserve">
-    <value>Použít stejné chování oznámení pro všechny uvedené aplikace</value>
-  </data>
   <data name="SendButton" xml:space="preserve">
     <value>Odeslat</value>
   </data>
@@ -757,5 +748,8 @@ input text %pwd%</value>
   </data>
   <data name="OpenInBrowser" xml:space="preserve">
     <value>Otevřít v prohlížeči</value>
+  </data>
+  <data name="PhoneFrameScrollTip" xml:space="preserve">
+    <value>Scroll on the phone preview to change the active device</value>
   </data>
 </root>
