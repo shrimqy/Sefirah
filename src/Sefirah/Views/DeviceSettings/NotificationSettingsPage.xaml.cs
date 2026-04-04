@@ -1,3 +1,4 @@
+using Sefirah.Data.Enums;
 using Sefirah.ViewModels.Settings;
 
 namespace Sefirah.Views.DeviceSettings;
@@ -28,9 +29,31 @@ public sealed partial class NotificationSettingsPage : Page
     public void OnMenuFlyoutItemClick(object sender, RoutedEventArgs e)
     {
         if (sender is MenuFlyoutItem menuItem &&
-            menuItem.Tag is string appPackage)
+            menuItem.Tag is string appPackage &&
+            TryGetNotificationFilter(menuItem.CommandParameter, out var filter))
         {
-            ViewModel.ChangeNotificationFilter(menuItem.Text, appPackage);
+            ViewModel.ChangeNotificationFilter(filter, appPackage);
         }
+    }
+
+    public void OnSetAllMenuFlyoutItemClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuFlyoutItem menuItem &&
+            TryGetNotificationFilter(menuItem.Tag, out var filter))
+        {
+            ViewModel.ChangeAllNotificationFilters(filter);
+        }
+    }
+
+    private static bool TryGetNotificationFilter(object? filterValue, out NotificationFilter filter)
+    {
+        if (filterValue is string filterTag &&
+            Enum.TryParse(filterTag, out filter))
+        {
+            return true;
+        }
+
+        filter = NotificationFilter.ToastFeed;
+        return false;
     }
 }

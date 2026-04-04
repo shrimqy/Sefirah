@@ -14,6 +14,7 @@
     mc:Ignorable="d">
 
     <Page.Resources>
+        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
     </Page.Resources>
 
     <ScrollViewer>
@@ -72,14 +73,17 @@
                                         <MenuFlyout>
                                             <MenuFlyoutItem
                                                 Click="OnMenuFlyoutItemClick"
+                                                CommandParameter="ToastFeed"
                                                 Tag="{x:Bind PackageName}"
                                                 Text="{helpers:ResourceString Name=NotificationFilterToastFeed/Content}" />
                                             <MenuFlyoutItem
                                                 Click="OnMenuFlyoutItemClick"
+                                                CommandParameter="Feed"
                                                 Tag="{x:Bind PackageName}"
                                                 Text="{helpers:ResourceString Name=NotificationFilterFeed/Content}" />
                                             <MenuFlyoutItem
                                                 Click="OnMenuFlyoutItemClick"
+                                                CommandParameter="Disabled"
                                                 Tag="{x:Bind PackageName}"
                                                 Text="{helpers:ResourceString Name=NotificationFilterDisabled/Content}" />
                                         </MenuFlyout>
@@ -91,6 +95,30 @@
                     <wuc:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE7F4;" />
                     </wuc:SettingsExpander.HeaderIcon>
+                    <Grid
+                        Padding="0,8,20,4"
+                        Visibility="{x:Bind ViewModel.RemoteApps.Count, Mode=OneWay, Converter={StaticResource CountToVisibilityConverter}}">
+                        <Button
+                            HorizontalAlignment="Right"
+                            Content="{helpers:ResourceString Name=ApplyToListedApps}">
+                            <Button.Flyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem
+                                        Click="OnSetAllMenuFlyoutItemClick"
+                                        Tag="ToastFeed"
+                                        Text="{helpers:ResourceString Name=NotificationFilterToastFeed/Content}" />
+                                    <MenuFlyoutItem
+                                        Click="OnSetAllMenuFlyoutItemClick"
+                                        Tag="Feed"
+                                        Text="{helpers:ResourceString Name=NotificationFilterFeed/Content}" />
+                                    <MenuFlyoutItem
+                                        Click="OnSetAllMenuFlyoutItemClick"
+                                        Tag="Disabled"
+                                        Text="{helpers:ResourceString Name=NotificationFilterDisabled/Content}" />
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
+                    </Grid>
                     <wuc:SettingsExpander.Items />
                 </wuc:SettingsExpander>
 

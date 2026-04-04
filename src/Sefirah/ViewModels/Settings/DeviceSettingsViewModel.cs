@@ -762,12 +762,27 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         RemoteApps = RemoteAppsRepository.GetApplicationsForDevice(id);
     }
 
-    public void ChangeNotificationFilter(string notificationFilter, string appPackage)
+    public void ChangeNotificationFilter(NotificationFilter filter, string appPackage)
     {
-        var filterKey = ApplicationItem.NotificationFilterTypes.First(f => f.Value == notificationFilter).Key;
-        RemoteAppsRepository.UpdateAppNotificationFilter(Device!.Id, appPackage, filterKey);
+        RemoteAppsRepository.UpdateAppNotificationFilter(Device!.Id, appPackage, filter);
         var app = RemoteApps.First(p => p.PackageName == appPackage);
-        app.DeviceInfo.Filter = filterKey;
-        app.SelectedNotificationFilter = notificationFilter;
+        app.DeviceInfo.Filter = filter;
+        app.SelectedNotificationFilter = ApplicationItem.NotificationFilterTypes[filter];
+    }
+
+    public void ChangeAllNotificationFilters(NotificationFilter filter)
+    {
+        if (RemoteApps.Count == 0)
+        {
+            return;
+        }
+
+        RemoteAppsRepository.UpdateAllAppNotificationFilters(Device!.Id, filter);
+
+        foreach (var app in RemoteApps)
+        {
+            app.DeviceInfo.Filter = filter;
+            app.SelectedNotificationFilter = ApplicationItem.NotificationFilterTypes[filter];
+        }
     }
 }
