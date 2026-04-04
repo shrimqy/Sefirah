@@ -151,6 +151,7 @@
                             x:Name="PhoneFrameOverlay"
                             Background="#80000000"
                             Opacity="0"
+                            AutomationProperties.Name="{helpers:ResourceString Name=StartScreenMirroring}"
                             utu:CommandExtensions.Command="{x:Bind ViewModel.StartScrcpyCommand}"
                             Visibility="Collapsed">
                             <FontIcon
@@ -192,6 +193,7 @@
                             <Button
                                 Grid.Column="2"
                                 Padding="4"
+                                AutomationProperties.Name="{helpers:ResourceString Name=DeviceAudio}"
                                 Background="Transparent"
                                 BorderThickness="0">
                                 <FontIcon Glyph="{x:Bind ViewModel.Device.RingerMode, Converter={StaticResource RingerModeToIconConverter}, Mode=OneWay}" />
@@ -301,6 +303,7 @@
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"
                         Padding="8,4"
+                        AutomationProperties.Name="{helpers:ResourceString Name=DndToggle}"
                         IsEnabled="{x:Bind ViewModel.Device.IsConnected, Mode=OneWay}"
                         Style="{x:Bind ViewModel.Device.DndEnabled, Converter={StaticResource BoolToDndButtonStyleConverter}, Mode=OneWay}"
                         Command="{x:Bind ViewModel.ToggleDndCommand}">
@@ -312,6 +315,7 @@
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"
                         Padding="8,4"
+                        AutomationProperties.Name="{helpers:ResourceString Name=ShareFiles}"
                         IsEnabled="{x:Bind ViewModel.Device.IsConnected, Mode=OneWay}"
                         Click="SendFilesButton_Click">
                         <FontIcon Glyph="&#xE72D;" />
@@ -323,6 +327,7 @@
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"
                         Padding="8,4"
+                        AutomationProperties.Name="{helpers:ResourceString Name=DeviceSettings}"
                         Command="{x:Bind ViewModel.OpenDeviceSettingsCommand}">
                         <FontIcon Glyph="&#xE713;" />
                     </Button>
@@ -403,6 +408,7 @@
                                                     <Button
                                                         Background="Transparent"
                                                         BorderBrush="Transparent"
+                                                        AutomationProperties.Name="{helpers:ResourceString Name=PreviousTrack}"
                                                         Click="PreviousButton_Click"
                                                         Visibility="{x:Bind CanGoPrevious, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
                                                             <FontIcon FontSize="14" Glyph="&#xE892;" />
@@ -410,12 +416,14 @@
                                                     <Button
                                                         Background="Transparent"
                                                         BorderBrush="Transparent"
+                                                        AutomationProperties.Name="{helpers:ResourceString Name=PlayOrPause}"
                                                         Click="PlayPauseButton_Click">
                                                         <FontIcon FontSize="14" Glyph="{x:Bind PlayPauseGlyph, Mode=OneWay}" />
                                                     </Button>
                                                     <Button
                                                         Background="Transparent"
                                                         BorderBrush="Transparent"
+                                                        AutomationProperties.Name="{helpers:ResourceString Name=NextTrack}"
                                                         Click="NextButton_Click"
                                                         Visibility="{x:Bind CanGoNext, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
                                                         <FontIcon FontSize="14" Glyph="&#xE893;" />
@@ -423,6 +431,7 @@
                                                     <Button
                                                         Background="Transparent"
                                                         BorderBrush="Transparent"
+                                                        AutomationProperties.Name="{helpers:ResourceString Name=MediaVolume}"
                                                         Click="VolumeButton_Click"
                                                         Tag="{x:Bind}">
                                                         <FontIcon FontSize="14" Glyph="&#xE767;" />
@@ -591,9 +600,9 @@
                                                             Height="20"
                                                             Margin="0,0,0,0"
                                                             Padding="0"
+                                                            AutomationProperties.Name="{helpers:ResourceString Name=ContextMenu}"
                                                             Background="Transparent"
                                                             BorderBrush="Transparent"
-                                                            IsHitTestVisible="False"
                                                             Opacity="0">
                                                             <SymbolIcon Symbol="More" />
                                                             <Button.Flyout>
@@ -631,9 +640,9 @@
                                                             Height="20"
                                                             Margin="0,0,0,0"
                                                             Padding="0"
+                                                            AutomationProperties.Name="{helpers:ResourceString Name=Dismiss}"
                                                             Command="{Binding ViewModel.RemoveNotificationCommand, ElementName=PageRoot}"
                                                             CommandParameter="{x:Bind}"
-                                                            IsHitTestVisible="False"
                                                             Opacity="0"
                                                             Style="{StaticResource AlternateCloseButtonStyle}" />
                                                         <SymbolIcon
@@ -733,6 +742,7 @@
                                                         Grid.Column="1"
                                                         Background="Transparent"
                                                         BorderBrush="Transparent"
+                                                        AutomationProperties.Name="{helpers:ResourceString Name=SendNotificationReply}"
                                                         Click="SendButton_Click"
                                                         Tag="{x:Bind}">
                                                         <FontIcon Glyph="&#xE724;" />
@@ -875,7 +885,8 @@
                             Style="{StaticResource CompactFooterNavigationViewItemStyle}"
                             SelectsOnInvoked="False"
                             utu:CommandExtensions.Command="{x:Bind ViewModel.UpdateCommand}"
-                            ToolTipService.ToolTip="Update"
+                            AutomationProperties.Name="{helpers:ResourceString Name=UpdateNotification/Action}"
+                            ToolTipService.ToolTip="{helpers:ResourceString Name=UpdateNotification/Action}"
                             Visibility="{x:Bind ViewModel.IsUpdateAvailableOrUpdating, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <Grid>
                                 <FontIcon

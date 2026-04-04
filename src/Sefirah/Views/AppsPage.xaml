@@ -26,8 +26,10 @@
             <Grid
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
+                AutomationProperties.Name="{x:Bind AppName}"
                 Background="Transparent"
-                IsRightTapEnabled="True">
+                IsRightTapEnabled="True"
+                ToolTipService.ToolTip="{x:Bind AppName}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -155,10 +157,11 @@
             Margin="0,12"
             Padding="12,8"
             HorizontalAlignment="Right"
+            AutomationProperties.Name="{helpers:ResourceString Name=RefreshApps}"
             Background="Transparent"
             BorderThickness="0"
             Command="{x:Bind ViewModel.RefreshAppsCommand}"
-            ToolTipService.ToolTip="Refresh Apps">
+            ToolTipService.ToolTip="{helpers:ResourceString Name=RefreshApps}">
             <FontIcon FontSize="16" Glyph="&#xE72C;" />
         </Button>
 
@@ -169,7 +172,6 @@
             MinWidth="250"
             Margin="6,12,16,12"
             HorizontalAlignment="Right"
-            AutomationProperties.Name="App AutoSuggestBox"
             ItemTemplate="{StaticResource SearchSuggestionTemplate}"
             PlaceholderText="{helpers:ResourceString Name=SearchApps}"
             QueryIcon="Find"

@@ -105,9 +105,7 @@ public sealed partial class MainPage : Page
 
             pinIcon.IsHitTestVisible = true;
             closeButton.Opacity = 1;
-            closeButton.IsHitTestVisible = true;
             moreButton.Opacity = 1;
-            moreButton.IsHitTestVisible = true;
 
             // Hover shadow / elevation
             border.Shadow = new ThemeShadow();
@@ -136,9 +134,7 @@ public sealed partial class MainPage : Page
 
             pinIcon.IsHitTestVisible = false;
             closeButton.Opacity = 0;
-            closeButton.IsHitTestVisible = false;
             moreButton.Opacity = 0;
-            moreButton.IsHitTestVisible = false;
 
             // Remove hover shadow / elevation
             border.Shadow = null;
@@ -161,9 +157,7 @@ public sealed partial class MainPage : Page
             }
 
             closeButton.Opacity = 0;
-            closeButton.IsHitTestVisible = false;
             moreButton.Opacity = 0;
-            moreButton.IsHitTestVisible = false;
             timeStamp.Visibility = Visibility.Visible;
         }
     }
