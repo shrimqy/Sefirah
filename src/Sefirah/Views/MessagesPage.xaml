@@ -135,6 +135,7 @@
                         x:Name="NewMessageButton"
                         Grid.Column="1"
                         Margin="8,12,16,12"
+                        AutomationProperties.Name="{helpers:ResourceString Name=NewMessage}"
                         Click="NewMessageButton_Click"
                         ToolTipService.ToolTip="{helpers:ResourceString Name=NewMessage}">
                         <FontIcon FontSize="20" Glyph="&#xE932;" />

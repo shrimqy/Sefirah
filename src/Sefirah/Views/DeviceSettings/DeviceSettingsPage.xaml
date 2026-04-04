@@ -1,4 +1,4 @@
-<Page
+﻿<Page
     x:Class="Sefirah.Views.DevicePreferences.DeviceSettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -113,12 +113,12 @@
                         <FontIcon FontSize="11" Glyph="&#xE76C;" />
                     </wuc:SettingsCard.ActionIcon>
                     <wuc:Segmented SelectionMode="Multiple" SelectionChanged="ClipboardSyncSegmented_SelectionChanged" Loaded="ClipboardSyncSegmented_Loaded">
-                        <wuc:SegmentedItem>
+                        <wuc:SegmentedItem AutomationProperties.Name="{helpers:ResourceString Name=ReceiveClipboard}">
                             <wuc:SegmentedItem.Icon>
                                 <FontIcon Glyph="&#xE896;" />
                             </wuc:SegmentedItem.Icon>
                         </wuc:SegmentedItem>
-                        <wuc:SegmentedItem>
+                        <wuc:SegmentedItem AutomationProperties.Name="{helpers:ResourceString Name=SendClipboard}">
                             <wuc:SegmentedItem.Icon>
                                 <FontIcon Glyph="&#xE898;" />
                             </wuc:SegmentedItem.Icon>
@@ -203,12 +203,12 @@
                         <FontIcon FontSize="11" Glyph="&#xE76C;" />
                     </wuc:SettingsCard.ActionIcon>
                     <wuc:Segmented SelectionMode="Multiple" SelectionChanged="MediaSessionSyncSegmented_SelectionChanged" Loaded="MediaSessionSyncSegmented_Loaded">
-                        <wuc:SegmentedItem>
+                        <wuc:SegmentedItem AutomationProperties.Name="{helpers:ResourceString Name=ReceiveMediaSessions}">
                             <wuc:SegmentedItem.Icon>
                                 <FontIcon Glyph="&#xE896;" />
                             </wuc:SegmentedItem.Icon>
                         </wuc:SegmentedItem>
-                        <wuc:SegmentedItem>
+                        <wuc:SegmentedItem AutomationProperties.Name="{helpers:ResourceString Name=SendMediaSessions}">
                             <wuc:SegmentedItem.Icon>
                                 <FontIcon Glyph="&#xE898;" />
                             </wuc:SegmentedItem.Icon>

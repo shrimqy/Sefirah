@@ -118,538 +118,535 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="About" xml:space="preserve">
-    <value>אודות</value>
+    <value>O aplikaci</value>
   </data>
   <data name="General" xml:space="preserve">
-    <value>כללי</value>
+    <value>Obecné</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>הגדרות</value>
+    <value>Nastavení</value>
   </data>
   <data name="PrivacyPolicy" xml:space="preserve">
-    <value>מדיניות פרטיות</value>
+    <value>Zásady ochrany soukromí</value>
   </data>
   <data name="SupportDevelopment" xml:space="preserve">
-    <value>תמיכה בפיתוח</value>
+    <value>Podpořit vývoj</value>
   </data>
   <data name="OpenLogs" xml:space="preserve">
-    <value>פתח יומנים</value>
+    <value>Otevřít logy</value>
   </data>
   <data name="GitHubRepository" xml:space="preserve">
-    <value>מאגר GitHub לאפליקציית Windows</value>
+    <value>GitHub repozitář</value>
   </data>
   <data name="AndroidGitHubRepository" xml:space="preserve">
-    <value>מאגר GitHub לאפליקציית Android</value>
+    <value>Android GitHub repozitář</value>
   </data>
   <data name="Feedback" xml:space="preserve">
-    <value>משוב</value>
+    <value>Zpětná vazba</value>
   </data>
   <data name="Notifications" xml:space="preserve">
-    <value>התראות</value>
+    <value>Oznámení</value>
   </data>
   <data name="ThirdPartyLibraries" xml:space="preserve">
-    <value>ספריות צד שלישי</value>
+    <value>Knihovny třetích stran</value>
   </data>
   <data name="SaveLocation" xml:space="preserve">
-    <value>נתיב שמירת קבצים במחשב</value>
+    <value>Umístění pro ukládání</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Remote storage location</value>
+    <value>Umístění vzdáleného úložiště</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
-    <value>הצג התראות Windows על סנכרון לוח העתקה</value>
+    <value>Zobrazovat toast oznámení schránky</value>
   </data>
   <data name="ClipboardFiles" xml:space="preserve">
-    <value>שמירת קבצים שנשלחים מהטלפון בלוח העתקה באופן אוטומטי</value>
+    <value>Přidávat přijaté soubory do schránky</value>
   </data>
   <data name="GeneralSettings" xml:space="preserve">
-    <value>הגדרות כלליות</value>
+    <value>Obecná nastavení</value>
   </data>
   <data name="ShowNotificationToast" xml:space="preserve">
-    <value>הצג התראות Windows על התראות מהתקן מרוחק</value>
+    <value>Zobrazovat toast oznámení</value>
   </data>
   <data name="IgnoreWindowsApps" xml:space="preserve">
-    <value>התעלם מהתראות מאפליקציות במחשב שחופפות לאפליקציות בהתקן המרוחק</value>
+    <value>Ignorovat vzdálená oznámení z aktivních aplikací Windows</value>
   </data>
   <data name="NotificationFilterDisabled.Content" xml:space="preserve">
-    <value>מושבת</value>
+    <value>Vypnuto</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Notification feed</value>
+    <value>Přehled oznámení</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>Notification feed + toast</value>
+    <value>Přehled oznámení + toast</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
-    <value>התקנים זמינים</value>
+    <value>Dostupná zařízení</value>
   </data>
   <data name="AvailableDevices.Subtitle" xml:space="preserve">
-    <value>התקני אנדרואיד המריצים את האפליקציה ונמצאים באותה רשת יופיעו כאן למטה</value>
+    <value>Android zařízení, na kterých běží aplikace ve stejné síti, se zobrazí níže</value>
   </data>
   <data name="StartupOption" xml:space="preserve">
-    <value>סוג הפעלה</value>
+    <value>Možnost spuštění</value>
   </data>
   <data name="StartupOptionDescription" xml:space="preserve">
-    <value>בחר כיצד האפליקציה תופעל כאשר הWindows עולה</value>
+    <value>Vyberte, jak se aplikace spustí po startu Windows</value>
   </data>
   <data name="StartupOptionMinimized.Content" xml:space="preserve">
-    <value>הפעל במצב ממוזער</value>
+    <value>Spustit minimalizovaně</value>
   </data>
   <data name="StartupOptionMaximized.Content" xml:space="preserve">
-    <value>הפעל במצב חלון מרבי</value>
+    <value>Spustit maximalizovaně</value>
   </data>
   <data name="StartupOptionSystemTray.Content" xml:space="preserve">
-    <value>הפעל במגש המערכת</value>
+    <value>Spustit v oznamovací oblasti</value>
   </data>
   <data name="StartupOptionDisabled.Content" xml:space="preserve">
-    <value>מושבת</value>
+    <value>Vypnuto</value>
   </data>
   <data name="Theme" xml:space="preserve">
-    <value>ערכת נושא</value>
+    <value>Motiv</value>
   </data>
   <data name="ThemeDescription" xml:space="preserve">
-    <value>בחר את עיצוב ברירת המחדל לאפליקציה</value>
+    <value>Vyberte výchozí motiv aplikace</value>
   </data>
   <data name="Default" xml:space="preserve">
-    <value>ברירת מחדל</value>
+    <value>Výchozí</value>
   </data>
   <data name="ThemeLight.Content" xml:space="preserve">
-    <value>בהיר</value>
+    <value>Světlý</value>
   </data>
   <data name="ThemeDark.Content" xml:space="preserve">
-    <value>חשוך</value>
+    <value>Tmavý</value>
   </data>
   <data name="RemoveDeviceDialogTitle" xml:space="preserve">
-    <value>הסר התקן</value>
+    <value>Odebrat zařízení</value>
   </data>
   <data name="Remove" xml:space="preserve">
-    <value>הסרה</value>
+    <value>Odebrat</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>בטל</value>
+    <value>Zrušit</value>
   </data>
   <data name="OnboardingWelcome.Title" xml:space="preserve">
-    <value>ברוכ/ה הבא/ה ל-Serifah</value>
+    <value>Vítejte v Sefirah</value>
   </data>
   <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
-    <value>כדי להתחיל, יש להוריד ולהתקין את האפליקצית ליווי של התוכנה דרך עמוד ה-GitHub או בחנויות האפליקציות השונות.</value>
+    <value>Chcete-li začít, stáhněte a nainstalujte doprovodnou aplikaci z příslušné stránky na GitHubu.</value>
   </data>
   <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
-    <value>התחל</value>
+    <value>Začít</value>
   </data>
   <data name="OnboardingSkip" xml:space="preserve">
-    <value>לדלג בינתיים</value>
+    <value>Prozatím přeskočit</value>
   </data>
   <data name="OnboardingDevice.Title" xml:space="preserve">
-    <value>חבר/י את ההתקן שלך</value>
+    <value>Připojte své zařízení</value>
   </data>
   <data name="OnboardingDevice.Subtitle" xml:space="preserve">
-    <value>Scan the QR code or pair directly from the discovered devices below</value>
+    <value>Naskenujte QR kód nebo zařízení spárujte přímo z níže nalezených zařízení</value>
   </data>
   <data name="ConnectionRequest.Title" xml:space="preserve">
-    <value>Device connection request</value>
+    <value>Požadavek na připojení zařízení</value>
   </data>
   <data name="ConnectionRequest.Subtitle" xml:space="preserve">
-    <value>נא לוודא שהקוד תואם בשני ההתקנים:</value>
+    <value>Ověřte, že bezpečnostní kód souhlasí na obou zařízeních:</value>
   </data>
   <data name="ConnectionRequestRejectButton" xml:space="preserve">
-    <value>דחה</value>
+    <value>Odmítnout</value>
   </data>
   <data name="NotificationsClearButton" xml:space="preserve">
-    <value>נקה הכל</value>
+    <value>Vymazat vše</value>
   </data>
   <data name="ConnectionRequestAcceptButton" xml:space="preserve">
-    <value>אשר</value>
+    <value>Přijmout</value>
   </data>
   <data name="NoDevicesFound" xml:space="preserve">
-    <value>לא נמצאו התקנים</value>
+    <value>Nebyla nalezena žádná zařízení</value>
   </data>
   <data name="OpenLinksInBrowser" xml:space="preserve">
-    <value>פתח קישורים בדפדפן באופן אוטומטי</value>
+    <value>Otevřít odkazy v prohlížeči</value>
   </data>
   <data name="Connected.Text" xml:space="preserve">
-    <value>מחובר</value>
+    <value>Připojeno</value>
   </data>
   <data name="Disconnected.Text" xml:space="preserve">
-    <value>מנותק</value>
+    <value>Odpojeno</value>
   </data>
   <data name="ShowHideWindow" xml:space="preserve">
-    <value>הצג/הסתר חלון</value>
+    <value>Zobrazit/skrýt okno</value>
   </data>
   <data name="Exit" xml:space="preserve">
-    <value>יציאה</value>
+    <value>Ukončit</value>
   </data>
   <data name="SelectLocation" xml:space="preserve">
-    <value>בחר נתיב</value>
+    <value>Vybrat umístění</value>
   </data>
   <data name="RemoveDeviceDialogSubtitle" xml:space="preserve">
-    <value>האם את/ה בטוח/ה שאת/ה רוצה להסיר את {0}? לא יהיה ניתן לבטל פעולה זו.</value>
+    <value>Opravdu chcete odebrat '{0}'? Tuto akci nelze vrátit zpět.</value>
   </data>
   <data name="AppSpecificSettings" xml:space="preserve">
-    <value>הגדרות יישום ספציפיות</value>
-  </data>
-  <data name="ApplyToListedApps" xml:space="preserve">
-    <value>הגדר את כל האפליקציות</value>
+    <value>Nastavení pro jednotlivé aplikace</value>
   </data>
   <data name="SendButton" xml:space="preserve">
-    <value>שלח</value>
+    <value>Odeslat</value>
   </data>
   <data name="ReplyPlaceholder" xml:space="preserve">
-    <value>הקלד תגובה</value>
+    <value>Napište odpověď</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
-    <value>פתיחת קובץ</value>
+    <value>Otevřít soubor</value>
   </data>
   <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
-    <value>פתיחת תיקייה</value>
+    <value>Otevřít složku</value>
   </data>
   <data name="NotificationFilterButton" xml:space="preserve">
-    <value>כבה התראות מ{0}</value>
+    <value>Vypnout oznámení z aplikace {0}</value>
   </data>
   <data name="SubmitBugReport" xml:space="preserve">
-    <value>דווח על באג</value>
+    <value>Nahlásit chybu</value>
   </data>
   <data name="SubmitFeatureRequest" xml:space="preserve">
-    <value>בקשת תכונה</value>
+    <value>Návrh funkce</value>
   </data>
   <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
-    <value>אל תציג התראות Windows כאשר הטלפון במצב 'נא לא להפריע'</value>
+    <value>Nezobrazovat toast oznámení, když je telefon v režimu Nerušit</value>
   </data>
   <data name="Devices.Title" xml:space="preserve">
-    <value>Devices</value>
+    <value>Zařízení</value>
   </data>
   <data name="Pin" xml:space="preserve">
-    <value>נעץ</value>
+    <value>Připnout</value>
   </data>
   <data name="Unpin" xml:space="preserve">
-    <value>בטל נעיצה</value>
+    <value>Odepnout</value>
   </data>
   <data name="VideoSettings" xml:space="preserve">
-    <value>הגדרות וידיאו</value>
+    <value>Nastavení videa</value>
   </data>
   <data name="AudioSettings" xml:space="preserve">
-    <value>Audio settings</value>
+    <value>Nastavení zvuku</value>
   </data>
   <data name="OpenApp" xml:space="preserve">
-    <value>פתיחה באפליקציה</value>
+    <value>Otevřít v aplikaci</value>
   </data>
   <data name="ScreenOff" xml:space="preserve">
-    <value>השאר את מסך ההתקן כבוי בזמן שיקוף מסך</value>
+    <value>Ponechat obrazovku zařízení při zrcadlení vypnutou</value>
   </data>
   <data name="PhysicalKeyboard" xml:space="preserve">
-    <value>הסתר את המקלדת במסך</value>
+    <value>Vypnout klávesnici na obrazovce</value>
   </data>
   <data name="Bitrate" xml:space="preserve">
-    <value>קצב סיביות</value>
+    <value>Datový tok</value>
   </data>
   <data name="Resolution" xml:space="preserve">
-    <value>רזולוציה</value>
+    <value>Rozlišení</value>
   </data>
   <data name="Buffer" xml:space="preserve">
-    <value>אוגר</value>
+    <value>Vyrovnávací paměť</value>
   </data>
   <data name="Messages" xml:space="preserve">
-    <value>הודעות</value>
+    <value>Zprávy</value>
   </data>
   <data name="EmptyMessages" xml:space="preserve">
-    <value>Start a new conversation or select one to reply</value>
+    <value>Začněte nový rozhovor nebo vyberte existující a odpovězte</value>
   </data>
   <data name="MessagePlaceholder" xml:space="preserve">
-    <value>הקלד הודעה</value>
+    <value>Napište zprávu</value>
   </data>
   <data name="Apps" xml:space="preserve">
-    <value>יישומים</value>
+    <value>Aplikace</value>
   </data>
   <data name="NewMessage" xml:space="preserve">
-    <value>הודעה חדשה</value>
+    <value>Nová zpráva</value>
   </data>
   <data name="SearchMessages" xml:space="preserve">
-    <value>חיפוש הודעות</value>
+    <value>Hledat zprávy</value>
   </data>
   <data name="AddressInputPlaceholder" xml:space="preserve">
-    <value>To</value>
+    <value>Komu</value>
   </data>
   <data name="RemoveAddress" xml:space="preserve">
-    <value>הסר כתובת</value>
+    <value>Odebrat adresu</value>
   </data>
   <data name="CopyMessage" xml:space="preserve">
-    <value>העתק הודעה</value>
+    <value>Kopírovat zprávu</value>
   </data>
   <data name="NoApps" xml:space="preserve">
-    <value>לא נמצאו יישומים</value>
+    <value>Nebyly nalezeny žádné aplikace</value>
   </data>
   <data name="AdditionalArguments" xml:space="preserve">
-    <value>פרמטרים נוספים</value>
+    <value>Další argumenty</value>
   </data>
   <data name="AdbDeviceOffline" xml:space="preserve">
-    <value>התקן Adb לא מקוון</value>
+    <value>Zařízení ADB je offline</value>
   </data>
   <data name="AdbDeviceOfflineDescription" xml:space="preserve">
-    <value>חבר את ההתקן שלך דרך USB עם הגדרת 'USB Debugging' מופעלת ונסה שנית</value>
+    <value>Připojte zařízení přes USB se zapnutým laděním USB a zkuste to znovu.</value>
   </data>
   <data name="Dismiss" xml:space="preserve">
-    <value>התעלם</value>
+    <value>Zavřít</value>
   </data>
   <data name="ScrcpyNotFound" xml:space="preserve">
-    <value>Scrcpy לא נמצא</value>
+    <value>Program scrcpy nebyl nalezen</value>
   </data>
   <data name="ScrcpyNotFoundDescription" xml:space="preserve">
-    <value>בחר את הנתיב שבו scrcpy מותקן</value>
+    <value>Vyberte složku, ve které je umístěn scrcpy</value>
   </data>
   <data name="SearchApps" xml:space="preserve">
-    <value>חיפוש יישומים</value>
+    <value>Hledat aplikace</value>
   </data>
   <data name="DisableVideoForwarding" xml:space="preserve">
-    <value>בטל העברת וידאו</value>
+    <value>Vypnout přeposílání videa</value>
   </data>
   <data name="VideoCodec" xml:space="preserve">
-    <value>קידוד וידאו</value>
+    <value>Video kodek</value>
   </data>
   <data name="FrameRate" xml:space="preserve">
-    <value>קצב פריימים</value>
+    <value>Snímková frekvence</value>
   </data>
   <data name="Crop" xml:space="preserve">
-    <value>חיתוך</value>
+    <value>Oříznutí</value>
   </data>
   <data name="Display" xml:space="preserve">
-    <value>תצוגה</value>
+    <value>Displej</value>
   </data>
   <data name="VirtualDisplaySize" xml:space="preserve">
-    <value>גודל מסך וירטואלי</value>
+    <value>Velikost virtuálního displeje</value>
   </data>
   <data name="DisplayOrientation" xml:space="preserve">
-    <value>כוון תצוגה</value>
+    <value>Orientace displeje</value>
   </data>
   <data name="RotationAngle" xml:space="preserve">
-    <value>זווית סיבוב</value>
+    <value>Úhel otočení</value>
   </data>
   <data name="AudioOutputMode" xml:space="preserve">
-    <value>יציאת שמע</value>
+    <value>Zvukový výstup</value>
   </data>
   <data name="ForwardMicrophone" xml:space="preserve">
-    <value>העבר מיקרופון</value>
+    <value>Přesměrovat mikrofon</value>
   </data>
   <data name="AudioOutputBuffer" xml:space="preserve">
-    <value>אוגר יציאת שמע</value>
+    <value>Vyrovnávací paměť zvukového výstupu</value>
   </data>
   <data name="AudioCodec" xml:space="preserve">
-    <value>קידוד שמע</value>
+    <value>Zvukový kodek</value>
   </data>
   <data name="AdbSettings" xml:space="preserve">
-    <value>הגדרות Adb</value>
+    <value>Nastavení ADB</value>
   </data>
   <data name="AutoConnect" xml:space="preserve">
-    <value>חיבור אוטומטי</value>
+    <value>Připojit automaticky</value>
   </data>
   <data name="Both" xml:space="preserve">
-    <value>שניהם</value>
+    <value>Obě</value>
   </data>
   <data name="DesktopDevice" xml:space="preserve">
-    <value>התקן שולחני</value>
+    <value>Počítač</value>
   </data>
   <data name="RemoteDevice" xml:space="preserve">
-    <value>התקן מרוחק</value>
+    <value>Vzdálené zařízení</value>
   </data>
   <data name="SelectDevice" xml:space="preserve">
-    <value>בחר התקן</value>
+    <value>Vyberte zařízení</value>
   </data>
   <data name="Start" xml:space="preserve">
-    <value>התחל</value>
+    <value>Spustit</value>
   </data>
   <data name="ScrcpyDevicePreference" xml:space="preserve">
-    <value>הגדרות התקן</value>
+    <value>Preference zařízení</value>
   </data>
   <data name="AskEverytime" xml:space="preserve">
-    <value>שאל בכל פעם</value>
+    <value>Zeptat se pokaždé</value>
   </data>
   <data name="Auto" xml:space="preserve">
-    <value>אוטומטי</value>
+    <value>Automaticky</value>
   </data>
   <data name="ScrcpyErrorTitle" xml:space="preserve">
-    <value>התוכנה Scrcpy נכשלה בעת הרצתה</value>
+    <value>Nepodařilo se spustit scrcpy</value>
   </data>
   <data name="CopyError" xml:space="preserve">
-    <value>העתק שגיאה</value>
+    <value>Kopírovat chybu</value>
   </data>
   <data name="DeviceName" xml:space="preserve">
-    <value>שם ההתקן</value>
+    <value>Název zařízení</value>
   </data>
   <data name="EnableVirtualDisplay" xml:space="preserve">
-    <value>הפעל מסך ווירטואלי</value>
+    <value>Povolit virtuální displej</value>
   </data>
   <data name="Uninstall" xml:space="preserve">
-    <value>Uninstall</value>
+    <value>Odinstalovat</value>
   </data>
   <data name="UnlockDeviceHelpTitle" xml:space="preserve">
-    <value>Shell commands help</value>
+    <value>Nápověda k příkazům shellu</value>
   </data>
   <data name="UnlockDeviceHelpDescription" xml:space="preserve">
-    <value>The shell commands in the text box will be executed before launching scrcpy. Enter commands that work on your device, separated by line.</value>
+    <value>Příkazy shellu v textovém poli budou spuštěny před spuštěním scrcpy. Zadejte příkazy, které fungují na vašem zařízení, každý na samostatný řádek. Pokud chcete být vyzváni k zadání hesla, použijte %pwd% jako zástupný symbol hesla.</value>
   </data>
   <data name="UnlockDeviceHelpExample" xml:space="preserve">
-    <value>Example:</value>
+    <value>Příklad:</value>
   </data>
   <data name="PinnedApps" xml:space="preserve">
-    <value>Pinned apps</value>
+    <value>Připnuté aplikace</value>
   </data>
   <data name="Actions" xml:space="preserve">
-    <value>Actions</value>
+    <value>Akce</value>
   </data>
   <data name="ActionsDescription" xml:space="preserve">
-    <value>Configure custom actions and executable commands</value>
+    <value>Nastavte vlastní akce a spustitelné příkazy</value>
   </data>
   <data name="AdbNoDevice" xml:space="preserve">
-    <value>No ADB devices connected</value>
+    <value>Nejsou připojena žádná zařízení ADB</value>
   </data>
   <data name="AdbNoDeviceSubtitle" xml:space="preserve">
-    <value>Turn on ADB and connect your device via USB or Wi-Fi to see it here</value>
+    <value>Zapněte ADB a připojte zařízení přes USB nebo Wi-Fi, aby se zde zobrazilo.</value>
   </data>
   <data name="ClipboardSettings" xml:space="preserve">
-    <value>Clipboard settings</value>
+    <value>Nastavení schránky</value>
   </data>
   <data name="DeviceSettings" xml:space="preserve">
-    <value>Device settings</value>
+    <value>Nastavení zařízení</value>
   </data>
   <data name="NotificationSettings" xml:space="preserve">
-    <value>Notification settings</value>
+    <value>Nastavení oznámení</value>
   </data>
   <data name="ScreenMirrorSettings" xml:space="preserve">
-    <value>Screen mirror settings</value>
+    <value>Nastavení zrcadlení obrazovky</value>
   </data>
   <data name="OpenLinksInBrowserDescription" xml:space="preserve">
-    <value>Automatically open links from clipboard in default browser</value>
+    <value>Automaticky otevírat odkazy ze schránky ve výchozím prohlížeči</value>
   </data>
   <data name="ShowClipboardToastDescription" xml:space="preserve">
-    <value>Show toast notifications for clipboard changes</value>
+    <value>Zobrazovat toast oznámení při změnách schránky</value>
   </data>
   <data name="ClipboardFilesDescription" xml:space="preserve">
-    <value>Enable file synchronization through clipboard</value>
+    <value>Povolit synchronizaci souborů přes schránku</value>
   </data>
   <data name="AutoConnectDescription" xml:space="preserve">
-    <value>Automatically connect to ADB when device connects</value>
+    <value>Automaticky se připojit k ADB po připojení zařízení</value>
   </data>
   <data name="SyncClipboardChanges" xml:space="preserve">
-    <value>Sync clipboard changes with this device</value>
+    <value>Synchronizovat změny schránky s tímto zařízením</value>
   </data>
   <data name="ConfigureNotificationSettings" xml:space="preserve">
-    <value>Configure notification settings</value>
+    <value>Nastavit oznámení</value>
   </data>
   <data name="DisplayToastNotifications" xml:space="preserve">
-    <value>Display toast notifications on this PC</value>
+    <value>Zobrazovat toast oznámení na tomto počítači</value>
   </data>
   <data name="ShowBadge" xml:space="preserve">
-    <value>Show badge</value>
+    <value>Zobrazit odznak</value>
   </data>
   <data name="ShowBadgeDescription" xml:space="preserve">
-    <value>Show notification badge on taskbar</value>
+    <value>Zobrazit odznak oznámení na hlavním panelu</value>
   </data>
   <data name="IgnoreDuringDoNotDisturb" xml:space="preserve">
-    <value>Ignore during Do Not Disturb</value>
+    <value>Ignorovat během režimu Nerušit</value>
   </data>
   <data name="IgnoreDuringDoNotDisturbDescription" xml:space="preserve">
-    <value>Don't show notifications when Do Not Disturb is enabled</value>
+    <value>Nezobrazovat oznámení, když je zapnutý režim Nerušit</value>
   </data>
   <data name="ConnectionPreference" xml:space="preserve">
-    <value>Connection preference</value>
+    <value>Preference připojení</value>
   </data>
   <data name="AddAction" xml:space="preserve">
-    <value>Add action</value>
+    <value>Přidat akci</value>
   </data>
   <data name="Edit" xml:space="preserve">
-    <value>Edit</value>
+    <value>Upravit</value>
   </data>
   <data name="NoActionsConfigured" xml:space="preserve">
-    <value>No actions configured</value>
+    <value>Nejsou nastaveny žádné akce</value>
   </data>
   <data name="ActionName" xml:space="preserve">
-    <value>Action name</value>
+    <value>Název akce</value>
   </data>
   <data name="ExecutablePath" xml:space="preserve">
-    <value>Executable path</value>
+    <value>Cesta ke spustitelnému souboru</value>
   </data>
   <data name="Arguments" xml:space="preserve">
-    <value>Arguments</value>
+    <value>Argumenty</value>
   </data>
   <data name="StartInDirectory" xml:space="preserve">
-    <value>Start in directory</value>
+    <value>Spustit ve složce</value>
   </data>
   <data name="EnterActionName" xml:space="preserve">
-    <value>Enter action name</value>
+    <value>Zadejte název akce</value>
   </data>
   <data name="PathToExecutable" xml:space="preserve">
-    <value>Path to executable</value>
+    <value>Cesta ke spustitelnému souboru</value>
   </data>
   <data name="CommandLineArguments" xml:space="preserve">
-    <value>Command line arguments (optional)</value>
+    <value>Argumenty příkazové řádky (volitelné)</value>
   </data>
   <data name="EnterPassword" xml:space="preserve">
-    <value>Enter password</value>
+    <value>Zadejte heslo</value>
   </data>
   <data name="Reply" xml:space="preserve">
-    <value>Reply</value>
+    <value>Odpovědět</value>
   </data>
   <data name="Back" xml:space="preserve">
-    <value>Back</value>
+    <value>Zpět</value>
   </data>
   <data name="Browse" xml:space="preserve">
-    <value>Browse</value>
+    <value>Procházet</value>
   </data>
   <data name="EnterAddressesAndCompose" xml:space="preserve">
-    <value>Enter addresses above and compose your message below</value>
+    <value>Zadejte výše adresy a níže napište zprávu</value>
   </data>
   <data name="UseTcpIpMode" xml:space="preserve">
-    <value>Use TCP/IP mode</value>
+    <value>Použít režim TCP/IP</value>
   </data>
   <data name="UseTcpIpModeDescription" xml:space="preserve">
-    <value>Enable wireless ADB connections</value>
+    <value>Povolit bezdrátová ADB připojení</value>
   </data>
   <data name="WorkingDirectory" xml:space="preserve">
-    <value>Working directory (optional)</value>
+    <value>Pracovní adresář (volitelné)</value>
   </data>
   <data name="UnlockDeviceBeforeLaunch" xml:space="preserve">
-    <value>Unlock device before launching scrcpy</value>
+    <value>Odemknout zařízení před spuštěním scrcpy</value>
   </data>
   <data name="Save" xml:space="preserve">
-    <value>Save</value>
+    <value>Uložit</value>
   </data>
   <data name="FileTransferNotification.Receiving" xml:space="preserve">
-    <value>Receiving from {0}</value>
+    <value>Přijímání od {0}</value>
   </data>
   <data name="FileTransferNotification.Sending" xml:space="preserve">
-    <value>Sending to {0}</value>
+    <value>Odesílání do {0}</value>
   </data>
   <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
-    <value>Receiving {0} files from {1}</value>
+    <value>Přijímání {0} souborů od {1}</value>
   </data>
   <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
-    <value>Sending {0} files to {1}</value>
+    <value>Odesílání {0} souborů do {1}</value>
   </data>
   <data name="FileTransferNotification.Completed" xml:space="preserve">
-    <value>File transfer completed</value>
+    <value>Přenos souborů dokončen</value>
   </data>
   <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
-    <value>Received {0} from {1}</value>
+    <value>Přijato {0} od {1}</value>
   </data>
   <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
-    <value>Received {0} files from {1}</value>
+    <value>Přijato {0} souborů od {1}</value>
   </data>
   <data name="FileTransferNotification.SentSingle" xml:space="preserve">
-    <value>Sent {0} to {1}</value>
+    <value>Odesláno {0} do {1}</value>
   </data>
   <data name="FileTransferNotification.SentBulk" xml:space="preserve">
-    <value>Sent {0} files to {1}</value>
+    <value>Odesláno {0} souborů do {1}</value>
   </data>
   <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>Zrušit</value>
   </data>
   <data name="NoPairedDevices" xml:space="preserve">
-    <value>No paired devices</value>
+    <value>Žádná spárovaná zařízení</value>
   </data>
   <data name="Add" xml:space="preserve">
-    <value>Add</value>
+    <value>Přidat</value>
   </data>
   <data name="HostnamePlaceholder" xml:space="preserve">
-    <value>Enter hostname or IP address</value>
+    <value>Zadejte název hostitele nebo IP adresu</value>
   </data>
   <data name="UnlockCommandsPlaceholder" xml:space="preserve">
     <value>input keyevent 26
@@ -657,100 +654,100 @@ input keyevent 66
 input text %pwd%</value>
   </data>
   <data name="FileDropCaption" xml:space="preserve">
-    <value>Drop files to send</value>
+    <value>Přetáhněte soubory k odeslání</value>
   </data>
   <data name="DeviceAddresses" xml:space="preserve">
-    <value>Device addresses</value>
+    <value>Adresy zařízení</value>
   </data>
   <data name="ManageAddressesAndPriority" xml:space="preserve">
-    <value>Manage addresses and connection priority</value>
+    <value>Spravovat adresy a prioritu připojení</value>
   </data>
   <data name="StorageAccess" xml:space="preserve">
-    <value>Show device in File Explorer</value>
+    <value>Zobrazit zařízení v Průzkumníku souborů</value>
   </data>
   <data name="StorageAccessDescription" xml:space="preserve">
-    <value>Enables or disables storage access for this device in the File Explorer</value>
+    <value>Povolí nebo zakáže přístup k úložišti tohoto zařízení v Průzkumníku souborů</value>
   </data>
   <data name="AudioSilent" xml:space="preserve">
-    <value>שקט</value>
+    <value>Tichý</value>
   </data>
   <data name="AudioVibrate" xml:space="preserve">
-    <value>רטט</value>
+    <value>Vibrace</value>
   </data>
   <data name="AudioRing" xml:space="preserve">
-    <value>Ring</value>
+    <value>Vyzvánění</value>
   </data>
   <data name="AudioMedia" xml:space="preserve">
-    <value>Media</value>
+    <value>Média</value>
   </data>
   <data name="AudioNotification" xml:space="preserve">
-    <value>Notification</value>
+    <value>Oznámení</value>
   </data>
   <data name="AudioCall" xml:space="preserve">
-    <value>Call</value>
+    <value>Hovor</value>
   </data>
   <data name="AudioAlarm" xml:space="preserve">
-    <value>Alarm</value>
+    <value>Budík</value>
   </data>
   <data name="AdbSettingsDescription" xml:space="preserve">
-    <value>Configure ADB connection</value>
+    <value>Nastavit připojení ADB</value>
   </data>
   <data name="ScreenMirrorSettingsDescription" xml:space="preserve">
-    <value>Configure scrcpy flags and screen mirroring options</value>
+    <value>Nastavit parametry scrcpy a možnosti zrcadlení obrazovky</value>
   </data>
   <data name="MediaSessionDescription" xml:space="preserve">
-    <value>Sync media playback information with this device</value>
+    <value>Synchronizovat informace o přehrávání médií s tímto zařízením</value>
   </data>
   <data name="AudioControl" xml:space="preserve">
-    <value>Audio device control</value>
+    <value>Ovládání zvukového zařízení</value>
   </data>
   <data name="MediaSession" xml:space="preserve">
-    <value>Media playback session</value>
+    <value>Relace přehrávání médií</value>
   </data>
   <data name="AudioControlDescription" xml:space="preserve">
-    <value>Allow audio device control with this device</value>
+    <value>Povolit ovládání zvukového zařízení tímto zařízením</value>
   </data>
   <data name="ClipboardIncludeImagesDescription" xml:space="preserve">
-    <value>Enable image synchronization through clipboard</value>
+    <value>Povolit synchronizaci obrázků přes schránku</value>
   </data>
   <data name="ClipboardIncludeImages" xml:space="preserve">
-    <value>כלול תמונות בסנכרון לוח העתקה</value>
+    <value>Zahrnout obrázky do sledování schránky</value>
   </data>
   <data name="Language" xml:space="preserve">
-    <value>Language</value>
+    <value>Jazyk</value>
   </data>
   <data name="LanguageDescription" xml:space="preserve">
-    <value>Choose your preferred display language</value>
+    <value>Vyberte preferovaný jazyk zobrazení</value>
   </data>
   <data name="UseSystemSetting" xml:space="preserve">
-    <value>Use system setting</value>
+    <value>Použít systémové nastavení</value>
   </data>
   <data name="ScrcpyLocation" xml:space="preserve">
-    <value>Scrcpy location</value>
+    <value>Umístění scrcpy</value>
   </data>
   <data name="AdbLocation" xml:space="preserve">
-    <value>Adb location</value>
+    <value>Umístění adb</value>
   </data>
   <data name="CallNotification.IncomingCall" xml:space="preserve">
-    <value>Incoming call</value>
+    <value>Příchozí hovor</value>
   </data>
   <data name="CallNotification.MissedCall" xml:space="preserve">
-    <value>Missed call</value>
+    <value>Zmeškaný hovor</value>
   </data>
   <data name="UpdateNotification.Title" xml:space="preserve">
-    <value>Update available</value>
+    <value>Je k dispozici aktualizace</value>
   </data>
   <data name="UpdateNotification.Action" xml:space="preserve">
-    <value>Download update</value>
+    <value>Stáhnout aktualizaci</value>
   </data>
   <data name="UpdateNotification.Subtitle" xml:space="preserve">
-    <value>A new version is available</value>
+    <value>K dispozici je nová verze</value>
   </data>
   <data name="ClipboardNotification.Title" xml:space="preserve">
-    <value>Clipboard received</value>
+    <value>Přijata data do schránky</value>
   </data>
   <data name="OpenInBrowser" xml:space="preserve">
-    <value>Open in browser</value>
+    <value>Otevřít v prohlížeči</value>
   </data>
   <data name="PhoneFrameScrollTip" xml:space="preserve">
     <value>Scroll on the phone preview to change the active device</value>

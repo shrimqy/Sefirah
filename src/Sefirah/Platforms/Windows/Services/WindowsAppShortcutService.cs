@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using Sefirah.Data.Contracts;
@@ -51,17 +52,15 @@ public sealed class WindowsAppShortcutService(ILogger logger) : IAppShortcutServ
             };
 
             var result = await packageManager.RegisterPackageByUriAsync(manifestUri, options);
+
             if (!result.IsRegistered)
             {
-                throw new InvalidOperationException($"Hosted app registration failed: {result.ErrorText}");
+                throw new Exception($"App registration failed: {result.ErrorText}");
             }
         }
         catch (Exception)
         {
-            if (Directory.Exists(folderPath))
-            {
-                try { Directory.Delete(folderPath, true); } catch { /* ignore */ }
-            }
+            try { Directory.Delete(folderPath, true); } catch { }
             throw;
         }
     }
@@ -71,27 +70,59 @@ public sealed class WindowsAppShortcutService(ILogger logger) : IAppShortcutServ
         var hostName = Package.Current.Id.Name;
         var identityName = $"{hostName}.Hosted.{GetAppId(androidPackageName)}";
         var folderPath = Path.Combine(localStatePath, HostedAppsFolder, identityName);
-
         var fullName = GetPackageFullName(identityName);
+
         try
         {
             await packageManager.RemovePackageAsync(fullName);
         }
-        catch { }
+        catch (COMException) { }
 
-        if (Directory.Exists(folderPath))
+        try 
+        { 
+            Directory.Delete(folderPath, true);
+        } 
+        catch (IOException) 
         {
-            try 
-            { 
-                Directory.Delete(folderPath, true); 
-            } 
-            catch (IOException ex) 
-            { 
-                // shell may still have a handle to the icon
-                logger.LogError(ex, "Failed to delete folder, {path}", folderPath);
-            }
+            // shell may still have a handle to the icon
+            throw;
         }
     }
+
+    /// <summary>
+    /// Uses <see cref="PackageManager.FindPackagesForUser"/> with the hosted app package family name (identity + publisher hash),
+    /// then matches <see cref="PackageId.FullName"/> to the same string <see cref="RemovePackageAsync"/> uses—no LocalState folder check.
+    /// </summary>
+    /// <summary>
+    /// Uses <see cref="PackageManager.FindPackagesForUser"/> with the hosted app package family name (identity + publisher hash),
+    /// then matches <see cref="PackageId.FullName"/> to the same string <see cref="RemovePackageAsync"/> uses—no LocalState folder check.
+    /// </summary>
+    public bool IsShortcutRegistered(string androidPackageName)
+    {
+        var hostName = Package.Current.Id.Name;
+        var identityName = $"{hostName}.Hosted.{GetAppId(androidPackageName)}";
+        var expectedFullName = GetPackageFullName(identityName);
+        var familyName = GetPackageFamilyName(identityName);
+
+        try
+        {
+            foreach (var package in packageManager.FindPackagesForUser(string.Empty, familyName))
+            {
+                if (string.Equals(package.Id.FullName, expectedFullName, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            var folderPath = Path.Combine(localStatePath, HostedAppsFolder, identityName);
+            return Directory.Exists(folderPath);
+        }
+        catch (Exception ex)
+        {
+            logger.LogDebug(ex, "FindPackagesForUser failed for hosted package {FamilyName}", familyName);
+            return false;
+        }
+    }
+
+    private static string GetPackageFamilyName(string identityName) => $"{identityName}_{HostedPublisherId}";
 
     /// <summary>Builds the package full name deterministically (Name_Version_Architecture__PublisherId).</summary>
     private static string GetPackageFullName(string identityName) =>

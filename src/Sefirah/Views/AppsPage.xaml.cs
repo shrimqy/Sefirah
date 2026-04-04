@@ -56,7 +56,15 @@ public sealed partial class AppsPage : Page
     {
         if (sender is MenuFlyoutItem menuItem && menuItem.DataContext is ApplicationItem app)
         {
-            ViewModel.PinApp(app);
+            ViewModel.TogglePin(app);
+        }
+    }
+
+    private void AppShortcutClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuFlyoutItem menuItem && menuItem.DataContext is ApplicationItem app)
+        {
+            ViewModel.ToggleAppShortcut(app);
         }
     }
 

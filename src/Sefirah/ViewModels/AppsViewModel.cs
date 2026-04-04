@@ -2,6 +2,7 @@ using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
+using Uno.Extensions.Specialized;
 using static Sefirah.Utils.IconUtils;
 
 namespace Sefirah.ViewModels;
@@ -45,20 +46,18 @@ public sealed partial class AppsViewModel : BaseViewModel
         DeviceManager.ActiveDevice.SendMessage(new RequestApplicationList());
     }
 
-    public async Task PinApp(ApplicationItem app)
+    public void TogglePin(ApplicationItem app)
     {
         try
         {
             if (app.DeviceInfo.Pinned)
             {
-                await AppShortcutService.RemoveAppShortcutAsync(app.PackageName);
                 app.DeviceInfo.Pinned = false;
                 RemoteAppsRepository.UnpinApp(app, DeviceManager.ActiveDevice!.Id);
                 PinnedApps.Remove(app);
             }
             else
             {
-                await AppShortcutService.CreateAppShortcutAsync(app);
                 app.DeviceInfo.Pinned = true;
                 RemoteAppsRepository.PinApp(app, DeviceManager.ActiveDevice!.Id);
                 PinnedApps.Add(app);
@@ -71,10 +70,36 @@ public sealed partial class AppsViewModel : BaseViewModel
         }
     }
 
+    public async void ToggleAppShortcut(ApplicationItem app)
+    {
+        try
+        {
+            if (app.AppShortcutRegistered)
+            {   
+                await AppShortcutService.RemoveAppShortcutAsync(app.PackageName);
+            }
+            else
+            {
+                await AppShortcutService.CreateAppShortcutAsync(app);
+            }
+
+            app.AppShortcutRegistered = AppShortcutService.IsShortcutRegistered(app.PackageName);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error toggling app shortcut: {AppPackage}", app?.PackageName);
+        }
+    }
+
     public async void UninstallApp(ApplicationItem app)
     {
         try
         {
+            if (!app.AppShortcutRegistered) 
+            {
+                await AppShortcutService.RemoveAppShortcutAsync(app.PackageName);
+            }
+
             var result = await AdbService.UninstallApp(DeviceManager.ActiveDevice!.Id, app.PackageName);
             if (!result) return;
 
@@ -82,7 +107,6 @@ public sealed partial class AppsViewModel : BaseViewModel
             {
                 Apps.Remove(app);
                 PinnedApps.Remove(app);
-                _ = AppShortcutService.RemoveAppShortcutAsync(app.PackageName);
                 OnPropertyChanged(nameof(IsEmpty));
                 OnPropertyChanged(nameof(HasPinnedApps));
             });
@@ -102,7 +126,7 @@ public sealed partial class AppsViewModel : BaseViewModel
     {
         try
         {
-            await App.MainWindow.DispatcherQueue.EnqueueAsync(async() =>
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
             {
                 Apps.Clear();
                 PinnedApps.Clear();
@@ -112,6 +136,11 @@ public sealed partial class AppsViewModel : BaseViewModel
                 IsLoading = true;
                 Apps = RemoteAppsRepository.GetApplicationsForDevice(DeviceManager.ActiveDevice.Id);
                 PinnedApps = Apps.Where(a => a.DeviceInfo.Pinned).ToObservableCollection();
+                foreach (var app in Apps) 
+                {
+                    app.AppShortcutRegistered = AppShortcutService.IsShortcutRegistered(app.PackageName);
+                }
+
                 OnPropertyChanged(nameof(Apps));
                 OnPropertyChanged(nameof(PinnedApps));
                 OnPropertyChanged(nameof(HasPinnedApps));
@@ -152,7 +181,11 @@ public sealed partial class AppsViewModel : BaseViewModel
                 {
                     Apps.Remove(appToRemove);
                     PinnedApps.Remove(appToRemove);
-                    _ = AppShortcutService.RemoveAppShortcutAsync(appToRemove.PackageName);
+
+                    if (appToRemove.AppShortcutRegistered)
+                    {
+                        _ = AppShortcutService.RemoveAppShortcutAsync(appToRemove.PackageName);
+                    }
                 }
             }
             else if (appInfo is not null)
@@ -175,12 +208,12 @@ public sealed partial class AppsViewModel : BaseViewModel
                     else if (!appInfo.DeviceInfo.Pinned && PinnedApps.Contains(existingApp))
                     {
                         PinnedApps.Remove(existingApp);
-                        _ = AppShortcutService.RemoveAppShortcutAsync(existingApp.PackageName);
                     }
                 }
                 else
                 {
                     // Add new app if it doesn't exist
+                    appInfo.AppShortcutRegistered = AppShortcutService.IsShortcutRegistered(appInfo.PackageName);
                     Apps.Add(appInfo);
                     if (appInfo.DeviceInfo.Pinned)
                     {

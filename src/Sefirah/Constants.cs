@@ -19,6 +19,7 @@ public static class Constants
 
         public const string SettingsFolderName = "settings";
         public const string UserSettingsFileName = "user_settings.json";
+        public const string PhoneFrameScrollTeachingTipShown = "PhoneFrameScrollTeachingTipShown";
         public const string DatabaseFileName = "sefirah.db";
         public static readonly string ConnectionString = $"Filename={Path.Combine(ApplicationData.Current.LocalFolder.Path, DatabaseFileName)}";
     }

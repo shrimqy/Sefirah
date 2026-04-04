@@ -39,6 +39,13 @@ public partial class ApplicationItem(string packageName, string appName, string?
         set => SetProperty(ref isLoading, value);
     }
 
+    private bool appShortcutRegistered;
+    public bool AppShortcutRegistered
+    {
+        get => appShortcutRegistered;
+        set => SetProperty(ref appShortcutRegistered, value);
+    }
+
     private string? selectedNotificationFilter;
     public string SelectedNotificationFilter
     {
