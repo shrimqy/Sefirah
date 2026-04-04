@@ -17,6 +17,8 @@
     <Page.Resources>
         <wctconverters:BoolToObjectConverter x:Key="BoolToPinGlyphConverter" FalseValue="&#xE718;" TrueValue="&#xE77A;" />
         <wctconverters:BoolToObjectConverter x:Key="BoolToPinTextConverter" FalseValue="{helpers:ResourceString Name=Pin}" TrueValue="{helpers:ResourceString Name=Unpin}" />
+        <wctconverters:BoolToObjectConverter x:Key="BoolToShortcutGlyphConverter" FalseValue="&#xE71B;" TrueValue="&#xECC9;" />
+        <wctconverters:BoolToObjectConverter x:Key="BoolToShortcutTextConverter" FalseValue="{helpers:ResourceString Name=AddAppShortcut}" TrueValue="{helpers:ResourceString Name=RemoveAppShortcut}" />
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" Inverse="True" />
         
@@ -39,6 +41,14 @@
                             Text="{x:Bind DeviceInfo.Pinned, Mode=OneWay, Converter={StaticResource BoolToPinTextConverter}}">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon Glyph="{x:Bind DeviceInfo.Pinned, Mode=OneWay, Converter={StaticResource BoolToPinGlyphConverter}}" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem
+                            Click="AppShortcutClick"
+                            DataContext="{x:Bind}"
+                            Text="{x:Bind AppShortcutRegistered, Mode=OneWay, Converter={StaticResource BoolToShortcutTextConverter}}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="{x:Bind AppShortcutRegistered, Mode=OneWay, Converter={StaticResource BoolToShortcutGlyphConverter}}" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
                         <MenuFlyoutItem

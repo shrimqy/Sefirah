@@ -8,6 +8,8 @@ namespace Sefirah.Data.Contracts;
 public interface IAppShortcutService
 {
     Task CreateAppShortcutAsync(ApplicationItem app);
-    
+
     Task RemoveAppShortcutAsync(string androidPackageName);
+
+    bool IsShortcutRegistered(string androidPackageName);
 }

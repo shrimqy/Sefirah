@@ -14,4 +14,6 @@ public class DesktopAppShortcutService : IAppShortcutService
     {
         return Task.CompletedTask;
     }
+
+    public bool IsShortcutRegistered(string androidPackageName) => false;
 }

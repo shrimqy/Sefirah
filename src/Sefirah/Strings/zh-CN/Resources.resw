@@ -753,4 +753,10 @@ input text %pwd%</value>
   <data name="PhoneFrameScrollTip" xml:space="preserve">
     <value>Scroll on the phone preview to change the active device</value>
   </data>
+  <data name="AddAppShortcut" xml:space="preserve">
+    <value>Add shortcut</value>
+  </data>
+  <data name="RemoveAppShortcut" xml:space="preserve">
+    <value>Remove shortcut</value>
+  </data>
 </root>
