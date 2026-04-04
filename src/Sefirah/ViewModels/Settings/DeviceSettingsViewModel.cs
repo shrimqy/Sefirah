@@ -643,7 +643,22 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
     public PairedDevice Device;
 
     private readonly RemoteAppRepository RemoteAppsRepository = Ioc.Default.GetRequiredService<RemoteAppRepository>();
-    public ObservableCollection<ApplicationItem> RemoteApps { get; set; } = [];
+    public List<ApplicationItem> RemoteApps { get; set; } = [];
+
+    public ObservableCollection<ApplicationItem> FilteredRemoteApps { get; } = [];
+
+    private string notificationAppsSearchText = string.Empty;
+    public string NotificationAppsSearchText
+    {
+        get => notificationAppsSearchText;
+        set
+        {
+            if (SetProperty(ref notificationAppsSearchText, value))
+            {
+                Search();
+            }
+        }
+    }
 
     private readonly DeviceRepository DeviceRepository = Ioc.Default.GetRequiredService<DeviceRepository>();
 
@@ -759,7 +774,23 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public void LoadApps(string id)
     {
-        RemoteApps = RemoteAppsRepository.GetApplicationsForDevice(id);
+        RemoteApps = [.. RemoteAppsRepository.GetApplicationsForDevice(id)];
+        Search();
+    }
+
+    private void Search()
+    {
+        FilteredRemoteApps.Clear();
+        var query = NotificationAppsSearchText.Trim();
+        foreach (var app in RemoteApps)
+        {
+            if (string.IsNullOrEmpty(query) ||
+                app.AppName.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                app.PackageName.Contains(query, StringComparison.OrdinalIgnoreCase))
+            {
+                FilteredRemoteApps.Add(app);
+            }
+        }
     }
 
     public void ChangeNotificationFilter(NotificationFilter filter, string appPackage)

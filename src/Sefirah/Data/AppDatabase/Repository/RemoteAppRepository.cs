@@ -10,14 +10,13 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
     public event EventHandler<string>? ApplicationListUpdated;
     public event EventHandler<(string deviceId, ApplicationItem? appInfo, string? packageName)>? ApplicationItemUpdated;
 
-    public ObservableCollection<ApplicationItem> GetApplicationsForDevice(string deviceId)
+    public IEnumerable<ApplicationItem> GetApplicationsForDevice(string deviceId)
     {
         return context.Database.Table<ApplicationEntity>()
             .ToList()
             .Where(a => HasDevice(a, deviceId))
             .Select(a => a.ToApplicationItem(deviceId))
-            .OrderBy(a => a.AppName)
-            .ToObservableCollection();
+            .OrderBy(a => a.AppName);
     }
 
     public async Task AddOrUpdateApplicationForDevice(ApplicationInfo application, string deviceId)

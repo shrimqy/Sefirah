@@ -289,9 +289,6 @@ page.</value>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>App-specific Settings</value>
   </data>
-  <data name="ApplyToListedApps" xml:space="preserve">
-    <value>Dat tat ca ung dung</value>
-  </data>
   <data name="SendButton" xml:space="preserve">
     <value>Send</value>
   </data>

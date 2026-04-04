@@ -288,9 +288,6 @@
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>App-spezifische Einstellungen</value>
   </data>
-  <data name="ApplyToListedApps" xml:space="preserve">
-    <value>Alle Apps festlegen</value>
-  </data>
   <data name="SendButton" xml:space="preserve">
     <value>Senden</value>
   </data>

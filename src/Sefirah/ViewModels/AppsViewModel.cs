@@ -134,7 +134,7 @@ public sealed partial class AppsViewModel : BaseViewModel
                 if (DeviceManager.ActiveDevice is null) return;
 
                 IsLoading = true;
-                Apps = RemoteAppsRepository.GetApplicationsForDevice(DeviceManager.ActiveDevice.Id);
+                Apps = RemoteAppsRepository.GetApplicationsForDevice(DeviceManager.ActiveDevice.Id).ToObservableCollection();
                 PinnedApps = Apps.Where(a => a.DeviceInfo.Pinned).ToObservableCollection();
                 foreach (var app in Apps) 
                 {

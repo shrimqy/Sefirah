@@ -288,9 +288,6 @@
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>הגדרות יישום ספציפיות</value>
   </data>
-  <data name="ApplyToListedApps" xml:space="preserve">
-    <value>הגדר את כל האפליקציות</value>
-  </data>
   <data name="SendButton" xml:space="preserve">
     <value>שלח</value>
   </data>
