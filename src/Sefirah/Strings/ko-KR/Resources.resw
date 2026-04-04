@@ -289,6 +289,9 @@ page.</value>
   <data name="AppSpecificSettings" xml:space="preserve">
     <value>앱별 설정</value>
   </data>
+  <data name="ApplyToListedApps" xml:space="preserve">
+    <value>Apply to listed apps</value>
+  </data>
   <data name="SendButton" xml:space="preserve">
     <value>전송</value>
   </data>
