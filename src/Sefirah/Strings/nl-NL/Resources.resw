@@ -316,12 +316,6 @@ page.</value>
   <data name="Devices.Title" xml:space="preserve">
     <value>Devices</value>
   </data>
-  <data name="AudioSilent" xml:space="preserve">
-    <value>Silent</value>
-  </data>
-  <data name="AudioVibrate" xml:space="preserve">
-    <value>Vibrate</value>
-  </data>
   <data name="Pin" xml:space="preserve">
     <value>Pin</value>
   </data>
@@ -675,6 +669,12 @@ input text %pwd%</value>
   <data name="StorageAccessDescription" xml:space="preserve">
     <value>Enables or disables storage access for this device in the File Explorer</value>
   </data>
+  <data name="AudioSilent" xml:space="preserve">
+    <value>Silent</value>
+  </data>
+  <data name="AudioVibrate" xml:space="preserve">
+    <value>Vibrate</value>
+  </data>
   <data name="AudioRing" xml:space="preserve">
     <value>Ring</value>
   </data>
@@ -758,5 +758,50 @@ input text %pwd%</value>
   </data>
   <data name="RemoveAppShortcut" xml:space="preserve">
     <value>Remove shortcut</value>
+  </data>
+  <data name="DeviceAudio" xml:space="preserve">
+    <value>Device audio</value>
+  </data>
+  <data name="DndToggle" xml:space="preserve">
+    <value>Toggle Do not disturb</value>
+  </data>
+  <data name="StartScreenMirroring" xml:space="preserve">
+    <value>Start screen mirroring</value>
+  </data>
+  <data name="PreviousTrack" xml:space="preserve">
+    <value>Previous track</value>
+  </data>
+  <data name="PlayOrPause" xml:space="preserve">
+    <value>Play or pause</value>
+  </data>
+  <data name="NextTrack" xml:space="preserve">
+    <value>Next track</value>
+  </data>
+  <data name="MediaVolume" xml:space="preserve">
+    <value>Media volume</value>
+  </data>
+  <data name="SendNotificationReply" xml:space="preserve">
+    <value>Send notification reply</value>
+  </data>
+  <data name="RefreshApps" xml:space="preserve">
+    <value>Refresh apps</value>
+  </data>
+  <data name="ContextMenu" xml:space="preserve">
+    <value>Context menu</value>
+  </data>
+  <data name="ShareFiles" xml:space="preserve">
+    <value>Share files</value>
+  </data>
+  <data name="ReceiveClipboard" xml:space="preserve">
+    <value>Receive clipboard</value>
+  </data>
+  <data name="SendClipboard" xml:space="preserve">
+    <value>Send clipboard</value>
+  </data>
+  <data name="ReceiveMediaSessions" xml:space="preserve">
+    <value>Receive media sessions</value>
+  </data>
+  <data name="SendMediaSessions" xml:space="preserve">
+    <value>Send media sessions</value>
   </data>
 </root>
