@@ -28,6 +28,8 @@ public class AdbService(
 
     private static readonly string DEFAULT = "Default".GetLocalizedResource();
 
+    private const string SefirahAndroidPackageId = "com.castle.sefirah";
+
     public AdbClient AdbClient => adbClient;
 
     // Initialize the codec option collections
@@ -338,6 +340,7 @@ public class AdbService(
 
             // Discover codec options for this device
             _ = Task.Run(async () => await DiscoverCodecOptionsForDevice(connectedDevice));
+            _ = Task.Run(async () => await GrantSensitiveNotificationAsync(connectedDevice));
         }
         catch (Exception ex)
         {
@@ -368,7 +371,7 @@ public class AdbService(
         logger.LogInformation($"Device state changed: {e.Device.Serial} {e.OldState} -> {e.NewState}");
         var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == e.Device.Serial);
             
-        if (e.NewState == DeviceState.Online)
+        if (e.NewState is DeviceState.Online)
         {
             var deviceInfo = await GetFullDeviceInfoAsync(e.Device);
                 
@@ -396,11 +399,12 @@ public class AdbService(
 
             // Discover codec options for this device
             _ = Task.Run(async () => await DiscoverCodecOptionsForDevice(deviceInfo));
+            _ = Task.Run(async () => await GrantSensitiveNotificationAsync(deviceInfo));
         }
         else
         {
             // Device is going offline/authorizing - just update the state if it exists
-            if (existingDevice != null)
+            if (existingDevice is not null)
             {
                 await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
                 {
@@ -442,6 +446,7 @@ public class AdbService(
                     
                     // Discover codec options for this device
                     _ = Task.Run(async () => await DiscoverCodecOptionsForDevice(adbDevice));
+                    _ = Task.Run(async () => await GrantSensitiveNotificationAsync(adbDevice));
                 }
                 else
                 {
@@ -570,7 +575,6 @@ public class AdbService(
         try
         {
             var result = await adbClient.PairAsync(host, port, pairingCode);
-            logger.LogInformation(result);
             if (result.Contains("failed") || result.Contains("refused"))
             {
                 return false;
@@ -753,5 +757,18 @@ public class AdbService(
         }
     }
 
+    // executes: adb shell appops set com.castle.sefirah RECEIVE_SENSITIVE_NOTIFICATIONS allow
+    private async Task GrantSensitiveNotificationAsync(AdbDevice device)
+    {
+        if (device.DeviceData is null || device.State is not DeviceState.Online) return;
 
+        try
+        {
+            await adbClient.ExecuteShellCommandAsync(device.DeviceData, $"appops set {SefirahAndroidPackageId} RECEIVE_SENSITIVE_NOTIFICATIONS allow");
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex,"Could not grant RECEIVE_SENSITIVE_NOTIFICATIONS on {Serial} (older Android or app not installed)", device.Serial);
+        }
+    }
 }
