@@ -1,7 +1,7 @@
 using CommunityToolkit.WinUI.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media.Animation;
 using Sefirah.ViewModels.Settings;
-using Sefirah.Views;
 using Sefirah.Views.DeviceSettings;
 
 namespace Sefirah.Views.DevicePreferences;
@@ -51,49 +51,47 @@ public sealed partial class DeviceSettingsPage : Page
         Frame.Navigate(typeof(AddressesSettingsPage), ViewModel, new DrillInNavigationTransitionInfo());
     }
 
-    private bool isUpdatingSelection = false;
+    private bool isUpdatingClipboardSelection = false;
     private bool isUpdatingMediaSessionSelection = false;
 
     private void ClipboardSyncSegmented_Loaded(object sender, RoutedEventArgs e)
     {
-        if (sender is Segmented segmented)
+        if (sender is not Segmented segmented)
+            return;
+
+        isUpdatingClipboardSelection = true;
+        try
         {
-            UpdateSegmentedSelection(segmented);
+            ApplySegmentedMultiSelection(segmented, ViewModel.ClipboardReceive, ViewModel.ClipboardSend);
+        }
+        finally
+        {
+            isUpdatingClipboardSelection = false;
         }
     }
 
     private void ClipboardSyncSegmented_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (isUpdatingSelection || sender is not Segmented segmented)
+        if (isUpdatingClipboardSelection || sender is not Segmented segmented)
             return;
 
-        // Index 0 = Receive (Download), Index 1 = Send (Upload)
-        var selectedItems = segmented.SelectedItems;
-        ViewModel.ClipboardReceive = segmented.Items.Count > 0 && selectedItems.Contains(segmented.Items[0]);
-        ViewModel.ClipboardSend = segmented.Items.Count > 1 && selectedItems.Contains(segmented.Items[1]);
+        ViewModel.ClipboardReceive = IsSegmentedIndexSelected(segmented, 0);
+        ViewModel.ClipboardSend = IsSegmentedIndexSelected(segmented, 1);
     }
-
-    private void UpdateSegmentedSelection(Segmented segmented)
-    {
-        isUpdatingSelection = true;
-        segmented.SelectedItems.Clear();
-        
-        if (ViewModel.ClipboardReceive && segmented.Items.Count > 0)
-            segmented.SelectedItems.Add(segmented.Items[0]);
-        
-        if (ViewModel.ClipboardSend && segmented.Items.Count > 1)
-            segmented.SelectedItems.Add(segmented.Items[1]);
-        
-        isUpdatingSelection = false;
-    }
-    
-    // TODO: Refactor this later
 
     private void MediaSessionSyncSegmented_Loaded(object sender, RoutedEventArgs e)
     {
-        if (sender is Segmented segmented)
+        if (sender is not Segmented segmented)
+            return;
+
+        isUpdatingMediaSessionSelection = true;
+        try
         {
-            UpdateMediaSessionSegmentedSelection(segmented);
+            ApplySegmentedMultiSelection(segmented, ViewModel.MediaSessionReceive, ViewModel.MediaSessionSend);
+        }
+        finally
+        {
+            isUpdatingMediaSessionSelection = false;
         }
     }
 
@@ -102,23 +100,24 @@ public sealed partial class DeviceSettingsPage : Page
         if (isUpdatingMediaSessionSelection || sender is not Segmented segmented)
             return;
 
-        // Index 0 = Receive (Download), Index 1 = Send (Upload)
-        var selectedItems = segmented.SelectedItems;
-        ViewModel.MediaSessionReceive = segmented.Items.Count > 0 && selectedItems.Contains(segmented.Items[0]);
-        ViewModel.MediaSessionSend = segmented.Items.Count > 1 && selectedItems.Contains(segmented.Items[1]);
+        ViewModel.MediaSessionReceive = IsSegmentedIndexSelected(segmented, 0);
+        ViewModel.MediaSessionSend = IsSegmentedIndexSelected(segmented, 1);
     }
 
-    private void UpdateMediaSessionSegmentedSelection(Segmented segmented)
+    /// Sets selection via realized <see cref="SelectorItem"/> containers instead of
+    /// <see cref="ListViewBase.SelectedItems"/>. Adding <see cref="ItemCollection"/> entries there
+    /// can throw <see cref="InvalidCastException"/>
+    private static void ApplySegmentedMultiSelection(Segmented segmented, bool selectFirst, bool selectSecond)
     {
-        isUpdatingMediaSessionSelection = true;
-        segmented.SelectedItems.Clear();
+        for (var i = 0; i < segmented.Items.Count; i++)
+        {
+            if (segmented.ContainerFromIndex(i) is not SelectorItem selectorItem) continue;
 
-        if (ViewModel.MediaSessionReceive && segmented.Items.Count > 0)
-            segmented.SelectedItems.Add(segmented.Items[0]);
-
-        if (ViewModel.MediaSessionSend && segmented.Items.Count > 1)
-            segmented.SelectedItems.Add(segmented.Items[1]);
-
-        isUpdatingMediaSessionSelection = false;
+            var selected = (i == 0 && selectFirst) || (i == 1 && selectSecond);
+            selectorItem.IsSelected = selected;
+        }
     }
+
+    private static bool IsSegmentedIndexSelected(Segmented segmented, int index) =>
+        segmented.ContainerFromIndex(index) is SelectorItem { IsSelected: true };
 }
