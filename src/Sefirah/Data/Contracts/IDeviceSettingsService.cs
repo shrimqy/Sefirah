@@ -40,6 +40,11 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     bool ShowNotificationToast { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether to show low battery alerts.
+    /// </summary>
+    bool LowBatteryAlertsEnabled { get; set; }
+
+    /// <summary>
     /// Gets or sets a value indicating whether to show badge for notifications on taskbar.
     /// </summary>
     bool ShowBadge { get; set; }

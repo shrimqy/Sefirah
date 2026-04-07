@@ -48,6 +48,12 @@ internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSh
         set => Set(value);
     }
 
+    public bool LowBatteryAlertsEnabled
+    {
+        get => Get(true);
+        set => Set(value);
+    }
+
     public bool ShowBadge
     {
         get => Get(true);

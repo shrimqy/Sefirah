@@ -4,6 +4,7 @@ public static class Constants
     public static class Notification
     {
         public const string FileTransferGroup = "file-transfer";
+        public const string BatteryGroup = "battery";
     }
 
     public static class ToastNotificationType

@@ -31,6 +31,13 @@
                     <ToggleSwitch IsOn="{x:Bind ViewModel.ShowNotificationToast, Mode=TwoWay}" />
                 </wuc:SettingsCard>
 
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=LowBatteryAlertsDescription}" Header="{helpers:ResourceString Name=LowBatteryAlerts}">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE850;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.LowBatteryAlertsEnabled, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+
                 <wuc:SettingsCard Description="{helpers:ResourceString Name=ShowBadgeDescription}" Header="{helpers:ResourceString Name=ShowBadge}">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xF136;" />

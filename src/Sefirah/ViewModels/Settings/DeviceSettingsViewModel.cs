@@ -122,6 +122,19 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         }
     }
 
+    public bool LowBatteryAlertsEnabled
+    {
+        get => DeviceSettings.LowBatteryAlertsEnabled;
+        set
+        {
+            if (DeviceSettings.LowBatteryAlertsEnabled != value)
+            {
+                DeviceSettings.LowBatteryAlertsEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public bool ShowBadge
     {
         get => DeviceSettings.ShowBadge;
