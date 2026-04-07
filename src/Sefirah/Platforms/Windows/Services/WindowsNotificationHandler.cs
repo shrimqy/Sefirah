@@ -175,6 +175,30 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
 
 
     /// <inheritdoc />
+    public Task<bool> ShowBatteryNotification(string title, string text, string tag)
+    {
+        try
+        {
+            var builder = new AppNotificationBuilder()
+                .AddText(title)
+                .AddText(text)
+                .SetTag(tag)
+                .SetGroup(Constants.Notification.BatteryGroup);
+
+            var notification = builder.BuildNotification();
+            notification.ExpiresOnReboot = true;
+            AppNotificationManager.Default.Show(notification);
+            return Task.FromResult(true);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to show battery notification");
+            return Task.FromResult(false);
+        }
+    }
+
+
+    /// <inheritdoc />
     public Task ShowCallNotification(string title, string text, string tag, Data.Enums.CallState callState, Uri? icon = null)
     {
         try

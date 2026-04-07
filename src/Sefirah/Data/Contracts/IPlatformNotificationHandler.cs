@@ -32,6 +32,8 @@ public interface IPlatformNotificationHandler
 
     void ShowFileTransferNotification(string notificationTitle, string progressTitle, string status, string transferId, uint notificationSequence, double progress);
 
+    Task<bool> ShowBatteryNotification(string title, string text, string tag);
+
     Task ShowCallNotification(string title, string text, string tag, Enums.CallState callState, Uri? icon = null);
 
     /// <summary>

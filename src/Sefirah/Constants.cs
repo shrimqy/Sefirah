@@ -1,9 +1,19 @@
 namespace Sefirah;
 public static class Constants
 {
+    public static class BatteryAlerts
+    {
+        public const int DefaultThreshold = 20;
+        public const int MinThreshold = 5;
+        public const int MaxThreshold = 50;
+    }
+
     public static class Notification
     {
         public const string FileTransferGroup = "file-transfer";
+        public const string BatteryGroup = "battery";
+
+        public static string GetBatteryTag(string deviceId) => $"battery_{deviceId}";
     }
 
     public static class ToastNotificationType

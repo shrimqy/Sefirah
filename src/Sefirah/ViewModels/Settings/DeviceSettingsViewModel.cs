@@ -122,6 +122,50 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         }
     }
 
+    public bool LowBatteryAlertsEnabled
+    {
+        get => DeviceSettings.LowBatteryAlertsEnabled;
+        set
+        {
+            if (DeviceSettings.LowBatteryAlertsEnabled != value)
+            {
+                DeviceSettings.LowBatteryAlertsEnabled = value;
+                OnPropertyChanged();
+                _ = ReconcileBatteryAlertsAsync();
+            }
+        }
+    }
+
+    public int LowBatteryAlertThreshold
+    {
+        get => DeviceSettings.LowBatteryAlertThreshold;
+        set
+        {
+            var currentThreshold = DeviceSettings.LowBatteryAlertThreshold;
+            DeviceSettings.LowBatteryAlertThreshold = value;
+
+            if (DeviceSettings.LowBatteryAlertThreshold != currentThreshold)
+            {
+                OnPropertyChanged();
+                _ = ReconcileBatteryAlertsAsync();
+            }
+        }
+    }
+
+    public IReadOnlyList<int> LowBatteryAlertThresholdOptions { get; } =
+    [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+    ];
+
     public bool ShowBadge
     {
         get => DeviceSettings.ShowBadge;
@@ -639,6 +683,8 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     private readonly ISftpService sftpService = Ioc.Default.GetRequiredService<ISftpService>();
     private readonly IAdbService AdbService = Ioc.Default.GetRequiredService<IAdbService>();
+    private readonly IBatteryAlertService batteryAlertService = Ioc.Default.GetRequiredService<IBatteryAlertService>();
+    private readonly ILogger<DeviceSettingsViewModel> logger = Ioc.Default.GetRequiredService<ILogger<DeviceSettingsViewModel>>();
     private readonly IDeviceSettingsService DeviceSettings;
     public PairedDevice Device;
 
@@ -769,5 +815,17 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         var app = RemoteApps.First(p => p.PackageName == appPackage);
         app.DeviceInfo.Filter = filterKey;
         app.SelectedNotificationFilter = notificationFilter;
+    }
+
+    private async Task ReconcileBatteryAlertsAsync()
+    {
+        try
+        {
+            await batteryAlertService.ReconcileBatteryAlertStateAsync(Device);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to reconcile low battery alerts for device {DeviceId}", Device.Id);
+        }
     }
 }
