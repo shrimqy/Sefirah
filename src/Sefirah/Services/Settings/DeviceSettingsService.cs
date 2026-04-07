@@ -54,6 +54,18 @@ internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSh
         set => Set(value);
     }
 
+    public int LowBatteryAlertThreshold
+    {
+        get => Math.Clamp(
+            Get(Constants.BatteryAlerts.DefaultThreshold),
+            Constants.BatteryAlerts.MinThreshold,
+            Constants.BatteryAlerts.MaxThreshold);
+        set => Set(Math.Clamp(
+            value,
+            Constants.BatteryAlerts.MinThreshold,
+            Constants.BatteryAlerts.MaxThreshold));
+    }
+
     public bool LowBatteryAlertShown
     {
         get => Get(false);

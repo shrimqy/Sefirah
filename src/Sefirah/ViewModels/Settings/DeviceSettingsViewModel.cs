@@ -141,6 +141,37 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         }
     }
 
+    public int LowBatteryAlertThreshold
+    {
+        get => DeviceSettings.LowBatteryAlertThreshold;
+        set
+        {
+            var currentThreshold = DeviceSettings.LowBatteryAlertThreshold;
+            DeviceSettings.LowBatteryAlertThreshold = value;
+
+            if (DeviceSettings.LowBatteryAlertThreshold != currentThreshold)
+            {
+                DeviceSettings.LowBatteryAlertShown = false;
+                _ = platformNotificationHandler.RemoveNotificationByTag(Constants.Notification.GetBatteryTag(Device.Id));
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public IReadOnlyList<int> LowBatteryAlertThresholdOptions { get; } =
+    [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+    ];
+
     public bool ShowBadge
     {
         get => DeviceSettings.ShowBadge;

@@ -545,7 +545,13 @@ page.</value>
     <value>Low battery alerts</value>
   </data>
   <data name="LowBatteryAlertsDescription" xml:space="preserve">
-    <value>Show a notification when this device drops to 20% battery or lower</value>
+    <value>Show a notification when this device reaches or drops below the selected battery percentage</value>
+  </data>
+  <data name="LowBatteryThreshold" xml:space="preserve">
+    <value>Low battery threshold</value>
+  </data>
+  <data name="LowBatteryThresholdDescription" xml:space="preserve">
+    <value>Choose the battery percentage that triggers the alert for this device</value>
   </data>
   <data name="IgnoreDuringDoNotDisturb" xml:space="preserve">
     <value>Ignore during Do Not Disturb</value>

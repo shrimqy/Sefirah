@@ -8,8 +8,6 @@ namespace Sefirah.Services;
 
 public sealed class BatteryAlertService : IBatteryAlertService
 {
-    private const int LowBatteryThreshold = 20;
-
     private readonly ConcurrentDictionary<string, SemaphoreSlim> deviceLocks = [];
     private readonly IPlatformNotificationHandler platformNotificationHandler;
     private readonly ILogger<BatteryAlertService> logger;
@@ -35,7 +33,7 @@ public sealed class BatteryAlertService : IBatteryAlertService
             await App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.BatteryStatus = batteryState);
 
             var notificationTag = Constants.Notification.GetBatteryTag(device.Id);
-            if (!ShouldShowLowBatteryAlert(batteryState))
+            if (!ShouldShowLowBatteryAlert(batteryState, device.DeviceSettings.LowBatteryAlertThreshold))
             {
                 device.DeviceSettings.LowBatteryAlertShown = false;
                 await platformNotificationHandler.RemoveNotificationByTag(notificationTag);
@@ -70,6 +68,6 @@ public sealed class BatteryAlertService : IBatteryAlertService
         await platformNotificationHandler.RemoveNotificationByTag(Constants.Notification.GetBatteryTag(device.Id));
     }
 
-    private static bool ShouldShowLowBatteryAlert(BatteryState batteryState) =>
-        batteryState.BatteryLevel <= LowBatteryThreshold && !batteryState.IsCharging;
+    private static bool ShouldShowLowBatteryAlert(BatteryState batteryState, int threshold) =>
+        batteryState.BatteryLevel <= threshold && !batteryState.IsCharging;
 }
