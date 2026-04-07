@@ -137,6 +137,7 @@ public static class AppLifecycleHelper
                 .AddSingleton<INetworkService, NetworkService>()
 
                 .AddSingleton<INotificationService, NotificationService>()
+                .AddSingleton<IBatteryAlertService, BatteryAlertService>()
                 .AddSingleton<IClipboardService, ClipboardService>()
                 .AddSingleton<IRemoteMediaHandler, RemoteMediaHandler>()
                 .AddSingleton<SmsHandlerService>()

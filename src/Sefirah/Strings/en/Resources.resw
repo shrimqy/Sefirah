@@ -541,6 +541,18 @@ page.</value>
   <data name="ShowBadgeDescription" xml:space="preserve">
     <value>Show notification badge on taskbar</value>
   </data>
+  <data name="LowBatteryAlerts" xml:space="preserve">
+    <value>Low battery alerts</value>
+  </data>
+  <data name="LowBatteryAlertsDescription" xml:space="preserve">
+    <value>Show a notification when this device reaches or drops below the selected battery percentage</value>
+  </data>
+  <data name="LowBatteryThreshold" xml:space="preserve">
+    <value>Low battery threshold</value>
+  </data>
+  <data name="LowBatteryThresholdDescription" xml:space="preserve">
+    <value>Choose the battery percentage that triggers the alert for this device</value>
+  </data>
   <data name="IgnoreDuringDoNotDisturb" xml:space="preserve">
     <value>Ignore during Do Not Disturb</value>
   </data>
@@ -746,6 +758,12 @@ input text %pwd%</value>
   </data>
   <data name="ClipboardNotification.Title" xml:space="preserve">
     <value>Clipboard received</value>
+  </data>
+  <data name="BatteryNotification.Title" xml:space="preserve">
+    <value>Low battery</value>
+  </data>
+  <data name="BatteryNotification.Text" xml:space="preserve">
+    <value>{0} is at {1}% battery.</value>
   </data>
   <data name="OpenInBrowser" xml:space="preserve">
     <value>Open in browser</value>

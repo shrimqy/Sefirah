@@ -31,6 +31,35 @@
                     <ToggleSwitch IsOn="{x:Bind ViewModel.ShowNotificationToast, Mode=TwoWay}" />
                 </wuc:SettingsCard>
 
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=LowBatteryAlertsDescription}" Header="{helpers:ResourceString Name=LowBatteryAlerts}">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE850;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.LowBatteryAlertsEnabled, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+
+                <wuc:SettingsCard
+                    Description="{helpers:ResourceString Name=LowBatteryThresholdDescription}"
+                    Header="{helpers:ResourceString Name=LowBatteryThreshold}"
+                    IsEnabled="{x:Bind ViewModel.LowBatteryAlertsEnabled, Mode=OneWay}">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE713;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <ComboBox
+                        Width="120"
+                        ItemsSource="{x:Bind ViewModel.LowBatteryAlertThresholdOptions, Mode=OneWay}"
+                        SelectedItem="{x:Bind ViewModel.LowBatteryAlertThreshold, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="x:Int32">
+                                <TextBlock>
+                                    <Run Text="{x:Bind}" />
+                                    <Run Text="%" />
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </wuc:SettingsCard>
+
                 <wuc:SettingsCard Description="{helpers:ResourceString Name=ShowBadgeDescription}" Header="{helpers:ResourceString Name=ShowBadge}">
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xF136;" />

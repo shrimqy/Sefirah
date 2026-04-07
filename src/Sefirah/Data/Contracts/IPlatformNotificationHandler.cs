@@ -20,6 +20,11 @@ public interface IPlatformNotificationHandler
     /// <paramref name="actionData"/> are both set, adds a button to the notification.
     /// </summary>
     void ShowClipboardNotification(string title, string text, string? actionLabel = null, string? actionData = null);
+
+    /// <summary>
+    /// Shows a low battery notification for a paired device.
+    /// </summary>
+    Task ShowBatteryNotification(string title, string text, string tag);
     
     /// <summary>
     /// Shows a file transfer notification
