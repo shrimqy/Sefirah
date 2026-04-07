@@ -750,6 +750,18 @@ input text %pwd%</value>
   <data name="OpenInBrowser" xml:space="preserve">
     <value>Open in browser</value>
   </data>
+  <data name="LowBatteryAlerts" xml:space="preserve">
+    <value>लो बैटरी अलर्ट</value>
+  </data>
+  <data name="LowBatteryAlertsDescription" xml:space="preserve">
+    <value>जब यह डिवाइस 20% या उससे कम बैटरी पर पहुंच जाए तो सूचना दिखाएं</value>
+  </data>
+  <data name="BatteryNotification.Title" xml:space="preserve">
+    <value>बैटरी कम है</value>
+  </data>
+  <data name="BatteryNotification.Text" xml:space="preserve">
+    <value>{0} की बैटरी {1}% पर है।</value>
+  </data>
   <data name="PhoneFrameScrollTip" xml:space="preserve">
     <value>Scroll on the phone preview to change the active device</value>
   </data>

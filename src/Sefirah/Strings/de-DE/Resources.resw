@@ -749,6 +749,18 @@ input text %pwd%</value>
   <data name="OpenInBrowser" xml:space="preserve">
     <value>Open in browser</value>
   </data>
+  <data name="LowBatteryAlerts" xml:space="preserve">
+    <value>Warnung bei niedrigem Akkustand</value>
+  </data>
+  <data name="LowBatteryAlertsDescription" xml:space="preserve">
+    <value>Zeigt eine Benachrichtigung an, wenn dieses Gerät auf 20 % Akku oder weniger fällt</value>
+  </data>
+  <data name="BatteryNotification.Title" xml:space="preserve">
+    <value>Niedriger Akkustand</value>
+  </data>
+  <data name="BatteryNotification.Text" xml:space="preserve">
+    <value>{0} hat noch {1} % Akku.</value>
+  </data>
   <data name="PhoneFrameScrollTip" xml:space="preserve">
     <value>Scroll on the phone preview to change the active device</value>
   </data>

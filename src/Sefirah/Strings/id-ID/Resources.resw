@@ -750,6 +750,18 @@ input text %pwd%</value>
   <data name="OpenInBrowser" xml:space="preserve">
     <value>Open in browser</value>
   </data>
+  <data name="LowBatteryAlerts" xml:space="preserve">
+    <value>Peringatan baterai lemah</value>
+  </data>
+  <data name="LowBatteryAlertsDescription" xml:space="preserve">
+    <value>Tampilkan notifikasi saat perangkat ini turun ke 20% baterai atau lebih rendah</value>
+  </data>
+  <data name="BatteryNotification.Title" xml:space="preserve">
+    <value>Baterai lemah</value>
+  </data>
+  <data name="BatteryNotification.Text" xml:space="preserve">
+    <value>{0} berada di {1}% baterai.</value>
+  </data>
   <data name="PhoneFrameScrollTip" xml:space="preserve">
     <value>Scroll on the phone preview to change the active device</value>
   </data>

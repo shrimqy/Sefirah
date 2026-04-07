@@ -750,6 +750,18 @@ input text %pwd%</value>
   <data name="OpenInBrowser" xml:space="preserve">
     <value>Open in browser</value>
   </data>
+  <data name="LowBatteryAlerts" xml:space="preserve">
+    <value>Cảnh báo pin yếu</value>
+  </data>
+  <data name="LowBatteryAlertsDescription" xml:space="preserve">
+    <value>Hiển thị thông báo khi thiết bị này giảm xuống còn 20% pin hoặc thấp hơn</value>
+  </data>
+  <data name="BatteryNotification.Title" xml:space="preserve">
+    <value>Pin yếu</value>
+  </data>
+  <data name="BatteryNotification.Text" xml:space="preserve">
+    <value>{0} còn {1}% pin.</value>
+  </data>
   <data name="PhoneFrameScrollTip" xml:space="preserve">
     <value>Scroll on the phone preview to change the active device</value>
   </data>

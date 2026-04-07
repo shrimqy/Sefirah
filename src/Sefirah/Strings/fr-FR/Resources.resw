@@ -749,6 +749,18 @@ input text %pwd%</value>
   <data name="OpenInBrowser" xml:space="preserve">
     <value>Open in browser</value>
   </data>
+  <data name="LowBatteryAlerts" xml:space="preserve">
+    <value>Alertes de batterie faible</value>
+  </data>
+  <data name="LowBatteryAlertsDescription" xml:space="preserve">
+    <value>Afficher une notification lorsque cet appareil atteint 20 % de batterie ou moins</value>
+  </data>
+  <data name="BatteryNotification.Title" xml:space="preserve">
+    <value>Batterie faible</value>
+  </data>
+  <data name="BatteryNotification.Text" xml:space="preserve">
+    <value>{0} est à {1} % de batterie.</value>
+  </data>
   <data name="PhoneFrameScrollTip" xml:space="preserve">
     <value>Scroll on the phone preview to change the active device</value>
   </data>

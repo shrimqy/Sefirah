@@ -749,6 +749,18 @@ input text %pwd%</value>
   <data name="OpenInBrowser" xml:space="preserve">
     <value>Open in browser</value>
   </data>
+  <data name="LowBatteryAlerts" xml:space="preserve">
+    <value>低バッテリー通知</value>
+  </data>
+  <data name="LowBatteryAlertsDescription" xml:space="preserve">
+    <value>このデバイスのバッテリーが20%以下になったときに通知を表示します</value>
+  </data>
+  <data name="BatteryNotification.Title" xml:space="preserve">
+    <value>バッテリー残量低下</value>
+  </data>
+  <data name="BatteryNotification.Text" xml:space="preserve">
+    <value>{0} のバッテリーは {1}% です。</value>
+  </data>
   <data name="PhoneFrameScrollTip" xml:space="preserve">
     <value>Scroll on the phone preview to change the active device</value>
   </data>

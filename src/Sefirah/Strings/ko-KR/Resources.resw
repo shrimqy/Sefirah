@@ -750,6 +750,18 @@ input text %pwd%</value>
   <data name="OpenInBrowser" xml:space="preserve">
     <value>Open in browser</value>
   </data>
+  <data name="LowBatteryAlerts" xml:space="preserve">
+    <value>배터리 부족 알림</value>
+  </data>
+  <data name="LowBatteryAlertsDescription" xml:space="preserve">
+    <value>이 장치의 배터리가 20% 이하로 떨어지면 알림을 표시합니다</value>
+  </data>
+  <data name="BatteryNotification.Title" xml:space="preserve">
+    <value>배터리 부족</value>
+  </data>
+  <data name="BatteryNotification.Text" xml:space="preserve">
+    <value>{0}의 배터리가 {1}%입니다.</value>
+  </data>
   <data name="PhoneFrameScrollTip" xml:space="preserve">
     <value>Scroll on the phone preview to change the active device</value>
   </data>

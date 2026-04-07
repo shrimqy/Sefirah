@@ -750,6 +750,18 @@ input text %pwd%</value>
   <data name="OpenInBrowser" xml:space="preserve">
     <value>Open in browser</value>
   </data>
+  <data name="LowBatteryAlerts" xml:space="preserve">
+    <value>Alacsony akkumulátorszint riasztások</value>
+  </data>
+  <data name="LowBatteryAlertsDescription" xml:space="preserve">
+    <value>Értesítés megjelenítése, amikor ez az eszköz 20%-os vagy annál alacsonyabb akkumulátorszintre csökken</value>
+  </data>
+  <data name="BatteryNotification.Title" xml:space="preserve">
+    <value>Alacsony akkumulátorszint</value>
+  </data>
+  <data name="BatteryNotification.Text" xml:space="preserve">
+    <value>A(z) {0} akkumulátorszintje {1}%.</value>
+  </data>
   <data name="PhoneFrameScrollTip" xml:space="preserve">
     <value>Scroll on the phone preview to change the active device</value>
   </data>
