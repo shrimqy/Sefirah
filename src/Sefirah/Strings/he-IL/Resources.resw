@@ -749,18 +749,6 @@ input text %pwd%</value>
   <data name="OpenInBrowser" xml:space="preserve">
     <value>Open in browser</value>
   </data>
-  <data name="LowBatteryAlerts" xml:space="preserve">
-    <value>התראות סוללה חלשה</value>
-  </data>
-  <data name="LowBatteryAlertsDescription" xml:space="preserve">
-    <value>הצג התראה כאשר המכשיר הזה יורד ל-20% סוללה או פחות</value>
-  </data>
-  <data name="BatteryNotification.Title" xml:space="preserve">
-    <value>סוללה חלשה</value>
-  </data>
-  <data name="BatteryNotification.Text" xml:space="preserve">
-    <value>ל-{0} נותרו {1}% סוללה.</value>
-  </data>
   <data name="PhoneFrameScrollTip" xml:space="preserve">
     <value>Scroll on the phone preview to change the active device</value>
   </data>

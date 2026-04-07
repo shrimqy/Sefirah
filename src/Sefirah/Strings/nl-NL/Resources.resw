@@ -750,18 +750,6 @@ input text %pwd%</value>
   <data name="OpenInBrowser" xml:space="preserve">
     <value>Open in browser</value>
   </data>
-  <data name="LowBatteryAlerts" xml:space="preserve">
-    <value>Meldingen voor lage batterij</value>
-  </data>
-  <data name="LowBatteryAlertsDescription" xml:space="preserve">
-    <value>Toon een melding wanneer dit apparaat een batterijpercentage van 20% of lager bereikt</value>
-  </data>
-  <data name="BatteryNotification.Title" xml:space="preserve">
-    <value>Lage batterij</value>
-  </data>
-  <data name="BatteryNotification.Text" xml:space="preserve">
-    <value>{0} heeft nog {1}% batterij.</value>
-  </data>
   <data name="PhoneFrameScrollTip" xml:space="preserve">
     <value>Scroll on the phone preview to change the active device</value>
   </data>
