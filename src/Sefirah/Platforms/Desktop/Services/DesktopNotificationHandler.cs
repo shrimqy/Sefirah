@@ -1,6 +1,5 @@
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
-using Sefirah.Extensions;
 using Sefirah.Utils;
 using Tmds.DBus.Protocol;
 
@@ -13,7 +12,7 @@ public class DesktopNotificationHandler(
     ILogger<DesktopNotificationHandler> logger,
     IDeviceManager deviceManager) : IPlatformNotificationHandler, IDisposable
 {
-    private Connection? _connection;
+    private DBusConnection? _connection;
     private NotificationsService? _notificationService;
     private Notifications? _notifications;
     private bool _isInitialized = false;
@@ -29,7 +28,7 @@ public class DesktopNotificationHandler(
         try
         {
             // Check if we have a session bus address
-            string? sessionBusAddress = Address.Session;
+            string? sessionBusAddress = DBusAddress.Session;
             if (sessionBusAddress is null)
             {
                 logger.LogWarning("Cannot determine session bus address. D-Bus may not be available on this system.");
@@ -37,7 +36,7 @@ public class DesktopNotificationHandler(
             }
 
             // Create connection to the session bus
-            _connection = new Connection(sessionBusAddress);
+            _connection = new DBusConnection(sessionBusAddress);
             await _connection.ConnectAsync();
             logger.LogDebug("Connected to D-Bus session bus");
 

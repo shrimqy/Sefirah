@@ -23,7 +23,7 @@
     <PackageVersion Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
     <PackageVersion Include="SQLitePCLRaw.provider.sqlite3" Version="2.1.11" />
     <PackageVersion Include="SSH.NET" Version="2025.0.0" />
-    <PackageVersion Include="Tmds.DBus" Version="0.21.2" />
+    <PackageVersion Include="Tmds.DBus" Version="0.92.0" />
     <PackageVersion Include="Uno.WinUI.Runtime.Skia.Linux.FrameBuffer" Version="5.6.91" />
     <PackageVersion Include="Uno.WinUI.Runtime.Skia.X11" Version="5.6.91" />
     <PackageVersion Include="Vanara.PInvoke.CldApi" Version="4.1.3" />
