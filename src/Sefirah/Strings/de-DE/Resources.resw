@@ -154,7 +154,7 @@
     <value>Speicherort festlegen</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Remote storage location</value>
+    <value>Remote-Speicherort</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>Zwischenablagen-Benachrichtigung anzeigen</value>
@@ -175,10 +175,10 @@
     <value>Deaktiviert</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Notification feed</value>
+    <value>Benachrichtigungs-Feed</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>Notification feed + toast</value>
+    <value>Benachrichtigungs-Feed + Pop-up</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>Verfügbare Geräte</value>
