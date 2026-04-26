@@ -46,9 +46,9 @@ public class LocalThumbnailProvider(
         return HRESULT.S_OK;
 
     }
-
-    // This doesn't get called for some reason: https://github.com/dahall/WinClassicSamplesCS/issues/6
-    public HRESULT GetThumbnail(uint cx, out SafeHBITMAP phbmp, out WTS_ALPHATYPE pdwAlpha)
+    
+    // TODO: implement thumbnails
+    public HRESULT GetThumbnail(uint cx, out HBITMAP phbmp, out WTS_ALPHATYPE pdwAlpha)
     {
         logger.LogDebug("Get thumbnail for {path}", _serverItem!.GetDisplayName(SIGDN.SIGDN_FILESYSPATH));
         try
