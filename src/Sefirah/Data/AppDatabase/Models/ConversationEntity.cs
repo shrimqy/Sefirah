@@ -43,19 +43,25 @@ public class ConversationEntity
         };
     }
 
-    internal async Task<Conversation> ToConversationAsync(SmsRepository repository)
+    internal Task<Conversation> ToConversationAsync(ContactRepository contactRepository)
     {
         if (!string.IsNullOrEmpty(AddressesJson))
         {
             Addresses = JsonSerializer.Deserialize<List<string>>(AddressesJson) ?? [];
         }
 
-        var contacts = new List<Contact>();
+        var contacts = new List<ParticipantInfo>();
         foreach (var address in Addresses)
         {
-            var contactEntity = await repository.GetContactAsync(DeviceId, address);
-            var contact = contactEntity is not null ? await contactEntity.ToContact() : new Contact(address, address);
-            contacts.Add(contact);
+            var contact = contactRepository.GetContactByPhoneNumber(address);
+            if (contact is not null)
+            {
+                contacts.Add(new ParticipantInfo(contact.Address, contact.DisplayName, contact.Avatar));
+            }
+            else
+            {
+                contacts.Add(new ParticipantInfo(address, address));
+            }
         }
 
         string avatarGlyph = string.Empty;
@@ -69,7 +75,7 @@ public class ConversationEntity
         }
         var avatarImage = contacts.Count > 0 ? contacts[0].Avatar : null;
 
-        return new Conversation
+        return Task.FromResult(new Conversation
         {
             ThreadId = ThreadId,
             Contacts = contacts,
@@ -78,7 +84,7 @@ public class ConversationEntity
             HasRead = HasRead,
             AvatarGlyph = avatarGlyph,
             AvatarImage = avatarImage,
-        };
+        });
     }
     #endregion
 }

@@ -1,0 +1,250 @@
+﻿<UserControl
+    x:Class="Sefirah.UserControls.CallView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:Sefirah.Converters"
+    xmlns:helpers="using:Sefirah.Helpers"
+    xmlns:wctconverters="using:CommunityToolkit.WinUI.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <converters:EmptyObjectToVisibilityConverter x:Key="EmptyObjectToVisibilityConverter" />
+        <converters:EmptyObjectToVisibilityConverter x:Key="InverseEmptyObjectToVisibilityConverter" Inverse="True" />
+        <wctconverters:BoolToObjectConverter
+            x:Key="HoldButtonTextConverter"
+            TrueValue="{helpers:ResourceString Name=Resume}"
+            FalseValue="{helpers:ResourceString Name=Hold}" />
+        <wctconverters:BoolToObjectConverter
+            x:Key="MuteButtonTextConverter"
+            TrueValue="{helpers:ResourceString Name=Unmute}"
+            FalseValue="{helpers:ResourceString Name=Mute}" />
+    </UserControl.Resources>
+
+    <Grid Padding="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Primary call -->
+        <Grid Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Grid
+                Grid.Column="0"
+                Width="60"
+                Height="60"
+                VerticalAlignment="Bottom">
+                <PersonPicture
+                    Width="60"
+                    Height="60"
+                    DisplayName="{x:Bind ViewModel.PrimaryCall.CallerHeadline, Mode=OneWay}"
+                    ProfilePicture="{x:Bind ViewModel.PrimaryCall.CallerAvatar, Mode=OneWay}"
+                    Visibility="{x:Bind ViewModel.PrimaryCall.CallerAvatar, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
+                <Border
+                    Width="60"
+                    Height="60"
+                    CornerRadius="30"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    Visibility="{x:Bind ViewModel.PrimaryCall.CallerAvatar, Mode=OneWay, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}">
+                    <FontIcon
+                        Glyph="&#xE77B;"
+                        FontSize="28"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
+                </Border>
+            </Grid>
+
+            <StackPanel
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                Spacing="4"
+                HorizontalAlignment="Stretch">
+                <TextBlock
+                    Text="{x:Bind ViewModel.PrimaryCall.CallerHeadline, Mode=OneWay}"
+                    FontSize="17"
+                    FontWeight="SemiBold"
+                    TextTrimming="CharacterEllipsis"
+                    TextWrapping="NoWrap"
+                    HorizontalAlignment="Left" />
+                <TextBlock
+                    Text="{x:Bind ViewModel.PrimaryCall.StatusText, Mode=OneWay}"
+                    FontSize="12"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    TextTrimming="CharacterEllipsis"
+                    HorizontalAlignment="Left" />
+            </StackPanel>
+
+            <Grid Grid.Column="2" VerticalAlignment="Center" ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="44" />
+                    <ColumnDefinition Width="44" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Spacing="4">
+                    <ToggleButton
+                        Width="36"
+                        Height="36"
+                        Padding="0"
+                        CornerRadius="18"
+                        HorizontalAlignment="Center"
+                        Command="{x:Bind ViewModel.PrimaryCall.ToggleHoldCommand, Mode=OneWay}"
+                        IsChecked="{x:Bind ViewModel.PrimaryCall.IsHoldActive, Mode=OneWay}"
+                        IsEnabled="{x:Bind ViewModel.PrimaryCall.CanToggleHold, Mode=OneWay}"
+                        ToolTipService.ToolTip="{x:Bind ViewModel.PrimaryCall.IsHoldActive, Mode=OneWay, Converter={StaticResource HoldButtonTextConverter}}"
+                        AutomationProperties.Name="{x:Bind ViewModel.PrimaryCall.IsHoldActive, Mode=OneWay, Converter={StaticResource HoldButtonTextConverter}}">
+                        <FontIcon Glyph="&#xE769;" FontSize="16" />
+                    </ToggleButton>
+                    <TextBlock
+                        TextWrapping="NoWrap"
+                        TextTrimming="CharacterEllipsis"
+                        TextAlignment="Center"
+                        FontSize="12"
+                        Text="{x:Bind ViewModel.PrimaryCall.IsHoldActive, Mode=OneWay, Converter={StaticResource HoldButtonTextConverter}}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="4">
+                    <ToggleButton
+                        Width="36"
+                        Height="36"
+                        Padding="0"
+                        CornerRadius="18"
+                        HorizontalAlignment="Center"
+                        Command="{x:Bind ViewModel.PrimaryCall.ToggleMuteCommand, Mode=OneWay}"
+                        IsChecked="{x:Bind ViewModel.PrimaryCall.IsMuteActive, Mode=OneWay}"
+                        IsEnabled="{x:Bind ViewModel.PrimaryCall.CanToggleMute, Mode=OneWay}"
+                        ToolTipService.ToolTip="{x:Bind ViewModel.PrimaryCall.IsMuteActive, Mode=OneWay, Converter={StaticResource MuteButtonTextConverter}}"
+                        AutomationProperties.Name="{x:Bind ViewModel.PrimaryCall.IsMuteActive, Mode=OneWay, Converter={StaticResource MuteButtonTextConverter}}">
+                        <FontIcon Glyph="&#xF781;" FontSize="16" />
+                    </ToggleButton>
+                    <TextBlock
+                        TextAlignment="Center"
+                        FontSize="12"
+                        TextWrapping="NoWrap"
+                        TextTrimming="CharacterEllipsis"
+                        Text="{x:Bind ViewModel.PrimaryCall.IsMuteActive, Mode=OneWay, Converter={StaticResource MuteButtonTextConverter}}" />
+                </StackPanel>
+            </Grid>
+        </Grid>
+
+        <Rectangle Margin="-12,8,0,0" Grid.Row="1" Height="1" Fill="{ThemeResource ControlStrokeColorDefaultBrush}" />
+
+        <!-- Primary call actions -->
+        <Grid Grid.Row="2" Margin="0,8,0,0" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button
+                Grid.Column="0"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                Content="{x:Bind ViewModel.PrimaryCall.AudioRouteButtonText, Mode=OneWay}"
+                Command="{x:Bind ViewModel.PrimaryCall.ToggleAudioRouteCommand, Mode=OneWay}"
+                IsEnabled="{x:Bind ViewModel.PrimaryCall.CanToggleAudioRoute, Mode=OneWay}" />
+
+            <Button
+                Grid.Column="1"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Command="{x:Bind ViewModel.PrimaryCall.EndCallCommand, Mode=OneWay}"
+                Background="#C42B1C"
+                Foreground="White">
+                <Button.Resources>
+                    <SolidColorBrush x:Key="ButtonBackground" Color="#C42B1C" />
+                    <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#AF2619" />
+                    <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#8F1E13" />
+                    <SolidColorBrush x:Key="ButtonBorderBrush" Color="#C42B1C" />
+                    <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#AF2619" />
+                    <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#8F1E13" />
+                    <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="White" />
+                    <SolidColorBrush x:Key="ButtonForegroundPressed" Color="White" />
+                </Button.Resources>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon Glyph="&#xF405;" FontSize="16" Foreground="White" />
+                    <TextBlock Text="{helpers:ResourceString Name=End}" VerticalAlignment="Center" Foreground="White" />
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!-- Secondary call -->
+        <Rectangle
+            Margin="-12,8,0,0"
+            Grid.Row="3"
+            Height="1" Fill="{ThemeResource ControlStrokeColorDefaultBrush}"
+            Visibility="{x:Bind ViewModel.SecondaryCall, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
+
+        <Button
+            Grid.Row="4"
+            HorizontalAlignment="Stretch"
+            Margin="0,8,0,0"
+            Padding="10,8"
+            Command="{x:Bind ViewModel.SwapCallsCommand}"
+            CornerRadius="6"
+            HorizontalContentAlignment="Left"
+            Visibility="{x:Bind ViewModel.SecondaryCall, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}">
+
+            <Grid ColumnSpacing="8" HorizontalAlignment="Left">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Grid
+                    Grid.Column="0"
+                    Width="38"
+                    Height="38"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center">
+                    <PersonPicture
+                        Width="38"
+                        Height="38"
+                        DisplayName="{x:Bind ViewModel.SecondaryCall.CallerHeadline, Mode=OneWay}"
+                        ProfilePicture="{x:Bind ViewModel.SecondaryCall.CallerAvatar, Mode=OneWay}"
+                        Visibility="{x:Bind ViewModel.SecondaryCall.CallerAvatar, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
+                    <Border
+                        Width="38"
+                        Height="38"
+                        CornerRadius="19"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        Visibility="{x:Bind ViewModel.SecondaryCall.CallerAvatar, Mode=OneWay, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}">
+                        <FontIcon
+                            Glyph="&#xE77B;"
+                            FontSize="16"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+                    </Border>
+                </Grid>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                    <TextBlock
+                        Text="{x:Bind ViewModel.SecondaryCall.CallerHeadline, Mode=OneWay}"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        TextTrimming="CharacterEllipsis"
+                        TextWrapping="NoWrap" />
+                    <TextBlock
+                        Text="{helpers:ResourceString Name=SecondaryCallOnHold}"
+                        FontSize="11"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </Grid>
+        </Button>
+    </Grid>
+</UserControl>

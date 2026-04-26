@@ -101,6 +101,7 @@
         <PackageReference Include="CommunityToolkit.WinUI.Extensions" />
         <PackageReference Include="CommunityToolkit.WinUI.Controls.Segmented" />
         <PackageReference Include="H.NotifyIcon.Uno.WinUI" />
+        <PackageReference Include="libphonenumber-csharp" />
         <PackageReference Include="MeaMod.DNS" />
         <PackageReference Include="NAudio" />
         <PackageReference Include="NetCoreServer" />

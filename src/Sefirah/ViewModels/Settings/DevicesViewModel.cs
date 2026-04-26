@@ -1,6 +1,5 @@
 using Microsoft.UI.Dispatching;
 using Sefirah.Data.AppDatabase.Repository;
-using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 
 namespace Sefirah.ViewModels.Settings;
@@ -14,6 +13,7 @@ public partial class DevicesViewModel : ObservableObject
     private ISftpService SftpService { get; } = Ioc.Default.GetRequiredService<ISftpService>();
     private RemoteAppRepository RemoteAppRepository { get; } = Ioc.Default.GetRequiredService<RemoteAppRepository>();
     private SmsRepository SmsRepository { get; } = Ioc.Default.GetRequiredService<SmsRepository>();
+    private CallLogRepository CallLogRepository { get; } = Ioc.Default.GetRequiredService<CallLogRepository>();
     private NotificationRepository NotificationRepository { get; } = Ioc.Default.GetRequiredService<NotificationRepository>();
     #endregion
     
@@ -23,6 +23,21 @@ public partial class DevicesViewModel : ObservableObject
     public DevicesViewModel()
     {
         Dispatcher = DispatcherQueue.GetForCurrentThread();
+        DeviceManager.ActiveDeviceChanged += OnActiveDeviceChanged;
+        UpdateActiveDeviceState(DeviceManager.ActiveDevice);
+    }
+
+    private void OnActiveDeviceChanged(object? sender, PairedDevice? activeDevice)
+    {
+        UpdateActiveDeviceState(activeDevice);
+    }
+
+    private void UpdateActiveDeviceState(PairedDevice? activeDevice)
+    {
+        foreach (var pairedDevice in PairedDevices)
+        {
+            pairedDevice.IsActiveDevice = pairedDevice == activeDevice;
+        }
     }
 
     [RelayCommand]
@@ -66,6 +81,7 @@ public partial class DevicesViewModel : ObservableObject
                 SftpService.Remove(device.Id);
                 RemoteAppRepository.RemoveAllAppsForDeviceAsync(device.Id);
                 SmsRepository.DeleteAllDataForDevice(device.Id);
+                CallLogRepository.DeleteAllCallLogsForDevice(device.Id);
                 NotificationRepository.RemoveNotificationsForDevice(device.Id);
             }
             catch (Exception ex)
@@ -81,5 +97,17 @@ public partial class DevicesViewModel : ObservableObject
                 await errorDialog.ShowAsync();
             }
         }
+    }
+
+    [RelayCommand]
+    public void SelectDevice(PairedDevice? device)
+    {
+        if (device is null || DeviceManager.ActiveDevice == device)
+        {
+            return;
+        }
+
+        DeviceManager.ActiveDevice = device;
+        UpdateActiveDeviceState(device);
     }
 }

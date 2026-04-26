@@ -32,7 +32,12 @@ public interface IPlatformNotificationHandler
 
     void ShowFileTransferNotification(string notificationTitle, string progressTitle, string status, string transferId, uint notificationSequence, double progress);
 
-    Task ShowCallNotification(string title, string text, string tag, Enums.CallState callState, Uri? icon = null);
+    Task ShowCallNotification(string title, string text, string tag, CallState callState, Uri? icon = null);
+
+    /// <summary>
+    /// incoming linked call with Accept / Decline actions.
+    /// </summary>
+    Task ShowCallNotification(string callId, string title, string displayName, Uri? icon = null);
 
     /// <summary>
     /// Registers for platform-specific notification events

@@ -138,6 +138,9 @@ public class DesktopNotificationHandler(
         }
     }
 
+    public Task ShowCallNotification(string callId, string title, string subtitle, Uri? icon = null) =>
+        Task.CompletedTask;
+
     public async Task ShowCallNotification(string title, string text, string tag, Data.Enums.CallState callState, Uri? icon = null)
     {
         if (!await EnsureInitializedAsync() || _notifications is null)

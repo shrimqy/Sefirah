@@ -1,14 +1,13 @@
 using CommunityToolkit.WinUI;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
-using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 using Sefirah.ViewModels.Settings;
 using Sefirah.Views.DevicePreferences;
 using Windows.Graphics;
 using Rect = Windows.Foundation.Rect;
 
-namespace Sefirah.Views;
+namespace Sefirah.Views.WindowViews;
 public sealed partial class DeviceSettingsWindow : Window
 {
     public PairedDevice Device { get; }

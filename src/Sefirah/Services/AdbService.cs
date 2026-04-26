@@ -548,6 +548,24 @@ public class AdbService(
         }
     }
 
+    /// <summary>
+    /// Parses <c>adb connect</c> / <c>adb pair</c> text output. Must not rely on English-only words like
+    /// "refused" because ADB prints localized reasons (e.g. Polish) after an English "cannot connect" prefix.
+    /// </summary>
+    private static bool IsAdbConnectOrPairSuccess(string? message)
+    {
+        if (string.IsNullOrWhiteSpace(message)) return false;
+        var m = message.Trim();
+        if (m.Contains("cannot connect", StringComparison.OrdinalIgnoreCase)) return false;
+        if (m.Contains("cannot resolve", StringComparison.OrdinalIgnoreCase)) return false;
+        if (m.Contains("failed to authenticate", StringComparison.OrdinalIgnoreCase)) return false;
+        if (m.Contains("failed to connect", StringComparison.OrdinalIgnoreCase)) return false;
+        if (m.Contains("unable to connect", StringComparison.OrdinalIgnoreCase)) return false;
+        return m.Contains("connected to", StringComparison.OrdinalIgnoreCase)
+            || m.Contains("already connected to", StringComparison.OrdinalIgnoreCase)
+            || m.Contains("successfully paired", StringComparison.OrdinalIgnoreCase);
+    }
+
     public async Task<bool> ConnectWireless(string host, int port=5555)
     {
         if (string.IsNullOrEmpty(host)) return false;
@@ -556,11 +574,7 @@ public class AdbService(
         {
             var result = await adbClient.ConnectAsync(host, port);
             logger.LogInformation($"adb wireless connection: {result}");
-            if (result.Contains("failed") || result.Contains("refused"))
-            {
-                return false;
-            }
-            return true;
+            return IsAdbConnectOrPairSuccess(result);
         }
         catch (Exception ex)
         {
@@ -575,11 +589,7 @@ public class AdbService(
         try
         {
             var result = await adbClient.PairAsync(host, port, pairingCode);
-            if (result.Contains("failed") || result.Contains("refused"))
-            {
-                return false;
-            }
-            return true;
+            return IsAdbConnectOrPairSuccess(result);
         }
         catch (Exception ex)
         {

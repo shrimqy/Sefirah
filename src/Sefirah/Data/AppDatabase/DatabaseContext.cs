@@ -5,9 +5,10 @@ namespace Sefirah.Data.AppDatabase;
 
 public class DatabaseContext
 {
-    private const int CurrentSchemaVersion = 3;
+    private const int CurrentSchemaVersion = 4;
 
-    private static readonly IMigration[] Migrations = [new SchemaVersion2Migration()];
+    private static readonly IMigration[] Migrations =
+        [new SchemaVersion2Migration(), new SchemaVersion4Migration()];
 
     public SQLiteConnection Database { get; private set; }
 
@@ -110,6 +111,7 @@ public class DatabaseContext
         db.CreateTable<ConversationEntity>();
         db.CreateTable<MessageEntity>();
         db.CreateTable<AttachmentEntity>();
+        db.CreateTable<CallLogEntity>();
         db.CreateTable<NotificationEntity>();
     }
 
@@ -122,6 +124,7 @@ public class DatabaseContext
         db.DropTable<ConversationEntity>();
         db.DropTable<MessageEntity>();
         db.DropTable<AttachmentEntity>();
+        db.DropTable<CallLogEntity>();
         db.DropTable<NotificationEntity>();
         db.DropTable<SchemaVersionEntity>();
     }

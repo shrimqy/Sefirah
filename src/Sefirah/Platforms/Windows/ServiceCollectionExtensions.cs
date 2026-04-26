@@ -12,7 +12,9 @@ using Sefirah.Platforms.Windows.RemoteStorage.Shell.Commands;
 using Sefirah.Platforms.Windows.RemoteStorage.Shell.Local;
 using Sefirah.Platforms.Windows.RemoteStorage.Worker;
 using Sefirah.Platforms.Windows.RemoteStorage.Worker.IO;
+using Sefirah.Platforms.Windows.Bluetooth;
 using Sefirah.Platforms.Windows.Services;
+using Sefirah.Platforms.Windows.Calling;
 
 namespace Sefirah.Platforms.Windows;
 
@@ -40,6 +42,10 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<SyncProviderWorker>();
         services.AddSingleton<ISftpService, WindowsSftpService>();
+        services.AddSingleton<IPhoneLineService, WindowsPhoneLineService>();
+        services.AddSingleton<BluetoothRadioManager>();
+        services.AddSingleton<IBluetoothPairingService, BluetoothPairingService>();
+        services.AddSingleton<BluetoothPairingService>(sp => (BluetoothPairingService)sp.GetRequiredService<IBluetoothPairingService>());
         return services;
     }
 

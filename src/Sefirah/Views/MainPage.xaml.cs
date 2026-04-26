@@ -2,8 +2,6 @@ using System.Collections.Specialized;
 using CommunityToolkit.WinUI.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
-using Sefirah.Data.Contracts;
-using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Utils;
 using Sefirah.ViewModels;
@@ -37,6 +35,32 @@ public sealed partial class MainPage : Page
     private void MainPage_Unloaded(object sender, RoutedEventArgs e)
     {
         ViewModel.PairedDevices.CollectionChanged -= OnPairedDevicesCollectionChanged;
+        MainNavigationView.Loaded -= MainNavigationView_Loaded;
+    }
+
+    private void MainNavigationView_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel.Device is null)
+        {
+            MainNavigationView.SelectedItem = MainNavigationView.SettingsItem;
+            return;
+        }
+
+        if (ApplicationData.Current.LocalSettings.Values[Constants.LocalSettings.MainNavigationSelection] is not string lastActivePage ||
+            !Pages.ContainsKey(lastActivePage))
+        {
+            MainNavigationView.SelectedItem = MainNavigationView.SettingsItem;
+            return;
+        }
+
+        MainNavigationView.SelectedItem = lastActivePage switch
+        {
+            "Settings" => MainNavigationView.SettingsItem,
+            "Calls" => CallsNavigationItem,
+            "Messages" => MessagesNavigationItem,
+            "Apps" => AppsNavigationItem,
+            _ => MainNavigationView.SettingsItem,
+        };
     }
 
     private void OnPairedDevicesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) => TryShowPhoneFrameScrollTeachingTip();
@@ -52,7 +76,7 @@ public sealed partial class MainPage : Page
         PhoneFrameScrollTeachingTip.IsOpen = true;
     }
 
-    private void PhoneFrameScrollTeachingTip_Closed(TeachingTip sender, TeachingTipClosedEventArgs args)
+    private void PhoneFrameScrollTeachingTip_Closed(object? _, TeachingTipClosedEventArgs args)
     {
         IsPhoneFrameScrollTeachingTipShown = true;
     }
@@ -60,6 +84,7 @@ public sealed partial class MainPage : Page
     private readonly Dictionary<string, Type> Pages = new()
     {
         { "Settings", typeof(SettingsPage) },
+        { "Calls", typeof(CallsPage) },
         { "Messages", typeof(MessagesPage) },
         { "Apps", typeof(AppsPage) }
     };
@@ -79,10 +104,11 @@ public sealed partial class MainPage : Page
 
     private void NavigationView_SelectionChanged(NavigationView _, NavigationViewSelectionChangedEventArgs args)
     {
-        if (args.SelectedItem is NavigationViewItem selectedItem && 
+        if (args.SelectedItem is NavigationViewItem selectedItem &&
             selectedItem.Tag?.ToString() is string tag &&
             Pages.TryGetValue(tag, out Type? pageType))
         {
+            ApplicationData.Current.LocalSettings.Values[Constants.LocalSettings.MainNavigationSelection] = tag;
             ContentFrame.Navigate(pageType);
         }
     }
@@ -247,7 +273,7 @@ public sealed partial class MainPage : Page
         }
     }
 
-    private async void DiscoveredDeviceButton_Click(object sender, RoutedEventArgs e)
+    private void DiscoveredDeviceButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button button && button.Tag is DiscoveredDevice device)
         {

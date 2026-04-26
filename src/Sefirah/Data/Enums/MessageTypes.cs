@@ -72,6 +72,19 @@ public enum CallState
     MissedCall
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum CallLogType
+{
+    Incoming,
+    Outgoing,
+    Missed,
+    Voicemail,
+    Rejected,
+    Blocked,
+    AnsweredExternally,
+    Unknown,
+}
+
 /// <summary>
 /// Android AudioManager stream type constants.
 /// </summary>

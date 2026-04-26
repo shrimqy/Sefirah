@@ -1,5 +1,5 @@
 using CommunityToolkit.WinUI;
-using Sefirah.Data.Contracts;
+using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
 using Sefirah.Services;
@@ -9,6 +9,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
 {
     #region Services
     private readonly SmsHandlerService smsHandlerService = Ioc.Default.GetRequiredService<SmsHandlerService>();
+    private readonly ContactRepository contactRepository = Ioc.Default.GetRequiredService<ContactRepository>();
     private readonly IDeviceManager deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
     #endregion
 
@@ -18,7 +19,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
     public ObservableCollection<Contact> SearchContactsResults { get; } = [];
     private HashSet<long> MessageIds { get; set; } = [];
 
-    public ObservableCollection<Contact> Contacts { get; set; } = [];
+    private ObservableCollection<Contact> Contacts { get; set; } = [];
 
     private ObservableCollection<MessageGroup> messageGroups = [];
     public ObservableCollection<MessageGroup> MessageGroups
@@ -67,6 +68,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
     public MessagesViewModel()
     {
+        Contacts = contactRepository.Contacts;
         deviceManager.ActiveDeviceChanged += OnActiveDeviceChanged;
         smsHandlerService.ConversationRemoved += OnConversationRemoved;
         smsHandlerService.ConversationUpdated += OnConversationUpdated;
@@ -91,11 +93,6 @@ public sealed partial class MessagesViewModel : BaseViewModel
         InitializeAsync();
         SelectedConversation = null;
         IsNewConversation = false;
-    }
-
-    private async void LoadContacts()
-    {
-        Contacts = await smsHandlerService.GetAllContactsAsync();
     }
 
     private async Task LoadConversationsForActiveDevice()
@@ -235,12 +232,11 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
         if (Contacts.Count == 0)
         {
-            // if contacts are null, try loading contacts again
-            LoadContacts();
+            return;
         }
 
         var filtered = Contacts
-            .Where(c => c.DisplayName is not null && c.DisplayName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+            .Where(c => c.DisplayName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
                        c.Address.Contains(searchText, StringComparison.OrdinalIgnoreCase))
             .OrderBy(c => c.DisplayName)
             .Take(10)
@@ -317,14 +313,14 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
         foreach (var message in messages)
         {
-            bool shouldStartNewGroup = currentGroup is null || !currentGroup.Sender.Address.Equals(message.Contact.Address, StringComparison.OrdinalIgnoreCase) ||
+            bool shouldStartNewGroup = currentGroup is null || !currentGroup.Sender.Address.Equals(message.Participant.Address, StringComparison.OrdinalIgnoreCase) ||
                 currentGroup.IsReceived != (message.MessageType == 1) || (message.Timestamp - currentGroup.LatestTimestamp) > (groupingThreshold);
 
             if (shouldStartNewGroup)
             {
                 currentGroup = new MessageGroup
                 {
-                    Sender = message.Contact,
+                    Sender = message.Participant,
                     Messages = []
                 };
                 MessageGroups.Add(currentGroup);
@@ -352,7 +348,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
             // First message - create new group
             MessageGroups.Add(new MessageGroup
             {
-                Sender = message.Contact,
+                Sender = message.Participant,
                 Messages = [message]
             });
             return;
@@ -369,7 +365,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
             }
             MessageGroups.Add(new MessageGroup
             {
-                Sender = message.Contact,
+                Sender = message.Participant,
                 Messages = [message]
             });
             return;
@@ -386,7 +382,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
             }
             MessageGroups.Insert(0, new MessageGroup
             {
-                Sender = message.Contact,
+                Sender = message.Participant,
                 Messages = [message]
             });
             return;
@@ -399,7 +395,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
         MessageGroups.Insert(insertIndex, new MessageGroup
         {
-            Sender = message.Contact,
+            Sender = message.Participant,
             Messages = [message]
         });
     }
@@ -449,7 +445,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
     private static bool CanGroupWith(Message message, MessageGroup group)
     {
-        return group.Sender.Address.Equals(message.Contact.Address, StringComparison.OrdinalIgnoreCase) &&
+        return group.Sender.Address.Equals(message.Participant.Address, StringComparison.OrdinalIgnoreCase) &&
                group.IsReceived == (message.MessageType == 1) &&
                Math.Abs(message.Timestamp - GetClosestTimestamp(message, group)) <= groupingThreshold;
     }

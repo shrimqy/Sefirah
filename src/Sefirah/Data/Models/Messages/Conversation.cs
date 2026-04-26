@@ -6,7 +6,7 @@ public partial class Conversation : ObservableObject
 {
     public long ThreadId { get; set; }
 
-    public List<Contact> Contacts { get; set; } = [];
+    public List<ParticipantInfo> Contacts { get; set; } = [];
 
     public string? AvatarGlyph { get; set; } = string.Empty;
 

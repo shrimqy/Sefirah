@@ -7,13 +7,11 @@ using Sefirah.Views.Onboarding;
 using Windows.ApplicationModel.Activation;
 using LaunchActivatedEventArgs = Microsoft.UI.Xaml.LaunchActivatedEventArgs;
 using H.NotifyIcon;
-using Sefirah.Data.Contracts;
 using System.Runtime.InteropServices;
-using Sefirah.Data.Enums;
 using Microsoft.UI.Windowing;
 using WinRT.Interop;
 using Sefirah.Data.Models;
-
+using Sefirah.Views.WindowViews;
 
 #if WINDOWS
 using Sefirah.Platforms.Windows.Helpers;

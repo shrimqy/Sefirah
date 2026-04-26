@@ -3,7 +3,7 @@ using Sefirah.Data.Models;
 
 namespace Sefirah.Data.AppDatabase.Repository;
 
-public class SmsRepository(DatabaseContext context, ILogger logger)
+public class SmsRepository(DatabaseContext context, ContactRepository contactRepository, ILogger logger)
 {
     #region Conversation Operations
 
@@ -67,7 +67,7 @@ public class SmsRepository(DatabaseContext context, ILogger logger)
 
         context.Database.Table<MessageEntity>().Where(m => m.DeviceId == deviceId).Delete();
         context.Database.Table<ConversationEntity>().Where(c => c.DeviceId == deviceId).Delete();
-        context.Database.Table<ContactEntity>().Where(c => c.DeviceId == deviceId).Delete();
+        contactRepository.DeleteAllContactsForDevice(deviceId);
 
         logger.LogInformation("Deleted all SMS data for device {DeviceId}", deviceId);
     }
@@ -171,41 +171,6 @@ public class SmsRepository(DatabaseContext context, ILogger logger)
             logger.LogError(ex, "Error deleting message {UniqueId} for device {DeviceId}", uniqueId, deviceId);
             return false;
         }
-    }
-
-    #endregion
-
-    #region Contact Operations
-
-    public async Task<List<ContactEntity>> GetAllContactsAsync()
-    {
-        return await Task.Run(() => context.Database.Table<ContactEntity>().ToList());
-    }
-
-    public async Task<List<ContactEntity>> GetContactsForDevice(string deviceId)
-    {
-        return await Task.Run(() => context.Database.Table<ContactEntity>()
-            .Where(c => c.DeviceId == deviceId)
-            .OrderByDescending(n => n.DisplayName)
-            .ToList());
-    }
-
-    public async Task<ContactEntity?> GetContactAsync(string deviceId, string phoneNumber)  
-    {
-        return await Task.Run(() => context.Database.Table<ContactEntity>()
-            .FirstOrDefault(c => c.DeviceId == deviceId && c.Number == phoneNumber));
-    }
-
-    public async Task<ContactEntity?> GetContactByIdAsync(string deviceId, string contactId)
-    {
-        return await Task.Run(() => context.Database.Table<ContactEntity>()
-            .FirstOrDefault(c => c.DeviceId == deviceId && c.Id == contactId));
-    }
-
-    public async Task SaveContactAsync(string deviceId, ContactInfo contact)
-    {
-        var contactEntity = contact.ToEntity(deviceId);
-        await Task.Run(() => context.Database.InsertOrReplace(contactEntity));
     }
 
     #endregion

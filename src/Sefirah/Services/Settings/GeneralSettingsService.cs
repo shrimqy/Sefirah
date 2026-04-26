@@ -1,14 +1,13 @@
 using CommunityToolkit.WinUI;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
-using Sefirah.Data.Contracts;
-using Sefirah.Data.Enums;
 using Sefirah.Data.Models.Actions;
 using Sefirah.Utils.Serialization;
 using Windows.UI;
 using Windows.UI.ViewManagement;
 
 namespace Sefirah.Services.Settings;
+
 internal sealed partial class GeneralSettingsService : BaseObservableJsonSettings, IGeneralSettingsService
 {
     private readonly UISettings _uiSettings = new();

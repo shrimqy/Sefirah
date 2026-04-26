@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="using:Sefirah.Converters"
     xmlns:wctconverters="using:CommunityToolkit.WinUI.Converters"
+    xmlns:data="using:Sefirah.Data.Models"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:entity="using:Sefirah.Data.AppDatabase.Models"
     xmlns:helpers="using:Sefirah.Helpers"
@@ -109,7 +110,7 @@
         OpenPaneLength="420"
         PaneBackground="Transparent">
 
-        <!--  Left panel - Contacts/Message threads list  -->
+        <!--  Left panel - Message threads list  -->
         <SplitView.Pane>
             <Grid>
                 <Grid.RowDefinitions>
@@ -126,8 +127,8 @@
 
                     <TextBlock
                         Grid.Column="0"
-                        Margin="16,12"
-                        FontSize="20"
+                        Margin="16,16,0,0"
+                        FontSize="24"
                         FontWeight="SemiBold"
                         Text="{helpers:ResourceString Name=Messages}" />
 
@@ -351,7 +352,7 @@
                         TextChanged="AddressInput_TextChanged"
                         UpdateTextOnSelect="False">
                         <AutoSuggestBox.ItemTemplate>
-                            <DataTemplate x:DataType="models:Contact">
+                            <DataTemplate x:DataType="data:Contact">
                                 <Grid Margin="0,8,0,8">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
@@ -412,7 +413,7 @@
                     ItemsSource="{x:Bind ViewModel.NewConversationRecipients, Mode=OneWay}"
                     Visibility="{x:Bind ViewModel.IsNewConversation, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="models:Contact">
+                        <DataTemplate x:DataType="data:Contact">
                             <Border
                                 Padding="4,4"
                                 HorizontalAlignment="Left"

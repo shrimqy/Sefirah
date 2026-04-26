@@ -1,6 +1,5 @@
 using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Repository;
-using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 
 namespace Sefirah.Services;
@@ -17,6 +16,7 @@ public class MessageHandler(
     ISftpService sftpService,
     ISessionManager sessionManager,
     ICallHandler callHandler,
+    IBluetoothPairingService bluetoothPairingService,
     ILogger<MessageHandler> logger) : IMessageHandler
 {
     public async void HandleMessageAsync(PairedDevice device, SocketMessage message)
@@ -92,6 +92,14 @@ public class MessageHandler(
 
                 case CallInfo callInfo:
                     await callHandler.HandleCallInfoAsync(device, callInfo);
+                    break;
+
+                case CallLogInfo callLogInfo:
+                    await callHandler.HandleCallLogInfoAsync(device, callLogInfo);
+                    break;
+
+                case BluetoothPairingResult pairingResult:
+                    bluetoothPairingService.HandleBluetoothPairingResult(device, pairingResult);
                     break;
 
                 case Disconnect:

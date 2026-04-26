@@ -1,6 +1,6 @@
 using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
-using Sefirah.Data.Contracts;
+using Sefirah.Platforms.Windows.Calling;
 using Sefirah.Services;
 using Sefirah.Utils;
 using Windows.System;
@@ -11,7 +11,9 @@ namespace Sefirah.Platforms.Windows.Services;
 /// <summary>
 /// Windows implementation of the platform notification handler
 /// </summary>
-public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionManager, IDeviceManager deviceManager) : IPlatformNotificationHandler
+public class WindowsNotificationHandler(
+    ILogger logger,
+    IDeviceManager deviceManager) : IPlatformNotificationHandler
 {
     /// <inheritdoc />
     public async Task ShowRemoteNotification(Data.Models.NotificationInfo message, string deviceId)
@@ -175,11 +177,11 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
 
 
     /// <inheritdoc />
-    public Task ShowCallNotification(string title, string text, string tag, Data.Enums.CallState callState, Uri? icon = null)
+    public Task ShowCallNotification(string title, string text, string tag, CallState callState, Uri? icon = null)
     {
         try
         {
-            var soundEvent = callState is Data.Enums.CallState.MissedCall
+            var soundEvent = callState is CallState.MissedCall
                 ? AppNotificationSoundEvent.Default
                 : AppNotificationSoundEvent.Call;
 
@@ -201,6 +203,45 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to show call notification");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    /// <inheritdoc />
+    public Task ShowCallNotification(string callId, string title, string subtitle, Uri? icon = null)
+    {
+        try
+        {
+            var builder = new AppNotificationBuilder()
+                .AddText(title, new AppNotificationTextProperties().SetMaxLines(1))
+                .AddText(subtitle)
+                .SetTag(callId)
+                .SetGroup(Notification.IncomingPhoneCallGroup)
+                .SetAudioEvent(AppNotificationSoundEvent.Call)
+                .AddButton(new AppNotificationButton("ConnectionRequestAcceptButton".GetLocalizedResource())
+                    .SetButtonStyle(AppNotificationButtonStyle.Success)
+                    .AddArgument("notificationType", ToastNotificationType.IncomingPhoneCall)
+                    .AddArgument("action", "accept")
+                    .AddArgument("callId", callId))
+                .AddButton(new AppNotificationButton("ConnectionRequestRejectButton".GetLocalizedResource())
+                    .SetButtonStyle(AppNotificationButtonStyle.Critical)
+                    .AddArgument("notificationType", ToastNotificationType.IncomingPhoneCall)
+                    .AddArgument("action", "decline")
+                    .AddArgument("callId", callId));
+
+            if (icon is not null)
+            {
+                builder.SetAppLogoOverride(icon, AppNotificationImageCrop.Circle);
+            }
+
+            var notification = builder.BuildNotification();
+            notification.ExpiresOnReboot = true;
+            AppNotificationManager.Default.Show(notification);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to show incoming phone call notification for {CallId}", callId);
         }
 
         return Task.CompletedTask;
@@ -277,7 +318,11 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
                 case ToastNotificationType.Update:
                     HandleUpdateNotification(args);
                     break;
-                
+
+                case ToastNotificationType.IncomingPhoneCall:
+                    await HandleIncomingPhoneCallNotificationAsync(args);
+                    break;
+
                 default:
                     logger.LogWarning("Unhandled notification type: {NotificationType}", notificationType);
                     break;
@@ -343,6 +388,57 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
                     break;
             }
         }
+    }
+
+    private async Task HandleIncomingPhoneCallNotificationAsync(AppNotificationActivatedEventArgs args)
+    {
+        if (!args.Arguments.TryGetValue("action", out var action) ||
+            !args.Arguments.TryGetValue("callId", out var callId) ||
+            string.IsNullOrWhiteSpace(callId))
+        {
+            return;
+        }
+
+        await AppNotificationManager.Default.RemoveByTagAsync(callId).AsTask();
+
+        var call = PhoneCall.FromCallId(callId);
+        if (call is null)
+        {
+            logger.LogInformation("Incoming call notification action {Action}: no session for {CallId}", action, callId);
+            return;
+        }
+
+        if (action == "decline")
+        {
+            try
+            {
+                await call.RejectIncomingAsync();
+            }
+            finally
+            {
+                call.Dispose();
+            }
+
+            return;
+        }
+
+        if (action != "accept")
+        {
+            call.Dispose();
+            return;
+        }
+
+        try
+        {
+            await call.AcceptIncomingAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "AcceptIncomingAsync failed for {CallId}", callId);
+            call.Dispose();
+            return;
+        }
+        call.Dispose();
     }
 
     private void HandleMessageNotification(AppNotificationActivatedEventArgs args)

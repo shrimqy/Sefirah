@@ -31,6 +31,12 @@ public class PairedDeviceEntity
         set => AddressesJson = value is null ? null : JsonSerializer.Serialize(value);
     }
 
+    public string? CallsTransportDeviceId { get; set; }
+
+    public string? BluetoothAddress { get; set; }
+
+    public string? BluetoothClassicDeviceId { get; set; }
+
     [Column("PhoneNumbers")]
     public string? PhoneNumbersJson { get; set; }
 
@@ -52,6 +58,9 @@ public class PairedDeviceEntity
             Addresses = Addresses,
             PhoneNumbers = PhoneNumbers,
             Wallpaper = await ImageHelper.ToBitmapAsync(WallpaperBytes),
+            CallsTransportDeviceId = CallsTransportDeviceId,
+            BluetoothAddress = BluetoothAddress,
+            BluetoothClassicDeviceId = BluetoothClassicDeviceId,
         };
     }
     #endregion

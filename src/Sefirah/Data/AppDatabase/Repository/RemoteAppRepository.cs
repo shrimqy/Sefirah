@@ -1,5 +1,4 @@
 using Sefirah.Data.AppDatabase.Models;
-using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Utils;
 
