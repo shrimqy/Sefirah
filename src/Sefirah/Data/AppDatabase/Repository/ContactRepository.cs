@@ -1,14 +1,16 @@
+using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Models;
 using Sefirah.Data.Models;
 using Sefirah.Utils;
+using System.Collections.Concurrent;
 
 namespace Sefirah.Data.AppDatabase.Repository;
 
 public class ContactRepository(DatabaseContext context, ILogger<ContactRepository> logger)
 {
-    private readonly SemaphoreSlim contactsSemaphore = new(1, 1);
+    private readonly ConcurrentDictionary<string, Contact> contactsById = new(StringComparer.Ordinal);
 
-    public ObservableCollection<Contact> Contacts { get; } = [];
+    public IEnumerable<Contact> Contacts => contactsById.Values;
 
     public async Task<List<ContactEntity>> GetAllContactsAsync()
     {
@@ -83,26 +85,43 @@ public class ContactRepository(DatabaseContext context, ILogger<ContactRepositor
         return new CallerContact(contact.Address, contact.DisplayName, contact.Avatar);
     }
 
-    public async Task SaveContactAsync(string deviceId, ContactInfo contact)
+    public async Task SaveContactAsync(string deviceId, ContactInfo contactInfo)
     {
-        var contactEntity = contact.ToEntity(deviceId);
+        if (string.IsNullOrWhiteSpace(contactInfo.Id)) return;
+        if (contactsById.ContainsKey(contactInfo.Id)) return;
+
+        var contactEntity = contactInfo.ToEntity(deviceId);
         await Task.Run(() => context.Database.InsertOrReplace(contactEntity));
+
+        contactsById[contactInfo.Id] = await App.MainWindow.DispatcherQueue.EnqueueAsync(() => contactEntity.ToContact());
     }
 
     public async Task LoadContacts()
     {
-        await contactsSemaphore.WaitAsync();
-        try
+        var contacts = await GetAllContactsAsync();
+        var models = await Task.WhenAll(contacts.Select(c => c.ToContact()));
+
+        contactsById.Clear();
+        foreach (var contact in models)
         {
-            var contacts = await GetAllContactsAsync();
-            var models = await Task.WhenAll(contacts.Select(c => c.ToContact()));
-            Contacts.Clear();
-            Contacts.AddRange(models);
+            contactsById[contact.Id] = contact;
         }
-        finally
+    }
+
+    public List<Contact> SearchContacts(string searchText, int take = 10)
+    {
+        if (string.IsNullOrWhiteSpace(searchText))
         {
-            contactsSemaphore.Release();
+            return [];
         }
+
+        return Contacts
+            .Where(c =>
+                (c.DisplayName?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                c.Address.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(c => c.DisplayName)
+            .Take(take)
+            .ToList();
     }
 
     /// <summary>

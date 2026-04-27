@@ -35,13 +35,13 @@ public class CallLogEntity
         };
     }
 
-    public Task<CallLog> ToCallLogAsync(CallerContact? contact)
+    public CallLog ToCallLogAsync(CallerContact? contact = null)
     {
         var displayName = contact is null || string.IsNullOrWhiteSpace(contact.DisplayName)
             ? PhoneNumber
             : contact.DisplayName;
 
-        return Task.FromResult(new CallLog
+        return new CallLog
         {
             CallLogId = CallLogId,
             PhoneNumber = PhoneNumber,
@@ -50,6 +50,6 @@ public class CallLogEntity
             CallType = CallType,
             DisplayName = displayName,
             AvatarImage = contact?.Avatar,
-        });
+        };
     }
 }

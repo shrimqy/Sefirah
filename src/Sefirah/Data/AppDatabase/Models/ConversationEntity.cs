@@ -43,7 +43,7 @@ public class ConversationEntity
         };
     }
 
-    internal Task<Conversation> ToConversationAsync(ContactRepository contactRepository)
+    internal async Task<Conversation> ToConversationAsync(ContactRepository contactRepository)
     {
         if (!string.IsNullOrEmpty(AddressesJson))
         {
@@ -75,7 +75,7 @@ public class ConversationEntity
         }
         var avatarImage = contacts.Count > 0 ? contacts[0].Avatar : null;
 
-        return Task.FromResult(new Conversation
+        return new Conversation
         {
             ThreadId = ThreadId,
             Contacts = contacts,
@@ -84,7 +84,7 @@ public class ConversationEntity
             HasRead = HasRead,
             AvatarGlyph = avatarGlyph,
             AvatarImage = avatarImage,
-        });
+        };
     }
     #endregion
 }

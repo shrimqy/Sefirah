@@ -5,6 +5,8 @@ using Sefirah.Data.Models;
 namespace Sefirah.Services;
 public class MessageHandler(
     RemoteAppRepository remoteAppRepository,
+    CallLogRepository callLogRepository,
+    ContactRepository contactRepository,
     IDeviceManager deviceManager,
     INotificationService notificationService,
     IClipboardService clipboardService,
@@ -71,7 +73,7 @@ public class MessageHandler(
                     break;
 
                 case ContactInfo contactMessage:
-                    await smsHandlerService.HandleContactMessage(device.Id, contactMessage);
+                    await contactRepository.SaveContactAsync(device.Id, contactMessage);
                     break;
 
                 case ActionInfo action:
@@ -95,7 +97,7 @@ public class MessageHandler(
                     break;
 
                 case CallLogInfo callLogInfo:
-                    await callHandler.HandleCallLogInfoAsync(device, callLogInfo);
+                    await callLogRepository.SaveCallLogAsync(device.Id, callLogInfo);
                     break;
 
                 case BluetoothPairingResult pairingResult:

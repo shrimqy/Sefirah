@@ -16,7 +16,6 @@ public sealed partial class CallsPageViewModel : BaseViewModel
     private readonly ContactRepository contactRepository = Ioc.Default.GetRequiredService<ContactRepository>();
     #endregion
 
-    private ObservableCollection<Contact> Contacts { get; set; } = [];
     public ObservableCollection<CallLog> CallLogs { get; } = [];
 
     #region Properties
@@ -96,7 +95,6 @@ public sealed partial class CallsPageViewModel : BaseViewModel
     {
         PhoneNumber = string.Empty;
         ContactSearchQuery = string.Empty;
-        Contacts = contactRepository.Contacts;
         deviceManager.ActiveDeviceChanged += OnActiveDeviceChanged;
         phoneLineService.LineStatusChanged += OnLineStatusChanged;
         callLogRepository.CallLogUpdated += OnCallLogUpdated;
@@ -121,9 +119,6 @@ public sealed partial class CallsPageViewModel : BaseViewModel
         });
     }
 
-    partial void OnDialContactDisplayNameChanged(string? value)
-    {
-    }
 
     private void ClearDialContactVisual()
     {
@@ -138,7 +133,7 @@ public sealed partial class CallsPageViewModel : BaseViewModel
 
         App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {
-            var existing = CallLogs.FirstOrDefault(log => IsSameLog(log, callLog));
+            var existing = CallLogs.FirstOrDefault(log => log.CallLogId == callLog.CallLogId);
             if (existing is not null)
             {
                 var existingIndex = CallLogs.IndexOf(existing);
@@ -148,6 +143,9 @@ public sealed partial class CallsPageViewModel : BaseViewModel
             }
 
             InsertOrdered(callLog);
+
+            OnPropertyChanged(nameof(ShowCallLogEmpty));
+            OnPropertyChanged(nameof(ShowCallLogList));
         });
     }
 
@@ -171,11 +169,6 @@ public sealed partial class CallsPageViewModel : BaseViewModel
         {
             IsLoadingCallLogs = false;
         }
-    }
-
-    private static bool IsSameLog(CallLog left, CallLog right)
-    {
-        return left.CallLogId == right.CallLogId;
     }
 
     private void InsertOrdered(CallLog callLog)
@@ -235,21 +228,7 @@ public sealed partial class CallsPageViewModel : BaseViewModel
     {
         ContactSearchResults.Clear();
         if (string.IsNullOrWhiteSpace(searchText)) return;
-
-        if (Contacts.Count == 0)
-        {
-            return;
-        }
-
-        var filtered = Contacts
-            .Where(c =>
-                (c.DisplayName?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                c.Address.Contains(searchText, StringComparison.OrdinalIgnoreCase))
-            .OrderBy(c => c.DisplayName)
-            .Take(10)
-            .ToList();
-
-        ContactSearchResults.AddRange(filtered);
+        ContactSearchResults.AddRange(contactRepository.SearchContacts(searchText));
     }
 
     public void ApplyContactToDialer(Contact contact)

@@ -19,8 +19,6 @@ public sealed partial class MessagesViewModel : BaseViewModel
     public ObservableCollection<Contact> SearchContactsResults { get; } = [];
     private HashSet<long> MessageIds { get; set; } = [];
 
-    private ObservableCollection<Contact> Contacts { get; set; } = [];
-
     private ObservableCollection<MessageGroup> messageGroups = [];
     public ObservableCollection<MessageGroup> MessageGroups
     {
@@ -68,7 +66,6 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
     public MessagesViewModel()
     {
-        Contacts = contactRepository.Contacts;
         deviceManager.ActiveDeviceChanged += OnActiveDeviceChanged;
         smsHandlerService.ConversationRemoved += OnConversationRemoved;
         smsHandlerService.ConversationUpdated += OnConversationUpdated;
@@ -229,20 +226,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
         SearchContactsResults.Clear();
 
         if (string.IsNullOrWhiteSpace(searchText)) return;
-
-        if (Contacts.Count == 0)
-        {
-            return;
-        }
-
-        var filtered = Contacts
-            .Where(c => c.DisplayName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
-                       c.Address.Contains(searchText, StringComparison.OrdinalIgnoreCase))
-            .OrderBy(c => c.DisplayName)
-            .Take(10)
-            .ToList();
-
-        SearchContactsResults.AddRange(filtered);
+        SearchContactsResults.AddRange(contactRepository.SearchContacts(searchText));
     }
 
     private void OnConversationRemoved(object? sender, (string DeviceId, long ThreadId) args)

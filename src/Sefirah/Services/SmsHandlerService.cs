@@ -1,3 +1,4 @@
+using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
@@ -6,7 +7,7 @@ namespace Sefirah.Services;
 public class SmsHandlerService(
     SmsRepository smsRepository,
     ContactRepository contactRepository,
-    ILogger<SmsHandlerService> logger)
+    ILogger logger)
 {
     private readonly SemaphoreSlim semaphore = new(1, 1);
 
@@ -70,7 +71,9 @@ public class SmsHandlerService(
         {
             var address = tm.Addresses.Count > 0 ? tm.Addresses[0] : string.Empty;
             var contactEntity = await contactRepository.GetContactAsync(deviceId, address);
-            var participant = contactEntity is not null ? await contactEntity.ToParticipantInfo() : new ParticipantInfo(address, address);
+            var participant = contactEntity is not null
+                ? await App.MainWindow.DispatcherQueue.EnqueueAsync(() => contactEntity.ToParticipantInfo())
+                : new ParticipantInfo(address, address);
             messages.Add(new Message
             {
                 UniqueId = tm.UniqueId,
@@ -163,7 +166,6 @@ public class SmsHandlerService(
             var message = await entity.ToMessageAsync(contactRepository);
             messages.Add(message);
         }
-            
         return messages;
     }
 
@@ -177,18 +179,5 @@ public class SmsHandlerService(
         };
 
         device.SendMessage(threadRequest);
-    }
-
-    public async Task HandleContactMessage(string deviceId, ContactInfo contactMessage)
-    {
-        try
-        {
-            await contactRepository.SaveContactAsync(deviceId, contactMessage);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error handling contact message {ContactId} for device {DeviceId}", 
-                contactMessage.Id, deviceId);
-        }
     }
 }

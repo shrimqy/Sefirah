@@ -217,11 +217,6 @@ public class CallHandlerService(
         ActiveCallChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    public async Task HandleCallLogInfoAsync(PairedDevice device, CallLogInfo callLogInfo)
-    {
-        await callLogRepository.SaveCallLogAsync(device.Id, callLogInfo);
-    }
-
     private void UpdateActiveCallWindowSize()
     {
         ActiveCallWindow?.UpdateWindowSize(SecondaryCall is not null);
