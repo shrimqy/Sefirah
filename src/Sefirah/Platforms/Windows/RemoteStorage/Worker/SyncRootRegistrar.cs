@@ -48,14 +48,12 @@ public class SyncRootRegistrar(
             UpdateCredentials(id, context);
         }
 
-        string iconPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Assets\\Icons", "IconResource.dll"));
-        
         var info = new StorageProviderSyncRootInfo
         {
             Id = id,
             Path = directory,
             DisplayNameResource = command.Name,
-            IconResource = $"{iconPath},0",
+            IconResource = command.IconResource,
             HydrationPolicy = StorageProviderHydrationPolicy.Full,
             HydrationPolicyModifier = StorageProviderHydrationPolicyModifier.AutoDehydrationAllowed |
                                      StorageProviderHydrationPolicyModifier.AllowFullRestartHydration,

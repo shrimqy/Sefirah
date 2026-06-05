@@ -11,4 +11,5 @@ public struct RegisterSyncRootCommand
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 500)]
     public string Directory;
     public PopulationPolicy PopulationPolicy;
+    public string IconResource;
 }

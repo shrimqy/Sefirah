@@ -8,9 +8,11 @@
     xmlns:local="using:Sefirah.Views.Settings"
     xmlns:items="using:Sefirah.Data.Items"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:not_win="http://uno.ui/not_win"
     xmlns:vm="using:Sefirah.ViewModels.Settings"
+    xmlns:win="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:wuc="using:CommunityToolkit.WinUI.Controls"
-    mc:Ignorable="d">
+    mc:Ignorable="d not_win">
 
     <Page.DataContext>
         <vm:GeneralViewModel x:Name="ViewModel" />
@@ -101,6 +103,16 @@
                 </wuc:SettingsCard.HeaderIcon>
                 <Button Click="SelectRemoteLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
             </wuc:SettingsCard>
+
+            <win:StackPanel Spacing="4">
+                <!--  Remove All Sync Roots  -->
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=RemoveAllSyncRootsDescription}" Header="{helpers:ResourceString Name=RemoveAllSyncRoots}">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <SymbolIcon Symbol="Delete" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <Button Command="{x:Bind ViewModel.RemoveAllSyncRootsCommand}" Content="{helpers:ResourceString Name=RemoveAllSyncRoots}" />
+                </wuc:SettingsCard>
+            </win:StackPanel>
 
             <!--  Local Device Name  -->
             <wuc:SettingsCard Header="{helpers:ResourceString Name=DeviceName}">

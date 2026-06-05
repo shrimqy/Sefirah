@@ -12,6 +12,7 @@ public sealed partial class GeneralViewModel : BaseViewModel
     private readonly IUserSettingsService UserSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
     private readonly IDeviceManager _deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
     private readonly IAdbService AdbService = Ioc.Default.GetRequiredService<IAdbService>();
+    private readonly ISftpService SftpService = Ioc.Default.GetRequiredService<ISftpService>();
     #endregion
 
     #region Properties
@@ -183,6 +184,12 @@ public sealed partial class GeneralViewModel : BaseViewModel
         selectedAppLanguageIndex = AppLanguageHelper.SupportedLanguages.IndexOf(AppLanguageHelper.PreferredLanguage);
         // Load initial local device name
         LoadLocalDeviceName();
+    }
+
+    [RelayCommand]
+    private void RemoveAllSyncRoots()
+    {
+        SftpService.RemoveAll();
     }
 
     private void LoadLocalDeviceName()

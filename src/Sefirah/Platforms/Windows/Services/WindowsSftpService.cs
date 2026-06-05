@@ -1,6 +1,5 @@
-using System.Security.Principal;
-using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
+using Sefirah.Platforms.Windows.Abstractions;
 using Sefirah.Platforms.Windows.RemoteStorage.Commands;
 using Sefirah.Platforms.Windows.RemoteStorage.Sftp;
 using Sefirah.Platforms.Windows.RemoteStorage.Worker;
@@ -11,91 +10,89 @@ namespace Sefirah.Platforms.Windows.Services;
 public class WindowsSftpService(
     ILogger logger,
     SyncRootRegistrar registrar,
-    SyncProviderPool syncProviderPool,  
+    SyncProviderPool syncProviderPool,
     IUserSettingsService userSettingsService
     ) : ISftpService
 {
-    private StorageProviderSyncRootInfo? info;
+    private static readonly string IconDllPath = Path.GetFullPath(
+        Path.Combine(AppContext.BaseDirectory, "Assets\\Icons", "IconResource.dll"));
 
-    /// <summary>
-    /// Initializes the sftp service with the server information and shell services.
-    /// </summary>
     public async Task InitializeAsync(PairedDevice device, SftpServerInfo info)
     {
         if (!device.DeviceSettings.StorageAccess) return;
+        if (!StorageProviderSyncRootManager.IsSupported()) return;
 
         try
         {
-            if (!StorageProviderSyncRootManager.IsSupported()) return;
+            logger.Info($"Initializing SFTP service, IP: {info.IpAddress}, Port: {info.Port}, Username: {info.Username}");
 
-            logger.LogInformation("Initializing SFTP service, IP: {ip}, Port: {port}, Username: {name}",
-                info.IpAddress, info.Port, info.Username);
+            var baseDirectory = userSettingsService.GeneralSettingsService.RemoteStoragePath;
+            Directory.CreateDirectory(baseDirectory);
 
-            var sftpContext = new SftpContext
+            var deviceDirectory = Path.Combine(baseDirectory, device.Name);
+            Directory.CreateDirectory(deviceDirectory);
+
+            var paths = info.Paths.Count > 0 ? info.Paths : ["/"];
+            var pathNames = info.PathNames;
+            var multiVolume = paths.Count > 1;
+
+            for (int i = 0; i < paths.Count; i++)
             {
-                Host = info.IpAddress,
-                Port = info.Port,
-                Directory = "/",
-                Username = info.Username,
-                Password = info.Password,
-                WatchPeriodSeconds = 2,
-            };
+                var rawVolumeName = pathNames.Count > i ? pathNames[i] : $"Volume {i}";
+                var syncRootName = multiVolume ? $"{device.Name} - {rawVolumeName}" : device.Name;
+                var volumeDirectory = multiVolume ? Path.Combine(deviceDirectory, rawVolumeName) : deviceDirectory;
 
-            // Parent directory for all devices
-            var directory = userSettingsService.GeneralSettingsService.RemoteStoragePath;
-            if (!Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
+                Directory.CreateDirectory(volumeDirectory);
+
+                var sftpContext = new SftpContext
+                {
+                    Host = info.IpAddress,
+                    Port = info.Port,
+                    Directory = paths[i],
+                    Username = info.Username,
+                    Password = info.Password,
+                    WatchPeriodSeconds = 2,
+                };
+
+                await Register(syncRootName, volumeDirectory, $"{device.Id}_{i}", $"{IconDllPath},{i}", sftpContext);
             }
-
-            // Device-specific directory
-            var deviceDirectory = Path.Combine(directory, device.Name);
-            if (!Directory.Exists(deviceDirectory))
-            {
-                Directory.CreateDirectory(deviceDirectory);
-            }
-            
-            await Register(
-                name: device.Name,
-                directory: deviceDirectory,
-                accountId: device.Id,
-                context: sftpContext
-            );
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to initialize SFTP service");
-            throw;
+            logger.Error("Failed to initialize SFTP service", ex);
         }
     }
 
+    public async void RemoveAll()
+    {
+        await StopAndUnregister(registrar.GetSyncRoots());
+    }
 
-    /// <summary>
-    /// Removes the sync root registration for the specified device ID.
-    /// </summary>
     public async void Remove(string deviceId)
     {
+        var syncRoots = registrar.GetSyncRoots().Where(r => r.Id.Contains($"!{deviceId}_"));
+        await StopAndUnregister(syncRoots);
+    }
+
+    private async Task StopAndUnregister(IEnumerable<SyncRootInfo> syncRoots)
+    {
         try
         {
-            var id = $"Shrimqy:Sefirah!{WindowsIdentity.GetCurrent().User}!{deviceId}";
-            if (info?.Id == id)
+            foreach (var syncRoot in syncRoots.ToList())
             {
-                await syncProviderPool.StopSyncRoot(info);
-            }
-            if (registrar.IsRegistered(id))
-            {
-                registrar.Unregister(id);
+                await syncProviderPool.Stop(syncRoot.Id);
+                registrar.Unregister(syncRoot.Id);
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error removing sync root for device {deviceId}", deviceId);
+            logger.Error("Error removing sync roots", ex);
         }
     }
 
-    private async Task Register<T>(string name, string directory, string accountId, T context) where T : struct 
+    private async Task Register(string name, string directory, string accountId, string iconResource, SftpContext context)
     {
-        try 
+        try
         {
             var registerCommand = new RegisterSyncRootCommand
             {
@@ -103,20 +100,20 @@ public class WindowsSftpService(
                 Directory = directory,
                 AccountId = accountId,
                 PopulationPolicy = PopulationPolicy.Full,
+                IconResource = iconResource,
             };
 
-            StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(directory);
-
-            info = registrar.Register(registerCommand, storageFolder, context);
-            if (info is not null)
+            var storageFolder = await StorageFolder.GetFolderFromPathAsync(directory);
+            var syncRootInfo = registrar.Register(registerCommand, storageFolder, context);
+            if (syncRootInfo is not null)
             {
-                syncProviderPool.Start(info);
-                logger.LogDebug("Starting sync provider pool");
+                syncProviderPool.Start(syncRootInfo);
+                logger.Debug($"Started sync provider for {name} ({accountId})");
             }
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to register sync root. Directory: {directory}, AccountId: {accountId}", directory, accountId);
+            logger.Error($"Failed to register sync root. Directory: {directory}, AccountId: {accountId}", ex);
         }
     }
 }

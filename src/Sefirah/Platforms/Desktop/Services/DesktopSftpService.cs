@@ -1,4 +1,3 @@
-using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 using Sefirah.Utils;
 
@@ -60,6 +59,8 @@ public class DesktopSftpService(ILogger<DesktopSftpService> logger) : ISftpServi
         
         return (process.ExitCode, errorOutput);
     }
+
+    public void RemoveAll() { }
 
     public void Remove(string deviceId)
     {
