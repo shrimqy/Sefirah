@@ -31,19 +31,9 @@ public abstract partial class BaseRemoteDevice : ObservableObject
 
     public string Address { get; set; } = string.Empty;
 
-    private ServerSession? session;
-    public ServerSession? Session
-    {
-        get => session;
-        set => SetProperty(ref session, value);
-    }
+    public ServerSession? Session { get; set; }
 
-    private Client? client;
-    public Client? Client
-    {
-        get => client;
-        set => SetProperty(ref client, value);
-    }
+    public Client? Client { get; set; }
 
     public virtual void SendMessage(SocketMessage message)
     {
