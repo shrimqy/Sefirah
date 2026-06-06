@@ -96,12 +96,11 @@ public sealed class SftpWatcher(
                 catch (SshConnectionException ex)
                 {
                     logger.LogError("SSH connection error", ex);
-                    break;
                 }
                 catch (Exception ex)
                 {
                     logger.LogError("Unexpected error in SFTP watcher", ex);
-                    break;
+                    await Task.Delay(TimeSpan.FromSeconds(5), linkedTokenSource.Token);
                 }
             }
         }
@@ -113,22 +112,13 @@ public sealed class SftpWatcher(
 
     private Dictionary<string, DateTime> FindFiles(string relativeDirectory)
     {
-        if (!client?.IsConnected ?? true)
+        if (client is null || !client.IsConnected)
         {
-            logger.LogWarning("SFTP client is not connected during FindFiles");
-            return _knownFiles;
+            throw new SshConnectionException("SFTP client is not connected");
         }
 
         var serverDirectory = Path.Join(_context.Directory, relativeDirectory).Replace(@"\", "/");
-
-        try
-        {
-            var sftpFiles = client?.ListDirectory(serverDirectory);
-            if (sftpFiles == null)
-            {
-                logger.LogWarning("ListDirectory returned null for {directory}", serverDirectory);
-                return _knownFiles;
-            }
+        var sftpFiles = client.ListDirectory(serverDirectory);
 
             var dirEntries = sftpFiles
                 .Where(sftpFile => sftpFile.IsDirectory &&
@@ -160,17 +150,6 @@ public sealed class SftpWatcher(
                 .Concat(subFiles)
                 .ToDictionary();
         }
-        catch (SshConnectionException ex)
-        {
-            logger.LogError("SSH connection error in FindFiles", ex);
-            return _knownFiles;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError("Unexpected error in FindFiles", ex);
-            return _knownFiles;
-        }
-    }
 
     private async Task TryReconnectAsync(CancellationToken cancellationToken)
     {
