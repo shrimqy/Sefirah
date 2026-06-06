@@ -160,8 +160,16 @@ public class PlaceholdersService(
         var placeholderState = CloudFilter.GetPlaceholderState(hfile);
         if (!placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER))
         {
+            try
+            {
                 CloudFilter.ConvertToPlaceholder(hfile);
             }
+            catch (Exception ex)
+            {
+                logger.Error($"Failed to convert to placeholder for {relativeFile}", ex);
+                return;
+            }
+        }
 
         var remoteFileInfo = remoteService.GetFileInfo(relativeFile);
         if (!force && remoteFileInfo.GetHashCode() == _fileComparer.GetHashCode(clientFileInfo))
@@ -217,9 +225,16 @@ public class PlaceholdersService(
             logger.Info($"Directory {relativeDirectory} is hydrated");
             if (!CloudFilter.IsPlaceholder(clientDirectory))
             {
+                try
+                {
                     CloudFilter.ConvertToPlaceholder(clientDirectory);
                     CloudFilter.SetInSyncState(clientDirectory);
-                logger.LogInformation("Converted to placeholder and updated {path}", relativeDirectory);
+                    logger.Info($"Converted to placeholder and updated {relativeDirectory}");
+                }
+                catch (Exception ex)
+                {
+                    logger.Error($"Failed to convert directory to placeholder for {relativeDirectory}", ex);
+                }
                 return Task.CompletedTask;
             }
             CloudFilter.SetInSyncState(clientDirectory);

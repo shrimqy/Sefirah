@@ -174,7 +174,17 @@ public class ClientWatcher : IDisposable
 
         watcher.Created += async (sender, e) => {
 
-            var state = CloudFilter.GetPlaceholderState(e.FullPath);
+            CF_PLACEHOLDER_STATE state;
+            try
+            {
+                state = CloudFilter.GetPlaceholderState(e.FullPath);
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn($"Unable to get placeholder state for {e.FullPath}", ex);
+                return;
+            }
+
             if (state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
             {
                 return;
