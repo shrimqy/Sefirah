@@ -51,7 +51,7 @@ public class SftpReadWriteService(
         }
 
         logger.LogDebug("Update File {relativeFile}", relativeFile);
-        using (var sourceStream = sourceFileInfo.OpenRead())
+        using (var sourceStream = await FileHelper.WaitUntilUnlocked(sourceFileInfo.OpenRead, logger))
         {
             await Task.Factory.FromAsync(client.BeginUploadFile(sourceStream, serverFile), client.EndUploadFile);
         }
