@@ -91,42 +91,27 @@ public sealed class SyncRootConnector(
 
         foreach (var clientFile in Directory.GetFiles(clientDirectory))
         {
-            var clientRelativePath = PathMapper.GetRelativePath(clientFile, _rootDirectory);
-            if (!remoteService.Exists(clientRelativePath))
-            {
-                logger.LogInformation("Deleting local file (not on remote): {path}", clientRelativePath);
+            var relativePath = PathMapper.GetRelativePath(clientFile, _rootDirectory);
                 try
+                {
+                if (!remoteService.Exists(relativePath))
                 {
                     File.Delete(clientFile);
                 }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex, "Failed to delete local file {path}: {error}", clientRelativePath, ex.Message);
+            }
+                catch (Exception) { }
                 }
-            }            
-        }
 
         // Check and delete directories recursively
         foreach (var clientDir in Directory.GetDirectories(clientDirectory))
         {
-            // Skip system directories
-            if (FileHelper.IsSystemDirectory(Path.GetFileName(clientDir)))
-                continue;
-                
-            var clientRelativePath = PathMapper.GetRelativePath(clientDir, _rootDirectory);
-            
-            if (!remoteService.Exists(clientRelativePath))
-            {
-                logger.LogInformation("Deleting local directory (not on remote): {path}", clientRelativePath);
+            var relativePath = PathMapper.GetRelativePath(clientDir, _rootDirectory);
                 try
+                {
+                if (!remoteService.Exists(relativePath))
                 {
                     Directory.Delete(clientDir, recursive: true);
                 }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex, "Failed to delete local directory {path}: {error}", clientRelativePath, ex.Message);
-                }
-            }
             else
             {
                 //  recursively check hydrated directories
@@ -140,6 +125,8 @@ public sealed class SyncRootConnector(
                 }
             }
         }
+            catch (Exception) { }
+    }
     }
 
     private async void FetchData(CF_CALLBACK_INFO callbackInfo, CF_CALLBACK_PARAMETERS callbackParameters)
