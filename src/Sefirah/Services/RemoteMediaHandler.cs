@@ -1,6 +1,4 @@
 using CommunityToolkit.WinUI;
-using Sefirah.Data.Contracts;
-using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 
 namespace Sefirah.Services;

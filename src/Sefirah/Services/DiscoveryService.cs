@@ -65,7 +65,7 @@ public class DiscoveryService(
             var addresses = deviceManager.GetRemoteDeviceAddresses();
             broadcastEndpoints.AddRange(addresses.Select(address => new IPEndPoint(IPAddress.Parse(address), DiscoveryPort)));
 
-            logger.LogInformation("Active broadcast endpoints: {endpoints}", string.Join(", ", broadcastEndpoints));
+            logger.Info($"Active broadcast endpoints: {string.Join(", ", broadcastEndpoints)}");
 
             udpClient = new MulticastClient("0.0.0.0", port, this, logger)
             {
@@ -78,17 +78,17 @@ public class DiscoveryService(
             if (udpClient.Connect())
             {
                 udpClient.Socket.EnableBroadcast = true;
-                logger.LogInformation("UDP Client connected successfully {port}", port);
+                logger.Info($"UDP Client connected successfully {port}");
                 BroadcastDeviceInfoAsync(BroadcastMessage);
             }
             else
             {
-                logger.LogError("Failed to connect UDP client");
+                logger.Error("Failed to connect UDP client");
             }
         }
         catch (Exception ex)
         {
-            logger.LogError("Discovery initialization failed: {message}", ex.Message);
+            logger.Error($"Discovery initialization failed: {ex.Message}", ex);
         }
     }
 
@@ -130,7 +130,7 @@ public class DiscoveryService(
         }
         catch (Exception ex)
         {
-            logger.LogWarning("Error processing UDP message: {message}", ex.Message);
+            logger.Warn($"Error processing UDP message: {ex.Message}", ex);
         }
     }
 
@@ -145,7 +145,7 @@ public class DiscoveryService(
         }
         catch (Exception ex)
         {
-            logger.LogError("Error disposing default UDP client: {message}", ex.Message);
+            logger.Error($"Error disposing default UDP client: {ex.Message}", ex);
         }
     }
 
@@ -182,7 +182,7 @@ public class DiscoveryService(
         }
         catch (Exception ex)
         {
-            logger.LogWarning("Error generating QR code: {message}", ex.Message);
+            logger.Warn($"Error generating QR code: {ex.Message}", ex);
             return null;
         }
     }

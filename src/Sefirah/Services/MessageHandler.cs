@@ -109,13 +109,13 @@ public class MessageHandler(
                     break;
 
                 default:
-                    logger.LogWarning("Unknown message type received: {type}", message.GetType().Name);
+                    logger.Warn($"Unknown message type received: {message.GetType().Name}");
                     break;
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error handling message");
+            logger.Error("Error handling message", ex);
         }
     }
 }

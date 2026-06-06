@@ -31,14 +31,14 @@ public class DesktopNotificationHandler(
             string? sessionBusAddress = DBusAddress.Session;
             if (sessionBusAddress is null)
             {
-                logger.LogWarning("Cannot determine session bus address. D-Bus may not be available on this system.");
+                logger.Warn($"Cannot determine session bus address. D-Bus may not be available on this system.");
                 return false;
             }
 
             // Create connection to the session bus
             _connection = new DBusConnection(sessionBusAddress);
             await _connection.ConnectAsync();
-            logger.LogDebug("Connected to D-Bus session bus");
+            logger.Debug($"Connected to D-Bus session bus");
 
             // Create the notifications service
             _notificationService = new NotificationsService(_connection, "org.freedesktop.Notifications");
@@ -46,19 +46,18 @@ public class DesktopNotificationHandler(
 
             // Test if the notification service is available
             var serverInfo = await _notifications.GetServerInformationAsync();
-            logger.LogDebug("Notification server: {Name} {Version}, Vendor: {Vendor}", 
-                serverInfo.Name, serverInfo.Version, serverInfo.Vendor);
+            logger.Debug($"Notification server: {serverInfo.Name} {serverInfo.Version}, Vendor: {serverInfo.Vendor}");
 
             // Set up action watching
             _actionWatcher = await _notifications.WatchActionInvokedAsync(OnActionInvoked);
-            logger.LogDebug("Action watcher registered for D-Bus notifications");
+            logger.Debug($"Action watcher registered for D-Bus notifications");
 
             _isInitialized = true;
             return true;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to initialize D-Bus notifications");
+            logger.Error($"Failed to initialize D-Bus notifications", ex);
             return false;
         }
     }
@@ -129,12 +128,11 @@ public class DesktopNotificationHandler(
                 _notificationActions[notificationId] = actionData;
             }
 
-            logger.LogDebug("Remote notification sent with ID: {NotificationId}, Actions: {ActionCount}", 
-                notificationId, actionData.Actions.Count);
+            logger.Debug($"Remote notification sent with ID: {notificationId}, Actions: {actionData.Actions.Count}");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to show remote notification");
+            logger.Error($"Failed to show remote notification", ex);
         }
     }
 
@@ -173,7 +171,7 @@ public class DesktopNotificationHandler(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to show call notification");
+            logger.Error($"Failed to show call notification", ex);
         }
     }
 
@@ -228,11 +226,11 @@ public class DesktopNotificationHandler(
             if (notificationActionData.Actions.Count > 0)
                 _notificationActions[notificationId] = notificationActionData;
 
-            logger.LogDebug("Clipboard notification sent with ID: {NotificationId}, Actions: {ActionCount}", notificationId, notificationActionData.Actions.Count);
+            logger.Debug($"Clipboard notification sent with ID: {notificationId}, Actions: {notificationActionData.Actions.Count}");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to show clipboard notification");
+            logger.Error($"Failed to show clipboard notification", ex);
         }
     }
 
@@ -263,11 +261,11 @@ public class DesktopNotificationHandler(
                 expireTimeout: 6000 // 6 seconds
             );
 
-            logger.LogDebug("File transfer notification sent with ID: {NotificationId}", notificationId);
+            logger.Debug($"File transfer notification sent with ID: {notificationId}");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to show file transfer notification");
+            logger.Error($"Failed to show file transfer notification", ex);
         }
     }
 
@@ -299,12 +297,12 @@ public class DesktopNotificationHandler(
             {
                 await _notifications.CloseNotificationAsync(notificationId);
                 _notificationIds.Remove(notificationKey);
-                logger.LogDebug("Removed notification with key: {NotificationKey}", notificationKey);
+                logger.Debug($"Removed notification with key: {notificationKey}");
             }
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Failed to remove notification with key {NotificationKey}", notificationKey);
+            logger.Warn($"Failed to remove notification with key {notificationKey}", ex);
         }
     }
 
@@ -331,17 +329,17 @@ public class DesktopNotificationHandler(
     {
         if (ex != null)
         {
-            logger.LogError(ex, "Error in action invoked handler");
+            logger.Error($"Error in action invoked handler", ex);
             return;
         }
 
         try
         {
-            logger.LogDebug("Action invoked - ID: {NotificationId}, ActionKey: {ActionKey}", args.Id, args.ActionKey);
+            logger.Debug($"Action invoked - ID: {args.Id}, ActionKey: {args.ActionKey}");
 
             if (!_notificationActions.TryGetValue(args.Id, out var actionData))
             {
-                logger.LogWarning("No action data found for notification ID: {NotificationId}", args.Id);
+                logger.Warn($"No action data found for notification ID: {args.Id}");
                 return;
             }
 
@@ -353,7 +351,7 @@ public class DesktopNotificationHandler(
         }
         catch (Exception actionEx)
         {
-            logger.LogError(actionEx, "Error handling notification action");
+            logger.Error($"Error handling notification action", actionEx);
         }
     }
 
@@ -361,12 +359,12 @@ public class DesktopNotificationHandler(
     {
         try
         {
-            logger.LogDebug("Handling notification action - ID: {NotificationId}, ActionKey: {ActionKey}", notificationId, actionKey);
+            logger.Debug($"Handling notification action - ID: {notificationId}, ActionKey: {actionKey}");
 
             var action = actionData.Actions.FirstOrDefault(a => a.ActionId == actionKey);
             if (action == null)
             {
-                logger.LogWarning("Action not found: {ActionKey} for notification ID: {NotificationId}", actionKey, notificationId);
+                logger.Warn($"Action not found: {actionKey} for notification ID: {notificationId}");
                 return;
             }
 
@@ -382,13 +380,13 @@ public class DesktopNotificationHandler(
                     break;
                 
                 default:
-                    logger.LogWarning("Unhandled notification type: {NotificationType}", actionData.NotificationType);
+                    logger.Warn($"Unhandled notification type: {actionData.NotificationType}");
                     break;
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error handling notification action");
+            logger.Error($"Error handling notification action", ex);
         }
     }
 
@@ -396,7 +394,7 @@ public class DesktopNotificationHandler(
     {
         if (string.IsNullOrEmpty(actionData.DeviceId) || string.IsNullOrEmpty(actionData.NotificationKey))
         {
-            logger.LogWarning("Missing device ID or notification key for remote notification action");
+            logger.Warn($"Missing device ID or notification key for remote notification action");
             return;
         }
 
@@ -404,21 +402,20 @@ public class DesktopNotificationHandler(
         var device = deviceManager.FindDeviceById(actionData.DeviceId);
         if (device is null)
         {
-            logger.LogWarning("Could not find device with ID: {DeviceId}", actionData.DeviceId);
+            logger.Warn($"Could not find device with ID: {actionData.DeviceId}");
             return;
         }
 
         // Process the click action using the static utility
-        NotificationActionUtils.ProcessClickAction(logger, device, actionData.NotificationKey, action.ActionIndex);
-        logger.LogDebug("Processed remote notification action for device {DeviceId}, action index: {ActionIndex}", 
-            actionData.DeviceId, action.ActionIndex);
+        NotificationActionUtils.ProcessClickAction(device, actionData.NotificationKey, action.ActionIndex);
+        logger.Debug($"Processed remote notification action for device {actionData.DeviceId}, action index: {action.ActionIndex}");
     }
 
     private async Task HandleClipboardAction(NotificationActionInfo action)
     {
         if (string.IsNullOrEmpty(action.Data))
         {
-            logger.LogWarning("No data provided for clipboard action");
+            logger.Warn($"No data provided for clipboard action");
             return;
         }
 
@@ -436,16 +433,16 @@ public class DesktopNotificationHandler(
                     }
                 };
                 process.Start();
-                logger.LogDebug("Opened URL: {Url}", uri);
+                logger.Debug($"Opened URL: {uri}");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to open URL: {Url}", uri);
+                logger.Error($"Failed to open URL: {uri}", ex);
             }
         }
         else
         {
-            logger.LogWarning("Invalid URL in clipboard action: {Data}", action.Data);
+            logger.Warn($"Invalid URL in clipboard action: {action.Data}");
         }
     }
 
@@ -458,7 +455,7 @@ public class DesktopNotificationHandler(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Error disposing D-Bus connection");
+            logger.Warn($"Error disposing D-Bus connection", ex);
         }
     }
 }

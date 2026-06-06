@@ -45,7 +45,7 @@ public class SmsRepository(DatabaseContext context, ContactRepository contactRep
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error deleting conversation {ThreadId} for device {DeviceId}", threadId, deviceId);
+            logger.Error($"Error deleting conversation {threadId} for device {deviceId}", ex);
             return false;
         }
     }
@@ -69,7 +69,7 @@ public class SmsRepository(DatabaseContext context, ContactRepository contactRep
         context.Database.Table<ConversationEntity>().Where(c => c.DeviceId == deviceId).Delete();
         contactRepository.DeleteAllContactsForDevice(deviceId);
 
-        logger.LogInformation("Deleted all SMS data for device {DeviceId}", deviceId);
+        logger.Info($"Deleted all SMS data for device {deviceId}");
     }
 
     #endregion
@@ -109,7 +109,7 @@ public class SmsRepository(DatabaseContext context, ContactRepository contactRep
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error getting messages with attachments for device {DeviceId}, thread {ThreadId}", deviceId, threadId);
+            logger.Error($"Error getting messages with attachments for device {deviceId}, thread {threadId}", ex);
             return [];
         }
     }
@@ -122,7 +122,7 @@ public class SmsRepository(DatabaseContext context, ContactRepository contactRep
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error getting message {UniqueId} for device {DeviceId}", uniqueId, deviceId);
+            logger.Error($"Error getting message {uniqueId} for device {deviceId}", ex);
             return null;
         }
     }
@@ -136,7 +136,7 @@ public class SmsRepository(DatabaseContext context, ContactRepository contactRep
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error saving message {UniqueId} for device {DeviceId}", message.UniqueId, message.DeviceId);
+            logger.Error($"Error saving message {message.UniqueId} for device {message.DeviceId}", ex);
             return false;
         }
     }
@@ -150,7 +150,7 @@ public class SmsRepository(DatabaseContext context, ContactRepository contactRep
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error saving batch messages");
+            logger.Error("Error saving batch messages", ex);
             return false;
         }
     }
@@ -168,7 +168,7 @@ public class SmsRepository(DatabaseContext context, ContactRepository contactRep
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error deleting message {UniqueId} for device {DeviceId}", uniqueId, deviceId);
+            logger.Error($"Error deleting message {uniqueId} for device {deviceId}", ex);
             return false;
         }
     }
@@ -188,7 +188,7 @@ public class SmsRepository(DatabaseContext context, ContactRepository contactRep
         }
         catch (Exception ex)
         {
-            logger.LogError("Error getting attachments for message {MessageUniqueId}, device {DeviceId}", messageUniqueId, ex);
+            logger.Error($"Error getting attachments for message {messageUniqueId}", ex);
             return [];
         }
     }
@@ -202,7 +202,7 @@ public class SmsRepository(DatabaseContext context, ContactRepository contactRep
         }
         catch (Exception ex)
         {
-            logger.LogError("Error saving attachment for message {MessageUniqueId}, device {DeviceId}",attachment.MessageUniqueId, ex);
+            logger.Error($"Error saving attachment for message {attachment.MessageUniqueId}", ex);
             return false;
         }
     }
@@ -216,7 +216,7 @@ public class SmsRepository(DatabaseContext context, ContactRepository contactRep
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error saving batch attachments");
+            logger.Error("Error saving batch attachments", ex);
             return false;
         }
     }

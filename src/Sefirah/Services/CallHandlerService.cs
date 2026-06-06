@@ -52,7 +52,7 @@ public class CallHandlerService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error handling call info from device {DeviceId}", device.Id);
+            logger.Error($"Error handling call info from device {device.Id}", ex);
         }
     }
 
@@ -86,7 +86,7 @@ public class CallHandlerService(
                     }
                     catch (Exception ex)
                     {
-                        logger.LogDebug(ex, "Failed to show incoming call notification for {CallId}.", callId);
+                        logger.Debug($"Failed to show incoming call notification for {callId}.", ex);
                     }
                     break;
                 }
@@ -142,7 +142,7 @@ public class CallHandlerService(
                         }
                         catch (Exception ex)
                         {
-                            logger.LogError(ex, "Failed to create call session for {CallId}.", callId);
+                            logger.Error($"Failed to create call session for {callId}.", ex);
                             call.Dispose();
                         }
                     });
@@ -151,7 +151,7 @@ public class CallHandlerService(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Failed to handle call state change for {CallId}.", callId);
+            logger.Warn($"Failed to handle call state change for {callId}.", ex);
             call.Dispose();
         }
     }

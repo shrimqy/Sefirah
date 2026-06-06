@@ -32,7 +32,7 @@ public class SmsHandlerService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error loading conversations from database for device: {DeviceId}", deviceId);
+            logger.Error($"Error loading conversations from database for device: {deviceId}", ex);
             return [];
         }
     }
@@ -54,7 +54,7 @@ public class SmsHandlerService(
                     await HandleRemovedConversation(deviceId, textConversation);
                     break;
                 default:
-                    logger.LogWarning("Unknown conversation type: {ConversationType}", textConversation.InfoType);
+                    logger.Warn($"Unknown conversation type: {textConversation.InfoType}");
                     break;
             }
         }
@@ -123,7 +123,7 @@ public class SmsHandlerService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error handling conversation update {ThreadId} for device {DeviceId}", textConversation.ThreadId, deviceId);
+            logger.Error($"Error handling conversation update {textConversation.ThreadId} for device {deviceId}", ex);
         }
     }
 
@@ -136,7 +136,7 @@ public class SmsHandlerService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error handling removed conversation {ThreadId} for device {DeviceId}", textConversation.ThreadId, deviceId);
+            logger.Error($"Error handling removed conversation {textConversation.ThreadId} for device {deviceId}", ex);
         }
     }
 
@@ -151,7 +151,7 @@ public class SmsHandlerService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error saving messages for device {DeviceId}", deviceId);
+            logger.Error($"Error saving messages for device {deviceId}", ex);
         }
     }
 

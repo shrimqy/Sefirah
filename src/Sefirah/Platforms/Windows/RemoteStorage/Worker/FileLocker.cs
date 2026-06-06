@@ -32,7 +32,7 @@ public sealed class FileLocker(ILogger logger) : IDisposable
         {
             if (!_lockers.TryGetValue(relativePath, out var semaphore))
             {
-                logger.LogWarning("Could not find semaphore for {relativePath}", relativePath);
+                logger.Warn($"Could not find semaphore for {relativePath}");
                 return;
             }
             var freed = semaphore.Release();

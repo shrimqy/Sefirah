@@ -29,7 +29,7 @@ public sealed class SyncRootConnector(
 
     public CF_CONNECTION_KEY Connect()
     {
-        logger.LogDebug("Connecting sync provider to {syncRootPath}", _rootDirectory);
+        logger.Debug($"Connecting sync provider to {_rootDirectory}");
         CallbackRegistrations = CloudFilter.ConnectSyncRoot(
             _rootDirectory,
             new SyncRootEvents
@@ -60,16 +60,13 @@ public sealed class SyncRootConnector(
 
     public void Disconnect(CF_CONNECTION_KEY connectionKey)
     {
-        logger.LogDebug("Disconnecting sync provider, {connectionKey}", connectionKey);
+        logger.Debug($"Disconnecting sync provider, {connectionKey}");
         CloudFilter.DisconnectSyncRoot(connectionKey);
     }
 
     private void FetchPlaceholders(in CF_CALLBACK_INFO callbackInfo, in CF_CALLBACK_PARAMETERS callbackParameters)
     {
-        logger.LogDebug("Fetch Placeholders '{path}' '{pattern}' Flags: {flags}", 
-            callbackInfo.NormalizedPath, 
-            callbackParameters.FetchPlaceholders.Pattern,
-            callbackParameters.FetchPlaceholders.Flags);
+        logger.Debug($"Fetch Placeholders '{callbackInfo.NormalizedPath}' '{callbackParameters.FetchPlaceholders.Pattern}' Flags: {callbackParameters.FetchPlaceholders.Flags}");
 
         var clientDirectory = Path.Join(callbackInfo.VolumeDosName, callbackInfo.NormalizedPath[1..]);
         var relativeDirectory = PathMapper.GetRelativePath(clientDirectory, _rootDirectory);
@@ -84,7 +81,7 @@ public sealed class SyncRootConnector(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error transferring placeholders");
+            logger.Error("Error transferring placeholders", ex);
         }
     }
     
@@ -136,13 +133,7 @@ public sealed class SyncRootConnector(
 
     private void FetchData(CF_CALLBACK_INFO callbackInfo, CF_CALLBACK_PARAMETERS callbackParameters)
     {
-        logger.LogDebug(
-            "Fetch data, {file}, fileSize: {fileSize}, offset: {offset}, total: {total}",
-            callbackInfo.NormalizedPath,
-            callbackInfo.FileSize,
-            callbackParameters.FetchData.RequiredFileOffset,
-            callbackParameters.FetchData.RequiredLength
-        );
+        logger.Debug($"Fetch data, {callbackInfo.NormalizedPath}, fileSize: {callbackInfo.FileSize}, offset: {callbackParameters.FetchData.RequiredFileOffset}, total: {callbackParameters.FetchData.RequiredLength}");
 
         var transferKey = callbackInfo.TransferKey;
 
@@ -191,11 +182,11 @@ public sealed class SyncRootConnector(
         }
         catch (OperationCanceledException)
         {
-            logger.LogDebug("Fetch data cancelled for {file}", callbackInfo.NormalizedPath);
+            logger.Debug($"Fetch data cancelled for {callbackInfo.NormalizedPath}");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to transfer server->client");
+            logger.Error("Failed to transfer server->client", ex);
             try
             {
                 CloudFilter.TransferData(
@@ -208,7 +199,7 @@ public sealed class SyncRootConnector(
             }
             catch (Exception innerEx)
             {
-                logger.LogError(innerEx, "Failed to signal transfer failure to Cloud Filter");
+                logger.Error("Failed to signal transfer failure to Cloud Filter", innerEx);
             }
         }
         finally
@@ -235,7 +226,7 @@ public sealed class SyncRootConnector(
 
     private async Task OnRenameCompletion(string volumeDosName, string oldPath, string newPath)
     {
-        logger.LogDebug("SyncRoot Rename {old} -> {new}", oldPath, newPath);
+        logger.Info($"SyncRoot Rename {oldPath} -> {newPath}");
         var oldClientPath = Path.Join(volumeDosName, oldPath[1..]);
         var oldRelativePath = PathMapper.GetRelativePath(oldClientPath, _rootDirectory);
         var newClientPath = Path.Join(volumeDosName, newPath[1..]);
@@ -272,23 +263,23 @@ public sealed class SyncRootConnector(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Rename server object failed");
+            logger.Error("Rename server object failed", ex);
         }
     }
 
     private async Task OnDeleteCompletion(string volumeDosName, string path)
     {
-        logger.LogDebug("SyncRoot Delete {path}", path);
+        logger.Debug($"SyncRoot Delete {path}");
         var clientPath = Path.Join(volumeDosName, path[1..]);
         // For files created in client, sometimes it's not actually deleted yet. Wait until it's really gone.
         for (var attempt = 0; attempt < 60 && Path.Exists(clientPath); attempt++)
         {
-            logger.LogDebug("File has not yet been deleted, waiting before retry");
+            logger.Debug("File has not yet been deleted, waiting before retry");
             await Task.Delay(500);
         }
         if (Path.Exists(clientPath))
         {
-            logger.LogWarning("Received delete completion, but file has not been deleted: {clientPath}", clientPath);
+            logger.Warn($"Received delete completion, but file has not been deleted: {clientPath}");
             return;
         }
         var relativePath = PathMapper.GetRelativePath(clientPath, _rootDirectory);
@@ -310,7 +301,7 @@ public sealed class SyncRootConnector(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Delete server object failed");
+            logger.Error("Delete server object failed", ex);
         }
     }
 }

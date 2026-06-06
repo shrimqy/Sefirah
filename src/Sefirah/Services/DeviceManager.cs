@@ -93,7 +93,7 @@ public partial class DeviceManager(
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error getting local device");
+            logger.Error("Error getting local device", e);
             throw;
         }
     }
@@ -106,7 +106,7 @@ public partial class DeviceManager(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error updating local device");
+            logger.Error("Error updating local device", ex);
         }
     }
 

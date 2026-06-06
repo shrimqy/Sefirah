@@ -1,7 +1,6 @@
 using System.Threading.Channels;
 using Sefirah.Platforms.Windows.Helpers;
 using Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
-using Sefirah.Platforms.Windows.RemoteStorage.Worker;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker.IO;
 public sealed class RemoteWatcher(
@@ -49,7 +48,7 @@ public sealed class RemoteWatcher(
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Handle Created failed for: {relativePath}",relativePath);
+                logger.Error($"Handle Created failed for: {relativePath}", ex);
             }
         });
     }
@@ -76,7 +75,7 @@ public sealed class RemoteWatcher(
                         }
                         catch (Exception ex)
                         {
-                            logger.LogError(ex, "Failed to update file {file}", file.RelativePath);
+                            logger.Error($"Failed to update file {file.RelativePath}", ex);
                         }
                     }
                 }
@@ -87,7 +86,7 @@ public sealed class RemoteWatcher(
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Handle Changed failed");
+                logger.Error("Handle Changed failed", ex);
             }
         });
     }
@@ -116,7 +115,7 @@ public sealed class RemoteWatcher(
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Rename placeholder failed");
+                logger.Error("Rename placeholder failed", ex);
             }
         });
     }
@@ -126,7 +125,7 @@ public sealed class RemoteWatcher(
         // Brief pause to let client finish before reflecting it back
         await Task.Delay(1000);
         relativePath = PathMapper.NormalizePath(relativePath);
-        logger.LogDebug("Deleted {path}", relativePath);
+        logger.Debug($"Deleted {relativePath}");
         await taskWriter.WriteAsync(async () =>
         {
             using var locker = await fileLocker.Lock(relativePath);
@@ -136,7 +135,7 @@ public sealed class RemoteWatcher(
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Delete placeholder failed");
+                logger.Error("Delete placeholder failed", ex);
             }
         });
     }

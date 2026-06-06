@@ -63,7 +63,7 @@ public static class FileHelper
 
     private static async Task LogAndWait(IOException ex, ILogger logger)
     {
-        logger.LogWarning(ex, "File access error, waiting to retry; HR {HResult}", ex.HResult);
+        logger.Warn($"File access error, waiting to retry; HR {ex.HResult}", ex);
         await Task.Delay(DELAY_MS);
     }
 

@@ -31,7 +31,7 @@ public class CallLogRepository(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to load call logs for device {DeviceId}.", deviceId);
+            logger.Error($"Failed to load call logs for device {deviceId}.", ex);
             return [];
         }
     }
@@ -55,7 +55,7 @@ public class CallLogRepository(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to save call log for device {DeviceId}.", deviceId);
+            logger.Error($"Failed to save call log for device {deviceId}.", ex);
         }
     }
 
@@ -71,7 +71,7 @@ public class CallLogRepository(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to delete call logs for device {DeviceId}", deviceId);
+            logger.Error($"Failed to delete call logs for device {deviceId}", ex);
         }
     }
 }

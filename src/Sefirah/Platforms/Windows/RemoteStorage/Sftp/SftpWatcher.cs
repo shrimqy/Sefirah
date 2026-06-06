@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using Sefirah.Platforms.Windows.Abstractions;
@@ -95,11 +94,11 @@ public sealed class SftpWatcher(
                 }
                 catch (SshConnectionException ex)
                 {
-                    logger.LogError("SSH connection error", ex);
+                    logger.Error("SSH connection error", ex);
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError("Unexpected error in SFTP watcher", ex);
+                    logger.Error("Unexpected error in SFTP watcher", ex);
                     await Task.Delay(TimeSpan.FromSeconds(5), linkedTokenSource.Token);
                 }
             }
@@ -120,36 +119,36 @@ public sealed class SftpWatcher(
         var serverDirectory = Path.Join(_context.Directory, relativeDirectory).Replace(@"\", "/");
         var sftpFiles = client.ListDirectory(serverDirectory);
 
-            var dirEntries = sftpFiles
-                .Where(sftpFile => sftpFile.IsDirectory &&
-                                   !_relativeDirectoryNames.Contains(sftpFile.Name) &&
-                                   !FileHelper.IsSystemDirectory(PathMapper.GetRelativePath(sftpFile.FullName, _context.Directory)))
-                .ToArray();
+        var dirEntries = sftpFiles
+            .Where(sftpFile => sftpFile.IsDirectory &&
+                               !_relativeDirectoryNames.Contains(sftpFile.Name) &&
+                               !FileHelper.IsSystemDirectory(PathMapper.GetRelativePath(sftpFile.FullName, _context.Directory)))
+            .ToArray();
 
-            var directories = dirEntries.ToDictionary(
-                dir => PathMapper.GetRelativePath(dir.FullName, _context.Directory),
-                _ => DateTime.MaxValue
+        var directories = dirEntries.ToDictionary(
+            dir => PathMapper.GetRelativePath(dir.FullName, _context.Directory),
+            _ => DateTime.MaxValue
+        );
+
+        // Get files from current directory
+        var files = sftpFiles
+            .Where(sftpFile => sftpFile.IsRegularFile)
+            .ToDictionary(
+                file => PathMapper.GetRelativePath(file.FullName, _context.Directory),
+                file => file.LastWriteTimeUtc
             );
 
-            // Get files from current directory
-            var files = sftpFiles
-                .Where(sftpFile => sftpFile.IsRegularFile)
-                .ToDictionary(
-                    file => PathMapper.GetRelativePath(file.FullName, _context.Directory),
-                    file => file.LastWriteTimeUtc
-                );
+        // Recursively get files from hydrated subdirectories
+        var subFiles = directories.Keys
+            .Where(IsHydrated)
+            .SelectMany(FindFiles)
+            .ToDictionary(pair => pair.Key, pair => pair.Value);
 
-            // Recursively get files from hydrated subdirectories
-            var subFiles = directories.Keys
-                .Where(IsHydrated)
-                .SelectMany(FindFiles)
-                .ToDictionary(pair => pair.Key, pair => pair.Value);
-
-            return directories
-                .Concat(files)
-                .Concat(subFiles)
-                .ToDictionary();
-        }
+        return directories
+            .Concat(files)
+            .Concat(subFiles)
+            .ToDictionary();
+    }
 
     private async Task TryReconnectAsync(CancellationToken cancellationToken)
     {
@@ -165,7 +164,7 @@ public sealed class SftpWatcher(
                 }
                 catch (Exception ex) 
                 { 
-                    logger.LogError("Error disconnecting SFTP client", ex);
+                    logger.Error("Error disconnecting SFTP client", ex);
                 }
             }
 
@@ -174,11 +173,11 @@ public sealed class SftpWatcher(
                 try
                 {
                     client.Connect();
-                    logger.LogInformation("Successfully reconnected to SFTP server");
+                    logger.Info("Successfully reconnected to SFTP server");
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError("Failed to connect SFTP client", ex);
+                    logger.Error("Failed to connect SFTP client", ex);
                     // Check cancellation before delay
                     cancellationToken.ThrowIfCancellationRequested();
                     await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
@@ -186,12 +185,12 @@ public sealed class SftpWatcher(
             }
             else
             {
-                logger.LogError("SFTP client is null during reconnection attempt");
+                logger.Error("SFTP client is null during reconnection attempt");
             }
         }
         catch (Exception ex)
         {
-            logger.LogError("Unexpected error during reconnection", ex);
+            logger.Error("Unexpected error during reconnection", ex);
             throw;
         }
     }
@@ -206,7 +205,7 @@ public sealed class SftpWatcher(
         }
         catch (Exception ex)
         {
-            logger.LogError("Error checking hydration state for {path}", relativePath, ex);
+            logger.Error($"Error checking hydration state for {relativePath}", ex);
             return false;
         }
     }
@@ -217,7 +216,7 @@ public sealed class SftpWatcher(
         {
             try
             {
-                logger.LogDebug("Disposing SFTP watcher");
+                logger.Debug("Disposing SFTP watcher");
                 _cancellationTokenSource.Cancel();
                 
                 // Safely disconnect the client
@@ -230,7 +229,7 @@ public sealed class SftpWatcher(
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError("Error disconnecting client during disposal", ex);
+                    logger.Error("Error disconnecting client during disposal", ex);
                 }
             }
             catch (ObjectDisposedException)

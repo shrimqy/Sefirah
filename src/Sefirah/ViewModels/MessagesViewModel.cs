@@ -105,7 +105,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error loading conversations for device: {DeviceId}", ActiveDevice?.Id);
+            Logger.Error($"Error loading conversations for device: {ActiveDevice?.Id}", ex);
         }
     }
 
@@ -173,7 +173,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error sending message");
+            Logger.Error("Error sending message", ex);
         }
     }
     public void StartNewConversation()

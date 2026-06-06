@@ -133,11 +133,11 @@ public class ContactRepository(DatabaseContext context, ILogger<ContactRepositor
         {
             context.Database.Table<ContactEntity>().Where(c => c.DeviceId == deviceId).Delete();
             await LoadContacts();
-            logger.LogInformation("Deleted all contacts for device {DeviceId}", deviceId);
+            logger.Info($"Deleted all contacts for device {deviceId}");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to delete contacts for device {DeviceId}", deviceId);
+            logger.Error($"Failed to delete contacts for device {deviceId}", ex);
         }
     }
 }

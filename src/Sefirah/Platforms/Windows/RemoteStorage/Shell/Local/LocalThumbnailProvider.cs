@@ -24,7 +24,7 @@ public class LocalThumbnailProvider(
             // We want to identify the original item in the source folder that we're mirroring, based on the placeholder item that we
             // get initialized with. There's probably a way to do this based on the file identity blob but this just uses path manipulation.
             var clientPath = _clientItem.GetDisplayName(SIGDN.SIGDN_FILESYSPATH);
-            logger.LogDebug("Client path: {path}", clientPath);
+            logger.Debug($"Client path: {clientPath}");
             var rootDirectory = syncProviderContext.Context.RootDirectory;
 
             if (!clientPath.StartsWith(rootDirectory))
@@ -33,14 +33,14 @@ public class LocalThumbnailProvider(
             }
 
             var remotePath = PathMapper.ReplaceStart(clientPath, rootDirectory, "");
-            logger.LogDebug("Mapped remote path: {remotePath}", remotePath);
+            logger.Debug($"Mapped remote path: {remotePath}");
             
             _serverItem = SHCreateItemFromParsingName<IShellItem2>(remotePath);
 
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Failed to initialize thumbnail provider");
+            logger.Warn("Failed to initialize thumbnail provider", ex);
             return ex.HResult;
         }
         return HRESULT.S_OK;
@@ -50,7 +50,7 @@ public class LocalThumbnailProvider(
     // TODO: implement thumbnails
     public HRESULT GetThumbnail(uint cx, out HBITMAP phbmp, out WTS_ALPHATYPE pdwAlpha)
     {
-        logger.LogDebug("Get thumbnail for {path}", _serverItem!.GetDisplayName(SIGDN.SIGDN_FILESYSPATH));
+        logger.Debug($"Get thumbnail for {_serverItem!.GetDisplayName(SIGDN.SIGDN_FILESYSPATH)}");
         try
         {
             using var tps = ComReleaserFactory.Create(_serverItem!.BindToHandler<IThumbnailProvider>(default, BHID.BHID_ThumbnailHandler.Guid()));
@@ -58,7 +58,7 @@ public class LocalThumbnailProvider(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Failed to get thumbnail");
+            logger.Warn("Failed to get thumbnail", ex);
             phbmp = new SafeHBITMAP(nint.Zero, false);
             pdwAlpha = WTS_ALPHATYPE.WTSAT_UNKNOWN;
             return ex.HResult;

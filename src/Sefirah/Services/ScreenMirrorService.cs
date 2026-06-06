@@ -45,7 +45,7 @@ public class ScreenMirrorService(
             var scrcpyPath = userSettingsService.GeneralSettingsService.ScrcpyPath;
             if (!File.Exists(scrcpyPath))
             {
-                logger.LogError("Scrcpy not found at {ScrcpyPath}", scrcpyPath);
+                logger.Error($"Scrcpy not found at {scrcpyPath}");
                 var result = await dispatcher.EnqueueAsync(async () =>
                 {
                     var dialog = new ContentDialog
@@ -158,7 +158,7 @@ public class ScreenMirrorService(
                         }
                         catch (Exception ex)
                         {
-                            logger.LogError($"Failed to terminate existing process: {ex.Message}", ex);
+                            logger.Error($"Failed to terminate existing process: {ex.Message}", ex);
                         }
                     }
                 }
@@ -195,7 +195,7 @@ public class ScreenMirrorService(
             }
             catch (Exception ex)
             {
-                logger.LogError($"Failed to start scrcpy: {ex.Message}", ex);
+                logger.Error($"Failed to start scrcpy: {ex.Message}", ex);
                 process?.Dispose();
                 processCts.Dispose();
                 if (ReferenceEquals(cts, processCts)) cts = null;
@@ -204,7 +204,7 @@ public class ScreenMirrorService(
 
             if (!started)
             {
-                logger.LogError("Failed to start scrcpy process");
+                logger.Error("Failed to start scrcpy process");
                 process?.Dispose();
                 processCts.Dispose();
                 if (ReferenceEquals(cts, processCts)) cts = null;
@@ -216,7 +216,7 @@ public class ScreenMirrorService(
         }
         catch (Exception ex)
         {
-            logger.LogError("Error in StartScrcpy {ex}", ex);
+            logger.Error("Error in StartScrcpy", ex);
             processCts?.Dispose();
             if (ReferenceEquals(cts, processCts)) cts = null;
             process?.Dispose();
@@ -260,7 +260,7 @@ public class ScreenMirrorService(
                     selectedDeviceSerial = await ShowDeviceSelectionDialog(pairedDevices);
                     if (string.IsNullOrEmpty(selectedDeviceSerial))
                     {
-                        logger.LogWarning("No device selected for scrcpy");
+                        logger.Warn("No device selected for scrcpy");
                         return null;
                     }
                     break;
@@ -322,7 +322,7 @@ public class ScreenMirrorService(
         }
         else
         {
-            logger.LogWarning("No online devices found from adb");
+            logger.Warn("No online devices found from adb");
             await dispatcher.EnqueueAsync(async () =>
             {
                 var dialog = new ContentDialog
@@ -453,14 +453,14 @@ public class ScreenMirrorService(
         process.OutputDataReceived += (_, e) => 
         {
             if (!string.IsNullOrEmpty(e.Data))
-                logger.LogInformation($"scrcpy: {e.Data}");
+                logger.Info($"scrcpy: {e.Data}");
         };
         
         process.ErrorDataReceived += (_, e) =>
         {
             if (!string.IsNullOrEmpty(e.Data))
             {
-                logger.LogError($"scrcpy error: {e.Data}");
+                logger.Error($"scrcpy error: {e.Data}");
                 lock (errorOutput)
                 {
                     errorOutput.AppendLine(e.Data);
@@ -468,11 +468,11 @@ public class ScreenMirrorService(
             }
         };
         
-        process.Exited += (_, _) => logger.LogInformation("scrcpy process terminated");
+        process.Exited += (_, _) => logger.Info("scrcpy process terminated");
         
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
-        logger.LogInformation("scrcpy process started {pid}", process.Id);
+        logger.Info($"scrcpy process started {process.Id}");
        
 
         scrcpyProcesses.Add(deviceSerial, process);
@@ -482,7 +482,7 @@ public class ScreenMirrorService(
             try
             {
                 await process.WaitForExitAsync(processCts.Token);
-                logger.LogInformation("scrcpy process exited with code: {exitCode}", process.ExitCode);
+                logger.Info($"scrcpy process exited with code: {process.ExitCode}");
                 
                 if (process.ExitCode != 0 && process.ExitCode != 2)
                 {
@@ -491,7 +491,7 @@ public class ScreenMirrorService(
                     {
                         errorMessage = $"Scrcpy process exited with code {process.ExitCode}\n\nError Output:\n{errorOutput.ToString().TrimEnd()}";
                     }
-                    logger.LogError("Scrcpy failed: {error}", errorMessage);
+                    logger.Error($"Scrcpy failed: {errorMessage}");
 
                     await dispatcher.EnqueueAsync(async () =>
                     {
@@ -523,17 +523,15 @@ public class ScreenMirrorService(
                             var dataPackage = new DataPackage();
                             dataPackage.SetText(errorMessage);
                             Clipboard.SetContent(dataPackage);
-                            logger.LogInformation("Scrcpy error output copied to clipboard");
+                            logger.Info("Scrcpy error output copied to clipboard");
                         }
                     });
                 }
             }
+            catch (OperationCanceledException) { }
             catch (Exception ex)
             {
-                if (ex is not OperationCanceledException)
-                {
-                    logger.LogError("Error monitoring scrcpy process {ex}", ex);
-                }
+                logger.Error("Error monitoring scrcpy process", ex);
             }
             finally
             {

@@ -72,7 +72,7 @@ public class SyncRootRegistrar(
         };
          //info.StorageProviderItemPropertyDefinitions.Add()
 
-        logger.LogDebug("Registering {syncRootId}", id);
+        logger.Debug($"Registering {id}");
         StorageProviderSyncRootManager.Register(info);
 
         return info;
@@ -80,7 +80,7 @@ public class SyncRootRegistrar(
 
     public void Unregister(string id)
     {
-        logger.LogDebug("Unregistering {syncRootId}", id);
+        logger.Debug($"Unregistering {id}");
         try
         {
             // Try to force garbage collection and cleanup before unregistering
@@ -91,11 +91,11 @@ public class SyncRootRegistrar(
         }
         catch (COMException ex) when (ex.HResult == -2147023728)
         {
-            logger.LogError(ex, "Sync root not found");
+            logger.Error("Sync root not found", ex);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Unregister sync root failed");
+            logger.Error("Unregister sync root failed", ex);
         }
     }
 
@@ -111,7 +111,7 @@ public class SyncRootRegistrar(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to update credentials");
+            logger.Error("Failed to update credentials", ex);
             throw;
         }
     }

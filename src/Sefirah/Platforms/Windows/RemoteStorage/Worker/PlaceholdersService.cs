@@ -6,6 +6,7 @@ using Vanara.PInvoke;
 using FileAttributes = System.IO.FileAttributes;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
+
 public class PlaceholdersService(
     ISyncProviderContextAccessor contextAccessor,
     IRemoteReadWriteService remoteService,
@@ -92,7 +93,7 @@ public class PlaceholdersService(
             out var entriesProcessed
         ).ThrowIfFailed("Create placeholder failed");
 
-        logger.LogInformation("Created placeholder file for {path}", relativeFile);
+        logger.Info($"Created placeholder file for {relativeFile}");
     }
 
     public async Task CreateDirectory(string relativeDirectory)
@@ -105,7 +106,7 @@ public class PlaceholdersService(
         // If it's already a placeholder, just update it
         if (CloudFilter.IsPlaceholder(targetPath))
         {
-            logger.LogInformation("Directory is already a placeholder, updating {path}", relativeDirectory);
+            logger.Info($"Directory is already a placeholder, updating {relativeDirectory}");
             await UpdateDirectory(relativeDirectory);
             return;
         }
@@ -122,11 +123,11 @@ public class PlaceholdersService(
                 out var entriesProcessed
             ).ThrowIfFailed("Create placeholder failed");
 
-            logger.LogInformation("Created placeholder for {path}", relativeDirectory);
+            logger.Info($"Created placeholder for {relativeDirectory}");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to create placeholder for {path}: {error}", relativeDirectory, ex.Message);
+            logger.Error($"Failed to create placeholder for {relativeDirectory}: {ex.Message}", ex);
             throw;
         }
     }
@@ -159,8 +160,8 @@ public class PlaceholdersService(
         var placeholderState = CloudFilter.GetPlaceholderState(hfile);
         if (!placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER))
         {
-            CloudFilter.ConvertToPlaceholder(hfile);
-        }
+                CloudFilter.ConvertToPlaceholder(hfile);
+            }
 
         var remoteFileInfo = remoteService.GetFileInfo(relativeFile);
         if (!force && remoteFileInfo.GetHashCode() == _fileComparer.GetHashCode(clientFileInfo))
@@ -173,7 +174,7 @@ public class PlaceholdersService(
             return;
         }
 
-        logger.LogInformation("UpdateFile - update placeholder {relativeFile}", relativeFile);
+        logger.Info($"UpdateFile - update placeholder {relativeFile}");
         var pinned = clientFileInfo.Attributes.HasAnySyncFlag(SyncAttributes.PINNED);
         if (pinned)
         {
@@ -207,17 +208,17 @@ public class PlaceholdersService(
 
         var remoteDirectoryInfo = remoteService.GetDirectoryInfo(relativeDirectory);
 
-        // Check if the directory is hydrated 
+        // Check if the directory is hydrated
         bool isHydrated = !File.GetAttributes(clientDirectory).HasAnySyncFlag(SyncAttributes.OFFLINE);
-        
+
         // Only update placeholder state if directory is a hydrated directory
         if (isHydrated)
         {
-            logger.LogInformation("Directory {path} is hydrated", relativeDirectory);
+            logger.Info($"Directory {relativeDirectory} is hydrated");
             if (!CloudFilter.IsPlaceholder(clientDirectory))
             {
-                CloudFilter.ConvertToPlaceholder(clientDirectory);
-                CloudFilter.SetInSyncState(clientDirectory);
+                    CloudFilter.ConvertToPlaceholder(clientDirectory);
+                    CloudFilter.SetInSyncState(clientDirectory);
                 logger.LogInformation("Converted to placeholder and updated {path}", relativeDirectory);
                 return Task.CompletedTask;
             }

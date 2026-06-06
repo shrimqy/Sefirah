@@ -16,12 +16,12 @@ public class DatabaseContext
     {
         try
         {
-            logger.LogInformation("Initializing database context");
+            logger.Info("Initializing database context");
             Database = TryCreateDatabase(logger);
         }
         catch (Exception ex)
         {
-            logger.LogError("Failed to initialize database context {ex}", ex);
+            logger.Error($"Failed to initialize database context", ex);
             throw;
         }
     }
@@ -61,7 +61,7 @@ public class DatabaseContext
             }
 
             SetSchemaVersion(db, CurrentSchemaVersion);
-            logger.LogInformation("Database schema updated successfully");
+            logger.Info("Database schema updated successfully");
         }
         else
         {
@@ -88,13 +88,13 @@ public class DatabaseContext
         {
             try
             {
-                logger.LogInformation("Running migration to version {Version}", migration.TargetVersion);
+                logger.Info($"Running migration to version {migration.TargetVersion}");
                 migration.Up(db);
                 SetSchemaVersion(db, migration.TargetVersion);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Migration to version {Version} failed. Falling back to destructive mode.", migration.TargetVersion);
+                logger.Error($"Migration to version {migration.TargetVersion} failed. Falling back to destructive mode.", ex);
                 DestructiveFallback(db);
                 return;
             }

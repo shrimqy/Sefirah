@@ -24,14 +24,14 @@ internal static class CallingFeatureUtils
             var accessResult = LimitedAccessFeatures.TryUnlockFeature(FeatureId, token, attestation);
             if (accessResult is not null)
             {
-                logger.LogInformation("Phone line transport LAF {FeatureId}: {Status}", FeatureId, accessResult.Status);
+                logger.Info($"Phone line transport LAF {FeatureId}: {accessResult.Status}");
                 return accessResult.Status is LimitedAccessFeatureStatus.Available
                     || accessResult.Status is LimitedAccessFeatureStatus.AvailableWithoutToken;
             }
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "TryUnlockPhoneLineTransportLimitedAccessFeature");
+            logger.Warn("TryUnlockPhoneLineTransportLimitedAccessFeature", ex);
         }
 
         return false;

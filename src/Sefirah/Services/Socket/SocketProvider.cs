@@ -90,6 +90,6 @@ public partial class MulticastClient(string address, int port, IUdpClientProvide
     }
     protected override void OnError(SocketError error)
     {
-        logger.LogError("Session {Id} encountered error: {error}", Id, error);
+        logger.Error($"Session {Id} encountered error: {error}");
     }
 }

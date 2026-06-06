@@ -72,7 +72,7 @@ public class NetworkService(
                 server = null;
             }
         }
-        logger.LogError("Failed to start server");
+        logger.Error($"Failed to start server");
     }
 
     private async void ConnectionStatusChangedEvent(object? sender, PairedDevice device)
@@ -94,7 +94,7 @@ public class NetworkService(
         }
         catch (Exception ex)
         {
-            logger.Error("Exception occurred while sending device info", ex);
+            logger.Error($"Exception occurred while sending device info", ex);
         }
     }
 
@@ -119,7 +119,7 @@ public class NetworkService(
         }
         catch (Exception ex)
         {
-            logger.LogError("Error sending message {ex}", ex);
+            logger.Error($"Error sending message", ex);
         }
     }
 
@@ -132,7 +132,7 @@ public class NetworkService(
         }
         catch (Exception ex)
         {
-            logger.LogError("Error sending message to client {ex}", ex);
+            logger.Error($"Error sending message to client", ex);
         }
     }
 
@@ -172,7 +172,7 @@ public class NetworkService(
 
             if (string.IsNullOrEmpty(messageString)) continue;
 
-            logger.LogDebug("Processing message: {Preview}", messageString.Length > 100 ? string.Concat(messageString.AsSpan(0, 100), "...") : messageString);
+            logger.Debug($"Processing message: {(messageString.Length > 100 ? string.Concat(messageString.AsSpan(0, 100), "...") : messageString)}");
 
             var socketMessage = JsonMessageSerializer.DeserializeMessage(messageString);
             if (socketMessage is not null)
@@ -215,7 +215,7 @@ public class NetworkService(
 
     public void OnError(SocketError error)
     {
-        logger.LogError("Error on socket {error}", error);
+        logger.Error($"Error on socket {error}");
     }
 
     public void OnReceived(ServerSession session, byte[] buffer, long offset, long size)
@@ -237,7 +237,7 @@ public class NetworkService(
         }
         catch (Exception ex)
         {
-            logger.LogError("Error in OnReceived for session {id}: {ex}", session.Id, ex);
+            logger.Error($"Error in OnReceived for session {session.Id}", ex);
         }
     }
 
@@ -265,7 +265,7 @@ public class NetworkService(
             return;
         }
 
-        logger.Warn("Received message from unknown client");
+        logger.Warn($"Received message from unknown client");
     }
 
     private void HandlePairMessage(DiscoveredDevice device, PairMessage pairMessage)
@@ -293,7 +293,7 @@ public class NetworkService(
             var cert = SslHelper.GetCertForPublicKey(authMessage.PublicKey);
             if (cert is null || cert.Length == 0)
             {
-                logger.Warn("No client certificate or PublicKey mismatch; rejecting connection");
+                logger.Warn($"No client certificate or PublicKey mismatch; rejecting connection");
                 throw new Exception("Client certificate required");
             }
 
@@ -313,7 +313,7 @@ public class NetworkService(
         }
         catch (Exception ex)
         {
-            logger.Error($"Error in session authentication: {ex}");
+            logger.Error($"Error in session authentication", ex);
             DisconnectSession(session);
         }
     }
@@ -391,7 +391,7 @@ public class NetworkService(
             }
             catch (Exception ex)
             {
-                logger.Error($"Error showing connection request dialog: {ex}");
+                logger.Error($"Error showing connection request dialog", ex);
                 tcs.SetResult(false);
             }
         });
@@ -445,7 +445,7 @@ public class NetworkService(
         }
         catch (Exception ex)
         {
-            logger.Error($"Error in Disconnecting: {ex.Message}");
+            logger.Error($"Error in Disconnecting", ex);
         }
     }
 
@@ -475,7 +475,7 @@ public class NetworkService(
         }
         catch (Exception ex)
         {
-            logger.Error($"Error disconnecting client: {ex.Message}");
+            logger.Error($"Error disconnecting client", ex);
         }
     }
 
@@ -523,7 +523,7 @@ public class NetworkService(
             }
             catch (Exception ex)
             {
-                logger.Warn($"Error connecting to {address}:{port}: {ex.Message}");
+                logger.Warn($"Error connecting to {address}:{port}", ex);
             }
         }
         finally
@@ -597,7 +597,7 @@ public class NetworkService(
                 }
                 catch (Exception ex)
                 {
-                    logger.Debug($"Failed to connect to {address}:{device.Port}: {ex.Message}");
+                    logger.Debug($"Failed to connect to {address}:{device.Port}", ex);
                 }
             }
             logger.Warn($"Failed to connect to device {device.Name} on any IP address/port combination");
@@ -650,7 +650,7 @@ public class NetworkService(
     {
         if (handshakeCompletion.TryRemove(client.Id, out var tcs))
             tcs.TrySetException(new IOException($"Socket error before TLS handshake completed: {error}"));
-        logger.LogError("Error on client socket {error}", error);
+        logger.Error($"Error on client socket {error}");
         DisconnectClient(client);
     }
 
@@ -673,7 +673,7 @@ public class NetworkService(
         }
         catch (Exception ex)
         {
-            logger.LogError("Error in OnReceived for client: {ex}", ex);
+            logger.Error($"Error in OnReceived for client", ex);
         }
     }
     #endregion
@@ -709,7 +709,7 @@ public class NetworkService(
         }
         catch (Exception ex)
         {
-            logger.Error($"Error in client authentication: {ex}");
+            logger.Error($"Error in client authentication", ex);
             DisconnectClient(client);
         }
     }

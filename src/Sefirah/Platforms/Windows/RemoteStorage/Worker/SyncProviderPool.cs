@@ -7,6 +7,7 @@ using Vanara.PInvoke;
 using Windows.Storage.Provider;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
+
 public class SyncProviderPool(
     IServiceScopeFactory scopeFactory,
     ILogger logger)
@@ -27,7 +28,7 @@ public class SyncProviderPool(
             // If there's an existing thread, stop it first
             if (_threads.TryGetValue(syncRootInfo.Id, out var existingThread))
             {
-                logger.LogDebug("Stopping existing sync provider for {id}", syncRootInfo.Id);
+                logger.Debug($"Stopping existing sync provider for {syncRootInfo.Id}");
                 existingThread.Stop().Wait();
                 _threads.Remove(syncRootInfo.Id);
             }
@@ -45,7 +46,7 @@ public class SyncProviderPool(
 
             thread.Start();
             _threads[syncRootInfo.Id] = thread;
-            logger.LogDebug("Started new sync provider for {id}", syncRootInfo.Id);
+            logger.Debug($"Started new sync provider for {syncRootInfo.Id}");
         }
     }
 
@@ -65,14 +66,14 @@ public class SyncProviderPool(
         {
             if (_threads.TryGetValue(syncRootInfo.Id, out var existingThread))
             {
-                logger.LogDebug("Stopping existing sync provider for {id}", syncRootInfo.Id);
+                logger.Debug($"Stopping existing sync provider for {syncRootInfo.Id}");
                 await existingThread.Stop();
                 _threads.Remove(syncRootInfo.Id);
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to stop sync root");
+            logger.Error("Failed to stop sync root", ex);
         }
     }
 
@@ -118,7 +119,7 @@ public class SyncProviderPool(
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Thread stopped unexpectedly");
+                    logger.Error("Thread stopped unexpectedly", ex);
                 }
                 Stopped?.Invoke(this, EventArgs.Empty);
             });

@@ -4,7 +4,6 @@ using Sefirah.Platforms.Windows.Interop;
 using Sefirah.Platforms.Windows.Interop.Extensions;
 using Sefirah.Platforms.Windows.RemoteStorage.Abstractions;
 using Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
-using Sefirah.Platforms.Windows.RemoteStorage.Worker;
 using Vanara.PInvoke;
 using static Vanara.PInvoke.CldApi;
 using FileAttributes = System.IO.FileAttributes;
@@ -53,30 +52,30 @@ public class ClientWatcher : IDisposable
         };
 
         watcher.Changed += async (sender, e) => {
-            try 
+            try
             {
-                if (e.ChangeType != WatcherChangeTypes.Changed || 
-                    !Path.Exists(e.FullPath) || 
+                if (e.ChangeType != WatcherChangeTypes.Changed ||
+                    !Path.Exists(e.FullPath) ||
                     FileHelper.IsSystemFile(e.FullPath))
                 {
                     return;
                 }
 
                 var fileInfo = new FileInfo(e.FullPath);
-                
+
                 CF_PLACEHOLDER_STATE state;
-                try 
+                try
                 {
                     state = CloudFilter.GetPlaceholderState(e.FullPath);
                 }
                 catch (HFileException)
                 {
-                    _logger.LogWarning("Unable to get placeholder state for {path} - connection may be lost", e.FullPath);
+                    _logger.Warn($"Unable to get placeholder state for {e.FullPath} - connection may be lost");
                     return;
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error getting placeholder state for {path}", e.FullPath);
+                    _logger.Warn($"Unable to get placeholder state for {e.FullPath}", ex);
                     return;
                 }
 
@@ -85,8 +84,8 @@ public class ClientWatcher : IDisposable
                     state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER) ||
                     fileInfo.Attributes.HasFlag(FileAttributes.ReparsePoint) ||
                     fileInfo.LastWriteTime == fileInfo.LastAccessTime ||
-                    e.ChangeType == WatcherChangeTypes.Changed && 
-                    (state == CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_NO_STATES || 
+                    e.ChangeType == WatcherChangeTypes.Changed &&
+                    (state == CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_NO_STATES ||
                      state == (CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER | CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC)))
                 {
                     return;
@@ -114,17 +113,17 @@ public class ClientWatcher : IDisposable
                                     }
                                     catch (HFileException)
                                     {
-                                        _logger.LogWarning("Unable to hydrate placeholder for {path} - connection may be lost", childItem);
+                                        _logger.Warn($"Unable to hydrate placeholder for {childItem} - connection may be lost");
                                     }
                                     catch (Exception ex)
                                     {
-                                        _logger.LogError(ex, "Hydrate file failed: {filePath}", childItem);
+                                        _logger.Error($"Hydrate file failed: {childItem}", ex);
                                     }
                                 }
                             }
                             catch (Exception ex)
                             {
-                                _logger.LogError(ex, "Error processing directory {path}", e.FullPath);
+                                _logger.Error($"Error processing directory {e.FullPath}", ex);
                             }
                         }
                         else
@@ -135,7 +134,7 @@ public class ClientWatcher : IDisposable
                             }
                             catch (HFileException)
                             {
-                                _logger.LogWarning("Unable to hydrate placeholder for {path} - connection may be lost", e.FullPath);
+                                _logger.Warn($"Unable to hydrate placeholder for {e.FullPath} - connection may be lost");
                             }
                         }
                     }
@@ -151,7 +150,7 @@ public class ClientWatcher : IDisposable
                         }
                         catch (HFileException)
                         {
-                            _logger.LogWarning("Unable to dehydrate placeholder for {path} - connection may be lost", e.FullPath);
+                            _logger.Warn($"Unable to dehydrate placeholder for {e.FullPath} - connection may be lost");
                         }
                     }
 
@@ -164,12 +163,12 @@ public class ClientWatcher : IDisposable
                     {
                         await _remoteService.UpdateFile(fileInfo, relativePath);
                     }
-                    
+
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unhandled error in file system watcher for {path}", e.FullPath);
+                _logger.Error($"Unhandled error in file system watcher for {e.FullPath}", ex);
             }
         };
 
@@ -188,7 +187,7 @@ public class ClientWatcher : IDisposable
                 if (File.GetAttributes(e.FullPath).HasFlag(FileAttributes.Directory))
                 {
                     var directoryInfo = new DirectoryInfo(e.FullPath);
-                    await _remoteService.CreateDirectory(directoryInfo, relativePath);
+                        await _remoteService.CreateDirectory(directoryInfo, relativePath);
                     var childItems = Directory.EnumerateFiles(e.FullPath, "*", SearchOption.AllDirectories)
                         .Where((x) => !FileHelper.IsSystemFile(x))
                         .ToArray();
@@ -201,7 +200,7 @@ public class ClientWatcher : IDisposable
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError(ex, "Create file failed: {filePath}", childItem);
+                            _logger.Error($"Create file failed: {childItem}", ex);
                         }
                     }
                 }
@@ -212,47 +211,32 @@ public class ClientWatcher : IDisposable
                         var fileInfo = new FileInfo(e.FullPath);
                         await _remoteService.CreateFile(fileInfo, relativePath);
 
-                        // Add explicit placeholder and sync state handling with delays
                         try
                         {
-                            _logger.LogInformation("Setting placeholder state for new file: {path}", e.FullPath);
-                            
                             if (!CloudFilter.IsPlaceholder(e.FullPath))
                             {
                                 CloudFilter.ConvertToPlaceholder(e.FullPath);
-                                _logger.LogInformation("Converted to placeholder: {path}", e.FullPath);
-                                
-                                // Give time for the placeholder conversion to settle
                                 await Task.Delay(1000);
                             }
 
-                            var stateAfterPlaceholder = CloudFilter.GetPlaceholderState(e.FullPath);
-                            _logger.LogInformation("State after placeholder conversion: {state} for {path}", 
-                                stateAfterPlaceholder, e.FullPath);
-
-                            // Set sync state and wait for it to settle
                             CloudFilter.SetInSyncState(e.FullPath);
-                            await Task.Delay(1000);  // Wait for state change to complete
+                            await Task.Delay(1000);
 
                             var finalState = CloudFilter.GetPlaceholderState(e.FullPath);
-                            _logger.LogInformation("Final state after sync: {state} for {path}", 
-                                finalState, e.FullPath);
-
-                            // One final check to ensure we don't trigger another upload
                             if (!finalState.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
                             {
-                                _logger.LogWarning("Sync state not set properly, retrying for: {path}", e.FullPath);
+                                _logger.Warn($"Sync state not set properly, retrying for: {e.FullPath}");
                                 CloudFilter.SetInSyncState(e.FullPath);
                             }
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError(ex, "Failed to set placeholder/sync state for {path}", e.FullPath);
+                            _logger.Error($"Failed to set placeholder/sync state for {e.FullPath}", ex);
                         }
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Create file failed: {filePath}", e.FullPath);
+                        _logger.Error($"Create file failed: {e.FullPath}", ex);
                     }
                 }
             });
@@ -260,7 +244,7 @@ public class ClientWatcher : IDisposable
 
         watcher.Error += (sender, e) => {
             var ex = e.GetException();
-            _logger.LogError(ex, "Client file watcher error");
+            _logger.Error("Client file watcher error", ex);
         };
 
         return watcher;
