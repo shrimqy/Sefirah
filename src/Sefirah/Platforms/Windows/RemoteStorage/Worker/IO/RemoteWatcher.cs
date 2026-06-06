@@ -32,6 +32,12 @@ public sealed class RemoteWatcher(
             using var locker = await fileLocker.Lock(relativePath);
             try
             {
+                if (!remoteReadService.Exists(relativePath))
+                {
+                    // path no longer exists on the server
+                    return;
+                }
+
                 if (remoteReadService.IsDirectory(relativePath))
                 {
                     await placeholderService.CreateOrUpdateDirectory(relativePath);
