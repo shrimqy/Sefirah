@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Threading.Channels;
 using Sefirah.Platforms.Windows.Helpers;
 using Sefirah.Platforms.Windows.Interop;
@@ -19,8 +20,12 @@ public sealed class SyncRootConnector(
 {
     private readonly string _rootDirectory = contextAccessor.Context.RootDirectory;
 
+    private readonly ConcurrentDictionary<CF_TRANSFER_KEY, CancellationTokenSource> _cancellationTokenSources = new();
+    private readonly ConcurrentDictionary<CF_TRANSFER_KEY, Task> _transferTasks = new();
+    private static readonly TimeSpan TransferKeyReuseWaitTimeout = TimeSpan.FromSeconds(5);
+
     // Trying to prevent garbage collection of these callbacks
-    private static CF_CALLBACK_REGISTRATION[] CallbackRegistrations;
+    private CF_CALLBACK_REGISTRATION[]? CallbackRegistrations;
 
     public CF_CONNECTION_KEY Connect()
     {
@@ -30,8 +35,8 @@ public sealed class SyncRootConnector(
             new SyncRootEvents
             {
                 FetchPlaceholders = FetchPlaceholders,
-                FetchData = (in callbackInfo, in callbackParameters) =>
-                    FetchData(callbackInfo, callbackParameters),
+                FetchData = (in callbackInfo, in callbackParameters) => FetchData(callbackInfo, callbackParameters),
+                CancelFetchData = CancelFetchData,
                 OnCloseCompletion = OnCloseCompletion,
                 OnRenameCompletion = (in callbackInfo, in callbackParameters) =>
                 {
@@ -92,44 +97,44 @@ public sealed class SyncRootConnector(
         foreach (var clientFile in Directory.GetFiles(clientDirectory))
         {
             var relativePath = PathMapper.GetRelativePath(clientFile, _rootDirectory);
-                try
-                {
+            try
+            {
                 if (!remoteService.Exists(relativePath))
                 {
                     File.Delete(clientFile);
                 }
             }
-                catch (Exception) { }
-                }
+            catch (Exception) { }
+        }
 
         // Check and delete directories recursively
         foreach (var clientDir in Directory.GetDirectories(clientDirectory))
         {
             var relativePath = PathMapper.GetRelativePath(clientDir, _rootDirectory);
-                try
-                {
+            try
+            {
                 if (!remoteService.Exists(relativePath))
                 {
                     Directory.Delete(clientDir, recursive: true);
                 }
-            else
-            {
-                //  recursively check hydrated directories
-                var attributes = File.GetAttributes(clientDir);
-                bool isHydrated = !attributes.HasFlag(FileAttributes.Offline);
-                
-                if (isHydrated)
+                else
                 {
-                    // Directory exists remotely and is hydrated, check its contents recursively
-                    UpdatePlaceholders(clientDir);
+                    //  recursively check hydrated directories
+                    var attributes = File.GetAttributes(clientDir);
+                    bool isHydrated = !attributes.HasFlag(FileAttributes.Offline);
+                
+                    if (isHydrated)
+                    {
+                        // Directory exists remotely and is hydrated, check its contents recursively
+                        UpdatePlaceholders(clientDir);
+                    }
                 }
             }
-        }
             catch (Exception) { }
-    }
+        }
     }
 
-    private async void FetchData(CF_CALLBACK_INFO callbackInfo, CF_CALLBACK_PARAMETERS callbackParameters)
+    private void FetchData(CF_CALLBACK_INFO callbackInfo, CF_CALLBACK_PARAMETERS callbackParameters)
     {
         logger.LogDebug(
             "Fetch data, {file}, fileSize: {fileSize}, offset: {offset}, total: {total}",
@@ -138,14 +143,31 @@ public sealed class SyncRootConnector(
             callbackParameters.FetchData.RequiredFileOffset,
             callbackParameters.FetchData.RequiredLength
         );
+
+        var transferKey = callbackInfo.TransferKey;
+
+        if (_transferTasks.TryGetValue(transferKey, out var existingTask))
+        {
+            existingTask.Wait(TransferKeyReuseWaitTimeout);
+        }
+
+        var cts = new CancellationTokenSource();
+        _cancellationTokenSources[transferKey] = cts;
+
+        var wrappedTask = new Task<Task>(() => FetchDataAsync(callbackInfo, callbackParameters, cts.Token));
+        _transferTasks[transferKey] = wrappedTask.Unwrap();
+        wrappedTask.RunSynchronously();
+    }
+
+    private async Task FetchDataAsync(CF_CALLBACK_INFO callbackInfo, CF_CALLBACK_PARAMETERS callbackParameters, CancellationToken cancellationToken)
+    {
         try
         {
             var clientFile = Path.Join(callbackInfo.VolumeDosName, callbackInfo.NormalizedPath[1..]);
 
             var bufferSize = Math.Min(callbackParameters.FetchData.RequiredLength, 4096 * 4);
             var buffer = new byte[bufferSize];
-            long startOffset = callbackParameters.FetchData.RequiredFileOffset;
-            long currentOffset = startOffset;
+            long currentOffset = callbackParameters.FetchData.RequiredFileOffset;
             long targetOffset = callbackParameters.FetchData.RequiredFileOffset
                 + callbackParameters.FetchData.RequiredLength;
             long readLength = 0;
@@ -155,6 +177,7 @@ public sealed class SyncRootConnector(
             fileStream.Seek(currentOffset, SeekOrigin.Begin);
             while (currentOffset <= targetOffset && (readLength = fileStream.Read(buffer, 0, buffer.Length)) > 0)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 // Update the transfer progress
                 CloudFilter.ReportProgress(callbackInfo, callbackInfo.FileSize, currentOffset + readLength);
                 // TODO: Tell the Shell so File Explorer can display the progress bar in its view
@@ -166,17 +189,42 @@ public sealed class SyncRootConnector(
                 currentOffset += readLength;
             }
         }
+        catch (OperationCanceledException)
+        {
+            logger.LogDebug("Fetch data cancelled for {file}", callbackInfo.NormalizedPath);
+        }
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to transfer server->client");
+            try
+            {
+                CloudFilter.TransferData(
+                    callbackInfo,
+                    null,
+                    callbackParameters.FetchData.RequiredFileOffset,
+                    callbackParameters.FetchData.RequiredLength,
+                    success: false
+                );
+            }
+            catch (Exception innerEx)
+            {
+                logger.LogError(innerEx, "Failed to signal transfer failure to Cloud Filter");
+            }
+        }
+        finally
+        {
+            _cancellationTokenSources.TryRemove(callbackInfo.TransferKey, out var cts);
+            cts?.Dispose();
+            _transferTasks.TryRemove(callbackInfo.TransferKey, out _);
+        }
+    }
 
-            CloudFilter.TransferData(
-                callbackInfo,
-                null,
-                callbackParameters.FetchData.RequiredFileOffset,
-                callbackParameters.FetchData.RequiredLength,
-                success: false
-            );
+    private void CancelFetchData(in CF_CALLBACK_INFO callbackInfo, in CF_CALLBACK_PARAMETERS _)
+    {
+        if (_cancellationTokenSources.TryRemove(callbackInfo.TransferKey, out var cts))
+        {
+            cts.Cancel();
+            cts.Dispose();
         }
     }
 
