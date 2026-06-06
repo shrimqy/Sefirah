@@ -52,9 +52,7 @@ public sealed class SftpWatcher(
                         }
                     }
 
-                    var foundFiles = IsHydrated(_context.Directory)
-                                    ? FindFiles(_context.Directory)
-                                    : [];
+                    var foundFiles = IsHydrated("") ? FindFiles("") : [];
 
                     if (client.IsConnected)
                     {
@@ -113,7 +111,7 @@ public sealed class SftpWatcher(
         }
     }
 
-    private Dictionary<string, DateTime> FindFiles(string directory)
+    private Dictionary<string, DateTime> FindFiles(string relativeDirectory)
     {
         if (!client?.IsConnected ?? true)
         {
@@ -121,41 +119,41 @@ public sealed class SftpWatcher(
             return _knownFiles;
         }
 
+        var serverDirectory = Path.Join(_context.Directory, relativeDirectory).Replace(@"\", "/");
+
         try
         {
-            var sftpFiles = client?.ListDirectory(directory);
+            var sftpFiles = client?.ListDirectory(serverDirectory);
             if (sftpFiles == null)
             {
-                logger.LogWarning("ListDirectory returned null for {directory}", directory);
-                return _knownFiles; 
+                logger.LogWarning("ListDirectory returned null for {directory}", serverDirectory);
+                return _knownFiles;
             }
 
-            // Get all directories first, excluding system directories
-            var directories = sftpFiles
-                .Where(sftpFile => sftpFile.IsDirectory && 
-                                  !_relativeDirectoryNames.Contains(sftpFile.Name) &&
-                                  !FileHelper.IsSystemDirectory(PathMapper.GetRelativePath(sftpFile.FullName, _context.Directory)))
-                .ToDictionary(
-                    dir => dir.FullName,
-                    _ => DateTime.MaxValue
-                );
+            var dirEntries = sftpFiles
+                .Where(sftpFile => sftpFile.IsDirectory &&
+                                   !_relativeDirectoryNames.Contains(sftpFile.Name) &&
+                                   !FileHelper.IsSystemDirectory(PathMapper.GetRelativePath(sftpFile.FullName, _context.Directory)))
+                .ToArray();
+
+            var directories = dirEntries.ToDictionary(
+                dir => PathMapper.GetRelativePath(dir.FullName, _context.Directory),
+                _ => DateTime.MaxValue
+            );
 
             // Get files from current directory
             var files = sftpFiles
                 .Where(sftpFile => sftpFile.IsRegularFile)
                 .ToDictionary(
-                    file => file.FullName,
+                    file => PathMapper.GetRelativePath(file.FullName, _context.Directory),
                     file => file.LastWriteTimeUtc
                 );
 
             // Recursively get files from hydrated subdirectories
             var subFiles = directories.Keys
-                .Where(IsHydrated) 
+                .Where(IsHydrated)
                 .SelectMany(FindFiles)
-                .ToDictionary(
-                    pair => pair.Key,
-                    pair => pair.Value
-                );
+                .ToDictionary(pair => pair.Key, pair => pair.Value);
 
             return directories
                 .Concat(files)
@@ -219,20 +217,17 @@ public sealed class SftpWatcher(
         }
     }
 
-    private bool IsHydrated(string serverPath)
+    private bool IsHydrated(string relativePath)
     {
-        serverPath = PathMapper.NormalizePath(serverPath);
         try
         {
-            var relativePath = PathMapper.GetRelativePath(serverPath, _context.Directory);
             var clientPath = Path.Join(_syncContext.RootDirectory, relativePath);
-
             return Path.Exists(clientPath) &&
                    !File.GetAttributes(clientPath).HasAnySyncFlag(SyncAttributes.OFFLINE);
         }
         catch (Exception ex)
         {
-            logger.LogError("Error checking hydration state for {path}", serverPath, ex);
+            logger.LogError("Error checking hydration state for {path}", relativePath, ex);
             return false;
         }
     }
