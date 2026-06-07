@@ -1,4 +1,5 @@
 namespace Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
+
 public interface IRemoteReadService
 {
     IEnumerable<RemoteDirectoryInfo> EnumerateDirectories(string relativeDirectory);

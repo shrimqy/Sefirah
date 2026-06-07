@@ -8,6 +8,7 @@ using Vanara.InteropServices;
 using Vanara.PInvoke;
 
 namespace Sefirah.Platforms.Windows.Interop;
+
 public static class CloudFilter
 {
     public static CldApi.CF_CALLBACK_REGISTRATION[] ConnectSyncRoot(
@@ -68,7 +69,7 @@ public static class CloudFilter
             Kernel32.FILE_INFO_BY_HANDLE_CLASS.FileAttributeTagInfo
         );
         var state = CldApi.CfGetPlaceholderStateFromAttributeTag(info.FileAttributes, info.ReparseTag);
-        if (state == CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_INVALID)
+        if (state is CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_INVALID)
         {
             throw new Exception("Invalid placeholder state");
         }

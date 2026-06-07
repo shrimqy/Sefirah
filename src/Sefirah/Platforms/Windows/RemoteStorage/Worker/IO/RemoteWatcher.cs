@@ -3,7 +3,9 @@ using Sefirah.Platforms.Windows.Helpers;
 using Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker.IO;
-public sealed class RemoteWatcher(
+
+/// <summary>Updates local placeholders for events raised from <see cref="IRemoteWatcher"/>.</summary>
+public sealed partial class RemoteWatcher(
     IRemoteReadService remoteReadService,
     IRemoteWatcher remoteWatcher,
     ChannelWriter<Func<Task>> taskWriter,

@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Commands;
+
 [StructLayout(LayoutKind.Sequential)]
 public struct RegisterSyncRootCommand
 {

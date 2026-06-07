@@ -10,6 +10,7 @@ using static Vanara.PInvoke.ShlwApi;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Shell.Commands;
 
+
 [ComVisible(true), Guid("942952b6-3bdc-4e50-8fe2-8d2d869ca70f")]
 public class SyncCommand(
     ChannelWriter<ShellCommand> commandWriter,

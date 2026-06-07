@@ -1,6 +1,7 @@
 using FileAttributes = System.IO.FileAttributes;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
+
 public record RemoteFileSystemInfo
 {
     public required string Name { get; init; }

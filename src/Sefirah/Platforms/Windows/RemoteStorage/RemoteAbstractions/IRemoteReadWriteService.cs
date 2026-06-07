@@ -1,4 +1,5 @@
 namespace Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
+
 public interface IRemoteReadWriteService : IRemoteReadService
 {
     Task CreateFile(FileInfo sourceFileInfo, string relativeFile);

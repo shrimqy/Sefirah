@@ -1,6 +1,7 @@
 using Sefirah.Platforms.Windows.RemoteStorage.Commands;
 
 namespace Sefirah.Platforms.Windows.Abstractions;
+
 public partial record SyncProviderContext
 {
     public required string Id { get; init; }

@@ -2,7 +2,8 @@ using System.Collections.Concurrent;
 using Sefirah.Platforms.Windows.Helpers;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
-public sealed class FileLocker(ILogger logger) : IDisposable
+
+public sealed partial class FileLocker(ILogger logger) : IDisposable
 {
     private readonly Dictionary<string, SemaphoreQueue> _lockers = [];
 
@@ -52,7 +53,7 @@ public sealed class FileLocker(ILogger logger) : IDisposable
         }
     }
 
-    private class SemaphoreQueue : IDisposable
+    private partial class SemaphoreQueue : IDisposable
     {
         private ConcurrentQueue<TaskCompletionSource<bool>> _queue = new();
         private readonly SemaphoreSlim _semaphore = new(1);

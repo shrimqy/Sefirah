@@ -6,7 +6,8 @@ using Sefirah.Platforms.Windows.RemoteStorage.Abstractions;
 using Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Sftp;
-public sealed class SftpWatcher(
+
+public sealed partial class SftpWatcher(
     ISyncProviderContextAccessor syncContextAccessor,
     ISftpContextAccessor contextAccessor,
     SftpClient client,
@@ -24,7 +25,7 @@ public sealed class SftpWatcher(
     public event RemoteChangeHandler? Changed;
     public event RemoteRenameHandler? Renamed;
     public event RemoteDeleteHandler? Deleted;
-
+    
     public async void Start(CancellationToken stoppingToken = default)
     {
         ObjectDisposedException.ThrowIf(_cancellationTokenSource.IsCancellationRequested, this);

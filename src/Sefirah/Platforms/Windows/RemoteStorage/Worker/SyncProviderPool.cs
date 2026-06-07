@@ -8,14 +8,18 @@ using Windows.Storage.Provider;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
 
-public class SyncProviderPool(
+public partial class SyncProviderPool(
     IServiceScopeFactory scopeFactory,
     ILogger logger)
 {
     private readonly Dictionary<string, CancellableThread> _threads = [];
-    private readonly object _lock = new();
+    private readonly Lock _lock = new();
     private bool _stopping = false;
 
+    /// <summary>
+    /// Starts the sync loop for a root, replacing any existing one with the same Id. 
+    /// Call this after registering a sync root.
+    /// </summary>
     public void Start(StorageProviderSyncRootInfo syncRootInfo)
     {
         if (_stopping)
@@ -104,7 +108,7 @@ public class SyncProviderPool(
         await syncProvider.Run(cancellation);
     }
 
-    private sealed class CancellableThread : IDisposable
+    private sealed partial class CancellableThread : IDisposable
     {
         private readonly CancellationTokenSource _cts = new();
         private readonly Task _task;

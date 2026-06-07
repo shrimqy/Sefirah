@@ -9,7 +9,9 @@ using static Vanara.PInvoke.CldApi;
 using FileAttributes = System.IO.FileAttributes;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker.IO;
-public class ClientWatcher : IDisposable
+
+/// <summary>Watches local sync root and updates remote storage.</summary>
+public partial class ClientWatcher : IDisposable
 {
     private readonly ISyncProviderContextAccessor _contextAccessor;
     private readonly ChannelWriter<Func<Task>> _taskWriter;
@@ -19,7 +21,7 @@ public class ClientWatcher : IDisposable
     private readonly ILogger _logger;
     private readonly FileSystemWatcher _watcher;
 
-    private string _rootDirectory => _contextAccessor.Context.RootDirectory;
+    private string RootDirectory => _contextAccessor.Context.RootDirectory;
 
     public ClientWatcher(
         ISyncProviderContextAccessor contextAccessor,
@@ -41,7 +43,7 @@ public class ClientWatcher : IDisposable
 
     private FileSystemWatcher CreateWatcher()
     {
-        var watcher = new FileSystemWatcher(_rootDirectory)
+        var watcher = new FileSystemWatcher(RootDirectory)
         {
             IncludeSubdirectories = true,
             NotifyFilter = NotifyFilters.FileName
@@ -84,15 +86,15 @@ public class ClientWatcher : IDisposable
                     state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER) ||
                     fileInfo.Attributes.HasFlag(FileAttributes.ReparsePoint) ||
                     fileInfo.LastWriteTime == fileInfo.LastAccessTime ||
-                    e.ChangeType == WatcherChangeTypes.Changed &&
-                    (state == CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_NO_STATES ||
-                     state == (CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER | CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC)))
+                    e.ChangeType is WatcherChangeTypes.Changed &&
+                    (state is CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_NO_STATES ||
+                     state is (CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER | CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC)))
                 {
                     return;
                 }
 
                 await _taskWriter.WriteAsync(async () => {
-                    var relativePath = PathMapper.GetRelativePath(e.FullPath, _rootDirectory);
+                    var relativePath = PathMapper.GetRelativePath(e.FullPath, RootDirectory);
                     using var locker = await _fileLocker.Lock(relativePath);
 
                     if (fileInfo.Attributes.HasAllSyncFlags(SyncAttributes.PINNED | (int)FileAttributes.Offline))
@@ -191,13 +193,22 @@ public class ClientWatcher : IDisposable
             }
 
             await _taskWriter.WriteAsync(async () => {
-                var relativePath = PathMapper.GetRelativePath(e.FullPath, _rootDirectory);
+                var relativePath = PathMapper.GetRelativePath(e.FullPath, RootDirectory);
                 using var locker = await _fileLocker.Lock(relativePath);
 
                 if (File.GetAttributes(e.FullPath).HasFlag(FileAttributes.Directory))
                 {
                     var directoryInfo = new DirectoryInfo(e.FullPath);
+
+                    try
+                    {
                         await _remoteService.CreateDirectory(directoryInfo, relativePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error($"Create directory failed: {relativePath}", ex);
+                    }
+
                     var childItems = Directory.EnumerateFiles(e.FullPath, "*", SearchOption.AllDirectories)
                         .Where((x) => !FileHelper.IsSystemFile(x))
                         .ToArray();
@@ -206,7 +217,8 @@ public class ClientWatcher : IDisposable
                         try
                         {
                             var fileInfo = new FileInfo(childItem);
-                            await _remoteService.CreateFile(fileInfo, childItem);
+                            var childRelativePath = PathMapper.GetRelativePath(childItem, RootDirectory);
+                            await _remoteService.CreateFile(fileInfo, childRelativePath);
                         }
                         catch (Exception ex)
                         {

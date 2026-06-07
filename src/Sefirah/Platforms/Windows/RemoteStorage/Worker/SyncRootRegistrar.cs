@@ -5,10 +5,12 @@ using Sefirah.Platforms.Windows.Abstractions;
 using Sefirah.Platforms.Windows.Interop;
 using Sefirah.Platforms.Windows.RemoteStorage.Commands;
 using Sefirah.Platforms.Windows.RemoteStorage.Configuration;
+using Sefirah.Platforms.Windows.RemoteStorage.Sftp;
 using Windows.Security.Cryptography;
 using Windows.Storage.Provider;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
+
 public class SyncRootRegistrar(
     IOptions<ProviderOptions> providerOptions,
     ILogger logger
@@ -28,10 +30,9 @@ public class SyncRootRegistrar(
             .ToArray();
     }
 
-    public bool IsRegistered(string id) =>
-        StorageProviderSyncRootManager.GetCurrentSyncRoots().Any((x) => x.Id == id);
+    public static bool IsRegistered(string id) => StorageProviderSyncRootManager.GetCurrentSyncRoots().Any((x) => x.Id == id);
 
-    public StorageProviderSyncRootInfo Register<T>(RegisterSyncRootCommand command, IStorageFolder directory, T context) where T : struct
+    public StorageProviderSyncRootInfo Register(RegisterSyncRootCommand command, IStorageFolder directory, SftpContext context)
     {
         // Stage 1: Setup
         //--------------------------------------------------------------------------------------------

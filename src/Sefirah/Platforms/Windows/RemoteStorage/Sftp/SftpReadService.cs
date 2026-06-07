@@ -6,6 +6,7 @@ using Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
 using FileAttributes = System.IO.FileAttributes;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Sftp;
+
 public class SftpReadService(
     ISftpContextAccessor contextAccessor,
     SftpClient client,

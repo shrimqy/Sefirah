@@ -10,6 +10,7 @@ using static Vanara.PInvoke.CldApi;
 using FileAttributes = System.IO.FileAttributes;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
+
 public sealed class SyncRootConnector(
     ISyncProviderContextAccessor contextAccessor,
     ChannelWriter<Func<Task>> taskWriter,
@@ -84,9 +85,10 @@ public sealed class SyncRootConnector(
             logger.Error("Error transferring placeholders", ex);
         }
     }
-    
-    // Right now it just deletes the placeholders which was deleted in remote
-    public void UpdatePlaceholders(string clientDirectory)
+    /// <summary>
+    /// Removes local placeholders which are removed from the remote since last sync.
+    /// </summary>
+    public void RemoveStalePlaceholders(string clientDirectory)
     {
         if (!Directory.Exists(clientDirectory))
             return;
@@ -123,7 +125,7 @@ public sealed class SyncRootConnector(
                     if (isHydrated)
                     {
                         // Directory exists remotely and is hydrated, check its contents recursively
-                        UpdatePlaceholders(clientDir);
+                        RemoveStalePlaceholders(clientDir);
                     }
                 }
             }
@@ -139,7 +141,14 @@ public sealed class SyncRootConnector(
 
         if (_transferTasks.TryGetValue(transferKey, out var existingTask))
         {
-            existingTask.Wait(TransferKeyReuseWaitTimeout);
+            try 
+            { 
+                existingTask.Wait(TransferKeyReuseWaitTimeout); 
+            }
+            catch (Exception) 
+            { 
+                // prior transfer faulted or cancelled, proceed
+            }
         }
 
         var cts = new CancellationTokenSource();
