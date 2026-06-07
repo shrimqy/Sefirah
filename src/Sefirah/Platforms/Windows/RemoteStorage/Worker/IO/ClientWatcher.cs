@@ -81,14 +81,8 @@ public partial class ClientWatcher : IDisposable
                     return;
                 }
 
-                // More specific conditions for when to skip the change event
-                if (state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC) ||
-                    state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER) ||
-                    fileInfo.Attributes.HasFlag(FileAttributes.ReparsePoint) ||
-                    fileInfo.LastWriteTime == fileInfo.LastAccessTime ||
-                    e.ChangeType is WatcherChangeTypes.Changed &&
-                    (state is CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_NO_STATES ||
-                     state is (CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER | CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC)))
+                // FileSystemWatcher also fires on hydration updates, so skip if already in-sync.
+                if (state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
                 {
                     return;
                 }
@@ -164,6 +158,14 @@ public partial class ClientWatcher : IDisposable
                     else
                     {
                         await _remoteService.UpdateFile(fileInfo, relativePath);
+                        try
+                        {
+                            CloudFilter.SetInSyncState(e.FullPath);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error($"Failed to set in-sync state for {e.FullPath}", ex);
+                        }
                     }
 
                 });

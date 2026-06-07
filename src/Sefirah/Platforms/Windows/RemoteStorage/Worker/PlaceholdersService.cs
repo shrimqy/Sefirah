@@ -176,7 +176,14 @@ public class PlaceholdersService(
             }
         }
 
+        // Skip if local file isn't synced yet (Possibly a local edit and not a remote change)
+        if (!force && downloaded && !placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
+        {
+            return;
+        }
+
         var remoteFileInfo = remoteService.GetFileInfo(relativeFile);
+
         if (!force && remoteFileInfo.GetHashCode() == _fileComparer.GetHashCode(clientFileInfo))
         {
             //logger.Info("UpdateFile - equal, ignoring {relativeFile}", relativeFile);
