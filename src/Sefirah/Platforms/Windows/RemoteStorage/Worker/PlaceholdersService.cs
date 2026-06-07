@@ -293,7 +293,8 @@ public class PlaceholdersService(
         {
             return;
         }
-        if (File.GetAttributes(clientPath).HasFlag(FileAttributes.Directory))
+        var isDirectory = File.GetAttributes(clientPath).HasFlag(FileAttributes.Directory);
+        if (isDirectory)
         {
             Directory.Delete(clientPath, recursive: true);
         }
@@ -301,5 +302,7 @@ public class PlaceholdersService(
         {
             File.Delete(clientPath);
         }
+
+        ShellNotify.NotifyDelete(clientPath, isDirectory);
     }
 }
