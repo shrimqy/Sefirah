@@ -56,38 +56,30 @@ public partial class ClientWatcher : IDisposable
         watcher.Changed += async (sender, e) => {
             try
             {
-                if (e.ChangeType != WatcherChangeTypes.Changed ||
-                    !Path.Exists(e.FullPath) ||
-                    FileHelper.IsSystemFile(e.FullPath))
+                if (e.ChangeType is not WatcherChangeTypes.Changed || !Path.Exists(e.FullPath) || FileHelper.IsSystemFile(e.FullPath))
                 {
                     return;
                 }
 
                 var fileInfo = new FileInfo(e.FullPath);
 
-                CF_PLACEHOLDER_STATE state;
+                await _taskWriter.WriteAsync(async () => {
                 try
                 {
-                    state = CloudFilter.GetPlaceholderState(e.FullPath);
-                }
-                catch (HFileException)
+                        var state = CloudFilter.GetPlaceholderState(e.FullPath);
+
+                        // FileSystemWatcher also fires on hydration updates, so skip if already in-sync.
+                        if (state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
                 {
-                    _logger.Warn($"Unable to get placeholder state for {e.FullPath} - connection may be lost");
                     return;
                 }
+                    }
                 catch (Exception ex)
                 {
                     _logger.Warn($"Unable to get placeholder state for {e.FullPath}", ex);
                     return;
                 }
 
-                // FileSystemWatcher also fires on hydration updates, so skip if already in-sync.
-                if (state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
-                {
-                    return;
-                }
-
-                await _taskWriter.WriteAsync(async () => {
                     var relativePath = PathMapper.GetRelativePath(e.FullPath, RootDirectory);
                     using var locker = await _fileLocker.Lock(relativePath);
 
@@ -178,10 +170,14 @@ public partial class ClientWatcher : IDisposable
 
         watcher.Created += async (sender, e) => {
 
-            CF_PLACEHOLDER_STATE state;
+            await _taskWriter.WriteAsync(async () => {
             try
             {
-                state = CloudFilter.GetPlaceholderState(e.FullPath);
+                    var state = CloudFilter.GetPlaceholderState(e.FullPath);
+                    if (state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
+                    {
+                        return;
+                    }
             }
             catch (Exception ex)
             {
@@ -189,12 +185,6 @@ public partial class ClientWatcher : IDisposable
                 return;
             }
 
-            if (state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
-            {
-                return;
-            }
-
-            await _taskWriter.WriteAsync(async () => {
                 var relativePath = PathMapper.GetRelativePath(e.FullPath, RootDirectory);
                 using var locker = await _fileLocker.Lock(relativePath);
 
