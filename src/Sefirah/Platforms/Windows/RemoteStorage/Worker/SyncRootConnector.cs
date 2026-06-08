@@ -25,6 +25,9 @@ public sealed class SyncRootConnector(
     private readonly ConcurrentDictionary<CF_TRANSFER_KEY, Task> _transferTasks = new();
     private static readonly TimeSpan TransferKeyReuseWaitTimeout = TimeSpan.FromSeconds(5);
 
+    // Transfer chunk size. The Cloud File API rejects any TRANSFER_DATA whose length isn't 4 KiB-aligned (unless it ends at EOF)
+    private const int ChunkSize = 4096 * 4;
+
     // Trying to prevent garbage collection of these callbacks
     private CF_CALLBACK_REGISTRATION[]? CallbackRegistrations;
 
@@ -165,18 +168,26 @@ public sealed class SyncRootConnector(
         {
             var clientFile = Path.Join(callbackInfo.VolumeDosName, callbackInfo.NormalizedPath[1..]);
 
-            var bufferSize = Math.Min(callbackParameters.FetchData.RequiredLength, 4096 * 4);
+            var bufferSize = (int)Math.Min(callbackParameters.FetchData.RequiredLength, ChunkSize);
             var buffer = new byte[bufferSize];
             long currentOffset = callbackParameters.FetchData.RequiredFileOffset;
-            long targetOffset = callbackParameters.FetchData.RequiredFileOffset
-                + callbackParameters.FetchData.RequiredLength;
-            long readLength = 0;
+            long targetOffset = callbackParameters.FetchData.RequiredFileOffset + callbackParameters.FetchData.RequiredLength;
 
             var relativeFile = PathMapper.GetRelativePath(clientFile, _rootDirectory);
             using var fileStream = await remoteService.GetFileStream(relativeFile);
             fileStream.Seek(currentOffset, SeekOrigin.Begin);
-            while (currentOffset <= targetOffset && (readLength = fileStream.Read(buffer, 0, buffer.Length)) > 0)
+
+            // A bare Stream.Read over SFTP can return a short, unaligned count mid-file (which fails the transfer
+            // with error 380), so ReadAtLeast fills each chunk completely, and we never read past the requested range.
+            while (currentOffset < targetOffset)
             {
+                var bytesToRead = (int)Math.Min(buffer.Length, targetOffset - currentOffset);
+                var readLength = fileStream.ReadAtLeast(buffer.AsSpan(0, bytesToRead), bytesToRead, throwOnEndOfStream: false);
+                if (readLength == 0)
+                {
+                    break;
+                }
+
                 cancellationToken.ThrowIfCancellationRequested();
                 // Update the transfer progress
                 CloudFilter.ReportProgress(callbackInfo, callbackInfo.FileSize, currentOffset + readLength);
