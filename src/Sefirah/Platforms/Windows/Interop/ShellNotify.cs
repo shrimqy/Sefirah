@@ -15,4 +15,9 @@ public static class ShellNotify
             SHChangeNotify(SHCNE.SHCNE_UPDATEDIR, SHCNF.SHCNF_PATHW, parentPath, null);
         }
     }
+
+    public static void NotifyUpdate(string clientPath)
+    {
+        SHChangeNotify(SHCNE.SHCNE_UPDATEITEM, SHCNF.SHCNF_PATHW, clientPath, null);
+    }
 }

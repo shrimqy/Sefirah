@@ -1,4 +1,5 @@
 using System.Threading.Channels;
+using Renci.SshNet.Common;
 using Sefirah.Platforms.Windows.Helpers;
 using Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
 
@@ -48,6 +49,7 @@ public sealed partial class RemoteWatcher(
                     await placeholderService.CreateOrUpdateFile(relativePath);
                 }
             }
+            catch (SshConnectionException) { }
             catch (Exception ex)
             {
                 logger.Error($"Handle Created failed for: {relativePath}", ex);
@@ -96,7 +98,7 @@ public sealed partial class RemoteWatcher(
     private async Task HandleRenamed(string oldRelativePath, string newRelativePath)
     {
         // Brief pause to let client rename finish before reflecting it back
-        await Task.Delay(1000);
+        //await Task.Delay(1000);
         oldRelativePath = PathMapper.NormalizePath(oldRelativePath);
         newRelativePath = PathMapper.NormalizePath(newRelativePath);
 
@@ -125,7 +127,7 @@ public sealed partial class RemoteWatcher(
     private async Task HandleDeleted(string relativePath)
     {
         // Brief pause to let client finish before reflecting it back
-        await Task.Delay(1000);
+        //await Task.Delay(1000);
         relativePath = PathMapper.NormalizePath(relativePath);
         logger.Debug($"Deleted {relativePath}");
         await taskWriter.WriteAsync(async () =>

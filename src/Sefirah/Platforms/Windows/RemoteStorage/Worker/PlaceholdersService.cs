@@ -91,7 +91,7 @@ public class PlaceholdersService(
             1u,
             CldApi.CF_CREATE_FLAGS.CF_CREATE_FLAG_NONE,
             out var entriesProcessed
-        ).ThrowIfFailed("Create placeholder failed");
+        ).ThrowIfFailed($"Create placeholder failed: {relativeFile}");
 
         logger.Info($"Created placeholder file for {relativeFile}");
         return Task.CompletedTask;
@@ -122,7 +122,7 @@ public class PlaceholdersService(
                 1u,
                 CldApi.CF_CREATE_FLAGS.CF_CREATE_FLAG_NONE,
                 out var entriesProcessed
-            ).ThrowIfFailed("Create placeholder failed");
+            ).ThrowIfFailed($"Create placeholder failed: {relativeDirectory}");
 
             logger.Info($"Created placeholder for {relativeDirectory}");
         }
@@ -163,7 +163,13 @@ public class PlaceholdersService(
             ? await FileHelper.WaitUntilUnlocked(() => CloudFilter.CreateHFileWithOplock(clientFile, FileAccess.Write), logger)
             : CloudFilter.CreateHFile(clientFile, FileAccess.Write);
         var placeholderState = CloudFilter.GetPlaceholderState(hfile);
-        if (!placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER))
+
+        // Skip if local file isn't synced yet (Possibly a local edit and not a remote change)
+        if (!force && downloaded && !placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
+        {
+            return;
+        }
+        else if (!placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER))
         {
             try
             {
@@ -176,17 +182,10 @@ public class PlaceholdersService(
             }
         }
 
-        // Skip if local file isn't synced yet (Possibly a local edit and not a remote change)
-        if (!force && downloaded && !placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
-        {
-            return;
-        }
-
         var remoteFileInfo = remoteService.GetFileInfo(relativeFile);
 
         if (!force && remoteFileInfo.GetHashCode() == _fileComparer.GetHashCode(clientFileInfo))
         {
-            //logger.Info("UpdateFile - equal, ignoring {relativeFile}", relativeFile);
             if (!placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
             {
                 CloudFilter.SetInSyncState(hfile);
@@ -194,7 +193,6 @@ public class PlaceholdersService(
             return;
         }
 
-        logger.Info($"UpdateFile - update placeholder {relativeFile}");
         var pinned = clientFileInfo.Attributes.HasAnySyncFlag(SyncAttributes.PINNED);
         if (pinned)
         {

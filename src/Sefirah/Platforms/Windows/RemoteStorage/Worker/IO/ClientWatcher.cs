@@ -64,21 +64,21 @@ public partial class ClientWatcher : IDisposable
                 var fileInfo = new FileInfo(e.FullPath);
 
                 await _taskWriter.WriteAsync(async () => {
-                try
-                {
+                    try
+                    {
                         var state = CloudFilter.GetPlaceholderState(e.FullPath);
 
                         // FileSystemWatcher also fires on hydration updates, so skip if already in-sync.
                         if (state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
-                {
-                    return;
-                }
+                        {
+                            return;
+                        }
                     }
-                catch (Exception ex)
-                {
-                    _logger.Warn($"Unable to get placeholder state for {e.FullPath}", ex);
-                    return;
-                }
+                    catch (Exception ex)
+                    {
+                        _logger.Warn($"Unable to get placeholder state for {e.FullPath}", ex);
+                        return;
+                    }
 
                     var relativePath = PathMapper.GetRelativePath(e.FullPath, RootDirectory);
                     using var locker = await _fileLocker.Lock(relativePath);
@@ -150,14 +150,7 @@ public partial class ClientWatcher : IDisposable
                     else
                     {
                         await _remoteService.UpdateFile(fileInfo, relativePath);
-                        try
-                        {
-                            CloudFilter.SetInSyncState(e.FullPath);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.Error($"Failed to set in-sync state for {e.FullPath}", ex);
-                        }
+                        EnsurePlaceholderSync(e.FullPath);
                     }
 
                 });
@@ -171,19 +164,19 @@ public partial class ClientWatcher : IDisposable
         watcher.Created += async (sender, e) => {
 
             await _taskWriter.WriteAsync(async () => {
-            try
-            {
+                try
+                {
                     var state = CloudFilter.GetPlaceholderState(e.FullPath);
                     if (state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
                     {
                         return;
                     }
-            }
-            catch (Exception ex)
-            {
-                _logger.Warn($"Unable to get placeholder state for {e.FullPath}", ex);
-                return;
-            }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Warn($"Unable to get placeholder state for {e.FullPath}", ex);
+                    return;
+                }
 
                 var relativePath = PathMapper.GetRelativePath(e.FullPath, RootDirectory);
                 using var locker = await _fileLocker.Lock(relativePath);
@@ -215,43 +208,24 @@ public partial class ClientWatcher : IDisposable
                         catch (Exception ex)
                         {
                             _logger.Error($"Create file failed: {childItem}", ex);
+                            continue;
                         }
+                        EnsurePlaceholderSync(childItem);
                     }
                 }
                 else
                 {
+                    var fileInfo = new FileInfo(e.FullPath);
                     try
                     {
-                        var fileInfo = new FileInfo(e.FullPath);
                         await _remoteService.CreateFile(fileInfo, relativePath);
-
-                        try
-                        {
-                            if (!CloudFilter.IsPlaceholder(e.FullPath))
-                            {
-                                CloudFilter.ConvertToPlaceholder(e.FullPath);
-                                await Task.Delay(1000);
-                            }
-
-                            CloudFilter.SetInSyncState(e.FullPath);
-                            await Task.Delay(1000);
-
-                            var finalState = CloudFilter.GetPlaceholderState(e.FullPath);
-                            if (!finalState.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
-                            {
-                                _logger.Warn($"Sync state not set properly, retrying for: {e.FullPath}");
-                                CloudFilter.SetInSyncState(e.FullPath);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.Error($"Failed to set placeholder/sync state for {e.FullPath}", ex);
-                        }
                     }
                     catch (Exception ex)
                     {
                         _logger.Error($"Create file failed: {e.FullPath}", ex);
+                        return;
                     }
+                    EnsurePlaceholderSync(e.FullPath);
                 }
             });
         };
@@ -262,6 +236,24 @@ public partial class ClientWatcher : IDisposable
         };
 
         return watcher;
+    }
+
+    private void EnsurePlaceholderSync(string fullPath)
+    {
+        try
+        {
+            if (!CloudFilter.IsPlaceholder(fullPath))
+            {
+                CloudFilter.ConvertToPlaceholder(fullPath);
+            }
+            CloudFilter.SetInSyncState(fullPath);
+            
+            ShellNotify.NotifyUpdate(fullPath);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error($"Failed to set in-sync state for {fullPath}", ex);
+        }
     }
 
     public void Start()

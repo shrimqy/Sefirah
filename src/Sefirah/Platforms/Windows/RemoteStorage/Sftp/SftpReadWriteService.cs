@@ -18,9 +18,9 @@ public class SftpReadWriteService(
 
         var serverFile = GetSftpPath(relativeFile);
 
-        if (Exists(serverFile))
+        if (Exists(relativeFile))
         {
-            throw new Exception("Conflict: already exists???");
+            return;
         }
 
         logger.Debug($"Create File {relativeFile}");
@@ -41,7 +41,7 @@ public class SftpReadWriteService(
     {
         var serverFile = GetSftpPath(relativeFile);
         // Update only - CreateFile to create!
-        if (!Exists(serverFile))
+        if (!Exists(relativeFile))
         {
             return;
         }
@@ -52,7 +52,6 @@ public class SftpReadWriteService(
             return;
         }
 
-        logger.Debug($"Update File {relativeFile}");
         using (var sourceStream = await FileHelper.WaitUntilUnlocked(sourceFileInfo.OpenRead, logger))
         {
             await Task.Factory.FromAsync(client.BeginUploadFile(sourceStream, serverFile), client.EndUploadFile);
@@ -84,9 +83,9 @@ public class SftpReadWriteService(
     {
         var serverDirectory = GetSftpPath(relativeDirectory);
 
-        if (Exists(serverDirectory))
+        if (Exists(relativeDirectory))
         {
-            throw new Exception("Conflict: already exists");
+            return Task.CompletedTask;
         }
 
         client.CreateDirectory(serverDirectory);
