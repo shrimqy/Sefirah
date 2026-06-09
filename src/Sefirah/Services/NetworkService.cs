@@ -345,6 +345,9 @@ public class NetworkService(
             }
             deviceManager.ActiveDevice = pairedDevice;
         });
+
+        if (pairedDevice.Client is not null)
+            DisconnectClient(pairedDevice.Client);
     }
 
     private async Task AddDiscoveredDevice(ServerSession session, Authentication authMessage, string address, byte[] certificate)
@@ -430,9 +433,11 @@ public class NetworkService(
             if (pairedDevice is not null)
             {
                 pairedDevice.Session = null;
-                App.MainWindow.DispatcherQueue.EnqueueAsync(() => pairedDevice.ConnectionStatus = new Disconnected(forcedDisconnect));
-
-                ConnectionStatusChanged?.Invoke(this, pairedDevice);
+                if (pairedDevice.Client is null)
+                {
+                    App.MainWindow.DispatcherQueue.EnqueueAsync(() => pairedDevice.ConnectionStatus = new Disconnected(forcedDisconnect));
+                    ConnectionStatusChanged?.Invoke(this, pairedDevice);
+                }
             }
             else
             {
@@ -463,8 +468,11 @@ public class NetworkService(
             if (device is not null)
             {
                 device.Client = null;
-                App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.ConnectionStatus = new Disconnected(forcedDisconnect));
-                ConnectionStatusChanged?.Invoke(this, device);
+                if (device.Session is null)
+                {
+                    App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.ConnectionStatus = new Disconnected(forcedDisconnect));
+                    ConnectionStatusChanged?.Invoke(this, device);
+                }
             }
 
             var discoveredDevice = DiscoveredDevices.FirstOrDefault(d => d.Client == client);
@@ -608,7 +616,10 @@ public class NetworkService(
         }
         finally
         {
-            device.ConnectionStatus = new Disconnected();
+            if (device.IsConnecting)
+            {
+                await App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.ConnectionStatus = new Disconnected());
+            }
 
             if (connectionCancellationTokens.TryRemove(device.Id, out var cancellationTokenSource))
             {
@@ -731,6 +742,9 @@ public class NetworkService(
             pairedDevice.ConnectionStatus = new Connected();
             deviceManager.ActiveDevice = pairedDevice;
         });
+
+        if (pairedDevice.Session is not null)
+            DisconnectSession(pairedDevice.Session);
 
         logger.Info($"Paired device {pairedDevice.Name} connected successfully");
     }
