@@ -64,7 +64,6 @@ public sealed class SyncRootConnector(
 
     public void Disconnect(CF_CONNECTION_KEY connectionKey)
     {
-        logger.Debug($"Disconnecting sync provider, {connectionKey}");
         CloudFilter.DisconnectSyncRoot(connectionKey);
     }
 

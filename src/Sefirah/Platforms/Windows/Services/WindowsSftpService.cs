@@ -7,15 +7,46 @@ using Windows.Storage.Provider;
 
 namespace Sefirah.Platforms.Windows.Services;
 
-public class WindowsSftpService(
-    ILogger logger,
-    SyncRootRegistrar registrar,
-    SyncProviderPool syncProviderPool,
-    IUserSettingsService userSettingsService
-    ) : ISftpService
+public class WindowsSftpService : ISftpService
 {
     private static readonly string IconDllPath = Path.GetFullPath(
         Path.Combine(AppContext.BaseDirectory, "Assets\\Icons", "IconResource.dll"));
+
+    private readonly ILogger logger;
+    private readonly SyncRootRegistrar registrar;
+    private readonly SyncProviderPool syncProviderPool;
+    private readonly IUserSettingsService userSettingsService;
+
+    public WindowsSftpService(
+        ILogger logger,
+        SyncRootRegistrar registrar,
+        SyncProviderPool syncProviderPool,
+        IUserSettingsService userSettingsService,
+        ISessionManager sessionManager)
+    {
+        this.logger = logger;
+        this.registrar = registrar;
+        this.syncProviderPool = syncProviderPool;
+        this.userSettingsService = userSettingsService;
+        sessionManager.ConnectionStatusChanged += OnConnectionStatusChanged;
+    }
+
+    private IEnumerable<SyncRootInfo> GetSyncRootsForDevice(string deviceId)
+        => registrar.GetSyncRoots().Where(r => r.Id.Contains($"!{deviceId}_"));
+
+    private async void OnConnectionStatusChanged(object? sender, PairedDevice device)
+    {
+        if (device.IsConnected) return;
+
+        try
+        {
+            await StopSyncRoots(GetSyncRootsForDevice(device.Id));
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"Error stopping sync roots for device {device.Id}", ex);
+        }
+    }
 
     public async Task InitializeAsync(PairedDevice device, SftpServerInfo info)
     {
@@ -70,17 +101,26 @@ public class WindowsSftpService(
 
     public async void Remove(string deviceId)
     {
-        var syncRoots = registrar.GetSyncRoots().Where(r => r.Id.Contains($"!{deviceId}_"));
-        await StopAndUnregister(syncRoots);
+        await StopAndUnregister(GetSyncRootsForDevice(deviceId));
+    }
+
+    private async Task StopSyncRoots(IEnumerable<SyncRootInfo> syncRoots)
+    {
+        foreach (var syncRoot in syncRoots.ToList())
+        {
+            await syncProviderPool.Stop(syncRoot.Id);
+            logger.Info($"Stopped sync provider: {syncRoot.Id}");
+        }
     }
 
     private async Task StopAndUnregister(IEnumerable<SyncRootInfo> syncRoots)
     {
         try
         {
-            foreach (var syncRoot in syncRoots.ToList())
+            var roots = syncRoots.ToList();
+            await StopSyncRoots(roots);
+            foreach (var syncRoot in roots)
             {
-                await syncProviderPool.Stop(syncRoot.Id);
                 registrar.Unregister(syncRoot.Id);
             }
         }
