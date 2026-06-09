@@ -66,8 +66,9 @@ public sealed partial class ShellCommandQueue(
                             // Add explicit sync state setting here
                             try
                             {
+                                if (!CloudFilter.IsPlaceholder(shellCommand.FullPath))
+                                    CloudFilter.ConvertToPlaceholder(shellCommand.FullPath);
                                 CloudFilter.SetInSyncState(shellCommand.FullPath);
-                                logger.Info($"Set sync state after upload for {shellCommand.FullPath}");
                             }
                             catch (Exception ex)
                             {
