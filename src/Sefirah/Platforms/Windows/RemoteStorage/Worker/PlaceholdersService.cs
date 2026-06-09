@@ -164,12 +164,8 @@ public class PlaceholdersService(
             : CloudFilter.CreateHFile(clientFile, FileAccess.Write);
         var placeholderState = CloudFilter.GetPlaceholderState(hfile);
 
-        // Skip if local file isn't synced yet (Possibly a local edit and not a remote change)
-        if (!force && downloaded && !placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
-        {
-            return;
-        }
-        else if (!placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER))
+
+        if (!placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER))
         {
             try
             {
@@ -180,6 +176,12 @@ public class PlaceholdersService(
                 logger.Error($"Failed to convert to placeholder for {relativeFile}", ex);
                 return;
             }
+        }
+
+        // Skip if placeholder isn't synced yet (Possibly a local edit and not a remote change)
+        if (!force && downloaded && !placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
+        {
+            return;
         }
 
         var remoteFileInfo = remoteService.GetFileInfo(relativeFile);
