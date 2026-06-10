@@ -418,7 +418,7 @@ public class AdbService(
     private async Task RefreshDevicesAsync()
     {
         var devices = await adbClient.GetDevicesAsync();
-        if (devices.Any())
+        if (!devices.Any())
         {
             logger.Warn("No adb devices found");
             await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
