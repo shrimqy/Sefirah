@@ -282,8 +282,6 @@ public class SftpServerInfo : SocketMessage
 
     public required string Password { get; set; }
 
-    public required string IpAddress { get; set; }
-
     public int Port { get; set; }
 
     public List<string> Paths { get; set; } = [];

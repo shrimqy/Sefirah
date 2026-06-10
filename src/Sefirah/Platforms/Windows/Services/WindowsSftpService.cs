@@ -55,7 +55,9 @@ public class WindowsSftpService : ISftpService
 
         try
         {
-            logger.Info($"Initializing SFTP service, IP: {info.IpAddress}, Port: {info.Port}, Username: {info.Username}");
+            if (string.IsNullOrEmpty(device.Address)) return;
+
+            logger.Info($"Initializing SFTP service, IP: {device.Address}, Port: {info.Port}, Username: {info.Username}");
 
             var baseDirectory = userSettingsService.GeneralSettingsService.RemoteStoragePath;
             Directory.CreateDirectory(baseDirectory);
@@ -77,7 +79,7 @@ public class WindowsSftpService : ISftpService
 
                 var sftpContext = new SftpContext
                 {
-                    Host = info.IpAddress,
+                    Host = device.Address,
                     Port = info.Port,
                     Directory = paths[i],
                     Username = info.Username,
