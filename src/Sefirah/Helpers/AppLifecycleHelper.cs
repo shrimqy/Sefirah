@@ -40,7 +40,6 @@ public static class AppLifecycleHelper
         var playbackService = Ioc.Default.GetRequiredService<IMediaService>();
         var actionService = Ioc.Default.GetRequiredService<IActionService>();
         var updateService = Ioc.Default.GetRequiredService<IUpdateService>();
-        var generalSettingsService = Ioc.Default.GetRequiredService<IGeneralSettingsService>();
         var phoneLineService = Ioc.Default.GetRequiredService<IPhoneLineService>();
         var callManager = Ioc.Default.GetRequiredService<ICallManager>();
 #if WINDOWS
@@ -116,6 +115,7 @@ public static class AppLifecycleHelper
                 // Settings Services
                 .AddSingleton<IUserSettingsService, UserSettingsService>()
                 .AddSingleton<IGeneralSettingsService, GeneralSettingsService>(sp => new GeneralSettingsService(((UserSettingsService)sp.GetRequiredService<IUserSettingsService>()).GetSharingContext()))
+                .AddSingleton<IAppThemeModeService, AppThemeModeService>()
 
                 // Database and Repositories
                 .AddSingleton<DatabaseContext>()

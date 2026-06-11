@@ -2,7 +2,6 @@ using Microsoft.UI.Windowing;
 using Sefirah.UserControls;
 using Sefirah.ViewModels;
 using Windows.Graphics;
-
 namespace Sefirah.Views.WindowViews;
 
 public sealed partial class CallWindow : Window
@@ -30,8 +29,8 @@ public sealed partial class CallWindow : Window
         UpdateWindowSize(false);
 #if WINDOWS
         ExtendsContentIntoTitleBar = true;
-        SystemBackdrop = new MicaBackdrop();
 #endif
+        Ioc.Default.GetRequiredService<IAppThemeModeService>().ManageAppearance(this);
         Closed += OnClosed;
         Activate();
     }

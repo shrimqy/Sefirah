@@ -38,16 +38,29 @@
                 </BreadcrumbBar.ItemTemplate>
             </BreadcrumbBar>
 
-            <!--  Startup Options  -->
-            <wuc:SettingsCard Description="{helpers:ResourceString Name=StartupOptionDescription}" Header="{helpers:ResourceString Name=StartupOption}">
-                <wuc:SettingsCard.HeaderIcon>
-                    <FontIcon Glyph="&#xE7E8;" />
-                </wuc:SettingsCard.HeaderIcon>
-                <ComboBox
-                    MinWidth="140"
-                    ItemsSource="{x:Bind ViewModel.StartupTypes.Values}"
-                    SelectedItem="{x:Bind ViewModel.SelectedStartupType, Mode=TwoWay}" />
-            </wuc:SettingsCard>
+            <win:StackPanel Spacing="4">
+                <!--  Startup -->
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=StartupOptionDescription}" Header="{helpers:ResourceString Name=StartupOption}">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE7E8;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <ComboBox
+                        MinWidth="140"
+                        ItemsSource="{x:Bind ViewModel.StartupTypes.Values}"
+                        SelectedItem="{x:Bind ViewModel.SelectedStartupType, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+
+                <!--  Backdrop material -->
+                <wuc:SettingsCard Header="{helpers:ResourceString Name=BackdropMaterial}">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xEF1F;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <ComboBox
+                        MinWidth="160"
+                        ItemsSource="{x:Bind ViewModel.BackdropMaterialTypes.Values}"
+                        SelectedItem="{x:Bind ViewModel.SelectedBackdropMaterial, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+            </win:StackPanel>
 
             <!--  Theme  -->
             <wuc:SettingsCard Description="{helpers:ResourceString Name=ThemeDescription}" Header="{helpers:ResourceString Name=Theme}">

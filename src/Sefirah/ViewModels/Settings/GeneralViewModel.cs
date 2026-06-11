@@ -1,7 +1,5 @@
 using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Models;
-using Sefirah.Data.Contracts;
-using Sefirah.Data.Enums;
 using Sefirah.Data.Items;
 using Sefirah.Helpers;
 
@@ -10,6 +8,7 @@ public sealed partial class GeneralViewModel : BaseViewModel
 {
     #region Services
     private readonly IUserSettingsService UserSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
+    private readonly IAppThemeModeService AppThemeModeService = Ioc.Default.GetRequiredService<IAppThemeModeService>();
     private readonly IDeviceManager _deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
     private readonly IAdbService AdbService = Ioc.Default.GetRequiredService<IAdbService>();
     private readonly ISftpService SftpService = Ioc.Default.GetRequiredService<ISftpService>();
@@ -36,12 +35,12 @@ public sealed partial class GeneralViewModel : BaseViewModel
     // Theme settings
     public Theme CurrentTheme
     {
-        get => UserSettingsService.GeneralSettingsService.Theme;
+        get => AppThemeModeService.Theme;
         set
         {
-            if (value != UserSettingsService.GeneralSettingsService.Theme)
+            if (value != AppThemeModeService.Theme)
             {
-                UserSettingsService.GeneralSettingsService.Theme = value;
+                AppThemeModeService.Theme = value;
                 OnPropertyChanged();
             }
         }
@@ -65,6 +64,36 @@ public sealed partial class GeneralViewModel : BaseViewModel
                 var newTheme = ThemeTypes.First(t => t.Value == value).Key;
                 CurrentTheme = newTheme;
             }
+        }
+    }
+
+    public BackdropMaterialType BackdropMaterial
+    {
+        get => AppThemeModeService.BackdropMaterial;
+        set
+        {
+            if (value != AppThemeModeService.BackdropMaterial)
+            {
+                AppThemeModeService.BackdropMaterial = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public Dictionary<BackdropMaterialType, string> BackdropMaterialTypes { get; } = new()
+    {
+        { BackdropMaterialType.Acrylic, "BackdropMaterialAcrylic".GetLocalizedResource() },
+        { BackdropMaterialType.Mica, "BackdropMaterialMica".GetLocalizedResource() }
+    };
+
+    private string selectedBackdropMaterial = string.Empty;
+    public string SelectedBackdropMaterial
+    {
+        get => selectedBackdropMaterial;
+        set
+        {
+            if (SetProperty(ref selectedBackdropMaterial, value))
+                BackdropMaterial = BackdropMaterialTypes.First(t => t.Value == value).Key;
         }
     }
 
@@ -180,6 +209,7 @@ public sealed partial class GeneralViewModel : BaseViewModel
     public GeneralViewModel()
     {
         selectedThemeType = ThemeTypes[CurrentTheme];
+        selectedBackdropMaterial = BackdropMaterialTypes[BackdropMaterial];
         selectedStartupType = StartupTypes[StartupOption];
         selectedAppLanguageIndex = AppLanguageHelper.SupportedLanguages.IndexOf(AppLanguageHelper.PreferredLanguage);
         // Load initial local device name

@@ -1,4 +1,3 @@
-using CommunityToolkit.WinUI;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Sefirah.Data.Models;
@@ -6,19 +5,17 @@ using Sefirah.ViewModels.Settings;
 using Sefirah.Views.DevicePreferences;
 using Windows.Graphics;
 using Rect = Windows.Foundation.Rect;
-
 namespace Sefirah.Views.WindowViews;
+
 public sealed partial class DeviceSettingsWindow : Window
 {
     public PairedDevice Device { get; }
-
-    private readonly IUserSettingsService userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
 
     public DeviceSettingsWindow(PairedDevice device)
     {
         Device = device;
         var viewModel = new DeviceSettingsViewModel(device);
-        
+
         InitializeComponent();
         Title = device.Name;
         this.SetWindowIcon();
@@ -29,34 +26,14 @@ public sealed partial class DeviceSettingsWindow : Window
         AppWindow.Resize(new SizeInt32 { Width = 600, Height = 900 });
 #if WINDOWS
         ExtendsContentIntoTitleBar = true;
-        SystemBackdrop = new MicaBackdrop();
-        
         BackButton.Loaded += (s, e) => SetRegionsForCustomTitleBar();
 #endif
         var rootFrame = EnsureWindowIsInitialized();
         rootFrame.Navigate(typeof(DeviceSettingsPage), viewModel);
-        InitializeThemeService();
+        Ioc.Default.GetRequiredService<IAppThemeModeService>().ManageAppearance(this);
 
-        AppWindow.Closing += (s, e) => App.RemoveDeviceSettingsWindow(Device.Id);
+        AppWindow.Closing += OnClosing;
     }
-
-    private void InitializeThemeService()
-    {
-        // Get the user settings service if available
-        userSettingsService.GeneralSettingsService.ThemeChanged += AppThemeChanged;
-        userSettingsService.GeneralSettingsService.ApplyTheme(this, AppWindow.TitleBar, userSettingsService.GeneralSettingsService.Theme);
-    }
-
-    private async void AppThemeChanged(object? sender, EventArgs e)
-    {
-        if (AppWindow is null) return;
-
-        await DispatcherQueue.EnqueueAsync(() =>
-        {
-            userSettingsService.GeneralSettingsService.ApplyTheme(this, AppWindow.TitleBar, userSettingsService.GeneralSettingsService.Theme, false);
-        });
-    }
-
 
     public Frame EnsureWindowIsInitialized()
     {
@@ -111,11 +88,12 @@ public sealed partial class DeviceSettingsWindow : Window
     private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         => new Exception("Failed to load Page " + e.SourcePageType.FullName);
 
+    private void OnClosing(AppWindow sender, AppWindowClosingEventArgs args)
+        => App.RemoveDeviceSettingsWindow(Device.Id);
+
     private void TitleBar_BackRequested(object sender, RoutedEventArgs e)
     {
         if (RootFrame.CanGoBack)
-        {
             RootFrame.GoBack();
-        }
     }
 }

@@ -51,7 +51,6 @@ public partial class App : Application
 #if WINDOWS
             WindowHandle = WindowNative.GetWindowHandle(MainWindow);
             MainWindow.ExtendsContentIntoTitleBar = true;
-            MainWindow.SystemBackdrop = new MicaBackdrop();
 #endif
 #if DEBUG
             MainWindow.UseStudio();
@@ -79,6 +78,8 @@ public partial class App : Application
             var rootFrame = EnsureWindowIsInitialized();
             if (rootFrame is null)
                 return;
+
+            Ioc.Default.GetRequiredService<IAppThemeModeService>().ManageAppearance(MainWindow);
 
             if (isStartupTask)
             {
