@@ -121,4 +121,29 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </UnoSplashScreen>
     </ItemGroup>
+
+    <!-- Hosted app PRI generation: bundle Windows SDK mrmsupport.dll into the MSIX package. -->
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100'">
+        <SefirahMrmSupportSdkVersion Condition="'$(SefirahMrmSupportSdkVersion)' == ''">10.0.26100.0</SefirahMrmSupportSdkVersion>
+        <SefirahMrmSupportSdkArch Condition="'$(Platform)' == 'ARM64'">arm64</SefirahMrmSupportSdkArch>
+        <SefirahMrmSupportSdkArch Condition="'$(SefirahMrmSupportSdkArch)' == ''">x64</SefirahMrmSupportSdkArch>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100' and '$(SefirahMrmSupportDll)' == '' and Exists('C:\Program Files (x86)\Windows Kits\10\bin\$(SefirahMrmSupportSdkVersion)\$(SefirahMrmSupportSdkArch)\mrmsupport.dll')">
+        <SefirahMrmSupportDll>C:\Program Files (x86)\Windows Kits\10\bin\$(SefirahMrmSupportSdkVersion)\$(SefirahMrmSupportSdkArch)\mrmsupport.dll</SefirahMrmSupportDll>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100' and '$(SefirahMrmSupportDll)' == '' and Exists('C:\Program Files\Windows Kits\10\bin\$(SefirahMrmSupportSdkVersion)\$(SefirahMrmSupportSdkArch)\mrmsupport.dll')">
+        <SefirahMrmSupportDll>C:\Program Files\Windows Kits\10\bin\$(SefirahMrmSupportSdkVersion)\$(SefirahMrmSupportSdkArch)\mrmsupport.dll</SefirahMrmSupportDll>
+    </PropertyGroup>
+    <Target Name="IncludeMrmSupportDll"
+            BeforeTargets="PrepareForBuild"
+            Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100' and '$(Platform)' != 'Any CPU' and '$(Platform)' != 'x86'">
+        <Error Condition="'$(SefirahMrmSupportDll)' == '' or !Exists('$(SefirahMrmSupportDll)')"
+               Text="Windows SDK mrmsupport.dll was not found. Install the Windows SDK or set SefirahMrmSupportDll." />
+        <ItemGroup>
+            <Content Include="$(SefirahMrmSupportDll)">
+                <Link>mrmsupport.dll</Link>
+                <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </Content>
+        </ItemGroup>
+    </Target>
 </Project>
