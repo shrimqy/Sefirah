@@ -210,6 +210,15 @@
   <data name="ThemeDescription" xml:space="preserve">
     <value>Válassza ki az alapértelmezett témát</value>
   </data>
+  <data name="BackdropMaterial" xml:space="preserve">
+    <value>Backdrop material</value>
+  </data>
+  <data name="BackdropMaterialMica" xml:space="preserve">
+    <value>Mica</value>
+  </data>
+  <data name="BackdropMaterialAcrylic" xml:space="preserve">
+    <value>Acrylic</value>
+  </data>
   <data name="Default" xml:space="preserve">
     <value>Alap</value>
   </data>
