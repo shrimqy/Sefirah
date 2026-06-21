@@ -42,6 +42,7 @@ public static class AppLifecycleHelper
         var updateService = Ioc.Default.GetRequiredService<IUpdateService>();
         var phoneLineService = Ioc.Default.GetRequiredService<IPhoneLineService>();
         var callManager = Ioc.Default.GetRequiredService<ICallManager>();
+        var batteryService = Ioc.Default.GetRequiredService<IBatteryService>();
 #if WINDOWS
         var windowsNotificationHandler = Ioc.Default.GetRequiredService<IPlatformNotificationHandler>();
         await windowsNotificationHandler.RegisterForNotifications();
@@ -54,6 +55,7 @@ public static class AppLifecycleHelper
             actionService.InitializeAsync(),
             notificationService.Initialize(),
             clipboardService.Initialize(),
+            batteryService.InitializeAsync(),
             callManager.Initialize()
         );
 
