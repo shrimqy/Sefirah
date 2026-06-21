@@ -5,10 +5,12 @@ using Sefirah.Platforms.Windows.Abstractions;
 using Sefirah.Platforms.Windows.Interop;
 using Sefirah.Platforms.Windows.RemoteStorage.Commands;
 using Sefirah.Platforms.Windows.RemoteStorage.Configuration;
+using Sefirah.Platforms.Windows.RemoteStorage.Sftp;
 using Windows.Security.Cryptography;
 using Windows.Storage.Provider;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
+
 public class SyncRootRegistrar(
     IOptions<ProviderOptions> providerOptions,
     ILogger logger
@@ -28,10 +30,9 @@ public class SyncRootRegistrar(
             .ToArray();
     }
 
-    public bool IsRegistered(string id) =>
-        StorageProviderSyncRootManager.GetCurrentSyncRoots().Any((x) => x.Id == id);
+    public static bool IsRegistered(string id) => StorageProviderSyncRootManager.GetCurrentSyncRoots().Any((x) => x.Id == id);
 
-    public StorageProviderSyncRootInfo Register<T>(RegisterSyncRootCommand command, IStorageFolder directory, T context) where T : struct
+    public StorageProviderSyncRootInfo Register(RegisterSyncRootCommand command, IStorageFolder directory, SftpContext context)
     {
         // Stage 1: Setup
         //--------------------------------------------------------------------------------------------
@@ -48,14 +49,12 @@ public class SyncRootRegistrar(
             UpdateCredentials(id, context);
         }
 
-        string iconPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Assets\\Icons", "IconResource.dll"));
-        
         var info = new StorageProviderSyncRootInfo
         {
             Id = id,
             Path = directory,
             DisplayNameResource = command.Name,
-            IconResource = $"{iconPath},0",
+            IconResource = command.IconResource,
             HydrationPolicy = StorageProviderHydrationPolicy.Full,
             HydrationPolicyModifier = StorageProviderHydrationPolicyModifier.AutoDehydrationAllowed |
                                      StorageProviderHydrationPolicyModifier.AllowFullRestartHydration,
@@ -74,7 +73,7 @@ public class SyncRootRegistrar(
         };
          //info.StorageProviderItemPropertyDefinitions.Add()
 
-        logger.LogDebug("Registering {syncRootId}", id);
+        logger.Debug($"Registering {id}");
         StorageProviderSyncRootManager.Register(info);
 
         return info;
@@ -82,7 +81,7 @@ public class SyncRootRegistrar(
 
     public void Unregister(string id)
     {
-        logger.LogDebug("Unregistering {syncRootId}", id);
+        logger.Debug($"Unregistering {id}");
         try
         {
             // Try to force garbage collection and cleanup before unregistering
@@ -93,11 +92,11 @@ public class SyncRootRegistrar(
         }
         catch (COMException ex) when (ex.HResult == -2147023728)
         {
-            logger.LogError(ex, "Sync root not found");
+            logger.Error("Sync root not found", ex);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Unregister sync root failed");
+            logger.Error("Unregister sync root failed", ex);
         }
     }
 
@@ -113,7 +112,7 @@ public class SyncRootRegistrar(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to update credentials");
+            logger.Error("Failed to update credentials", ex);
             throw;
         }
     }

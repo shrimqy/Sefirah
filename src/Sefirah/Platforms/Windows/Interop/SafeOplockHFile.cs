@@ -1,7 +1,8 @@
 using Vanara.PInvoke;
 
 namespace Sefirah.Platforms.Windows.Interop;
-public class SafeOplockHFILE : IDisposable
+
+public partial class SafeOplockHFILE : IDisposable
 {
     private bool _isDisposed = false;
     private readonly CldApi.SafeHCFFILE _hcffile;

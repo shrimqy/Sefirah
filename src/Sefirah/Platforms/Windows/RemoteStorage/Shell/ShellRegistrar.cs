@@ -2,12 +2,13 @@ using Vanara.PInvoke;
 using static Vanara.PInvoke.Ole32;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Shell;
+
 public class ShellRegistrar(
   IEnumerable<IClassFactoryOf> factories,
   ILogger logger
 ) {
   public IReadOnlyList<uint> Register() {
-    logger.LogDebug("Register shell extensions");
+    logger.Debug("Register shell extensions");
 
     var cookies = factories
       .Select((factory) => {
@@ -51,7 +52,7 @@ public class ShellRegistrar(
   }
 
   public void Revoke(IEnumerable<uint> cookies) {
-    logger.LogDebug("Unregister shell extensions");
+    logger.Debug("Unregister shell extensions");
     foreach (var cookie in cookies)
     {
       CoRevokeClassObject(cookie);

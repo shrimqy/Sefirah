@@ -1,4 +1,5 @@
 namespace Sefirah.Platforms.Windows.RemoteStorage.Abstractions;
+
 public record ShellCommand
 {
     public required ShellCommandKind Kind { get; init; }

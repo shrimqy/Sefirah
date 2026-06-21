@@ -1,6 +1,6 @@
 using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
-using Sefirah.Data.Contracts;
+using Sefirah.Platforms.Windows.Calling;
 using Sefirah.Services;
 using Sefirah.Utils;
 using Windows.System;
@@ -11,7 +11,9 @@ namespace Sefirah.Platforms.Windows.Services;
 /// <summary>
 /// Windows implementation of the platform notification handler
 /// </summary>
-public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionManager, IDeviceManager deviceManager) : IPlatformNotificationHandler
+public class WindowsNotificationHandler(
+    ILogger logger,
+    IDeviceManager deviceManager) : IPlatformNotificationHandler
 {
     /// <inheritdoc />
     public async Task ShowRemoteNotification(Data.Models.NotificationInfo message, string deviceId)
@@ -69,7 +71,7 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to show remote notification");
+            logger.Error($"Failed to show remote notification", ex);
         }
     }
 
@@ -169,7 +171,7 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to show file transfer notification");
+            logger.Error($"Failed to show file transfer notification", ex);
         }
     }
 
@@ -198,11 +200,11 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
 
 
     /// <inheritdoc />
-    public Task ShowCallNotification(string title, string text, string tag, Data.Enums.CallState callState, Uri? icon = null)
+    public Task ShowCallNotification(string title, string text, string tag, CallState callState, Uri? icon = null)
     {
         try
         {
-            var soundEvent = callState is Data.Enums.CallState.MissedCall
+            var soundEvent = callState is CallState.MissedCall
                 ? AppNotificationSoundEvent.Default
                 : AppNotificationSoundEvent.Call;
 
@@ -223,7 +225,46 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to show call notification");
+            logger.Error($"Failed to show call notification", ex);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    /// <inheritdoc />
+    public Task ShowCallNotification(string callId, string title, string subtitle, Uri? icon = null)
+    {
+        try
+        {
+            var builder = new AppNotificationBuilder()
+                .AddText(title, new AppNotificationTextProperties().SetMaxLines(1))
+                .AddText(subtitle)
+                .SetTag(callId)
+                .SetGroup(Notification.IncomingPhoneCallGroup)
+                .SetAudioEvent(AppNotificationSoundEvent.Call)
+                .AddButton(new AppNotificationButton("ConnectionRequestAcceptButton".GetLocalizedResource())
+                    .SetButtonStyle(AppNotificationButtonStyle.Success)
+                    .AddArgument("notificationType", ToastNotificationType.IncomingPhoneCall)
+                    .AddArgument("action", "accept")
+                    .AddArgument("callId", callId))
+                .AddButton(new AppNotificationButton("ConnectionRequestRejectButton".GetLocalizedResource())
+                    .SetButtonStyle(AppNotificationButtonStyle.Critical)
+                    .AddArgument("notificationType", ToastNotificationType.IncomingPhoneCall)
+                    .AddArgument("action", "decline")
+                    .AddArgument("callId", callId));
+
+            if (icon is not null)
+            {
+                builder.SetAppLogoOverride(icon, AppNotificationImageCrop.Circle);
+            }
+
+            var notification = builder.BuildNotification();
+            notification.ExpiresOnReboot = true;
+            AppNotificationManager.Default.Show(notification);
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"Failed to show incoming phone call notification for {callId}", ex);
         }
 
         return Task.CompletedTask;
@@ -253,7 +294,7 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to show clipboard notification");
+            logger.Error($"Failed to show clipboard notification", ex);
         }
     }
 
@@ -269,7 +310,7 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Could not register for notifications, continuing without notifications");
+            logger.Warn($"Could not register for notifications, continuing without notifications", ex);
         }
     }
 
@@ -277,9 +318,7 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
     {
         try
         {
-            logger.LogInformation("Notification invoked - ArgumentCount: {ArgumentCount}, Keys: {Keys}",
-                args.Arguments.Count,
-                string.Join(", ", args.Arguments.Keys));
+            logger.Info($"Notification invoked - ArgumentCount: {args.Arguments.Count}, Keys: {string.Join(", ", args.Arguments.Keys)}");
 
             if (!args.Arguments.TryGetValue("notificationType", out var notificationType)) return;
             
@@ -300,15 +339,19 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
                 case ToastNotificationType.Update:
                     HandleUpdateNotification(args);
                     break;
-                
+
+                case ToastNotificationType.IncomingPhoneCall:
+                    await HandleIncomingPhoneCallNotificationAsync(args);
+                    break;
+
                 default:
-                    logger.LogWarning("Unhandled notification type: {NotificationType}", notificationType);
+                    logger.Warn($"Unhandled notification type: {notificationType}");
                     break;
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error handling notification action");
+            logger.Error($"Error handling notification action", ex);
         }
     }
 
@@ -368,6 +411,57 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
         }
     }
 
+    private async Task HandleIncomingPhoneCallNotificationAsync(AppNotificationActivatedEventArgs args)
+    {
+        if (!args.Arguments.TryGetValue("action", out var action) ||
+            !args.Arguments.TryGetValue("callId", out var callId) ||
+            string.IsNullOrWhiteSpace(callId))
+        {
+            return;
+        }
+
+        await AppNotificationManager.Default.RemoveByTagAsync(callId).AsTask();
+
+        var call = PhoneCall.FromCallId(callId);
+        if (call is null)
+        {
+            logger.Info($"Incoming call notification action {action}: no session for {callId}");
+            return;
+        }
+
+        if (action == "decline")
+        {
+            try
+            {
+                await call.RejectIncomingAsync();
+            }
+            finally
+            {
+                call.Dispose();
+            }
+
+            return;
+        }
+
+        if (action != "accept")
+        {
+            call.Dispose();
+            return;
+        }
+
+        try
+        {
+            await call.AcceptIncomingAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.Warn($"AcceptIncomingAsync failed for {callId}", ex);
+            call.Dispose();
+            return;
+        }
+        call.Dispose();
+    }
+
     private void HandleMessageNotification(AppNotificationActivatedEventArgs args)
     {
         if (!args.Arguments.TryGetValue("action", out var actionType))
@@ -385,13 +479,13 @@ public class WindowsNotificationHandler(ILogger logger, ISessionManager sessionM
             case "Reply" when args.UserInput.TryGetValue("textBox", out var replyText):
                 if (args.Arguments.TryGetValue("replyResultKey", out var replyResultKey))
                 {
-                    NotificationActionUtils.ProcessReplyAction(logger, device, notificationKey, replyResultKey, replyText);
+                    NotificationActionUtils.ProcessReplyAction(device, notificationKey, replyResultKey, replyText);
                 }
                 break;
             case "Click":
                 if (args.Arguments.TryGetValue("actionIndex", out var actionIndexStr))
                 {
-                    NotificationActionUtils.ProcessClickAction(logger, device, notificationKey, int.Parse(actionIndexStr));
+                    NotificationActionUtils.ProcessClickAction(device, notificationKey, int.Parse(actionIndexStr));
                 }
                 break;
         }

@@ -1,7 +1,6 @@
 using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Models;
 using Sefirah.Data.AppDatabase.Repository;
-using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
 using Sefirah.Helpers;
@@ -9,7 +8,10 @@ using Sefirah.Utils;
 
 namespace Sefirah.Services;
 
-public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceRepository repository) : ObservableObject, IDeviceManager
+public partial class DeviceManager(
+    ILogger<DeviceManager> logger,
+    DeviceRepository repository,
+    ContactRepository contactRepository) : ObservableObject, IDeviceManager
 {
     public ObservableCollection<PairedDevice> PairedDevices { get; set; } = [];
     public ObservableCollection<DiscoveredDevice> DiscoveredDevices { get; } = [];
@@ -91,7 +93,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error getting local device");
+            logger.Error("Error getting local device", e);
             throw;
         }
     }
@@ -104,7 +106,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error updating local device");
+            logger.Error("Error updating local device", ex);
         }
     }
 
@@ -113,6 +115,7 @@ public partial class DeviceManager(ILogger<DeviceManager> logger, DeviceReposito
         var pairedDevicesList = await repository.GetPairedDevices();
         PairedDevices = pairedDevicesList.ToObservableCollection();
         ActiveDevice = PairedDevices.FirstOrDefault();
+        await contactRepository.LoadContacts();
     }
 
     public async Task UpdateDeviceInfo(PairedDevice device, DeviceInfo deviceInfo)

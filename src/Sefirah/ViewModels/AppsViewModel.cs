@@ -1,9 +1,8 @@
 using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Repository;
-using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
+using Sefirah.Utils;
 using Uno.Extensions.Specialized;
-using static Sefirah.Utils.IconUtils;
 
 namespace Sefirah.ViewModels;
 
@@ -66,7 +65,7 @@ public sealed partial class AppsViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error on pin toggle: {AppPackage}", app?.PackageName);
+            Logger.Error($"Error on pin toggle: {app?.PackageName}", ex);
         }
     }
 
@@ -87,7 +86,7 @@ public sealed partial class AppsViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error toggling app shortcut: {AppPackage}", app?.PackageName);
+            Logger.Error($"Error toggling app shortcut: {app?.PackageName}", ex);
         }
     }
 
@@ -114,7 +113,7 @@ public sealed partial class AppsViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error uninstalling app: {AppPackage}", app.PackageName);
+            Logger.Error($"Error uninstalling app: {app.PackageName}", ex);
         }
     }
 
@@ -149,7 +148,7 @@ public sealed partial class AppsViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error loading apps");
+            Logger.Error("Error loading apps", ex);
         }
     }
 
@@ -234,8 +233,9 @@ public sealed partial class AppsViewModel : BaseViewModel
             app.IsLoading = true;
             try
             {
-                Logger.LogDebug("Opening app: {AppPackage}", app.AppName);
-                var started = await ScreenMirrorService.StartScrcpy(DeviceManager.ActiveDevice!, $"--start-app={app.PackageName} --window-title=\"{app.AppName}\"", GetAppIconFilePath(app.PackageName));
+                Logger.Debug($"Opening app: {app.AppName}");
+                IconUtils.SetScrcpyWindowIcon(app.PackageName);
+                var started = await ScreenMirrorService.StartScrcpy(DeviceManager.ActiveDevice!, $"--start-app={app.PackageName} --window-title=\"{app.AppName}\"");
                 if (started)
                 {
                     await Task.Delay(2000);

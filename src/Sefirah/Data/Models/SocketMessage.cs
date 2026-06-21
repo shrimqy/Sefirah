@@ -1,4 +1,3 @@
-using Sefirah.Data.Enums;
 using Sefirah.Data.Models.Messages;
 
 namespace Sefirah.Data.Models;
@@ -12,6 +11,7 @@ namespace Sefirah.Data.Models;
 [JsonDerivedType(typeof(AudioStreamState), nameof(AudioStreamState))]
 [JsonDerivedType(typeof(BatteryState), nameof(BatteryState))]
 [JsonDerivedType(typeof(CallInfo), nameof(CallInfo))]
+[JsonDerivedType(typeof(CallLogInfo), nameof(CallLogInfo))]
 [JsonDerivedType(typeof(ClearNotifications), nameof(ClearNotifications))]
 [JsonDerivedType(typeof(ClipboardInfo), nameof(ClipboardInfo))]
 [JsonDerivedType(typeof(ConnectionAck), nameof(ConnectionAck))]
@@ -26,6 +26,8 @@ namespace Sefirah.Data.Models;
 [JsonDerivedType(typeof(NotificationInfo), nameof(NotificationInfo))]
 [JsonDerivedType(typeof(NotificationReply), nameof(NotificationReply))]
 [JsonDerivedType(typeof(PairMessage), nameof(PairMessage))]
+[JsonDerivedType(typeof(BluetoothPairingRequest), nameof(BluetoothPairingRequest))]
+[JsonDerivedType(typeof(BluetoothPairingResult), nameof(BluetoothPairingResult))]
 [JsonDerivedType(typeof(PlaybackInfo), nameof(PlaybackInfo))]
 [JsonDerivedType(typeof(RequestApplicationList), nameof(RequestApplicationList))]
 [JsonDerivedType(typeof(RingerModeState), nameof(RingerModeState))]
@@ -57,6 +59,14 @@ public class Authentication : SocketMessage
 public class PairMessage : SocketMessage
 {
     public bool Pair { get; set; }
+}
+
+public class BluetoothPairingRequest : SocketMessage;
+
+public class BluetoothPairingResult : SocketMessage
+{
+    public bool Granted { get; set; }
+    public string? DeviceName { get; set; }
 }
 
 public class UdpBroadcast : SocketMessage
@@ -99,6 +109,21 @@ public class CallInfo : SocketMessage
     public CallState CallState { get; set; }
 
     public required string PhoneNumber { get; set; }
+
+    public ContactInfo? ContactInfo { get; set; }
+}
+
+public class CallLogInfo : SocketMessage
+{
+    public long CallLogId { get; set; }
+
+    public string PhoneNumber { get; set; } = string.Empty;
+
+    public long TimestampMillis { get; set; }
+
+    public long DurationSeconds { get; set; }
+
+    public CallLogType CallType { get; set; }
 
     public ContactInfo? ContactInfo { get; set; }
 }
@@ -257,9 +282,11 @@ public class SftpServerInfo : SocketMessage
 
     public required string Password { get; set; }
 
-    public required string IpAddress { get; set; }
-
     public int Port { get; set; }
+
+    public List<string> Paths { get; set; } = [];
+
+    public List<string> PathNames { get; set; } = [];
 }
 
 public class ClipboardInfo : SocketMessage

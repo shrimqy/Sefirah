@@ -1,4 +1,5 @@
 using Sefirah.Data.Contracts;
+using Sefirah.Platforms.Desktop.Bluetooth;
 using Sefirah.Platforms.Desktop.Services;
 
 namespace Sefirah.Platforms.Desktop;
@@ -17,6 +18,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IUpdateService, DesktopUpdateService>();
         services.AddSingleton<ISftpService, DesktopSftpService>();
         services.AddSingleton<IAppShortcutService, DesktopAppShortcutService>();
+        services.AddSingleton<IPhoneLineService, DesktopPhoneLineService>();
+        services.AddSingleton<IBluetoothPairingService, BluetoothPairingService>();
+        services.AddSingleton<BluetoothPairingService>(sp => (BluetoothPairingService)sp.GetRequiredService<IBluetoothPairingService>());
         return services;
     }
 } 

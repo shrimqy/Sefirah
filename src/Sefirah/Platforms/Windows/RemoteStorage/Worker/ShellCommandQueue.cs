@@ -7,7 +7,8 @@ using static Vanara.PInvoke.CldApi;
 using FileAttributes = System.IO.FileAttributes;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
-public sealed class ShellCommandQueue(
+
+public sealed partial class ShellCommandQueue(
     ISyncProviderContextAccessor contextAccessor,
     ChannelReader<ShellCommand> taskReader,
     FileLocker fileLocker,
@@ -16,7 +17,7 @@ public sealed class ShellCommandQueue(
     ILogger logger
 ) : IDisposable
 {
-    private string _rootDirectory => contextAccessor.Context.RootDirectory;
+    private string RootDirectory => contextAccessor.Context.RootDirectory;
     private readonly CancellationTokenSource _disposeTokenSource = new();
     private Task? _runningTask = null;
 
@@ -30,20 +31,20 @@ public sealed class ShellCommandQueue(
                 var shellCommand = await taskReader.ReadAsync(cancellationToken);
                 try
                 {
-                    if (!shellCommand.FullPath.StartsWith(_rootDirectory, StringComparison.OrdinalIgnoreCase))
+                    if (!shellCommand.FullPath.StartsWith(RootDirectory, StringComparison.OrdinalIgnoreCase))
                     {
                         continue;
                     }
 
                     var state = CloudFilter.GetPlaceholderState(shellCommand.FullPath);                    
                     // Broken upload, state is just "No State"
-                    logger.LogInformation("placeholder state {state}", state);
-                    if (state == CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_NO_STATES ||
-                        state == CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC ||
-                        state == CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER)
+                    logger.Info($"placeholder state {state}");
+                    if (state is CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_NO_STATES ||
+                        state is CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC ||
+                        state is CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER)
                     {
                         var isDirectory = File.GetAttributes(shellCommand.FullPath).HasFlag(FileAttributes.Directory);
-                        var relativePath = PathMapper.GetRelativePath(shellCommand.FullPath, _rootDirectory);
+                        var relativePath = PathMapper.GetRelativePath(shellCommand.FullPath, RootDirectory);
                         using var locker = await fileLocker.Lock(relativePath);
                         
                         if (isDirectory)
@@ -65,19 +66,20 @@ public sealed class ShellCommandQueue(
                             // Add explicit sync state setting here
                             try
                             {
+                                if (!CloudFilter.IsPlaceholder(shellCommand.FullPath))
+                                    CloudFilter.ConvertToPlaceholder(shellCommand.FullPath);
                                 CloudFilter.SetInSyncState(shellCommand.FullPath);
-                                logger.LogInformation("Set sync state after upload for {path}", shellCommand.FullPath);
                             }
                             catch (Exception ex)
                             {
-                                logger.LogError(ex, "Failed to set sync state for {path}", shellCommand.FullPath);
+                                logger.Error($"Failed to set sync state for {shellCommand.FullPath}", ex);
                             }
                         }
                     }
                     else if (state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PARTIALLY_ON_DISK))
                     {
                         var isDirectory = File.GetAttributes(shellCommand.FullPath).HasFlag(FileAttributes.Directory);
-                        var relativePath = PathMapper.GetRelativePath(shellCommand.FullPath, _rootDirectory);
+                        var relativePath = PathMapper.GetRelativePath(shellCommand.FullPath, RootDirectory);
                         if (isDirectory)
                         {
                             await placeholderService.CreateOrUpdateDirectory(relativePath);
@@ -90,7 +92,7 @@ public sealed class ShellCommandQueue(
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Error in handling shell command");
+                    logger.Error("Error in handling shell command", ex);
                 }
             }
         });

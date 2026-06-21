@@ -4,7 +4,8 @@ using Vanara.InteropServices;
 using Vanara.PInvoke;
 
 namespace Sefirah.Platforms.Windows.Interop;
-public sealed class SafeCreateInfo : IDisposable
+
+public sealed partial class SafeCreateInfo : IDisposable
 {
     private readonly SafeCoTaskMemString _relativePathPointer;
     public CldApi.CF_PLACEHOLDER_CREATE_INFO CreateInfo { get; init; }

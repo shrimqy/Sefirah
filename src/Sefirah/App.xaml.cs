@@ -7,13 +7,11 @@ using Sefirah.Views.Onboarding;
 using Windows.ApplicationModel.Activation;
 using LaunchActivatedEventArgs = Microsoft.UI.Xaml.LaunchActivatedEventArgs;
 using H.NotifyIcon;
-using Sefirah.Data.Contracts;
 using System.Runtime.InteropServices;
-using Sefirah.Data.Enums;
 using Microsoft.UI.Windowing;
 using WinRT.Interop;
 using Sefirah.Data.Models;
-
+using Sefirah.Views.WindowViews;
 
 #if WINDOWS
 using Sefirah.Platforms.Windows.Helpers;
@@ -53,7 +51,6 @@ public partial class App : Application
 #if WINDOWS
             WindowHandle = WindowNative.GetWindowHandle(MainWindow);
             MainWindow.ExtendsContentIntoTitleBar = true;
-            MainWindow.SystemBackdrop = new MicaBackdrop();
 #endif
 #if DEBUG
             MainWindow.UseStudio();
@@ -81,6 +78,8 @@ public partial class App : Application
             var rootFrame = EnsureWindowIsInitialized();
             if (rootFrame is null)
                 return;
+
+            Ioc.Default.GetRequiredService<IAppThemeModeService>().ManageAppearance(MainWindow);
 
             if (isStartupTask)
             {

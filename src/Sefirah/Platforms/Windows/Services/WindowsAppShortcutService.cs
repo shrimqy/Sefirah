@@ -1,8 +1,6 @@
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Text;
-using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
+using Sefirah.Platforms.Windows.HostedApp;
 using Windows.Management.Deployment;
 using static Sefirah.Utils.IconUtils;
 using RegisterPackageOptions = Windows.Management.Deployment.RegisterPackageOptions;
@@ -11,15 +9,15 @@ namespace Sefirah.Platforms.Windows.Services;
 
 public sealed class WindowsAppShortcutService(ILogger logger) : IAppShortcutService
 {
-    private const string HostedAppsFolder = "HostedApps";
+    private const int HResultPackageNotFound = unchecked((int)0x80073CF1);
+
+    private const string HostedAppsFolder = HostedPackageIdentity.HostedAppsFolder;
     /// <summary>Must match the HostRuntime Id in the host's Package.appxmanifest (windows.hostRuntime extension).</summary>
     private const string HostRuntimeId = "SefirahHost";
     private const string UnsignedPublisherOid = "OID.2.25.311729368913984317654407730594956997722=1";
 
     /// <summary>Prefix for the package parameter in the hosted app manifest</summary>
     public const string HostedPackageParamPrefix = "package:";
-    private const string HostedPackageVersion = "1.0.0.0";
-    private static readonly string HostedPublisherId = GetPublisherHash(UnsignedPublisherOid);
 
     private readonly PackageManager packageManager = new();
     private readonly string localStatePath = ApplicationData.Current.LocalFolder.Path;
@@ -31,19 +29,33 @@ public sealed class WindowsAppShortcutService(ILogger logger) : IAppShortcutServ
         var hostPublisher = host.Publisher;
         var hostVersion = $"{host.Version.Major}.{host.Version.Minor}.{host.Version.Build}.{host.Version.Revision}";
 
-        var identityName = $"{hostName}.Hosted.{GetAppId(app.PackageName)}";
+        var identityName = HostedPackageIdentity.GetIdentityName(app.PackageName);
         var folderPath = Path.Combine(localStatePath, HostedAppsFolder, identityName);
         var imagesPath = Path.Combine(folderPath, "Images");
+        var fullName = HostedPackageIdentity.GetPackageFullName(identityName);
 
         try
         {
+            await TryRemoveHostedPackageAsync(identityName);
+
+            if (Directory.Exists(folderPath))
+            {
+                try { Directory.Delete(folderPath, true); }
+                catch (IOException ex)
+                {
+                    logger.Debug($"Could not fully clear hosted app folder {identityName} before recreate", ex);
+                }
+            }
+
             Directory.CreateDirectory(imagesPath);
 
-            await CopyHostedAppImagesAsync(app.PackageName, imagesPath);
+            await CopyHostedAppImagesAsync(app.PackageName, folderPath);
 
             var manifestPath = Path.Combine(folderPath, "AppxManifest.xml");
             var manifestXml = BuildHostedAppManifest(identityName, app, hostName, hostPublisher, hostVersion);
             await File.WriteAllTextAsync(manifestPath, manifestXml);
+
+            await HostedAppResourcesGenerator.GeneratePriAsync(folderPath, identityName);
 
             var manifestUri = new Uri(manifestPath);
             var options = new RegisterPackageOptions
@@ -51,98 +63,99 @@ public sealed class WindowsAppShortcutService(ILogger logger) : IAppShortcutServ
                 AllowUnsigned = true
             };
 
-            var result = await packageManager.RegisterPackageByUriAsync(manifestUri, options);
+            DeploymentResult result;
+            try
+            {
+                result = await packageManager.RegisterPackageByUriAsync(manifestUri, options);
+            }
+            catch (COMException ex)
+            {
+                throw new InvalidOperationException($"App registration failed (0x{ex.HResult:X8}): {ex.Message}", ex);
+            }
 
             if (!result.IsRegistered)
             {
-                throw new Exception($"App registration failed: {result.ErrorText}");
+                throw new InvalidOperationException($"App registration failed: {result.ErrorText}");
             }
+
+            logger.Info($"Registered hosted app package {fullName}");
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            try { Directory.Delete(folderPath, true); } catch { }
+            logger.Error($"Failed to create hosted app shortcut for {app.PackageName}", ex);
             throw;
         }
     }
 
     public async Task RemoveAppShortcutAsync(string androidPackageName)
     {
-        var hostName = Package.Current.Id.Name;
-        var identityName = $"{hostName}.Hosted.{GetAppId(androidPackageName)}";
+        var identityName = HostedPackageIdentity.GetIdentityName(androidPackageName);
         var folderPath = Path.Combine(localStatePath, HostedAppsFolder, identityName);
-        var fullName = GetPackageFullName(identityName);
 
         try
         {
-            await packageManager.RemovePackageAsync(fullName);
-        }
-        catch (COMException) { }
-
-        try 
-        { 
-            Directory.Delete(folderPath, true);
-        } 
-        catch (IOException) 
-        {
-            // shell may still have a handle to the icon
-            throw;
-        }
-    }
-
-    /// <summary>
-    /// Uses <see cref="PackageManager.FindPackagesForUser"/> with the hosted app package family name (identity + publisher hash),
-    /// then matches <see cref="PackageId.FullName"/> to the same string <see cref="RemovePackageAsync"/> uses—no LocalState folder check.
-    /// </summary>
-    /// <summary>
-    /// Uses <see cref="PackageManager.FindPackagesForUser"/> with the hosted app package family name (identity + publisher hash),
-    /// then matches <see cref="PackageId.FullName"/> to the same string <see cref="RemovePackageAsync"/> uses—no LocalState folder check.
-    /// </summary>
-    public bool IsShortcutRegistered(string androidPackageName)
-    {
-        var hostName = Package.Current.Id.Name;
-        var identityName = $"{hostName}.Hosted.{GetAppId(androidPackageName)}";
-        var expectedFullName = GetPackageFullName(identityName);
-        var familyName = GetPackageFamilyName(identityName);
-
-        try
-        {
-            foreach (var package in packageManager.FindPackagesForUser(string.Empty, familyName))
-            {
-                if (string.Equals(package.Id.FullName, expectedFullName, StringComparison.OrdinalIgnoreCase))
-                    return true;
-            }
-
-            var folderPath = Path.Combine(localStatePath, HostedAppsFolder, identityName);
-            return Directory.Exists(folderPath);
+            await TryRemoveHostedPackageAsync(identityName);
         }
         catch (Exception ex)
         {
-            logger.LogDebug(ex, "FindPackagesForUser failed for hosted package {FamilyName}", familyName);
-            return false;
+            logger.Debug($"RemovePackageAsync failed for {identityName}", ex);
+        }
+
+        TryDeleteHostedAppFolder(folderPath, identityName);
+    }
+
+    public bool IsShortcutRegistered(string androidPackageName) =>
+        HostedPackageIdentity.IsRegistered(androidPackageName);
+
+    private async Task TryRemoveHostedPackageAsync(string identityName)
+    {
+        if (!IsHostedPackageInstalled(identityName))
+            return;
+
+        var fullName = HostedPackageIdentity.GetPackageFullName(identityName);
+
+        try
+        {
+            var result = await packageManager.RemovePackageAsync(fullName);
+            if (IsHostedPackageInstalled(identityName))
+                logger.Debug($"Hosted package still installed after RemovePackageAsync ({fullName}): {result.ErrorText}");
+        }
+        catch (COMException ex) when (ex.HResult == HResultPackageNotFound)
+        {
         }
     }
 
-    private static string GetPackageFamilyName(string identityName) => $"{identityName}_{HostedPublisherId}";
-
-    /// <summary>Builds the package full name deterministically (Name_Version_Architecture__PublisherId).</summary>
-    private static string GetPackageFullName(string identityName) =>
-        $"{identityName}_{HostedPackageVersion}_neutral__{HostedPublisherId}";
-
-    /// <summary>Publisher hash for package full name (Crockford Base32 of first 8 bytes of SHA-256 of publisher).</summary>
-    /// <remarks>From <see href="https://marcinotorowski.com/2021/12/19/calculating-hash-part-of-msix-package-family-name/">here</see>.</remarks>
-    private static string GetPublisherHash(string publisher)
+    private void TryDeleteHostedAppFolder(string folderPath, string identityName)
     {
-        var encoded = SHA256.HashData(Encoding.Unicode.GetBytes(publisher));
-        var binaryString = string.Concat(encoded.Take(8).Select(c => Convert.ToString(c, 2).PadLeft(8, '0'))) + '0'; // 65 bits = 13 * 5
-        var encodedPublisherId = string.Concat(Enumerable.Range(0, binaryString.Length / 5).Select(i => "0123456789abcdefghjkmnpqrstvwxyz".Substring(Convert.ToInt32(binaryString.Substring(i * 5, 5), 2), 1)));
-        return encodedPublisherId;
+        if (!Directory.Exists(folderPath))
+            return;
+
+        try
+        {
+            Directory.Delete(folderPath, true);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            logger.Debug($"Could not delete hosted app folder {identityName} (files may be in use)", ex);
+        }
     }
 
-    /// <summary>Deterministic id from package name for Identity Name.</summary>
-    private static string GetAppId(string packageName)
+    /// <summary>
+    /// Uses <see cref="PackageManager.FindPackagesForUser"/> with the hosted app package family name,
+    /// matching <see cref="PackageId.FullName"/> to the same string <see cref="PackageManager.RemovePackageAsync"/> uses.
+    /// </summary>
+    private bool IsHostedPackageInstalled(string identityName)
     {
-        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(packageName));
-        return Convert.ToHexString(hash)[..12].ToLowerInvariant();
+        var expectedFullName = HostedPackageIdentity.GetPackageFullName(identityName);
+        var familyName = HostedPackageIdentity.GetPackageFamilyName(identityName);
+
+        foreach (var package in packageManager.FindPackagesForUser(string.Empty, familyName))
+        {
+            if (string.Equals(package.Id.FullName, expectedFullName, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
     }
 
     private static string BuildHostedAppManifest(string identityName, ApplicationItem app, string hostName, string hostPublisher, string hostVersion)
@@ -150,7 +163,7 @@ public sealed class WindowsAppShortcutService(ILogger logger) : IAppShortcutServ
         var displayName = EscapeXml(app.AppName);
 
         return $@"<?xml version=""1.0"" encoding=""utf-8""?>
-<Package xmlns=""http://schemas.microsoft.com/appx/manifest/foundation/windows10"" xmlns:uap=""http://schemas.microsoft.com/appx/manifest/uap/windows10"" xmlns:uap10=""http://schemas.microsoft.com/appx/manifest/uap/windows10/10"" xmlns:rescap=""http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"" IgnorableNamespaces=""uap rescap"">
+<Package xmlns=""http://schemas.microsoft.com/appx/manifest/foundation/windows10"" xmlns:uap=""http://schemas.microsoft.com/appx/manifest/uap/windows10"" xmlns:uap10=""http://schemas.microsoft.com/appx/manifest/uap/windows10/10"" xmlns:rescap=""http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"" IgnorableNamespaces=""uap uap10 rescap"">
   <Identity Name=""{identityName}"" Publisher=""{UnsignedPublisherOid}"" Version=""1.0.0.0""/>
   <Properties>
     <DisplayName>{displayName}</DisplayName>
@@ -193,14 +206,9 @@ public sealed class WindowsAppShortcutService(ILogger logger) : IAppShortcutServ
             .Replace("'", "&apos;");
     }
 
-    private static async Task CopyHostedAppImagesAsync(string packageName, string imagesPath)
+    private static async Task CopyHostedAppImagesAsync(string packageName, string packageRoot)
     {
         var sourcePath = GetAppIconFilePath(packageName);
-
-        if (!File.Exists(sourcePath)) return;
-
-        var dest44 = Path.Combine(imagesPath, "Square44x44Logo.png");
-
-        await Task.Run(() => File.Copy(sourcePath, dest44, true));
+        await HostedAppIconGenerator.GenerateAsync(sourcePath, packageRoot);
     }
 }

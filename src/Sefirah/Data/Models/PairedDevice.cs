@@ -1,7 +1,5 @@
 using System.Collections.Specialized;
 using CommunityToolkit.WinUI;
-using Sefirah.Data.Contracts;
-using Sefirah.Data.Enums;
 using Sefirah.Data.Models.Messages;
 
 namespace Sefirah.Data.Models;
@@ -117,6 +115,34 @@ public partial class PairedDevice : BaseRemoteDevice
     public ObservableCollection<AdbDevice> ConnectedAdbDevices { get; set; } = [];
 
     public ObservableCollection<MediaSession> RemotePlaybackSessions { get; } = [];
+
+    private bool isActiveDevice;
+    public bool IsActiveDevice
+    {
+        get => isActiveDevice;
+        set => SetProperty(ref isActiveDevice, value);
+    }
+
+    private string? callsTransportDeviceId;
+    public string? CallsTransportDeviceId
+    {
+        get => callsTransportDeviceId;
+        set => SetProperty(ref callsTransportDeviceId, value);
+    }
+
+    private string? bluetoothAddress;
+    public string? BluetoothAddress
+    {
+        get => bluetoothAddress;
+        set => SetProperty(ref bluetoothAddress, value);
+    }
+
+    private string? bluetoothClassicDeviceId;
+    public string? BluetoothClassicDeviceId
+    {
+        get => bluetoothClassicDeviceId;
+        set => SetProperty(ref bluetoothClassicDeviceId, value);
+    }
 
     private readonly IAdbService adbService = Ioc.Default.GetRequiredService<IAdbService>();
     private readonly IUserSettingsService userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();

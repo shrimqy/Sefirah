@@ -1,8 +1,10 @@
 using CommunityToolkit.WinUI.Helpers;
 using Microsoft.UI.Xaml.Input;
+using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
 using Sefirah.ViewModels;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.UI;
 
 namespace Sefirah.Views;
 
@@ -62,7 +64,7 @@ public sealed partial class MessagesPage : Page
         }
     }
 
-    private Windows.UI.Color GetOrCreateConversationColor(long conversationId)
+    private Color GetOrCreateConversationColor(long conversationId)
     {
         if (!conversationColors.TryGetValue(conversationId, out var color))
         {
@@ -72,7 +74,7 @@ public sealed partial class MessagesPage : Page
         return color;
     }
 
-    private Windows.UI.Color GetOrCreateContactColor(string address)
+    private Color GetOrCreateContactColor(string address)
     {
         if (!contactColors.TryGetValue(address, out var color))
         {
@@ -89,7 +91,7 @@ public sealed partial class MessagesPage : Page
         "#A9DFBF", "#F9E79F", "#AED6F1", "#FADBD8", "#D5DBDB"
     ];
 
-    private Windows.UI.Color GenerateRandomColor()
+    private Color GenerateRandomColor()
     {
         var randomColorHex = PredefinedColors[random.Next(PredefinedColors.Length)];
         return randomColorHex.ToColor();
@@ -133,14 +135,14 @@ public sealed partial class MessagesPage : Page
                     textBlock.Text = GetInitials(conversation.DisplayName);
                 }
             }
-            else if (border.DataContext is Contact contact)
+            else if (border.DataContext is ParticipantInfo contact)
             {
                 // Handle contact suggestion avatars
                 var backgroundColor = GetOrCreateContactColor(contact.Address);
                 border.Background = new SolidColorBrush(backgroundColor);
                 
                 // Set initials for text content if it's a TextBlock
-                if (border.Child is TextBlock textBlock && contact.DisplayName != null)
+                if (border.Child is TextBlock textBlock)
                 {
                     textBlock.Text = GetInitials(contact.DisplayName);
                 }
@@ -158,7 +160,7 @@ public sealed partial class MessagesPage : Page
             border.Background = new SolidColorBrush(backgroundColor);
             
             // Set initials for text content if it's a TextBlock
-            if (border.Child is TextBlock textBlock && messageGroup.Sender.DisplayName is not null)
+            if (border.Child is TextBlock textBlock)
             {
                 textBlock.Text = GetInitials(messageGroup.Sender.DisplayName);
             }
@@ -259,7 +261,7 @@ public sealed partial class MessagesPage : Page
         var address = args.QueryText;
         if (!string.IsNullOrWhiteSpace(address))
         {
-            ViewModel.AddAddress(new Contact(address, address));
+            ViewModel.AddAddress(new Contact(address, address, address));
         }
         sender.Text = string.Empty;
     }

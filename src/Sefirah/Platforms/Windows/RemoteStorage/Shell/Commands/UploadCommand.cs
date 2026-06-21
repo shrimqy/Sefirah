@@ -11,6 +11,7 @@ using static Vanara.PInvoke.Shell32;
 using static Vanara.PInvoke.ShlwApi;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Shell.Commands;
+
 [ComVisible(true), Guid("4a3c9b56-f075-4499-b4ee-ba4b88d1fe05")]
 public class UploadCommand(
     ChannelWriter<ShellCommand> commandWriter, 
@@ -64,23 +65,23 @@ public class UploadCommand(
                 using var pShellItem = ComReleaserFactory.Create(psiItemArray.GetItemAt(i));
 
                 var rawFullPath = pShellItem.Item.GetDisplayName(SIGDN.SIGDN_FILESYSPATH);
-                logger.LogInformation("Upload Command received for file {path}", rawFullPath);
+                logger.Info($"Upload Command received for file {rawFullPath}");
 
                 // Clear the in-sync flag to force reupload
                 try
                 {
                     var currentState = CloudFilter.GetPlaceholderState(rawFullPath);
-                    logger.LogInformation("Current state before reupload: {state}", currentState);
+                    logger.Info($"Current state before reupload: {currentState}");
 
                     if (currentState.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
                     {
                         CloudFilter.ClearInSyncState(rawFullPath);
-                        logger.LogInformation("Cleared in-sync state for reupload");
+                        logger.Info("Cleared in-sync state for reupload");
                     }
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Failed to clear sync state for {path}", rawFullPath);
+                    logger.Error($"Failed to clear sync state for {rawFullPath}", ex);
                 }
 
                 commandWriter.TryWrite(new ShellCommand
@@ -93,7 +94,7 @@ public class UploadCommand(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Upload command failed");
+            logger.Error("Upload command failed", ex);
             return ex.HResult;
         }
 

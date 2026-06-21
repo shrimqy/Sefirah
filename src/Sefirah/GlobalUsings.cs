@@ -27,3 +27,5 @@ global using Uno.Extensions.Logging;
 global using ApplicationExecutionState = Windows.ApplicationModel.Activation.ApplicationExecutionState;
 
 global using global::Sefirah.Extensions;
+global using global::Sefirah.Data.Contracts;
+global using global::Sefirah.Data.Enums;

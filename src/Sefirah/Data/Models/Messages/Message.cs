@@ -4,7 +4,7 @@ public class Message
 {
     public long UniqueId { get; set; }
 
-    public required Contact Contact { get; set; }
+    public required ParticipantInfo Participant { get; set; }
 
     public long ThreadId { get; set; }
 

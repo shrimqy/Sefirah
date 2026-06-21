@@ -4,7 +4,6 @@ using Sefirah.Data.Contracts;
 using Sefirah.Models;
 #if WINDOWS
 using Sefirah.Platforms.Windows;
-using Sefirah.Platforms.Windows.Services;
 #else
 using Sefirah.Platforms.Desktop;
 #endif
@@ -41,8 +40,8 @@ public static class AppLifecycleHelper
         var playbackService = Ioc.Default.GetRequiredService<IMediaService>();
         var actionService = Ioc.Default.GetRequiredService<IActionService>();
         var updateService = Ioc.Default.GetRequiredService<IUpdateService>();
-        var generalSettingsService = Ioc.Default.GetRequiredService<IGeneralSettingsService>();
-
+        var phoneLineService = Ioc.Default.GetRequiredService<IPhoneLineService>();
+        var callManager = Ioc.Default.GetRequiredService<ICallManager>();
 #if WINDOWS
         var windowsNotificationHandler = Ioc.Default.GetRequiredService<IPlatformNotificationHandler>();
         await windowsNotificationHandler.RegisterForNotifications();
@@ -54,7 +53,8 @@ public static class AppLifecycleHelper
             playbackService.InitializeAsync(),
             actionService.InitializeAsync(),
             notificationService.Initialize(),
-            clipboardService.Initialize()
+            clipboardService.Initialize(),
+            callManager.Initialize()
         );
 
         await networkService.StartServerAsync();
@@ -62,7 +62,8 @@ public static class AppLifecycleHelper
 
         await Task.WhenAll(
             adbService.StartAsync(),
-            updateService.CheckForUpdatesAsync()
+            updateService.CheckForUpdatesAsync(),
+            phoneLineService.Initialize()
         );
 
         App.SplashScreenLoadingTCS?.TrySetResult();
@@ -114,12 +115,15 @@ public static class AppLifecycleHelper
                 // Settings Services
                 .AddSingleton<IUserSettingsService, UserSettingsService>()
                 .AddSingleton<IGeneralSettingsService, GeneralSettingsService>(sp => new GeneralSettingsService(((UserSettingsService)sp.GetRequiredService<IUserSettingsService>()).GetSharingContext()))
+                .AddSingleton<IAppThemeModeService, AppThemeModeService>()
 
                 // Database and Repositories
                 .AddSingleton<DatabaseContext>()
                 .AddSingleton<DeviceRepository>()
                 .AddSingleton<RemoteAppRepository>()
+                .AddSingleton<ContactRepository>()
                 .AddSingleton<SmsRepository>()
+                .AddSingleton<CallLogRepository>()
                 .AddSingleton<NotificationRepository>()
 
                 // Platform-specific services
@@ -142,6 +146,7 @@ public static class AppLifecycleHelper
                 .AddSingleton<IRemoteMediaHandler, RemoteMediaHandler>()
                 .AddSingleton<SmsHandlerService>()
                 .AddSingleton<ICallHandler, CallHandlerService>()
+                .AddSingleton<ICallManager>(sp => (CallHandlerService)sp.GetRequiredService<ICallHandler>())
 
                 .AddSingleton<IMessageHandler, MessageHandler>()
                 .AddSingleton<Lazy<IMessageHandler>>(sp => new Lazy<IMessageHandler>(() => sp.GetRequiredService<IMessageHandler>()))
@@ -154,6 +159,7 @@ public static class AppLifecycleHelper
                 .AddSingleton<DevicesViewModel>()
                 .AddSingleton<AppsViewModel>()
                 .AddSingleton<MessagesViewModel>()
+                .AddSingleton<CallsPageViewModel>()
                 )
             );
     }

@@ -1,11 +1,12 @@
 using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Repository;
-using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 
 namespace Sefirah.Services;
 public class MessageHandler(
     RemoteAppRepository remoteAppRepository,
+    CallLogRepository callLogRepository,
+    ContactRepository contactRepository,
     IDeviceManager deviceManager,
     INotificationService notificationService,
     IBatteryAlertService batteryAlertService,
@@ -18,6 +19,7 @@ public class MessageHandler(
     ISftpService sftpService,
     ISessionManager sessionManager,
     ICallHandler callHandler,
+    IBluetoothPairingService bluetoothPairingService,
     ILogger<MessageHandler> logger) : IMessageHandler
 {
     public async void HandleMessageAsync(PairedDevice device, SocketMessage message)
@@ -72,7 +74,7 @@ public class MessageHandler(
                     break;
 
                 case ContactInfo contactMessage:
-                    await smsHandlerService.HandleContactMessage(device.Id, contactMessage);
+                    await contactRepository.SaveContactAsync(device.Id, contactMessage);
                     break;
 
                 case ActionInfo action:
@@ -95,18 +97,26 @@ public class MessageHandler(
                     await callHandler.HandleCallInfoAsync(device, callInfo);
                     break;
 
+                case CallLogInfo callLogInfo:
+                    await callLogRepository.SaveCallLogAsync(device.Id, callLogInfo);
+                    break;
+
+                case BluetoothPairingResult pairingResult:
+                    bluetoothPairingService.HandleBluetoothPairingResult(device, pairingResult);
+                    break;
+
                 case Disconnect:
                     sessionManager.DisconnectDevice(device, true);
                     break;
 
                 default:
-                    logger.LogWarning("Unknown message type received: {type}", message.GetType().Name);
+                    logger.Warn($"Unknown message type received: {message.GetType().Name}");
                     break;
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error handling message");
+            logger.Error("Error handling message", ex);
         }
     }
 }

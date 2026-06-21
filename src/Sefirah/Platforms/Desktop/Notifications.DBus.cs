@@ -217,10 +217,10 @@ partial class Notifications(NotificationsService service, ObjectPath path) : Not
 /// </summary>
 partial class NotificationsService
 {
-    public Connection Connection { get; }
+    public DBusConnection Connection { get; }
     public string Destination { get; }
 
-    public NotificationsService(Connection connection, string destination)
+    public NotificationsService(DBusConnection connection, string destination)
         => (Connection, Destination) = (connection, destination);
 
     public Notifications CreateNotifications(ObjectPath path) => new Notifications(this, path);
@@ -233,7 +233,7 @@ class NotificationsObject
 {
     public NotificationsService Service { get; }
     public ObjectPath Path { get; }
-    protected Connection Connection => Service.Connection;
+    protected DBusConnection Connection => Service.Connection;
 
     protected NotificationsObject(NotificationsService service, ObjectPath path)
         => (Service, Path) = (service, path);

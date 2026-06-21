@@ -1,8 +1,6 @@
 using System.Collections.Concurrent;
 using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Repository;
-using Sefirah.Data.Contracts;
-using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Windows.Data.Xml.Dom;
 using Windows.System;
@@ -67,7 +65,7 @@ public class NotificationService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error loading notifications from database for device {DeviceId}", device.Id);
+            logger.Error($"Error loading notifications from database for device {device.Id}", ex);
         }
         finally
         {
@@ -122,7 +120,7 @@ public class NotificationService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error handling notification message");
+            logger.Error("Error handling notification message", ex);
         }
         finally
         {
@@ -204,11 +202,11 @@ public class NotificationService(
                 });
             }
 
-            logger.LogDebug("Removed notification with key: {NotificationKey} from device {DeviceId}", notification.Key, device.Id);
+            logger.Debug($"Removed notification with key: {notification.Key} from device {device.Id}");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error removing notification");
+            logger.Error("Error removing notification", ex);
         }
     }
 
@@ -223,7 +221,7 @@ public class NotificationService(
             ReplyText = replyText
         });
 
-        logger.LogDebug("Sent reply action for notification {NotificationKey} to device {DeviceId}", notificationKey, device.Id);
+        logger.Debug($"Sent reply action for notification {notificationKey} to device {device.Id}");
     }
 
     public void ProcessClickAction(PairedDevice device, string notificationKey, int actionIndex)
@@ -236,7 +234,7 @@ public class NotificationService(
             ActionIndex = actionIndex,
         });
 
-        logger.LogDebug("Sent click action for notification {NotificationKey} to device {DeviceId}", notificationKey, device.Id);
+        logger.Debug($"Sent click action for notification {notificationKey} to device {device.Id}");
     }
 
     public async void ClearAllNotification()
@@ -256,11 +254,11 @@ public class NotificationService(
             if (!activeDevice.IsConnected) return;
 
             activeDevice.SendMessage(new ClearNotifications());
-            logger.LogInformation("Cleared all notifications for device {DeviceId}", activeDevice.Id);
+            logger.Info($"Cleared all notifications for device {activeDevice.Id}");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error clearing all notifications");
+            logger.Error("Error clearing all notifications", ex);
         }
     }
 
@@ -286,7 +284,7 @@ public class NotificationService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error clearing history");
+            logger.Error("Error clearing history", ex);
         }
         finally
         {

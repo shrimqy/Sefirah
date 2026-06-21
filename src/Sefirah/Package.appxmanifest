@@ -8,6 +8,7 @@
     xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
     xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
     xmlns:uap11="http://schemas.microsoft.com/appx/manifest/uap/windows10/11"
+    xmlns:uap13="http://schemas.microsoft.com/appx/manifest/uap/windows10/13"
    
     xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
     xmlns:rescap5="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities/5"
@@ -23,7 +24,7 @@
     xmlns:cloudfiles="http://schemas.microsoft.com/appx/manifest/cloudfiles/windows10"
     xmlns:cloudfiles2="http://schemas.microsoft.com/appx/manifest/cloudfiles/windows10/2"
     xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
-    IgnorableNamespaces="uap rescap rescap5 uap3 desktop2 desktop3 desktop4 desktop6 desktop7 cloudfiles cloudfiles2 mp">
+    IgnorableNamespaces="uap rescap rescap5 uap3 uap13 desktop2 desktop3 desktop4 desktop6 desktop7 cloudfiles cloudfiles2 mp">
     
         <Identity  Version="2.4.0.0" Name="shrimqy.Seki-PhoneLink" Publisher="CN=BEC0F2AA-07EB-4762-A2FE-13550AF289A5"/>
     
@@ -78,6 +79,7 @@
                     Enabled="false"
                     DisplayName="Sefirah" />
                 </uap5:Extension>
+                <uap13:Extension Category="windows.phoneCallActivation" />
                 <cloudfiles:Extension Category="windows.cloudFiles">
                     <cloudfiles:CloudFiles>
                         <cloudfiles:CustomStateHandler Clsid="20000000-0000-0000-0000-000000000001"/>
@@ -129,14 +131,20 @@
 
     <Capabilities>
         <Capability Name="internetClient" />
-        <rescap:Capability Name="runFullTrust" />
-        <rescap:Capability Name="packageManagement"/>
-        <rescap:Capability Name="appDiagnostics"/>
-        <uap3:Capability Name="backgroundMediaPlayback"/>
         <Capability Name="internetClientServer"/>
-        <uap3:Capability Name="userNotificationListener"/>
         <uap:Capability Name="userAccountInformation"/>
         <uap:Capability Name="removableStorage"/>
+        <uap:Capability Name="phoneCall" />
+        <uap:Capability Name="contacts" />
+        <uap3:Capability Name="backgroundMediaPlayback"/>
+        <uap3:Capability Name="userNotificationListener"/>
+        <rescap:Capability Name="appDiagnostics"/>
+        <rescap:Capability Name="packageManagement"/>
+        <rescap:Capability Name="phoneCallSystem" />
+        <rescap:Capability Name="phoneLineTransportManagement" />
+        <rescap:Capability Name="runFullTrust" />
         <DeviceCapability Name="bluetooth"/>
+        <DeviceCapability Name="microphone" />
+        <DeviceCapability Name="radios"/>
     </Capabilities>
 </Package>

@@ -19,6 +19,10 @@
         <wctconverters:BoolToObjectConverter x:Key="BoolToConnectionButtonTextConverter"
             FalseValue="{helpers:ResourceString Name=Disconnected/Text}"
             TrueValue="{helpers:ResourceString Name=Connected/Text}" />
+        <wctconverters:BoolToObjectConverter x:Key="BoolToSelectButtonTextConverter"
+            FalseValue="Select"
+            TrueValue="Selected" />
+        <wctconverters:BoolNegationConverter x:Key="BoolNegationConverter" />
 
         <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
         <converters:CountToVisibilityConverter x:Key="InverseCountToVisibilityConverter" Inverse="True" />
@@ -167,11 +171,18 @@
                             </wuc:SettingsExpander.ItemsHeader>
 
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Button Command="{Binding DataContext.OpenDeviceSettingsCommand, ElementName=DevicePage}" CommandParameter="{x:Bind}">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon FontSize="14" Glyph="&#xE713;" />
-                                        <TextBlock Text="{helpers:ResourceString Name=Settings}" />
-                                    </StackPanel>
+                                <Button
+                                    MinWidth="110"
+                                    Command="{Binding DataContext.SelectDeviceCommand, ElementName=DevicePage}"
+                                    CommandParameter="{x:Bind}"
+                                    IsEnabled="{x:Bind IsActiveDevice, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}">
+                                    <TextBlock Text="{x:Bind IsActiveDevice, Mode=OneWay, Converter={StaticResource BoolToSelectButtonTextConverter}}" />
+                                </Button>
+                                <Button
+                                    VerticalAlignment="Stretch"
+                                    Command="{Binding DataContext.OpenDeviceSettingsCommand, ElementName=DevicePage}"
+                                    CommandParameter="{x:Bind}">
+                                    <FontIcon FontSize="14" Glyph="&#xE713;" />
                                 </Button>
                                 <Button
                                     VerticalAlignment="Stretch"

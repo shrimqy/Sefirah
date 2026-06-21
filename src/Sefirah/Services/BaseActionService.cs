@@ -38,7 +38,7 @@ public abstract class BaseActionService(
 
     public virtual void HandleActionMessage(ActionInfo action)
     {
-        logger.LogInformation("Executing action: {name}", action.ActionName);
+        logger.Info($"Executing action: {action.ActionName}");
         var actionToExecute = generalSettingsService.Actions.FirstOrDefault(a => a.Id == action.ActionId);
 
         if (actionToExecute is not null && actionToExecute is ProcessAction processAction)

@@ -6,6 +6,7 @@ using Sefirah.Platforms.Windows.RemoteStorage.Worker.IO;
 using static Vanara.PInvoke.CldApi;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
+
 public class SyncProvider(
     ISyncProviderContextAccessor contextAccessor,
     TaskQueue taskQueue,
@@ -26,12 +27,13 @@ public class SyncProvider(
         using var connectDisposable = new Disposable<CF_CONNECTION_KEY>(syncProvider.Connect(), syncProvider.Disconnect);
 
         // Create the placeholders in the client folder so the user sees something
-        if (contextAccessor.Context.PopulationPolicy == PopulationPolicy.AlwaysFull)
+        if (contextAccessor.Context.PopulationPolicy is PopulationPolicy.AlwaysFull)
         {
             placeholdersService.CreateBulk(string.Empty);
         }
 
-        syncProvider.UpdatePlaceholders(contextAccessor.Context.RootDirectory);
+        // update local placeholders with the remote
+        syncProvider.RemoveStalePlaceholders(contextAccessor.Context.RootDirectory);
 
         // Stage 2: Running
         //--------------------------------------------------------------------------------------------
@@ -48,6 +50,6 @@ public class SyncProvider(
 
         await taskQueue.Stop();
 
-        logger.LogDebug("Disconnecting...");
+        logger.Debug("Disconnecting...");
     }
 }

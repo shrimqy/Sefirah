@@ -14,6 +14,7 @@ public static class Constants
         public const string BatteryGroup = "battery";
 
         public static string GetBatteryTag(string deviceId) => $"battery_{deviceId}";
+        public const string IncomingPhoneCallGroup = "incoming-phone-call";
     }
 
     public static class ToastNotificationType
@@ -22,6 +23,7 @@ public static class Constants
         public const string RemoteNotification = "RemoteNotification";
         public const string Clipboard = "Clipboard";
         public const string Update = "Update";
+        public const string IncomingPhoneCall = "IncomingPhoneCall";
     }
     public static class LocalSettings
     {
@@ -30,6 +32,7 @@ public static class Constants
         public const string SettingsFolderName = "settings";
         public const string UserSettingsFileName = "user_settings.json";
         public const string PhoneFrameScrollTeachingTipShown = "PhoneFrameScrollTeachingTipShown";
+        public const string MainNavigationSelection = "MainNavigationSelection";
         public const string DatabaseFileName = "sefirah.db";
         public static readonly string ConnectionString = $"Filename={Path.Combine(ApplicationData.Current.LocalFolder.Path, DatabaseFileName)}";
     }

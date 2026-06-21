@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using AdvancedSharpAdbClient;
@@ -6,8 +7,6 @@ using AdvancedSharpAdbClient.DeviceCommands;
 using AdvancedSharpAdbClient.Models;
 using AdvancedSharpAdbClient.Receivers;
 using CommunityToolkit.WinUI;
-using Sefirah.Data.Contracts;
-using Sefirah.Data.Enums;
 using Sefirah.Data.Items;
 using Sefirah.Data.Models;
 
@@ -53,10 +52,7 @@ public class AdbService(
     {
         if (!VideoCodecOptions.TryGetValue(deviceModel, out ObservableCollection<ScrcpyPreferenceItem>? value))
         {
-            value =
-            [
-                new("", DEFAULT)
-            ];
+            value = [new("", DEFAULT)];
             VideoCodecOptions[deviceModel] = value;
         }
         return value;
@@ -116,7 +112,7 @@ public class AdbService(
             deviceMonitor.DeviceChanged += DeviceChanged;
             
             await deviceMonitor.StartAsync();
-            logger.LogInformation("ADB device monitoring started successfully");
+            logger.Info("ADB device monitoring started successfully");
 
             // Get initial list of devices
             await RefreshDevicesAsync();
@@ -124,7 +120,7 @@ public class AdbService(
         catch (Exception ex)
         {
             await CleanupAsync();
-            logger.LogError("Failed to start ADB device monitoring: {ex}", ex);
+            logger.Error($"Failed to start ADB device monitoring: {ex.Message}", ex);
         }
     }
 
@@ -138,7 +134,7 @@ public class AdbService(
             var scrcpyPath = userSettingsService.GeneralSettingsService.ScrcpyPath;
             if (string.IsNullOrEmpty(scrcpyPath) || !File.Exists(scrcpyPath))
             {
-                logger.LogInformation("Scrcpy path not configured or not found, skipping codec discovery");
+                logger.Info("Scrcpy path not configured or not found, skipping codec discovery");
                 return;
             }
 
@@ -182,7 +178,7 @@ public class AdbService(
 
             if (process.ExitCode != 0)
             {
-                logger.LogWarning($"scrcpy --list-encoders failed for {deviceModel} with exit code {process.ExitCode}. Error: {error}");
+                logger.Warn($"scrcpy --list-encoders failed for {deviceModel} with exit code {process.ExitCode}. Error: {error}");
                 return;
             }
 
@@ -190,7 +186,7 @@ public class AdbService(
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error discovering codec options for device {device.Serial}: {ex.Message}", ex);
+            logger.Error($"Error discovering codec options for device {device.Serial}: {ex.Message}", ex);
         }
     }
 
@@ -271,12 +267,12 @@ public class AdbService(
     {
         if (!IsMonitoring)
         {
-            logger.LogWarning("ADB monitoring is not running");
+            logger.Warn("ADB monitoring is not running");
             return;
         }
         
         await CleanupAsync();
-        logger.LogInformation("ADB device monitoring stopped");
+        logger.Info("ADB device monitoring stopped");
     }
     
     private async Task CleanupAsync()
@@ -310,7 +306,7 @@ public class AdbService(
             // get the rudimentary data if it isn't online yet
             if (e.Device.State is not DeviceState.Online)
             {
-                logger.LogInformation($"Device {e.Device.Serial} connected but not yet online. Current state: {e.Device.State}");
+                logger.Info($"Device {e.Device.Serial} connected but not yet online. Current state: {e.Device.State}");
 
                 var adbDevice = new AdbDevice
                 {
@@ -336,7 +332,7 @@ public class AdbService(
             {
                 AdbDevices.Add(connectedDevice);
             });
-            logger.LogInformation($"Device connected: {connectedDevice.Model} ({connectedDevice.Serial})");
+            logger.Info($"Device connected: {connectedDevice.Model} ({connectedDevice.Serial})");
 
             // Discover codec options for this device
             _ = Task.Run(async () => await DiscoverCodecOptionsForDevice(connectedDevice));
@@ -344,13 +340,13 @@ public class AdbService(
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error handling device connection for {e.Device.Serial}: {ex.Message}", ex);
+            logger.Error($"Error handling device connection for {e.Device.Serial}: {ex.Message}", ex);
         }
     }
     
     private async void DeviceDisconnected(object? sender, DeviceDataEventArgs e)
     {
-        logger.LogInformation($"Device disconnected: {e.Device.Serial}");
+        logger.Info($"Device disconnected: {e.Device.Serial}");
         var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == e.Device.Serial);
         if (existingDevice != null)
         {
@@ -368,7 +364,7 @@ public class AdbService(
     private async void DeviceChanged(object? sender, DeviceDataChangeEventArgs e)
     {
 
-        logger.LogInformation($"Device state changed: {e.Device.Serial} {e.OldState} -> {e.NewState}");
+        logger.Info($"Device state changed: {e.Device.Serial} {e.OldState} -> {e.NewState}");
         var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == e.Device.Serial);
             
         if (e.NewState is DeviceState.Online)
@@ -384,18 +380,18 @@ public class AdbService(
                     if (index != -1)
                     {
                         AdbDevices[index] = deviceInfo;
-                        logger.LogInformation($"Device updated: {deviceInfo.Model} ({deviceInfo.Serial})");
+                        logger.Info($"Device updated: {deviceInfo.Model} ({deviceInfo.Serial})");
                     }
                 }
                 else
                 {
                     // Only add if device doesn't exist
                     AdbDevices.Add(deviceInfo);
-                    logger.LogInformation($"Device added: {deviceInfo.Model} ({deviceInfo.Serial})");
+                    logger.Info($"Device added: {deviceInfo.Model} ({deviceInfo.Serial})");
                 }
             });
                 
-            logger.LogInformation($"Device connected: {deviceInfo.Model} ({deviceInfo.Serial})");
+            logger.Info($"Device connected: {deviceInfo.Model} ({deviceInfo.Serial})");
 
             // Discover codec options for this device
             _ = Task.Run(async () => await DiscoverCodecOptionsForDevice(deviceInfo));
@@ -422,9 +418,9 @@ public class AdbService(
     private async Task RefreshDevicesAsync()
     {
         var devices = await adbClient.GetDevicesAsync();
-        if (devices.Any())
+        if (!devices.Any())
         {
-            logger.LogWarning("No adb devices found");
+            logger.Warn("No adb devices found");
             await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
             {
                 AdbDevices.Clear();
@@ -492,7 +488,7 @@ public class AdbService(
             }
             catch (Exception ex)
             {
-                logger.LogError($"Error getting Android ID for {deviceData.Serial}", ex);
+                logger.Error($"Error getting Android ID for {deviceData.Serial}", ex);
             }
 
             // Look for paired devices with matching model
@@ -513,7 +509,7 @@ public class AdbService(
                 }
                 else
                 {
-                    logger.LogWarning($"No matching paired device found for model: {deviceModel}");
+                    logger.Warn($"No matching paired device found for model: {deviceModel}");
                     androidId = string.Empty;
                 }
             }
@@ -532,7 +528,7 @@ public class AdbService(
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error getting full device info for {deviceData.Serial}", ex);
+            logger.Error($"Error getting full device info for {deviceData.Serial}", ex);
             // Return basic information if we can't get full details
             var device = new AdbDevice
             {
@@ -548,6 +544,24 @@ public class AdbService(
         }
     }
 
+    /// <summary>
+    /// Parses <c>adb connect</c> / <c>adb pair</c> text output. Must not rely on English-only words like
+    /// "refused" because ADB prints localized reasons (e.g. Polish) after an English "cannot connect" prefix.
+    /// </summary>
+    private static bool IsAdbConnectOrPairSuccess(string? message)
+    {
+        if (string.IsNullOrWhiteSpace(message)) return false;
+        var m = message.Trim();
+        if (m.Contains("cannot connect", StringComparison.OrdinalIgnoreCase)) return false;
+        if (m.Contains("cannot resolve", StringComparison.OrdinalIgnoreCase)) return false;
+        if (m.Contains("failed to authenticate", StringComparison.OrdinalIgnoreCase)) return false;
+        if (m.Contains("failed to connect", StringComparison.OrdinalIgnoreCase)) return false;
+        if (m.Contains("unable to connect", StringComparison.OrdinalIgnoreCase)) return false;
+        return m.Contains("connected to", StringComparison.OrdinalIgnoreCase)
+            || m.Contains("already connected to", StringComparison.OrdinalIgnoreCase)
+            || m.Contains("successfully paired", StringComparison.OrdinalIgnoreCase);
+    }
+
     public async Task<bool> ConnectWireless(string host, int port=5555)
     {
         if (string.IsNullOrEmpty(host)) return false;
@@ -555,16 +569,17 @@ public class AdbService(
         try
         {
             var result = await adbClient.ConnectAsync(host, port);
-            logger.LogInformation($"adb wireless connection: {result}");
-            if (result.Contains("failed") || result.Contains("refused"))
-            {
-                return false;
-            }
-            return true;
+            logger.Info($"adb wireless connection: {result}");
+            return IsAdbConnectOrPairSuccess(result);
+        }
+        catch (SocketException ex) when (ex.SocketErrorCode is SocketError.ConnectionRefused)
+        {
+            logger.Debug($"ADB server is not accepting connections while connecting wireless device {host}:{port}");
+            return false;
         }
         catch (Exception ex)
         {
-            logger.LogError("Error connecting to default wireless device: {ex}", ex);
+            logger.Error($"Error connecting to default wireless device: {ex.Message}", ex);
             return false;
         }
     }
@@ -575,15 +590,11 @@ public class AdbService(
         try
         {
             var result = await adbClient.PairAsync(host, port, pairingCode);
-            if (result.Contains("failed") || result.Contains("refused"))
-            {
-                return false;
-            }
-            return true;
+            return IsAdbConnectOrPairSuccess(result);
         }
         catch (Exception ex)
         {
-            logger.LogError("Error connecting to wireless device {device.Serial}: {ex}", device.Serial, ex);
+            logger.Error($"Error connecting to wireless device {device.Serial}: {ex.Message}", ex);
             return false;
         }
     }
@@ -592,12 +603,12 @@ public class AdbService(
     {
         try
         {
-            logger.LogInformation("Unlocking device");
+            logger.Info("Unlocking device");
             if (await IsLocked(deviceData))
             {
                 foreach (var command in commands)
                 {
-                    logger.LogInformation("Executing command: {command}", command);
+                    logger.Info($"Executing command: {command}");
                     await adbClient.ExecuteShellCommandAsync(deviceData, command);
                     await Task.Delay(250);
                 }
@@ -605,7 +616,7 @@ public class AdbService(
         }
         catch (Exception ex)
         { 
-            logger.LogError("Error unlocking device: {ex}", ex);
+            logger.Error($"Error unlocking device: {ex.Message}", ex);
         }
     }
 
@@ -618,7 +629,7 @@ public class AdbService(
 
     public async Task<bool> UninstallApp(string deviceId, string appPackage)
     {
-        logger.LogInformation("Uninstalling app {appPackage} from {deviceId}", appPackage, deviceId);
+        logger.Info($"Uninstalling app {appPackage} from {deviceId}");
 
         var adbDevice = AdbDevices.FirstOrDefault(d => d.AndroidId == deviceId);
         if (adbDevice?.DeviceData is null) return false;
@@ -640,7 +651,7 @@ public class AdbService(
             var result = await ConnectWireless(host);
             if (result)
             {
-                logger.LogInformation("Connected to adb device: {Host}", host);
+                logger.Info($"Connected to adb device: {host}");
                 return true;
             }
 
@@ -651,7 +662,7 @@ public class AdbService(
             var tcpipEnabled = await EnableTcpipMode(usbDevice.Serial);
             if (!tcpipEnabled)
             {
-                logger.LogError("Failed to enable TCP/IP mode");
+                logger.Error("Failed to enable TCP/IP mode");
                 return false;
             }
 
@@ -661,16 +672,16 @@ public class AdbService(
             result = await ConnectWireless(host);
             if (result)
             {
-                logger.LogInformation("Successfully connected to {Host} after enabling TCP/IP mode", host);
+                logger.Info($"Successfully connected to {host} after enabling TCP/IP mode");
                 return true;
             }
 
-            logger.LogError("TCP/IP connection still failed after enabling TCP/IP mode");
+            logger.Error("TCP/IP connection still failed after enabling TCP/IP mode");
             return false;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error in TryConnectTcp for {Host}", host);
+            logger.Error($"Error in TryConnectTcp for {host}: {ex.Message}", ex);
             return false;
         }
     }
@@ -685,11 +696,11 @@ public class AdbService(
             string adbPath = userSettingsService.GeneralSettingsService.AdbPath;
             if (string.IsNullOrEmpty(adbPath))
             {
-                logger.LogError("ADB path not configured");
+                logger.Error("ADB path not configured");
                 return false;
             }
 
-            logger.LogInformation("Enabling TCP/IP mode using ADB at: {AdbPath}", adbPath);
+            logger.Info($"Enabling TCP/IP mode using ADB at: {adbPath}");
             
             // Runs "adb -s <serial> tcpip 5555" to enable TCP/IP mode on the specified device
             var processInfo = new ProcessStartInfo
@@ -705,7 +716,7 @@ public class AdbService(
             using var process = Process.Start(processInfo);
             if (process is null)
             {
-                logger.LogError("Failed to start ADB process");
+                logger.Error("Failed to start ADB process");
                 return false;
             }
 
@@ -715,7 +726,7 @@ public class AdbService(
             
             if (!string.IsNullOrEmpty(error))
             {
-                logger.LogWarning("ADB tcpip command error: {Error}", error);
+                logger.Warn($"ADB tcpip command error: {error}");
             }
 
             // Restart our ADB client to pick up the changes
@@ -725,7 +736,7 @@ public class AdbService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to enable TCP/IP mode");
+            logger.Error($"Failed to enable TCP/IP mode: {ex.Message}", ex);
             return false;
         }
     }
@@ -737,7 +748,7 @@ public class AdbService(
     {
         try
         {
-            logger.LogInformation("Restarting ADB client");
+            logger.Info("Restarting ADB client");
             var wasMonitoring = IsMonitoring;
             if (wasMonitoring)
             {
@@ -749,11 +760,11 @@ public class AdbService(
             {
                 await StartAsync();
             }
-            logger.LogInformation("ADB client restarted successfully");
+            logger.Info("ADB client restarted successfully");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to restart ADB client");
+            logger.Error($"Failed to restart ADB client: {ex.Message}", ex);
         }
     }
 
@@ -768,7 +779,7 @@ public class AdbService(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex,"Could not grant RECEIVE_SENSITIVE_NOTIFICATIONS on {Serial} (older Android or app not installed)", device.Serial);
+            logger.Warn($"Could not grant RECEIVE_SENSITIVE_NOTIFICATIONS on {device.Serial} (older Android or app not installed): {ex.Message}", ex);
         }
     }
 }

@@ -37,7 +37,7 @@ public class WindowsMediaService(
             manager = await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
             if (manager is null)
             {
-                logger.LogError("Failed to initialize GlobalSystemMediaTransportControlsSessionManager");
+                logger.Error($"Failed to initialize GlobalSystemMediaTransportControlsSessionManager");
                 return;
             }
 
@@ -49,11 +49,11 @@ public class WindowsMediaService(
             manager.SessionsChanged += SessionsChanged;
             sessionManager.ConnectionStatusChanged += OnConnectionStatusChanged;
 
-            logger.LogInformation("PlaybackService initialized successfully");
+            logger.Info($"PlaybackService initialized successfully");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to initialize PlaybackService");
+            logger.Error($"Failed to initialize PlaybackService", ex);
         }
     }
 
@@ -147,13 +147,13 @@ public class WindowsMediaService(
                         ToggleMute(mediaAction.Source);
                         break;
                     default:
-                        logger.LogWarning("Unhandled media action: {PlaybackActionType}", mediaAction.ActionType);
+                        logger.Warn($"Unhandled media action: {mediaAction.ActionType}");
                         break;
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error executing media action {PlaybackActionType}", mediaAction.ActionType);
+                logger.Error($"Error executing media action {mediaAction.ActionType}", ex);
             }
         });
     }
@@ -174,7 +174,7 @@ public class WindowsMediaService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error updating active sessions");
+            logger.Error($"Error updating active sessions", ex);
         }
     }
 
@@ -252,7 +252,7 @@ public class WindowsMediaService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error processing timeline properties for {SourceAppUserModelId}", sender.SourceAppUserModelId);
+            logger.Error($"Error processing timeline properties for {sender.SourceAppUserModelId}", ex);
         }
     }
 
@@ -294,7 +294,7 @@ public class WindowsMediaService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error updating playback data for {SourceAppUserModelId}", sender.SourceAppUserModelId);
+            logger.Error($"Error updating playback data for {sender.SourceAppUserModelId}", ex);
         }
     }
 
@@ -313,7 +313,7 @@ public class WindowsMediaService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error updating playback data for {SourceAppUserModelId}", session.SourceAppUserModelId);
+            logger.Error($"Error updating playback data for {session.SourceAppUserModelId}", ex);
         }
     }
 
@@ -350,7 +350,7 @@ public class WindowsMediaService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error getting playback data for {SourceAppUserModelId}", session.SourceAppUserModelId);
+            logger.Error($"Error getting playback data for {session.SourceAppUserModelId}", ex);
             return null;
         }
     }
@@ -370,7 +370,7 @@ public class WindowsMediaService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error sending playback data");
+            logger.Error($"Error sending playback data", ex);
         }
     }
 
@@ -404,7 +404,7 @@ public class WindowsMediaService(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Failed to enumerate audio devices");
+            logger.Warn($"Failed to enumerate audio devices", ex);
         }
     }
 
@@ -439,7 +439,7 @@ public class WindowsMediaService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error sending audio device update");
+            logger.Error($"Error sending audio device update", ex);
         }
     }
 
@@ -456,12 +456,12 @@ public class WindowsMediaService(
             }
             catch (COMException comEx) when (comEx.HResult == unchecked((int)0x8007001F))
             {
-                logger.LogWarning("Device {DeviceId} not functioning when muting", deviceId);
+                logger.Warn($"Device {deviceId} not functioning when muting");
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error muting device {DeviceId}", deviceId);
+            logger.Error($"Error muting device {deviceId}", ex);
         }
     }
 
@@ -478,12 +478,12 @@ public class WindowsMediaService(
             }
             catch (COMException comEx) when (comEx.HResult == unchecked((int)0x8007001F))
             {
-                logger.LogWarning("Device {DeviceId} not functioning when setting volume", deviceId);
+                logger.Warn($"Device {deviceId} not functioning when setting volume");
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error setting volume to {Volume} for device {DeviceId}", volume, deviceId);
+            logger.Error($"Error setting volume to {volume} for device {deviceId}", ex);
         }
     }
 
@@ -507,7 +507,7 @@ public class WindowsMediaService(
 
             if (result1 is not HResult.S_OK || result2 is not HResult.S_OK || result3 is not HResult.S_OK)
             {
-                logger.LogError("SetDefaultEndpoint returned error codes: {Result1}, {Result2}, {Result3}", result1, result2, result3);
+                logger.Error($"SetDefaultEndpoint returned error codes: {result1}, {result2}, {result3}");
                 return;
             }
 
@@ -516,7 +516,7 @@ public class WindowsMediaService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error setting default device");
+            logger.Error($"Error setting default device", ex);
             return;
         }
         finally
@@ -530,7 +530,7 @@ public class WindowsMediaService(
 
     public void OnDeviceStateChanged(string deviceId, DeviceState newState)
     {
-        //logger.LogInformation("Device state changed: {DeviceId} - {NewState}", deviceId, newState);
+        //logger.Info($"Device state changed: {deviceId} - {newState}");
     }
 
     public void OnDeviceAdded(string pwstrDeviceId)
@@ -551,11 +551,11 @@ public class WindowsMediaService(
             var info = GetAudioDeviceInfo(device, false, AudioInfoType.New);
             SendAudioDeviceUpdate(info);
 
-            logger.LogInformation("Device added: {DeviceId}", pwstrDeviceId);
+            logger.Info($"Device added: {pwstrDeviceId}");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error adding device {DeviceId}", pwstrDeviceId);
+            logger.Error($"Error adding device {pwstrDeviceId}", ex);
         }
     }
 
@@ -609,7 +609,7 @@ public class WindowsMediaService(
             catch { }
         }
 
-        logger.LogInformation("Default device changed: {DefaultDeviceId}", newDefaultDeviceId);
+        logger.Info($"Default device changed: {newDefaultDeviceId}");
     }
 
     public void OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key)

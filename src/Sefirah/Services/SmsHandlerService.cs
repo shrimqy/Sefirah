@@ -1,12 +1,13 @@
+using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Repository;
-using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
 
 namespace Sefirah.Services;
 public class SmsHandlerService(
     SmsRepository smsRepository,
-    ILogger<SmsHandlerService> logger)
+    ContactRepository contactRepository,
+    ILogger logger)
 {
     private readonly SemaphoreSlim semaphore = new(1, 1);
 
@@ -24,14 +25,14 @@ public class SmsHandlerService(
             var list = new List<Conversation>();
             foreach (var entity in conversationEntities)
             {
-                var conversation = await entity.ToConversationAsync(smsRepository);
+                var conversation = await entity.ToConversationAsync(contactRepository);
                 list.Add(conversation);
             }
             return list;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error loading conversations from database for device: {DeviceId}", deviceId);
+            logger.Error($"Error loading conversations from database for device: {deviceId}", ex);
             return [];
         }
     }
@@ -53,7 +54,7 @@ public class SmsHandlerService(
                     await HandleRemovedConversation(deviceId, textConversation);
                     break;
                 default:
-                    logger.LogWarning("Unknown conversation type: {ConversationType}", textConversation.InfoType);
+                    logger.Warn($"Unknown conversation type: {textConversation.InfoType}");
                     break;
             }
         }
@@ -69,8 +70,10 @@ public class SmsHandlerService(
         foreach (var tm in textMessages)
         {
             var address = tm.Addresses.Count > 0 ? tm.Addresses[0] : string.Empty;
-            var contactEntity = await smsRepository.GetContactAsync(deviceId, address);
-            var contact = contactEntity is not null ? await contactEntity.ToContact() : new Contact(address, address);
+            var contactEntity = await contactRepository.GetContactAsync(deviceId, address);
+            var participant = contactEntity is not null
+                ? await App.MainWindow.DispatcherQueue.EnqueueAsync(() => contactEntity.ToParticipantInfo())
+                : new ParticipantInfo(address, address);
             messages.Add(new Message
             {
                 UniqueId = tm.UniqueId,
@@ -81,7 +84,7 @@ public class SmsHandlerService(
                 Read = tm.Read,
                 SubscriptionId = tm.SubscriptionId,
                 Attachments = tm.Attachments,
-                Contact = contact,
+                Participant = participant,
                 IsTextMessage = tm.IsTextMessage
             });
         }
@@ -114,13 +117,13 @@ public class SmsHandlerService(
 
             await smsRepository.SaveConversationAsync(conversationEntity);
             await SaveMessagesFromConversation(deviceId, textConversation);
-            var conversation = await conversationEntity.ToConversationAsync(smsRepository);
+            var conversation = await conversationEntity.ToConversationAsync(contactRepository);
             var newMessages = await ToMessagesAsync(deviceId, textConversation.Messages);
             ConversationUpdated?.Invoke(this, (deviceId, textConversation.ThreadId, conversation, newMessages));
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error handling conversation update {ThreadId} for device {DeviceId}", textConversation.ThreadId, deviceId);
+            logger.Error($"Error handling conversation update {textConversation.ThreadId} for device {deviceId}", ex);
         }
     }
 
@@ -133,7 +136,7 @@ public class SmsHandlerService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error handling removed conversation {ThreadId} for device {DeviceId}", textConversation.ThreadId, deviceId);
+            logger.Error($"Error handling removed conversation {textConversation.ThreadId} for device {deviceId}", ex);
         }
     }
 
@@ -148,7 +151,7 @@ public class SmsHandlerService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error saving messages for device {DeviceId}", deviceId);
+            logger.Error($"Error saving messages for device {deviceId}", ex);
         }
     }
 
@@ -160,10 +163,9 @@ public class SmsHandlerService(
             
         foreach (var entity in messageEntities)
         {
-            var message = await entity.ToMessageAsync(smsRepository);
+            var message = await entity.ToMessageAsync(contactRepository);
             messages.Add(message);
         }
-            
         return messages;
     }
 
@@ -177,25 +179,5 @@ public class SmsHandlerService(
         };
 
         device.SendMessage(threadRequest);
-    }
-
-    public async Task HandleContactMessage(string deviceId, ContactInfo contactMessage)
-    {
-        try
-        {
-            await smsRepository.SaveContactAsync(deviceId, contactMessage);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error handling contact message {ContactId} for device {DeviceId}", 
-                contactMessage.Id, deviceId);
-        }
-    }
-
-    public async Task<ObservableCollection<Contact>> GetAllContactsAsync()
-    {   
-        var contacts = await smsRepository.GetAllContactsAsync();
-        var senders = await Task.WhenAll(contacts.Select(c => c.ToContact()));
-        return senders.ToObservableCollection();
     }
 }

@@ -4,7 +4,7 @@ namespace Sefirah.Utils;
 
 public static class NotificationActionUtils
 {
-    public static void ProcessReplyAction(ILogger logger, PairedDevice device, string notificationKey, string replyResultKey, string replyText)
+    public static void ProcessReplyAction(PairedDevice device, string notificationKey, string replyResultKey, string replyText)
     {
         if (!device.IsConnected) return;
 
@@ -16,10 +16,9 @@ public static class NotificationActionUtils
         };
 
         device.SendMessage(replyAction);
-        logger.LogDebug("Sent reply action for notification {NotificationKey} to device {DeviceId}", notificationKey, device.Id);
     }
 
-    public static void ProcessClickAction(ILogger logger, PairedDevice device, string notificationKey, int actionIndex)
+    public static void ProcessClickAction(PairedDevice device, string notificationKey, int actionIndex)
     {        
         if (!device.IsConnected) return;
 
@@ -30,6 +29,5 @@ public static class NotificationActionUtils
         };
 
         device.SendMessage(notificationAction);
-        logger.LogDebug("Sent click action for notification {NotificationKey} to device {DeviceId}", notificationKey, device.Id);
     }
 } 

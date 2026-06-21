@@ -45,10 +45,10 @@ public class MessageEntity
         Address = message.Addresses[0]
     };
 
-    internal async Task<Message> ToMessageAsync(SmsRepository repository)
+    internal async Task<Message> ToMessageAsync(ContactRepository contactRepository)
     {
-        var contact = await repository.GetContactAsync(DeviceId, Address);
-        var sender = contact is not null ? await contact.ToContact() : new Contact(Address, Address);
+        var contact = await contactRepository.GetContactAsync(DeviceId, Address);
+        var participant = contact is not null ? await contact.ToParticipantInfo() : new ParticipantInfo(Address, Address);
 
         return new Message
         {
@@ -60,7 +60,7 @@ public class MessageEntity
             SubscriptionId = SubscriptionId,
             MessageType = MessageType,
             Attachments = Attachments,
-            Contact = sender,
+            Participant = participant,
         };
     }
     #endregion

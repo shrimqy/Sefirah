@@ -850,10 +850,12 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <NavigationView
+                    x:Name="MainNavigationView"
                     Grid.Row="0"
                     BorderBrush="Transparent"
                     IsBackButtonVisible="Collapsed"
                     IsSettingsVisible="True"
+                    Loaded="MainNavigationView_Loaded"
                     PaneDisplayMode="Top"
                     SelectionChanged="NavigationView_SelectionChanged">
                     <NavigationView.Resources>
@@ -866,14 +868,29 @@
 
                     <NavigationView.MenuItems>
                         <NavigationViewItem
+                            x:Name="CallsNavigationItem"
+                            Content="{helpers:ResourceString Name=Calls}"
+                            Tag="Calls"
+                            Visibility="{x:Bind ViewModel.Device, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}">
+                            <NavigationViewItem.Icon>
+                                <FontIcon Glyph="&#xE717;" />
+                            </NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem
+                            x:Name="MessagesNavigationItem"
                             Content="{helpers:ResourceString Name=Messages}"
-                            IsSelected="True"
-                            Tag="Messages">
+                            Tag="Messages"
+                            Visibility="{x:Bind ViewModel.Device, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}">
                             <NavigationViewItem.Icon>
                                 <FontIcon Glyph="&#xE8BD;" />
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
-                        <NavigationViewItem Content="{helpers:ResourceString Name=Apps}" Tag="Apps">
+
+                        <NavigationViewItem
+                            x:Name="AppsNavigationItem"
+                            Content="{helpers:ResourceString Name=Apps}"
+                            Tag="Apps"
+                            Visibility="{x:Bind ViewModel.Device, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}">
                             <NavigationViewItem.Icon>
                                 <FontIcon Glyph="&#xED35;" />
                             </NavigationViewItem.Icon>

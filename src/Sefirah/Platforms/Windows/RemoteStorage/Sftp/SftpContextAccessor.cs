@@ -2,6 +2,7 @@ using Sefirah.Platforms.Windows.Interop;
 using Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Sftp;
+
 public interface ISftpContextAccessor
 {
     SftpContext Context { get; }

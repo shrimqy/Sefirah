@@ -9,6 +9,8 @@ using static Vanara.PInvoke.Shell32;
 using static Vanara.PInvoke.ShlwApi;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Shell.Commands;
+
+
 [ComVisible(true), Guid("942952b6-3bdc-4e50-8fe2-8d2d869ca70f")]
 public class SyncCommand(
     ChannelWriter<ShellCommand> commandWriter,
@@ -62,7 +64,7 @@ public class SyncCommand(
                 using var pShellItem = ComReleaserFactory.Create(psiItemArray.GetItemAt(i));
 
                 var rawFullPath = pShellItem.Item.GetDisplayName(SIGDN.SIGDN_FILESYSPATH);
-                logger.LogDebug("Sync Command received for file {path}", rawFullPath);
+                logger.Debug($"Sync Command received for file {rawFullPath}");
 
                 commandWriter.TryWrite(new ShellCommand
                 {

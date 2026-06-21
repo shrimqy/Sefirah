@@ -1,5 +1,4 @@
 using CommunityToolkit.WinUI;
-using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Graphics.Imaging;
@@ -59,19 +58,19 @@ public class ClipboardService(
                 if (!devicesWithClipboardSync.Any() && isMonitoring)
                 {
                     Clipboard.ContentChanged -= OnClipboardContentChanged;
-                    logger.LogInformation("Clipboard monitoring stopped");
+                    logger.Info("Clipboard monitoring stopped");
                     isMonitoring = false;
                 }
                 else if (!isMonitoring)
                 {
                     Clipboard.ContentChanged += OnClipboardContentChanged;
-                    logger.LogInformation("Clipboard monitoring started");
+                    logger.Info("Clipboard monitoring started");
                     isMonitoring = true;
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError("Failed to start clipboard monitoring {ex}", ex);
+                logger.Error("Failed to start clipboard monitoring", ex);
             }
         });
     }
@@ -91,7 +90,7 @@ public class ClipboardService(
 
                 if (devicesWithClipboardSync.Count == 0) return;
 
-                logger.LogDebug("Sending clipboard content");
+                logger.Debug("Sending clipboard content");
 
                 var dataPackageView = Clipboard.GetContent();
 
@@ -127,7 +126,7 @@ public class ClipboardService(
                             mimeType = detectedMimeType;
                         }
 
-                        logger.LogInformation("fileName: {fileName}, fileExtension: {fileExtension}, Mime type: {mimeType}", file.Name, fileExtension, mimeType);
+                        logger.Info($"fileName: {file.Name}, fileExtension: {fileExtension}, Mime type: {mimeType}");
 
                         if ((long)(await file.GetBasicPropertiesAsync()).Size > DirectTransferThreshold)
                             await HandleLargeImageTransfer(file, fileExtension, mimeType, devicesWithImageSync);
@@ -157,7 +156,7 @@ public class ClipboardService(
             }
             catch (Exception ex)
             {
-                logger.LogError("Error handling clipboard content: {ex}", ex);
+                logger.Error("Error handling clipboard content", ex);
             }
         });
     }
@@ -241,11 +240,11 @@ public class ClipboardService(
                 }
 
                 Clipboard.SetContent(dataPackage);
-                logger.LogInformation("Clipboard content set. Type: {ContentType}", content.GetType().Name);
+                logger.Info($"Clipboard content set. Type: {content.GetType().Name}");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error setting clipboard content");
+                logger.Error("Error setting clipboard content", ex);
             }
             finally
             {

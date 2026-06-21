@@ -4,7 +4,8 @@ using Sefirah.Platforms.Windows.RemoteStorage.Configuration;
 using Windows.Storage.Provider;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
-public class SyncProviderWorker(
+
+public partial class SyncProviderWorker(
     IOptions<ProviderOptions> providerOptions,
     SyncProviderPool pool
 ) : BackgroundService

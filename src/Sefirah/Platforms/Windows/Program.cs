@@ -6,6 +6,7 @@ using Windows.System;
 using AppInstance = Microsoft.Windows.AppLifecycle.AppInstance;
 
 namespace Sefirah.Platforms.Windows;
+
 internal class Program
 {
     [STAThread]
@@ -93,9 +94,10 @@ internal class Program
     private static void HandleHostedAppLaunch(string[] args)
     {
         var package = GetHostedAppPackage(args);
-        if (string.IsNullOrEmpty(package)) return;
-        var uri = new Uri($"sefirah://{package}");
-        Launcher.LaunchUriAsync(uri).AsTask().GetAwaiter().GetResult();
+        if (string.IsNullOrEmpty(package))
+            return;
+
+        Launcher.LaunchUriAsync(new Uri($"sefirah://{package}")).AsTask().GetAwaiter().GetResult();
     }
 
     private static string? GetHostedAppPackage(string[] args)
@@ -103,7 +105,9 @@ internal class Program
         var prefix = WindowsAppShortcutService.HostedPackageParamPrefix;
         foreach (var arg in args)
         {
-            if (string.IsNullOrWhiteSpace(arg)) continue;
+            if (string.IsNullOrWhiteSpace(arg))
+                continue;
+
             if (arg.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                 return arg[prefix.Length..].Trim();
         }

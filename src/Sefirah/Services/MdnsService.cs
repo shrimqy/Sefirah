@@ -35,11 +35,11 @@ public class MdnsService(ILogger logger) : IMdnsService
             serviceDiscovery = new ServiceDiscovery(multicastService);
             serviceDiscovery.Advertise(serviceProfile);
 
-            logger.LogInformation("Advertising service for {name}", serviceProfile.InstanceName);
+            logger.Info($"Advertising service for {serviceProfile.InstanceName}");
         }
         catch (Exception ex)
         {
-            logger.LogError("Failed to advertise service {ex}", ex);
+            logger.Error("Failed to advertise service", ex);
         }
     }
 
@@ -50,12 +50,12 @@ public class MdnsService(ILogger logger) : IMdnsService
         {
             if (serviceDiscovery is not null && serviceProfile is not null && multicastService is not null)
             {
-                logger.LogInformation("Un-advertising service for {0}", serviceProfile.InstanceName);
+                logger.Info($"Un-advertising service for {serviceProfile.InstanceName}");
 
                 // Validate service instance name format
                 if (string.IsNullOrWhiteSpace(serviceProfile.QualifiedServiceName.ToString()))
                 {
-                    logger.LogWarning("Service profile has invalid name, skipping unadvertise");
+                    logger.Warn("Service profile has invalid name, skipping unadvertise");
                     return;
                 }
                 serviceDiscovery.Unadvertise(serviceProfile);
@@ -64,7 +64,7 @@ public class MdnsService(ILogger logger) : IMdnsService
         }
         catch (ArgumentOutOfRangeException ex)
         {
-            logger.LogError("Service already unadvertised or invalid state: {ex}", ex);
+            logger.Error("Service already unadvertised or invalid state", ex);
         }
         finally
         {
@@ -159,11 +159,11 @@ public class MdnsService(ILogger logger) : IMdnsService
             };
 
             multicastService.Start();
-            logger.LogInformation("Started mDNS discovery service");
+            logger.Info("Started mDNS discovery service");
         }
         catch (Exception ex)
         {
-            logger.LogError("Failed to start discovery service: {ex}", ex);
+            logger.Error("Failed to start discovery service", ex);
         }
     }
 }

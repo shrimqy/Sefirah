@@ -1,7 +1,8 @@
 using System.Threading.Channels;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
-public sealed class TaskQueue(ChannelReader<Func<Task>> taskReader) : IDisposable
+
+public sealed partial class TaskQueue(ChannelReader<Func<Task>> taskReader) : IDisposable
 {
     private readonly CancellationTokenSource _disposeTokenSource = new();
     private Task? _runningTask = null;

@@ -2,7 +2,7 @@ namespace Sefirah.Data.Models.Messages;
 
 public partial class MessageGroup : ObservableObject
 {
-    public required Contact Sender { get; set; }
+    public required ParticipantInfo Sender { get; set; }
 
     public ObservableCollection<Message> Messages { get; set; } = [];
 

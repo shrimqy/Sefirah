@@ -728,10 +728,7 @@ input text %pwd%</value>
   <data name="AdbLocation" xml:space="preserve">
     <value>Umístění adb</value>
   </data>
-  <data name="CallNotification.IncomingCall" xml:space="preserve">
-    <value>Příchozí hovor</value>
-  </data>
-  <data name="CallNotification.MissedCall" xml:space="preserve">
+  <data name="CallMissed" xml:space="preserve">
     <value>Zmeškaný hovor</value>
   </data>
   <data name="UpdateNotification.Title" xml:space="preserve">
@@ -802,5 +799,83 @@ input text %pwd%</value>
   </data>
   <data name="SendMediaSessions" xml:space="preserve">
     <value>Send media sessions</value>
+  </data>
+  <data name="SecondaryCallOnHold" xml:space="preserve">
+    <value>On hold. Select to resume</value>
+  </data>
+  <data name="CallLogDisabled.Description" xml:space="preserve">
+    <value>Enable call log sync for this device on the phone.</value>
+  </data>
+  <data name="BluetoothCallingUnsupported" xml:space="preserve">
+    <value>Bluetooth calling is not supported</value>
+  </data>
+  <data name="BluetoothCallingUnavailable.Description" xml:space="preserve">
+    <value>Connect or enable a Bluetooth adapter on your PC to continue.</value>
+  </data>
+  <data name="BluetoothDisabled.Description" xml:space="preserve">
+    <value>Enable Bluetooth to continue.</value>
+  </data>
+  <data name="BluetoothPairing.Title" xml:space="preserve">
+    <value>Pair mobile device and PC</value>
+  </data>
+  <data name="BluetoothPairing.Description" xml:space="preserve">
+    <value>Make sure your device is nearby and has Bluetooth turned on.</value>
+  </data>
+  <data name="BluetoothPairingAction" xml:space="preserve">
+    <value>Pair device</value>
+  </data>
+  <data name="BluetoothRegistrationFailed.Description" xml:space="preserve">
+    <value>Unpair the device from other apps and try again.</value>
+  </data>
+  <data name="TryAgain" xml:space="preserve">
+    <value>Try again</value>
+  </data>
+  <data name="SearchContacts" xml:space="preserve">
+    <value>Search contacts</value>
+  </data>
+  <data name="BluetoothRegistrationFailed.Title" xml:space="preserve">
+    <value>Registration failed</value>
+  </data>
+  <data name="BluetoothCallingUnavailable.Title" xml:space="preserve">
+    <value>Bluetooth calling is not available</value>
+  </data>
+  <data name="BluetoothDisabled.Title" xml:space="preserve">
+    <value>Bluetooth is turned off</value>
+  </data>
+  <data name="Calls" xml:space="preserve">
+    <value>Calls</value>
+  </data>
+  <data name="Unmute" xml:space="preserve">
+    <value>Unmute</value>
+  </data>
+  <data name="Resume" xml:space="preserve">
+    <value>Resume</value>
+  </data>
+  <data name="Mute" xml:space="preserve">
+    <value>Mute</value>
+  </data>
+  <data name="Hold" xml:space="preserve">
+    <value>Hold</value>
+  </data>
+  <data name="End" xml:space="preserve">
+    <value>End</value>
+  </data>
+  <data name="CallOnHold" xml:space="preserve">
+    <value>On hold</value>
+  </data>
+  <data name="CallIncoming" xml:space="preserve">
+    <value>Incoming call</value>
+  </data>
+  <data name="CallDialing" xml:space="preserve">
+    <value>Dialing</value>
+  </data>
+  <data name="CallConnecting" xml:space="preserve">
+    <value>Connecting</value>
+  </data>
+  <data name="CallAudioRouteToPhone" xml:space="preserve">
+    <value>Transfer to phone</value>
+  </data>
+  <data name="CallAudioRouteToPc" xml:space="preserve">
+    <value>Transfer to PC</value>
   </data>
 </root>

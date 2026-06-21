@@ -1,5 +1,4 @@
 using Sefirah.Data.AppDatabase.Models;
-using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Utils;
 
@@ -156,7 +155,7 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error updating application list for device {DeviceId}", pairedDevice.Id);
+            logger.Error($"Error updating application list for device {pairedDevice.Id}", ex);
         }
     }
 

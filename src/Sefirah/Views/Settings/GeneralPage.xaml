@@ -8,9 +8,11 @@
     xmlns:local="using:Sefirah.Views.Settings"
     xmlns:items="using:Sefirah.Data.Items"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:not_win="http://uno.ui/not_win"
     xmlns:vm="using:Sefirah.ViewModels.Settings"
+    xmlns:win="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:wuc="using:CommunityToolkit.WinUI.Controls"
-    mc:Ignorable="d">
+    mc:Ignorable="d not_win">
 
     <Page.DataContext>
         <vm:GeneralViewModel x:Name="ViewModel" />
@@ -36,16 +38,29 @@
                 </BreadcrumbBar.ItemTemplate>
             </BreadcrumbBar>
 
-            <!--  Startup Options  -->
-            <wuc:SettingsCard Description="{helpers:ResourceString Name=StartupOptionDescription}" Header="{helpers:ResourceString Name=StartupOption}">
-                <wuc:SettingsCard.HeaderIcon>
-                    <FontIcon Glyph="&#xE7E8;" />
-                </wuc:SettingsCard.HeaderIcon>
-                <ComboBox
-                    MinWidth="140"
-                    ItemsSource="{x:Bind ViewModel.StartupTypes.Values}"
-                    SelectedItem="{x:Bind ViewModel.SelectedStartupType, Mode=TwoWay}" />
-            </wuc:SettingsCard>
+            <win:StackPanel Spacing="4">
+                <!--  Startup -->
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=StartupOptionDescription}" Header="{helpers:ResourceString Name=StartupOption}">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE7E8;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <ComboBox
+                        MinWidth="140"
+                        ItemsSource="{x:Bind ViewModel.StartupTypes.Values}"
+                        SelectedItem="{x:Bind ViewModel.SelectedStartupType, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+
+                <!--  Backdrop material -->
+                <wuc:SettingsCard Header="{helpers:ResourceString Name=BackdropMaterial}">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xEF1F;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <ComboBox
+                        MinWidth="160"
+                        ItemsSource="{x:Bind ViewModel.BackdropMaterialTypes.Values}"
+                        SelectedItem="{x:Bind ViewModel.SelectedBackdropMaterial, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+            </win:StackPanel>
 
             <!--  Theme  -->
             <wuc:SettingsCard Description="{helpers:ResourceString Name=ThemeDescription}" Header="{helpers:ResourceString Name=Theme}">
@@ -101,6 +116,16 @@
                 </wuc:SettingsCard.HeaderIcon>
                 <Button Click="SelectRemoteLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
             </wuc:SettingsCard>
+
+            <win:StackPanel Spacing="4">
+                <!--  Remove All Sync Roots  -->
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=RemoveAllSyncRootsDescription}" Header="{helpers:ResourceString Name=RemoveAllSyncRoots}">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <SymbolIcon Symbol="Delete" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <Button Command="{x:Bind ViewModel.RemoveAllSyncRootsCommand}" Content="{helpers:ResourceString Name=RemoveAllSyncRoots}" />
+                </wuc:SettingsCard>
+            </win:StackPanel>
 
             <!--  Local Device Name  -->
             <wuc:SettingsCard Header="{helpers:ResourceString Name=DeviceName}">

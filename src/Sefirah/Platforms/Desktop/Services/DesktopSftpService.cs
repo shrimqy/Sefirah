@@ -1,4 +1,3 @@
-using Sefirah.Data.Contracts;
 using Sefirah.Data.Models;
 using Sefirah.Utils;
 
@@ -10,12 +9,11 @@ public class DesktopSftpService(ILogger<DesktopSftpService> logger) : ISftpServi
 
     public async Task InitializeAsync(PairedDevice device, SftpServerInfo info)
     {
-        logger.LogInformation("Initializing SFTP service for device {DeviceName}, IP: {IpAddress}, Port: {Port}",
-            device.Name, info.IpAddress, info.Port);
+        logger.Info($"Initializing SFTP service for device {device.Name}, IP: {info.IpAddress}, Port: {info.Port}");
 
         var sftpUri = $"sftp://{info.Username}@{info.IpAddress}:{info.Port}/";
         
-        logger.LogInformation("Mounting SFTP for device {DeviceName}", device.Name);
+        logger.Info($"Mounting SFTP for device {device.Name}");
 
         ProcessExecutor.ExecuteProcess("gio", $"mount -s \"{sftpUri}\"");
 
@@ -24,12 +22,12 @@ public class DesktopSftpService(ILogger<DesktopSftpService> logger) : ISftpServi
         
         if (exitCode != 0)
         {
-            logger.LogError("Failed to mount SFTP for device {DeviceName}: {Error}", device.Name, errorOutput);
+            logger.Error($"Failed to mount SFTP for device {device.Name}: {errorOutput}");
             return;
         }
         
         _mountedDevices[device.Id] = sftpUri;
-        logger.LogInformation("Successfully mounted SFTP for device {DeviceName}", device.Name);
+        logger.Info($"Successfully mounted SFTP for device {device.Name}");
     }
 
     private static async Task<(int ExitCode, string ErrorOutput)> ExecuteProcessWithPasswordAsync(string fileName, string arguments, string password)
@@ -61,15 +59,17 @@ public class DesktopSftpService(ILogger<DesktopSftpService> logger) : ISftpServi
         return (process.ExitCode, errorOutput);
     }
 
+    public void RemoveAll() { }
+
     public void Remove(string deviceId)
     {
         if (!_mountedDevices.TryGetValue(deviceId, out var sftpUri))
         {
-            logger.LogDebug("Device {DeviceId} is not mounted", deviceId);
+            logger.Debug($"Device {deviceId} is not mounted");
             return;
         }
         
-        logger.LogInformation("Unmounting SFTP for device {DeviceId}", deviceId);
+        logger.Info($"Unmounting SFTP for device {deviceId}");
         ProcessExecutor.ExecuteProcess("gio", $"mount -u \"{sftpUri}\"");
         _mountedDevices.Remove(deviceId);
     }

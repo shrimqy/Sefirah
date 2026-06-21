@@ -17,11 +17,8 @@ public class SyncProviderContextAccessor : ISyncProviderContextAccessor
         set
         {
             var holder = _syncProviderContextCurrent.Value;
-            if (holder != null)
-            {
-                // Clear current SyncProviderContext trapped in the AsyncLocals, as its done.
-                holder.Context = null;
-            }
+            // Clear current SyncProviderContext trapped in the AsyncLocals, as its done.
+            holder?.Context = null;
 
             if (value != null)
             {

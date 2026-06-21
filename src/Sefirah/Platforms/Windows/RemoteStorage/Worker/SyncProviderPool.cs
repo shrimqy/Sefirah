@@ -7,14 +7,19 @@ using Vanara.PInvoke;
 using Windows.Storage.Provider;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
-public class SyncProviderPool(
+
+public partial class SyncProviderPool(
     IServiceScopeFactory scopeFactory,
     ILogger logger)
 {
     private readonly Dictionary<string, CancellableThread> _threads = [];
-    private readonly object _lock = new();
+    private readonly Lock _lock = new();
     private bool _stopping = false;
 
+    /// <summary>
+    /// Starts the sync loop for a root, replacing any existing one with the same Id. 
+    /// Call this after registering a sync root.
+    /// </summary>
     public void Start(StorageProviderSyncRootInfo syncRootInfo)
     {
         if (_stopping)
@@ -27,7 +32,7 @@ public class SyncProviderPool(
             // If there's an existing thread, stop it first
             if (_threads.TryGetValue(syncRootInfo.Id, out var existingThread))
             {
-                logger.LogDebug("Stopping existing sync provider for {id}", syncRootInfo.Id);
+                logger.Debug($"Stopping existing sync provider for {syncRootInfo.Id}");
                 existingThread.Stop().Wait();
                 _threads.Remove(syncRootInfo.Id);
             }
@@ -45,7 +50,7 @@ public class SyncProviderPool(
 
             thread.Start();
             _threads[syncRootInfo.Id] = thread;
-            logger.LogDebug("Started new sync provider for {id}", syncRootInfo.Id);
+            logger.Debug($"Started new sync provider for {syncRootInfo.Id}");
         }
     }
 
@@ -65,14 +70,14 @@ public class SyncProviderPool(
         {
             if (_threads.TryGetValue(syncRootInfo.Id, out var existingThread))
             {
-                logger.LogDebug("Stopping existing sync provider for {id}", syncRootInfo.Id);
+                logger.Debug($"Stopping existing sync provider for {syncRootInfo.Id}");
                 await existingThread.Stop();
                 _threads.Remove(syncRootInfo.Id);
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to stop sync root");
+            logger.Error("Failed to stop sync root", ex);
         }
     }
 
@@ -103,7 +108,7 @@ public class SyncProviderPool(
         await syncProvider.Run(cancellation);
     }
 
-    private sealed class CancellableThread : IDisposable
+    private sealed partial class CancellableThread : IDisposable
     {
         private readonly CancellationTokenSource _cts = new();
         private readonly Task _task;
@@ -118,7 +123,7 @@ public class SyncProviderPool(
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Thread stopped unexpectedly");
+                    logger.Error("Thread stopped unexpectedly", ex);
                 }
                 Stopped?.Invoke(this, EventArgs.Empty);
             });
