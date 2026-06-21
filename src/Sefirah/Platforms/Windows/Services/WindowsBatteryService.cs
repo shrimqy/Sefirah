@@ -8,14 +8,12 @@ public class WindowsBatteryService(
     ILogger logger,
     ISessionManager sessionManager) : IBatteryService
 {
-    private bool initialized;
     private BatteryState? lastBatteryState;
 
     public Task InitializeAsync()
     {
-        if (initialized) return Task.CompletedTask;
+        if (!IsBatteryPresent()) return Task.CompletedTask;
 
-        initialized = true;
         sessionManager.ConnectionStatusChanged += OnConnectionStatusChanged;
         Battery.AggregateBattery.ReportUpdated += OnBatteryReportUpdated;
         BroadcastBatteryStatus();
@@ -57,6 +55,11 @@ public class WindowsBatteryService(
         return lastBatteryState is null ||
                lastBatteryState.BatteryLevel != batteryState.BatteryLevel ||
                lastBatteryState.IsCharging != batteryState.IsCharging;
+    }
+
+    private static bool IsBatteryPresent()
+    {
+        return Battery.AggregateBattery.GetReport().Status is not BatteryStatus.NotPresent;
     }
 
     private BatteryState? GetBatteryState()
