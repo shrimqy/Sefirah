@@ -31,34 +31,61 @@
                     <ToggleSwitch IsOn="{x:Bind ViewModel.ShowNotificationToast, Mode=TwoWay}" />
                 </wuc:SettingsCard>
 
-                <wuc:SettingsCard Description="{helpers:ResourceString Name=LowBatteryAlertsDescription}" Header="{helpers:ResourceString Name=LowBatteryAlerts}">
-                    <wuc:SettingsCard.HeaderIcon>
+                <wuc:SettingsExpander
+                    Description="{helpers:ResourceString Name=LowBatteryAlertsDescription}"
+                    Header="{helpers:ResourceString Name=LowBatteryAlerts}">
+                    <wuc:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE850;" />
-                    </wuc:SettingsCard.HeaderIcon>
-                    <ToggleSwitch IsOn="{x:Bind ViewModel.LowBatteryAlertsEnabled, Mode=TwoWay}" />
-                </wuc:SettingsCard>
-
-                <wuc:SettingsCard
-                    Description="{helpers:ResourceString Name=LowBatteryThresholdDescription}"
-                    Header="{helpers:ResourceString Name=LowBatteryThreshold}"
-                    IsEnabled="{x:Bind ViewModel.LowBatteryAlertsEnabled, Mode=OneWay}">
-                    <wuc:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xE713;" />
-                    </wuc:SettingsCard.HeaderIcon>
-                    <ComboBox
-                        Width="120"
-                        ItemsSource="{x:Bind ViewModel.LowBatteryAlertThresholdOptions, Mode=OneWay}"
-                        SelectedItem="{x:Bind ViewModel.LowBatteryAlertThreshold, Mode=TwoWay}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate x:DataType="x:Int32">
-                                <TextBlock>
-                                    <Run Text="{x:Bind}" />
+                    </wuc:SettingsExpander.HeaderIcon>
+                    <wuc:SettingsExpander.Content>
+                        <ToggleSwitch IsOn="{x:Bind ViewModel.LowBatteryAlertsEnabled, Mode=TwoWay}" />
+                    </wuc:SettingsExpander.Content>
+                    <wuc:SettingsExpander.ItemsHeader>
+                        <StackPanel
+                            Padding="58,16,44,16"
+                            HorizontalAlignment="Stretch"
+                            Background="{ThemeResource ExpanderHeaderBackground}"
+                            BorderBrush="{ThemeResource ExpanderHeaderBorderBrush}"
+                            Spacing="8">
+                            <Slider
+                                HorizontalAlignment="Stretch"
+                                Maximum="50"
+                                Minimum="5"
+                                SmallChange="1"
+                                StepFrequency="1"
+                                TickFrequency="5"
+                                TickPlacement="Outside"
+                                Value="{x:Bind ViewModel.LowBatteryAlertThreshold, Mode=TwoWay}" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Left"
+                                    FontSize="12"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Text="5%" />
+                                <TextBlock
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Center"
+                                    FontSize="12"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                                    <Run Text="{x:Bind ViewModel.LowBatteryAlertThreshold, Mode=OneWay}" />
                                     <Run Text="%" />
                                 </TextBlock>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                </wuc:SettingsCard>
+                                <TextBlock
+                                    Grid.Column="2"
+                                    HorizontalAlignment="Right"
+                                    FontSize="12"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Text="50%" />
+                            </Grid>
+                        </StackPanel>
+                    </wuc:SettingsExpander.ItemsHeader>
+                </wuc:SettingsExpander>
 
                 <wuc:SettingsCard Description="{helpers:ResourceString Name=ShowBadgeDescription}" Header="{helpers:ResourceString Name=ShowBadge}">
                     <wuc:SettingsCard.HeaderIcon>
