@@ -175,6 +175,39 @@ public class DesktopNotificationHandler(
         }
     }
 
+    public async Task ShowBatteryNotification(string title, string text, string tag)
+    {
+        if (!await EnsureInitializedAsync() || _notifications is null)
+            return;
+
+        try
+        {
+            var hints = new Dictionary<string, VariantValue>();
+            var categoryHint = NotificationHints.Category("battery");
+            var urgencyHint = NotificationHints.NormalUrgency();
+
+            hints.Add(categoryHint.Key, categoryHint.Value);
+            hints.Add(urgencyHint.Key, urgencyHint.Value);
+
+            var replacesId = _notificationIds.GetValueOrDefault(tag, 0u);
+            var notificationId = await _notifications.NotifyAsync(
+                appName: "Sefirah",
+                replacesId: replacesId,
+                appIcon: "battery-low",
+                summary: title,
+                body: text,
+                actions: [],
+                hints: hints,
+                expireTimeout: 8000);
+
+            _notificationIds[tag] = notificationId;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to show battery notification");
+        }
+    }
+
     public async void ShowClipboardNotification(string title, string text, string? actionLabel = null, string? actionData = null)
     {
         if (!await EnsureInitializedAsync() || _notifications is null) return;

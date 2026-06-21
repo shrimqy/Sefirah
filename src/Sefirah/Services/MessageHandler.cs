@@ -9,6 +9,7 @@ public class MessageHandler(
     ContactRepository contactRepository,
     IDeviceManager deviceManager,
     INotificationService notificationService,
+    IBatteryAlertService batteryAlertService,
     IClipboardService clipboardService,
     SmsHandlerService smsHandlerService,
     IFileTransferService fileTransferService,
@@ -48,7 +49,7 @@ public class MessageHandler(
                     break;
 
                 case BatteryState batteryStatus:
-                    await App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.BatteryStatus = batteryStatus);
+                    await batteryAlertService.HandleBatteryStateAsync(device, batteryStatus);
                     break;
 
                 case RingerModeState ringerMode:
