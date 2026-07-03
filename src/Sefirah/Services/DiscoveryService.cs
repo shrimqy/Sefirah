@@ -162,17 +162,17 @@ public class DiscoveryService(
             var localAddresses = NetworkHelper.GetAllValidAddresses();
             var addresses = localAddresses.Select(addr => addr.Address.ToString()).ToList();
 
-            var connectionInfo = new
+            var payload = new QrCodePayload
             {
                 Addresses = addresses,
-                broadcast.Port,
-                broadcast.DeviceId,
-                broadcast.DeviceName
+                Port = broadcast.Port,
+                DeviceId = broadcast.DeviceId,
+                DeviceName = broadcast.DeviceName
             };
+            var json = JsonMessageSerializer.Serialize(payload);
+            var deepLink = $"sefirah://pair?data={Uri.EscapeDataString(json)}";
 
-            var jsonData = JsonMessageSerializer.Serialize(connectionInfo);
-
-            var qrCodeBytes = ImageHelper.GenerateQrCode(jsonData);
+            var qrCodeBytes = ImageHelper.GenerateQrCode(deepLink);
             if (qrCodeBytes is null)
             {
                 return null;
