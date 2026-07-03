@@ -45,7 +45,9 @@ public sealed partial class CallsPage : Page
     private void ContactSearch_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
         if (args.Reason is AutoSuggestionBoxTextChangeReason.UserInput)
-            ViewModel.SearchContacts(sender.Text);
+        {
+            sender.ItemsSource = ViewModel.SearchContacts(sender.Text);
+    }
     }
 
     private void ContactSearch_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
@@ -54,6 +56,7 @@ public sealed partial class CallsPage : Page
         {
             ViewModel.ApplyContactToDialer(contact);
             sender.Text = string.Empty;
+            sender.ItemsSource = null;
         }
     }
 
@@ -63,11 +66,13 @@ public sealed partial class CallsPage : Page
         {
             ViewModel.ApplyContactToDialer(contact);
             sender.Text = string.Empty;
+            sender.ItemsSource = null;
             return;
         }
 
         ViewModel.ApplySearchQueryAsNumber(args.QueryText);
         sender.Text = string.Empty;
+        sender.ItemsSource = null;
     }
 
     private void CallAvatarBorder_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)

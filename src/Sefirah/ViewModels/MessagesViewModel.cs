@@ -15,8 +15,6 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
     #region Properties
     public ObservableCollection<Conversation> Conversations { get; } = [];
-    public ObservableCollection<Conversation> SearchResults { get; } = [];
-    public ObservableCollection<Contact> SearchContactsResults { get; } = [];
     private HashSet<long> MessageIds { get; set; } = [];
 
     private ObservableCollection<MessageGroup> messageGroups = [];
@@ -201,32 +199,23 @@ public sealed partial class MessagesViewModel : BaseViewModel
         await LoadConversationsForActiveDevice();
     }
 
-    [RelayCommand]
-    public void SearchConversations(string searchText)
+    public List<Conversation> SearchConversations(string searchText)
     {
-        SearchResults.Clear();
+        if (string.IsNullOrWhiteSpace(searchText) || searchText.Length < 2) return [];
         
-        if (string.IsNullOrWhiteSpace(searchText)) return;
-
-        if (searchText.Length < 2) return;
-
-        var filtered = Conversations
+        return Conversations
             .Where(c => c.DisplayName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
                        c.LastMessage.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
                        c.Contacts.Any(s => s.Address.Contains(searchText, StringComparison.OrdinalIgnoreCase)))
             .OrderByDescending(c => c.LastMessageTimestamp) 
             .Take(10) 
             .ToList();
-
-        SearchResults.AddRange(filtered);
     }
 
-    public void SearchContacts(string searchText)
+    public List<Contact> SearchContacts(string searchText)
     {
-        SearchContactsResults.Clear();
-
-        if (string.IsNullOrWhiteSpace(searchText)) return;
-        SearchContactsResults.AddRange(contactRepository.SearchContacts(searchText));
+        if (string.IsNullOrWhiteSpace(searchText) || ActiveDevice is null) return [];
+        return contactRepository.SearchContacts(ActiveDevice.Id, searchText);
     }
 
     private void OnConversationRemoved(object? sender, (string DeviceId, long ThreadId) args)

@@ -210,7 +210,7 @@ public sealed partial class MessagesPage : Page
     {
         if (args.Reason is AutoSuggestionBoxTextChangeReason.UserInput)
         {
-            ViewModel.SearchConversationsCommand.Execute(sender.Text);
+            sender.ItemsSource = ViewModel.SearchConversations(sender.Text);
         }
     }
 
@@ -223,6 +223,8 @@ public sealed partial class MessagesPage : Page
         if (args.SelectedItem is Conversation conversation)
         {
             ViewModel.SelectedConversation = conversation;
+            sender.Text = string.Empty;
+            sender.ItemsSource = null;
         }
     }
 
@@ -233,10 +235,11 @@ public sealed partial class MessagesPage : Page
 
     private void AddressInput_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
     {
-        if (args.SelectedItem is not null && args.SelectedItem is Contact contact)
+        if (args.SelectedItem is Contact contact)
         {
             ViewModel.AddAddress(contact);
             sender.Text = string.Empty;
+            sender.ItemsSource = null;
         }
     }
 
@@ -252,7 +255,7 @@ public sealed partial class MessagesPage : Page
     {
         if (args.Reason is AutoSuggestionBoxTextChangeReason.UserInput)
         {
-            ViewModel.SearchContacts(sender.Text);
+            sender.ItemsSource = ViewModel.SearchContacts(sender.Text);
         }
     }
 
@@ -263,6 +266,8 @@ public sealed partial class MessagesPage : Page
         {
             ViewModel.AddAddress(new Contact(address, address, address));
         }
+
         sender.Text = string.Empty;
+        sender.ItemsSource = null;
     }
 }

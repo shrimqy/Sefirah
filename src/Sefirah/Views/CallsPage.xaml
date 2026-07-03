@@ -257,8 +257,6 @@
                 <AutoSuggestBox
                     VerticalAlignment="Top" 
                     PlaceholderText="{helpers:ResourceString Name=SearchContacts}"
-                    Text="{x:Bind ViewModel.ContactSearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    ItemsSource="{x:Bind ViewModel.ContactSearchResults, Mode=OneWay}"
                     UpdateTextOnSelect="False"
                     TextChanged="ContactSearch_TextChanged"
                     QuerySubmitted="ContactSearch_QuerySubmitted"

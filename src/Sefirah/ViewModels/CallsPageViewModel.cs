@@ -64,16 +64,12 @@ public sealed partial class CallsPageViewModel : BaseViewModel
     [ObservableProperty]
     public partial CallLog? SelectedCallLog { get; set; }
 
-    [ObservableProperty]
-    public partial string ContactSearchQuery { get; set; }
 
     [ObservableProperty]
     public partial string? DialContactDisplayName { get; set; }
 
     [ObservableProperty]
     public partial BitmapImage? DialContactAvatar { get; set; }
-
-    public ObservableCollection<Contact> ContactSearchResults { get; } = [];
 
     private bool isLoadingCallLogs;
     public bool IsLoadingCallLogs
@@ -94,7 +90,6 @@ public sealed partial class CallsPageViewModel : BaseViewModel
     public CallsPageViewModel()
     {
         PhoneNumber = string.Empty;
-        ContactSearchQuery = string.Empty;
         deviceManager.ActiveDeviceChanged += OnActiveDeviceChanged;
         phoneLineService.LineStatusChanged += OnLineStatusChanged;
         callLogRepository.CallLogUpdated += OnCallLogUpdated;
@@ -224,11 +219,10 @@ public sealed partial class CallsPageViewModel : BaseViewModel
     }
 
 
-    public void SearchContacts(string? searchText)
+    public List<Contact> SearchContacts(string? searchText)
     {
-        ContactSearchResults.Clear();
-        if (string.IsNullOrWhiteSpace(searchText)) return;
-        ContactSearchResults.AddRange(contactRepository.SearchContacts(searchText));
+        if (string.IsNullOrWhiteSpace(searchText) || ActiveDevice is null) return [];
+        return contactRepository.SearchContacts(ActiveDevice.Id, searchText);
     }
 
     public void ApplyContactToDialer(Contact contact)
@@ -236,8 +230,7 @@ public sealed partial class CallsPageViewModel : BaseViewModel
         PhoneNumber = contact.Address;
         DialContactDisplayName = contact.DisplayName;
         DialContactAvatar = contact.Avatar;
-        ContactSearchQuery = string.Empty;
-        ContactSearchResults.Clear();
+
     }
 
     public void ApplySearchQueryAsNumber(string? query)
@@ -247,8 +240,6 @@ public sealed partial class CallsPageViewModel : BaseViewModel
 
         ClearDialContactVisual();
         PhoneNumber = q;
-        ContactSearchQuery = string.Empty;
-        ContactSearchResults.Clear();
     }
 
     public async Task RetryCallingSetupAsync()

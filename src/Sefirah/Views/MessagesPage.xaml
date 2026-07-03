@@ -150,7 +150,7 @@
                     Margin="16,0,16,12"
                     VerticalAlignment="Center"
                     AutomationProperties.Name="Messages AutoSuggestBox"
-                    ItemsSource="{x:Bind ViewModel.SearchResults, Mode=OneWay}"
+
                     PlaceholderText="{helpers:ResourceString Name=SearchMessages}"
                     QueryIcon="Find"
                     QuerySubmitted="SearchBox_QuerySubmitted"
