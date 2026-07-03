@@ -80,14 +80,7 @@ public sealed partial class SftpWatcher(
                         _knownFiles = foundFiles;
                     }
 
-                    try
-                    {
-                        await Task.Delay(_context.WatchPeriodSeconds * 1000, linkedTokenSource.Token);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        break;
-                    }
+                    await Task.Delay(_context.WatchPeriodSeconds * 1000, linkedTokenSource.Token);
                 }
                 catch (OperationCanceledException)
                 {
@@ -95,7 +88,11 @@ public sealed partial class SftpWatcher(
                 }
                 catch (SshConnectionException ex)
                 {
-                    logger.Error("SSH connection error", ex);
+                    logger.Warn("SSH connection lost in SFTP watcher", ex);
+                }
+                catch (SshOperationTimeoutException ex)
+                {
+                    logger.Warn("SFTP operation timed out (connection dropped mid-operation)", ex);
                 }
                 catch (Exception ex)
                 {
