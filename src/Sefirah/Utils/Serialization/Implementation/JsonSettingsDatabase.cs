@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Text.Json;
 
 namespace Sefirah.Utils.Serialization.Implementation;
 internal class JsonSettingsDatabase(
@@ -82,7 +81,14 @@ internal class JsonSettingsDatabase(
     {
         if (obj is JsonElement jElem)
         {
-            return jElem.Deserialize<TValue>();
+            try
+            {
+                return jElem.Deserialize<TValue>();
+            }
+            catch (JsonException)
+            {
+                return default;
+            }
         }
 
         return (TValue?)obj;
