@@ -4,7 +4,6 @@ using CommunityToolkit.WinUI;
 using Microsoft.UI.Dispatching;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
-using NAudio.Utils;
 using Sefirah.Data.Contracts;
 using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
@@ -49,15 +48,15 @@ public class WindowsMediaService(
             manager.SessionsChanged += SessionsChanged;
             sessionManager.ConnectionStatusChanged += OnConnectionStatusChanged;
 
-            logger.Info($"PlaybackService initialized successfully");
+            logger.Info("MediaService initialized successfully");
         }
         catch (Exception ex)
         {
-            logger.Error($"Failed to initialize PlaybackService", ex);
+            logger.Error("Failed to initialize MediaService", ex);
         }
     }
 
-    private async void OnConnectionStatusChanged(object? sender, PairedDevice device)
+    private void OnConnectionStatusChanged(object? sender, PairedDevice device)
     {
         if (!device.IsConnected) return;
 
@@ -88,11 +87,11 @@ public class WindowsMediaService(
         }
     }
 
-    public async Task HandleMediaActionAsync(MediaAction mediaAction)
+    public Task HandleMediaActionAsync(MediaAction mediaAction)
     {
         activeSessions.TryGetValue(mediaAction.Source, out var session);
-        
-        await dispatcher.EnqueueAsync(async () =>
+
+        return dispatcher.EnqueueAsync(async () =>
         {
             try
             {
@@ -387,7 +386,7 @@ public class WindowsMediaService(
         };
     }
 
-    public void InitializeAudioDevices()
+    private void InitializeAudioDevices()
     {
         try
         {
@@ -404,13 +403,13 @@ public class WindowsMediaService(
         }
         catch (Exception ex)
         {
-            logger.Warn($"Failed to enumerate audio devices", ex);
+            logger.Warn("Failed to enumerate audio devices", ex);
         }
     }
 
     private void OnDeviceVolumeChanged(string deviceId, string friendlyName, AudioVolumeNotificationData data)
     {
-        if (!deviceHandlers.TryGetValue(deviceId, out var handler)) return;
+        if (!deviceHandlers.ContainsKey(deviceId)) return;
 
         var audioInfo = new AudioDeviceInfo
         {
@@ -490,41 +489,25 @@ public class WindowsMediaService(
 
     public void SetDefaultAudioDevice(string deviceId)
     {
-        object? policyConfigObject = null;
+        IPolicyConfig? policyConfig = null;
         try
         {
-            Type? policyConfigType = Type.GetTypeFromCLSID(new Guid("870af99c-171d-4f9e-af0d-e63df40c2bc9"));
-            if (policyConfigType is null) return; 
-
-            policyConfigObject = Activator.CreateInstance(policyConfigType);
-            if (policyConfigObject is null) return;
-
-            if (policyConfigObject is not IPolicyConfig policyConfig) return;
-
-            int result1 = policyConfig.SetDefaultEndpoint(deviceId, ERole.eMultimedia);
-            int result2 = policyConfig.SetDefaultEndpoint(deviceId, ERole.eCommunications);
-            int result3 = policyConfig.SetDefaultEndpoint(deviceId, ERole.eConsole);
-
-            if (result1 is not HResult.S_OK || result2 is not HResult.S_OK || result3 is not HResult.S_OK)
-            {
-                logger.Error($"SetDefaultEndpoint returned error codes: {result1}, {result2}, {result3}");
-                return;
-            }
+            policyConfig = new IPolicyConfig();
+            Marshal.ThrowExceptionForHR(policyConfig.SetDefaultEndpoint(deviceId, ERole.eConsole));
+            Marshal.ThrowExceptionForHR(policyConfig.SetDefaultEndpoint(deviceId, ERole.eMultimedia));
+            Marshal.ThrowExceptionForHR(policyConfig.SetDefaultEndpoint(deviceId, ERole.eCommunications));
 
             if (deviceHandlers.ContainsKey(deviceId))
                 defaultDeviceId = deviceId;
         }
         catch (Exception ex)
         {
-            logger.Error($"Error setting default device", ex);
-            return;
+            logger.Error("Error setting default audio device", ex);
         }
         finally
         {
-            if (policyConfigObject is not null)
-            {
-                Marshal.ReleaseComObject(policyConfigObject);
-            }
+            if (policyConfig is not null)
+                Marshal.ReleaseComObject(policyConfig);
         }
     }
 
