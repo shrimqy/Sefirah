@@ -204,7 +204,8 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     #region General Settings
 
-    public ObservableCollection<ScrcpyPreferenceItem> DisplayOrientationOptions => AdbService.DisplayOrientationOptions;
+    public List<ScrcpyPreferenceItem> DisplayOrientationOptions => AdbService.DisplayOrientationOptions;
+
     public ObservableCollection<ScrcpyPreferenceItem> VideoCodecOptions => AdbService.GetVideoCodecOptions(Device?.Model ?? "Unknown");
     public ObservableCollection<ScrcpyPreferenceItem> AudioCodecOptions => AdbService.GetAudioCodecOptions(Device?.Model ?? "Unknown");
 

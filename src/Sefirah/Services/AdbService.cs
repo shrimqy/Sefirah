@@ -31,8 +31,7 @@ public class AdbService(
 
     public AdbClient AdbClient => adbClient;
 
-    // Initialize the codec option collections
-    public ObservableCollection<ScrcpyPreferenceItem> DisplayOrientationOptions { get; } =
+    public List<ScrcpyPreferenceItem> DisplayOrientationOptions { get; } =
     [
         new("", DEFAULT),
         new("0", "0°"),
@@ -47,6 +46,7 @@ public class AdbService(
 
     public Dictionary<string, ObservableCollection<ScrcpyPreferenceItem>> VideoCodecOptions { get; } = [];
     public Dictionary<string, ObservableCollection<ScrcpyPreferenceItem>> AudioCodecOptions { get; } = [];
+    private readonly Lock _codecLock = new();
 
     public ObservableCollection<ScrcpyPreferenceItem> GetVideoCodecOptions(string deviceModel)
     {
@@ -74,23 +74,25 @@ public class AdbService(
 
     private void AddVideoCodecOption(string deviceModel, string command, string display)
     {
-        var options = GetVideoCodecOptions(deviceModel);
-        var existingCommands = options.Select(v => v.Command).ToHashSet();
-        
-        if (!existingCommands.Contains(command))
+        lock (_codecLock)
         {
-            options.Add(new ScrcpyPreferenceItem(command, display));
+            var options = GetVideoCodecOptions(deviceModel);
+            var existingCommands = options.Select(v => v.Command).ToHashSet();
+
+            if (!existingCommands.Contains(command))
+                options.Add(new ScrcpyPreferenceItem(command, display));
         }
     }
 
     private void AddAudioCodecOption(string deviceModel, string command, string display)
     {
-        var options = GetAudioCodecOptions(deviceModel);
-        var existingCommands = options.Select(a => a.Command).ToHashSet();
-        
-        if (!existingCommands.Contains(command))
+        lock (_codecLock)
         {
-            options.Add(new ScrcpyPreferenceItem(command, display));
+            var options = GetAudioCodecOptions(deviceModel);
+            var existingCommands = options.Select(a => a.Command).ToHashSet();
+
+            if (!existingCommands.Contains(command))
+                options.Add(new ScrcpyPreferenceItem(command, display));
         }
     }
 
@@ -106,16 +108,16 @@ public class AdbService(
             StartServerResult startServerResult = await AdbServer.Instance.StartServerAsync(adbPath, false, cts.Token);
 
             deviceMonitor = new DeviceMonitor(new AdbSocket(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)));
-            
+
+            // Get initial list of devices
+            await RefreshDevicesAsync();
+
             deviceMonitor.DeviceConnected += DeviceConnected;
             deviceMonitor.DeviceDisconnected += DeviceDisconnected;
             deviceMonitor.DeviceChanged += DeviceChanged;
             
             await deviceMonitor.StartAsync();
             logger.Info("ADB device monitoring started successfully");
-
-            // Get initial list of devices
-            await RefreshDevicesAsync();
         }
         catch (Exception ex)
         {
@@ -123,146 +125,6 @@ public class AdbService(
             logger.Error($"Failed to start ADB device monitoring: {ex.Message}", ex);
         }
     }
-
-    private async Task DiscoverCodecOptionsForDevice(AdbDevice device)
-    {
-        try
-        {
-            if (device.DeviceData is null) return;
-
-            // Check if scrcpy is configured
-            var scrcpyPath = userSettingsService.GeneralSettingsService.ScrcpyPath;
-            if (string.IsNullOrEmpty(scrcpyPath) || !File.Exists(scrcpyPath))
-            {
-                logger.Info("Scrcpy path not configured or not found, skipping codec discovery");
-                return;
-            }
-
-            var deviceModel = device.Model ?? "Unknown";
-
-            // Run scrcpy --list-encoders
-            var processInfo = new ProcessStartInfo
-            {
-                FileName = scrcpyPath,
-                Arguments = $"--list-encoders -s {device.DeviceData.Serial}",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            using var process = new Process { StartInfo = processInfo };
-            var outputBuilder = new StringBuilder();
-            var errorBuilder = new StringBuilder();
-
-            process.OutputDataReceived += (_, e) =>
-            {
-                if (!string.IsNullOrEmpty(e.Data))
-                    outputBuilder.AppendLine(e.Data);
-            };
-
-            process.ErrorDataReceived += (_, e) =>
-            {
-                if (!string.IsNullOrEmpty(e.Data))
-                    errorBuilder.AppendLine(e.Data);
-            };
-
-            process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-
-            await process.WaitForExitAsync();
-
-            var output = outputBuilder.ToString();
-            var error = errorBuilder.ToString();
-
-            if (process.ExitCode != 0)
-            {
-                logger.Warn($"scrcpy --list-encoders failed for {deviceModel} with exit code {process.ExitCode}. Error: {error}");
-                return;
-            }
-
-            ParseEncoderOutput(output, deviceModel);
-        }
-        catch (Exception ex)
-        {
-            logger.Error($"Error discovering codec options for device {device.Serial}: {ex.Message}", ex);
-        }
-    }
-
-
-    private static readonly char[] separator = ['\r', '\n'];
-
-    private void ParseEncoderOutput(string output, string deviceModel)
-    {
-        if (string.IsNullOrWhiteSpace(output))
-            return;
-
-        var lines = output.Split(separator, StringSplitOptions.RemoveEmptyEntries);
-
-        foreach (var line in lines)
-        {
-            var trimmedLine = line.Trim();
-
-            if (trimmedLine.Contains("--video-codec", StringComparison.OrdinalIgnoreCase))
-            {
-                ParseVideoEncoder(trimmedLine, deviceModel);
-            }
-            else if (trimmedLine.Contains("--audio-codec", StringComparison.OrdinalIgnoreCase))
-            {
-                ParseAudioEncoder(trimmedLine, deviceModel);
-            }
-        }
-    }
-
-    private void ParseVideoEncoder(string line, string deviceModel)
-    {
-        var commandEndIndex = line.IndexOf('(');
-        var command = line[..commandEndIndex].Trim();
-
-        // Extract codec and encoder for display name
-        var codecMatch = Regex.Match(command, @"--video-codec=(\w+)");
-        var encoderMatch = Regex.Match(command, @"--video-encoder=([^\s]+)");
-
-        string display;
-
-        var codec = codecMatch.Groups[1].Value;
-        var encoder = encoderMatch.Groups[1].Value;
-        display = $"{codec} & {encoder}";
-            
-        // Add hardware/software indicator
-        if (line.Contains("(hw)", StringComparison.OrdinalIgnoreCase))
-            display += " (hw)";
-        else if (line.Contains("(sw)", StringComparison.OrdinalIgnoreCase))
-            display += " (sw)";
-        
-        AddVideoCodecOption(deviceModel, command, display);
-    }
-
-    private void ParseAudioEncoder(string line, string deviceModel)
-    {
-        var commandEndIndex = line.IndexOf('(');
-        var command = line[..commandEndIndex].Trim();
-
-        // Extract codec and encoder for display name
-        var codecMatch = Regex.Match(command, @"--audio-codec=(\w+)");
-        var encoderMatch = Regex.Match(command, @"--audio-encoder=([^\s]+)");
-
-        string display;
-
-        var codec = codecMatch.Groups[1].Value;
-        var encoder = encoderMatch.Groups[1].Value;
-        display = $"{codec} & {encoder}";
-            
-        // Add hardware/software indicator
-        if (line.Contains("(hw)", StringComparison.OrdinalIgnoreCase))
-            display += " (hw)";
-        else if (line.Contains("(sw)", StringComparison.OrdinalIgnoreCase))
-            display += " (sw)";
-       
-        AddAudioCodecOption(deviceModel, command, display);
-    }
-
     public async Task StopAsync()
     {
         if (!IsMonitoring)
@@ -299,42 +161,42 @@ public class AdbService(
     {
         try
         {
-            // Check if device already exists in collection
-            var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == e.Device.Serial);
-            if (existingDevice != null) return;
+            var serial = e.Device.Serial;
 
             // get the rudimentary data if it isn't online yet
             if (e.Device.State is not DeviceState.Online)
             {
-                logger.Info($"Device {e.Device.Serial} connected but not yet online. Current state: {e.Device.State}");
+                logger.Info($"Device {serial} connected but not yet online. Current state: {e.Device.State}");
 
                 var adbDevice = new AdbDevice
                 {
-                    Serial = e.Device.Serial,
+                    Serial = serial,
                     Model = e.Device.Model ?? "Unknown",
                     State = e.Device.State,
-                    Type = e.Device.Serial.Contains(':') || e.Device.Serial.Contains("tcp") ? DeviceType.WIFI : DeviceType.USB,
+                    Type = serial.Contains(':') || serial.Contains("tcp") ? DeviceType.WIFI : DeviceType.USB,
                     DeviceData = e.Device,
-                    AndroidId = "" // Will be populated when device comes online
+                    AndroidId = ""
                 };
 
                 await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
                 {
+                    var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == serial);
+                    if (existingDevice != null) return;
                     AdbDevices.Add(adbDevice);
                 });
                 return;
             }
-            
             // Refresh the full device information
             var connectedDevice = await GetFullDeviceInfoAsync(e.Device);
-            
+
             await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
             {
+                var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == serial);
+                if (existingDevice != null) return;
                 AdbDevices.Add(connectedDevice);
             });
             logger.Info($"Device connected: {connectedDevice.Model} ({connectedDevice.Serial})");
 
-            // Discover codec options for this device
             _ = Task.Run(async () => await DiscoverCodecOptionsForDevice(connectedDevice));
             _ = Task.Run(async () => await GrantSensitiveNotificationAsync(connectedDevice));
         }
@@ -346,33 +208,32 @@ public class AdbService(
     
     private async void DeviceDisconnected(object? sender, DeviceDataEventArgs e)
     {
-        logger.Info($"Device disconnected: {e.Device.Serial}");
-        var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == e.Device.Serial);
-        if (existingDevice != null)
+        var serial = e.Device.Serial;
+        logger.Info($"Device disconnected: {serial}");
+
+        await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {
-            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
-            {
-                var index = AdbDevices.IndexOf(existingDevice);
-                if (index != -1)
-                {
-                    AdbDevices.RemoveAt(index);
-                }
-            });
-        }
+            var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == serial);
+            if (existingDevice == null) return;
+
+            var index = AdbDevices.IndexOf(existingDevice);
+            if (index != -1)
+                AdbDevices.RemoveAt(index);
+        });
     }
     
     private async void DeviceChanged(object? sender, DeviceDataChangeEventArgs e)
     {
+        var serial = e.Device.Serial;
+        logger.Info($"Device state changed: {serial} {e.OldState} -> {e.NewState}");
 
-        logger.Info($"Device state changed: {e.Device.Serial} {e.OldState} -> {e.NewState}");
-        var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == e.Device.Serial);
-            
         if (e.NewState is DeviceState.Online)
         {
             var deviceInfo = await GetFullDeviceInfoAsync(e.Device);
-                
+
             await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
             {
+                var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == serial);
                 if (existingDevice != null)
                 {
                     // Update existing device
@@ -390,28 +251,28 @@ public class AdbService(
                     logger.Info($"Device added: {deviceInfo.Model} ({deviceInfo.Serial})");
                 }
             });
-                
+
             logger.Info($"Device connected: {deviceInfo.Model} ({deviceInfo.Serial})");
 
-            // Discover codec options for this device
             _ = Task.Run(async () => await DiscoverCodecOptionsForDevice(deviceInfo));
             _ = Task.Run(async () => await GrantSensitiveNotificationAsync(deviceInfo));
         }
         else
         {
             // Device is going offline/authorizing - just update the state if it exists
-            if (existingDevice is not null)
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
             {
-                await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+                var existingDevice = AdbDevices.FirstOrDefault(d => d.Serial == serial);
+                if (existingDevice == null) return;
+
+                var index = AdbDevices.IndexOf(existingDevice);
+                if (index != -1)
                 {
-                    var index = AdbDevices.IndexOf(existingDevice);
-                    if (index != -1)
-                    {
-                        existingDevice.State = e.NewState;
-                        AdbDevices[index] = existingDevice;
-                    }
-                });
-            }
+                    existingDevice.State = e.NewState;
+                    existingDevice.DeviceData = e.Device;
+                    AdbDevices[index] = existingDevice;
+                }
+            });
         }
     }
     
@@ -421,10 +282,6 @@ public class AdbService(
         if (!devices.Any())
         {
             logger.Warn("No adb devices found");
-            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
-            {
-                AdbDevices.Clear();
-            });
             return;
         }
 
@@ -544,6 +401,145 @@ public class AdbService(
         }
     }
 
+    private async Task DiscoverCodecOptionsForDevice(AdbDevice device)
+    {
+        try
+        {
+            if (device.DeviceData is null) return;
+
+            // Check if scrcpy is configured
+            var scrcpyPath = userSettingsService.GeneralSettingsService.ScrcpyPath;
+            if (string.IsNullOrEmpty(scrcpyPath) || !File.Exists(scrcpyPath))
+            {
+                logger.Info("Scrcpy path not configured or not found, skipping codec discovery");
+                return;
+            }
+
+            var deviceModel = device.Model ?? "Unknown";
+
+            // Run scrcpy --list-encoders
+            var processInfo = new ProcessStartInfo
+            {
+                FileName = scrcpyPath,
+                Arguments = $"--list-encoders -s {device.DeviceData.Serial}",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = new Process { StartInfo = processInfo };
+            var outputBuilder = new StringBuilder();
+            var errorBuilder = new StringBuilder();
+
+            process.OutputDataReceived += (_, e) =>
+            {
+                if (!string.IsNullOrEmpty(e.Data))
+                    outputBuilder.AppendLine(e.Data);
+            };
+
+            process.ErrorDataReceived += (_, e) =>
+            {
+                if (!string.IsNullOrEmpty(e.Data))
+                    errorBuilder.AppendLine(e.Data);
+            };
+
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
+            await process.WaitForExitAsync();
+
+            var output = outputBuilder.ToString();
+            var error = errorBuilder.ToString();
+
+            if (process.ExitCode != 0)
+            {
+                logger.Warn($"scrcpy --list-encoders failed for {deviceModel} with exit code {process.ExitCode}. Error: {error}");
+                return;
+            }
+
+            ParseEncoderOutput(output, deviceModel);
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"Error discovering codec options for device {device.Serial}: {ex.Message}", ex);
+        }
+    }
+
+
+    private static readonly char[] separator = ['\r', '\n'];
+
+    private void ParseEncoderOutput(string output, string deviceModel)
+    {
+        if (string.IsNullOrWhiteSpace(output))
+            return;
+
+        var lines = output.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (var line in lines)
+        {
+            var trimmedLine = line.Trim();
+
+            if (trimmedLine.Contains("--video-codec", StringComparison.OrdinalIgnoreCase))
+            {
+                ParseVideoEncoder(trimmedLine, deviceModel);
+            }
+            else if (trimmedLine.Contains("--audio-codec", StringComparison.OrdinalIgnoreCase))
+            {
+                ParseAudioEncoder(trimmedLine, deviceModel);
+            }
+        }
+    }
+
+    private void ParseVideoEncoder(string line, string deviceModel)
+    {
+        var commandEndIndex = line.IndexOf('(');
+        var command = line[..commandEndIndex].Trim();
+
+        // Extract codec and encoder for display name
+        var codecMatch = Regex.Match(command, @"--video-codec=(\w+)");
+        var encoderMatch = Regex.Match(command, @"--video-encoder=([^\s]+)");
+
+        string display;
+
+        var codec = codecMatch.Groups[1].Value;
+        var encoder = encoderMatch.Groups[1].Value;
+        display = $"{codec} & {encoder}";
+
+        // Add hardware/software indicator
+        if (line.Contains("(hw)", StringComparison.OrdinalIgnoreCase))
+            display += " (hw)";
+        else if (line.Contains("(sw)", StringComparison.OrdinalIgnoreCase))
+            display += " (sw)";
+
+        AddVideoCodecOption(deviceModel, command, display);
+    }
+
+    private void ParseAudioEncoder(string line, string deviceModel)
+    {
+        var commandEndIndex = line.IndexOf('(');
+        var command = line[..commandEndIndex].Trim();
+
+        // Extract codec and encoder for display name
+        var codecMatch = Regex.Match(command, @"--audio-codec=(\w+)");
+        var encoderMatch = Regex.Match(command, @"--audio-encoder=([^\s]+)");
+
+        string display;
+
+        var codec = codecMatch.Groups[1].Value;
+        var encoder = encoderMatch.Groups[1].Value;
+        display = $"{codec} & {encoder}";
+
+        // Add hardware/software indicator
+        if (line.Contains("(hw)", StringComparison.OrdinalIgnoreCase))
+            display += " (hw)";
+        else if (line.Contains("(sw)", StringComparison.OrdinalIgnoreCase))
+            display += " (sw)";
+
+        AddAudioCodecOption(deviceModel, command, display);
+    }
+
     /// <summary>
     /// Parses <c>adb connect</c> / <c>adb pair</c> text output. Must not rely on English-only words like
     /// "refused" because ADB prints localized reasons (e.g. Polish) after an English "cannot connect" prefix.
@@ -631,11 +627,63 @@ public class AdbService(
     {
         logger.Info($"Uninstalling app {appPackage} from {deviceId}");
 
-        var adbDevice = AdbDevices.FirstOrDefault(d => d.AndroidId == deviceId);
+        var adbDevice = GetOnlineAdbDevice(deviceId);
         if (adbDevice?.DeviceData is null) return false;
         
         await adbClient.UninstallPackageAsync(adbDevice.DeviceData, appPackage);
         return true;
+    }
+
+    public async Task<bool> InstallAppAsync(string deviceId, string apkPath)
+    {
+        logger.Info($"Installing app from {apkPath} on {deviceId}");
+
+        var adbDevice = GetOnlineAdbDevice(deviceId);
+        if (adbDevice?.DeviceData is null)
+        {
+            logger.Warn($"No online ADB device found for {deviceId}");
+            return false;
+        }
+
+        if (!File.Exists(apkPath))
+        {
+            logger.Warn($"APK file not found: {apkPath}");
+            return false;
+        }
+
+        try
+        {
+            await Task.Run(() =>
+            {
+                using var stream = File.OpenRead(apkPath);
+                adbClient.Install(adbDevice.DeviceData, stream);
+            });
+            logger.Info($"Installed app from {apkPath}");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"Failed to install APK: {ex.Message}", ex);
+            return false;
+        }
+    }
+
+    private AdbDevice? GetOnlineAdbDevice(string deviceId)
+    {
+        var pairedDevice = deviceManager.PairedDevices.FirstOrDefault(d => d.Id == deviceId);
+        if (pairedDevice is null) return null;
+
+        return AdbDevices.FirstOrDefault(adbDevice =>
+            adbDevice.IsOnline &&
+            (
+                (!string.IsNullOrEmpty(adbDevice.AndroidId) && adbDevice.AndroidId == deviceId) ||
+                (string.IsNullOrEmpty(adbDevice.AndroidId) &&
+                 !string.IsNullOrEmpty(adbDevice.Model) &&
+                 !string.IsNullOrEmpty(pairedDevice.Model) &&
+                 (pairedDevice.Model.Equals(adbDevice.Model, StringComparison.OrdinalIgnoreCase) ||
+                  pairedDevice.Model.Contains(adbDevice.Model, StringComparison.OrdinalIgnoreCase) ||
+                  adbDevice.Model.Contains(pairedDevice.Model, StringComparison.OrdinalIgnoreCase)))
+            ));
     }
 
     /// <summary>
@@ -768,9 +816,29 @@ public class AdbService(
         }
     }
 
+    public Task DisconnectDeviceAsync(AdbDevice device)
+    {
+        if (device.Type is not DeviceType.WIFI || string.IsNullOrEmpty(device.Serial))
+            return Task.CompletedTask;
+
+        try
+        {
+            var result = adbClient.Disconnect(device.Serial);
+            logger.Info($"ADB disconnect {device.Serial}: {result}");
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"Failed to disconnect ADB device {device.Serial}: {ex.Message}", ex);
+        }
+
+        return Task.CompletedTask;
+    }
+
     // executes: adb shell appops set com.castle.sefirah RECEIVE_SENSITIVE_NOTIFICATIONS allow
     private async Task GrantSensitiveNotificationAsync(AdbDevice device)
     {
+
+        logger.Info("Trying to grant sensitive notification permission");
         if (device.DeviceData is null || device.State is not DeviceState.Online) return;
 
         try
@@ -779,7 +847,7 @@ public class AdbService(
         }
         catch (Exception ex)
         {
-            logger.Warn($"Could not grant RECEIVE_SENSITIVE_NOTIFICATIONS on {device.Serial} (older Android or app not installed): {ex.Message}", ex);
+            logger.Warn($"Could not grant RECEIVE_SENSITIVE_NOTIFICATIONS on {device.Serial}: {ex.Message}", ex);
         }
     }
 }
