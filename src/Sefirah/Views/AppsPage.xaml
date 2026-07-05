@@ -139,6 +139,7 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
         <TextBlock
@@ -157,6 +158,21 @@
             Margin="0,12"
             Padding="12,8"
             HorizontalAlignment="Right"
+            AutomationProperties.Name="{helpers:ResourceString Name=InstallApp}"
+            Background="Transparent"
+            BorderThickness="0"
+            Command="{x:Bind ViewModel.InstallAppCommand}"
+            ToolTipService.ToolTip="{helpers:ResourceString Name=InstallApp}"
+            Visibility="{x:Bind ViewModel.ActiveDevice.HasAdbConnection, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <FontIcon FontSize="16" Glyph="&#xE898;" />
+        </Button>
+
+        <Button
+            Grid.Row="0"
+            Grid.Column="2"
+            Margin="0,12"
+            Padding="12,8"
+            HorizontalAlignment="Right"
             AutomationProperties.Name="{helpers:ResourceString Name=RefreshApps}"
             Background="Transparent"
             BorderThickness="0"
@@ -168,7 +184,7 @@
         <AutoSuggestBox
             x:Name="AppSearchBox"
             Grid.Row="0"
-            Grid.Column="2"
+            Grid.Column="3"
             MinWidth="250"
             Margin="6,12,16,12"
             HorizontalAlignment="Right"
@@ -183,7 +199,7 @@
         <ScrollViewer
             Grid.Row="1"
             Grid.Column="0"
-            Grid.ColumnSpan="3"
+            Grid.ColumnSpan="4"
             Padding="0,0,20,0"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
@@ -236,7 +252,7 @@
         <ProgressRing
             Grid.Row="1"
             Grid.Column="0"
-            Grid.ColumnSpan="3"
+            Grid.ColumnSpan="4"
             Width="50"
             Height="50"
             HorizontalAlignment="Center"
@@ -246,7 +262,7 @@
         <TextBlock
             Grid.Row="1"
             Grid.Column="0"
-            Grid.ColumnSpan="3"
+            Grid.ColumnSpan="4"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Style="{StaticResource BodyTextBlockStyle}"

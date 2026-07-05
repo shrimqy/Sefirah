@@ -46,6 +46,28 @@ public sealed partial class AppsViewModel : BaseViewModel
         DeviceManager.ActiveDevice.SendMessage(new RequestApplicationList());
     }
 
+    [RelayCommand]
+    public async Task InstallApp()
+    {
+        if (DeviceManager.ActiveDevice is not { HasAdbConnection: true })
+            return;
+
+        var file = await PickerHelper.PickFileAsync([".apk"]);
+        if (file is null)
+            return;
+
+        try
+        {
+            var installed = await AdbService.InstallAppAsync(DeviceManager.ActiveDevice.Id, file.Path);
+            if (installed)
+                RefreshApps();
+        }
+        catch (Exception ex)
+        {
+            Logger.Error("Error installing app", ex);
+        }
+    }
+
     public void TogglePin(ApplicationItem app)
     {
         try

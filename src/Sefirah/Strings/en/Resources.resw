@@ -810,6 +810,9 @@ input text %pwd%</value>
   <data name="RefreshApps" xml:space="preserve">
     <value>Refresh apps</value>
   </data>
+  <data name="InstallApp" xml:space="preserve">
+    <value>Install app</value>
+  </data>
   <data name="ContextMenu" xml:space="preserve">
     <value>Context menu</value>
   </data>
