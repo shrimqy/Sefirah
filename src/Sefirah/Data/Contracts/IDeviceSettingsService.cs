@@ -1,5 +1,3 @@
-using Sefirah.Data.Enums;
-
 namespace Sefirah.Data.Contracts;
 
 public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyChanged
@@ -132,7 +130,7 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// <summary>
     /// Gets or sets the video buffer.  
     /// </summary>
-    string? VideoBuffer { get; set; }
+    int VideoBuffer { get; set; }
 
     /// <summary>
     /// Gets or sets the audio bitrate.
@@ -142,7 +140,7 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// <summary>
     /// Gets or sets the audio buffer.
     /// </summary>
-    string? AudioBuffer { get; set; }
+    int AudioBuffer { get; set; }
 
     /// <summary>
     /// Gets or sets custom command-line arguments for scrcpy.
@@ -167,7 +165,7 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// <summary>
     /// Gets or sets the frame rate.
     /// </summary>
-    string? FrameRate { get; set; }
+    int FrameRate { get; set; }
 
     /// <summary>
     /// Gets or sets the crop settings.
@@ -192,7 +190,7 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// <summary>
     /// Gets or sets the rotation angle.
     /// </summary>
-    string? RotationAngle { get; set; }
+    int RotationAngle { get; set; }
 
     /// <summary>
     /// Gets or sets the audio output mode.
@@ -207,7 +205,7 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// <summary>
     /// Gets or sets the audio output buffer.
     /// </summary>
-    string? AudioOutputBuffer { get; set; }
+    int AudioOutputBuffer { get; set; }
 
     /// <summary>
     /// Gets or sets the audio codec.
@@ -233,6 +231,11 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// Gets or sets a value indicating whether to enable virtual display.
     /// </summary>
     bool IsVirtualDisplayEnabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to enable flex display.
+    /// </summary>
+    bool FlexDisplay { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to receive media playback sessions from the device.

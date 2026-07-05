@@ -1,8 +1,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using CommunityToolkit.WinUI;
-using Sefirah.Data.Contracts;
-using Sefirah.Data.Enums;
+using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Models;
 using Sefirah.Dialogs;
 using Sefirah.Utils;
@@ -11,15 +10,16 @@ using Windows.ApplicationModel.DataTransfer;
 
 namespace Sefirah.Services;
 public class ScreenMirrorService(
-    ILogger<ScreenMirrorService> logger,
+    ILogger logger,
     IUserSettingsService userSettingsService,
     IAdbService adbService,
-    IDeviceManager deviceManager
+    IDeviceManager deviceManager,
+    RemoteAppRepository remoteAppRepository
 ) : IScreenMirrorService
 {
     private readonly ObservableCollection<AdbDevice> devices = adbService.AdbDevices;
 
-    private Dictionary<string, Process> scrcpyProcesses = [];
+    private readonly Dictionary<string, Process> scrcpyProcesses = [];
     private CancellationTokenSource? cts;
     private readonly Microsoft.UI.Dispatching.DispatcherQueue dispatcher = App.MainWindow.DispatcherQueue;
     
@@ -30,11 +30,18 @@ public class ScreenMirrorService(
     {
         var device = deviceManager.ActiveDevice;
         if (device is null) return;
-        var iconPath = IconUtils.GetAppIconFilePath(package);
-        await StartScrcpy(device, $"--start-app={package}", iconPath);
+
+        var app = remoteAppRepository.GetApplicationForDevice(device.Id, package);
+        if (app is null)
+        {
+            logger.Warn($"No application found for package {package} on device {device.Id}");
+            return;
     }
 
-    public async Task<bool> StartScrcpy(PairedDevice device, string? customArgs = null, string? iconPath = null)
+        await StartScrcpy(device, app);
+    }
+
+    public async Task<bool> StartScrcpy(PairedDevice device, ApplicationItem? app = null)
     {
         Process? process = null;
         CancellationTokenSource? processCts = null;
@@ -71,9 +78,14 @@ public class ScreenMirrorService(
             }
 
             List<string> argBuilder = [];
-            if (!string.IsNullOrEmpty(customArgs))
+
+            var isStartApp = app is not null;
+            if (isStartApp)
             {
-                argBuilder.Add(customArgs);
+                IconUtils.SetScrcpyWindowIcon(app!.PackageName);
+                argBuilder.Add($"--start-app={app.PackageName}");
+                if (!string.IsNullOrEmpty(app.AppName))
+                    argBuilder.Add($"--window-title=\"{app.AppName}\"");
             }
 
             var preDefinedArgs = deviceSettings.CustomArguments;
@@ -130,9 +142,109 @@ public class ScreenMirrorService(
             
             argBuilder.Add($"-s {selectedDeviceSerial}");
 
-            argBuilder = BuildScrcpyArguments(argBuilder, deviceSettings, device.Model ?? "Unknown");
+            // General deviceSettings
+            if (deviceSettings.ScreenOff)
+            {
+                argBuilder.Add("--turn-screen-off");
+            }
 
-            if (argBuilder[0].StartsWith("--start-app"))
+            if (deviceSettings.PhysicalKeyboard)
+            {
+                argBuilder.Add("--keyboard=uhid");
+            }
+
+            // Video deviceSettings
+            if (deviceSettings.DisableVideoForwarding)
+            {
+                argBuilder.Add("--no-video");
+            }
+
+            if (deviceSettings.VideoCodec != 0)
+            {
+                var videoOptions = adbService.GetVideoCodecOptions(device.Model);
+                if (deviceSettings.VideoCodec < videoOptions.Count)
+                {
+                    argBuilder.Add($"{videoOptions[deviceSettings.VideoCodec].Command}");
+                }
+            }
+
+            if (!string.IsNullOrEmpty(deviceSettings.VideoResolution))
+            {
+                argBuilder.Add($"--max-size={deviceSettings.VideoResolution}");
+            }
+
+            var videoBitrate = isStartApp && deviceSettings.FlexDisplay ? "16M" : deviceSettings.VideoBitrate;
+            if (!string.IsNullOrEmpty(videoBitrate))
+            {
+                argBuilder.Add($"--video-bit-rate={videoBitrate}");
+            }
+
+            if (deviceSettings.VideoBuffer > 0)
+            {
+                argBuilder.Add($"--video-buffer={deviceSettings.VideoBuffer}");
+            }
+
+            if (deviceSettings.FrameRate > 0)
+            {
+                argBuilder.Add($"--max-fps={deviceSettings.FrameRate}");
+            }
+
+            if (!string.IsNullOrEmpty(deviceSettings.Crop))
+            {
+                argBuilder.Add($"--crop={deviceSettings.Crop}");
+            }
+
+            if (deviceSettings.DisplayOrientation != 0)
+            {
+                argBuilder.Add($"--orientation={adbService.DisplayOrientationOptions[deviceSettings.DisplayOrientation].Command}");
+            }
+
+            if (!string.IsNullOrEmpty(deviceSettings.Display))
+            {
+                argBuilder.Add($"--display-id={deviceSettings.Display}");
+            }
+
+            // Audio deviceSettings
+            if (!string.IsNullOrEmpty(deviceSettings.AudioBitrate))
+            {
+                argBuilder.Add($"--audio-bit-rate={deviceSettings.AudioBitrate}");
+            }
+
+            if (deviceSettings.AudioBuffer > 0)
+            {
+                argBuilder.Add($"--audio-buffer={deviceSettings.AudioBuffer}");
+            }
+
+            if (deviceSettings.AudioOutputBuffer > 0)
+            {
+                argBuilder.Add($"--audio-output-buffer={deviceSettings.AudioOutputBuffer}");
+            }
+
+            if (deviceSettings.ForwardMicrophone)
+            {
+                argBuilder.Add("--audio-source=mic");
+            }
+
+            switch (deviceSettings.AudioOutputMode)
+            {
+                case AudioOutputModeType.Remote:
+                    argBuilder.Add("--no-audio");
+                    break;
+                case AudioOutputModeType.Both:
+                    argBuilder.Add("--audio-dup");
+                    break;
+            }
+
+            if (deviceSettings.AudioCodec != 0)
+            {
+                var audioOptions = adbService.GetAudioCodecOptions(device.Model);
+                if (deviceSettings.AudioCodec < audioOptions.Count)
+                {
+                    argBuilder.Add($"{audioOptions[deviceSettings.AudioCodec].Command}");
+                }
+            }
+
+            if (isStartApp)
             {
                 if (!string.IsNullOrEmpty(deviceSettings.VirtualDisplaySize) && deviceSettings.IsVirtualDisplayEnabled)
                 {
@@ -162,6 +274,12 @@ public class ScreenMirrorService(
                         }
                     }
                 }
+
+                if (deviceSettings.FlexDisplay && deviceSettings.IsVirtualDisplayEnabled)
+                {
+                    argBuilder.Add("-x");
+                    argBuilder.Add("--keep-active");
+                }
             }
 
             cts?.Cancel();
@@ -183,9 +301,10 @@ public class ScreenMirrorService(
                 EnableRaisingEvents = true
             };
 
-            if (!string.IsNullOrEmpty(iconPath))
+            if (isStartApp && File.Exists(IconUtils.ScrcpyWindowIconPath))
             {
-                process.StartInfo.EnvironmentVariables["SCRCPY_ICON_PATH"] = iconPath;
+                process.StartInfo.EnvironmentVariables["SCRCPY_ICON_DIR"] = IconUtils.ScrcpyIconsDirectory;
+                process.StartInfo.EnvironmentVariables["SCRCPY_ICON_PATH"] = IconUtils.ScrcpyWindowIconPath;
             }
 
             bool started;
@@ -338,112 +457,6 @@ public class ScreenMirrorService(
         }
 
         return selectedDeviceSerial;
-    }
-
-    private List<string> BuildScrcpyArguments(List<string> argBuilder, IDeviceSettingsService deviceSettings, string deviceModel)
-    {
-        // General deviceSettings
-        if (deviceSettings.ScreenOff)
-        {
-            argBuilder.Add("--turn-screen-off");
-        }
-
-        if (deviceSettings.PhysicalKeyboard)
-        {
-            argBuilder.Add("--keyboard=uhid");
-        }
-
-        // Video deviceSettings
-        if (deviceSettings.DisableVideoForwarding)
-        {
-            argBuilder.Add("--no-video");
-        }
-
-        if (deviceSettings.VideoCodec != 0)
-        {
-            var videoOptions = adbService.GetVideoCodecOptions(deviceModel);
-            if (deviceSettings.VideoCodec < videoOptions.Count)
-            {
-                argBuilder.Add($"{videoOptions[deviceSettings.VideoCodec].Command}");
-            }
-        }
-
-        if (!string.IsNullOrEmpty(deviceSettings.VideoResolution))
-        {
-            argBuilder.Add($"--max-size={deviceSettings.VideoResolution}");
-        }
-
-        if (!string.IsNullOrEmpty(deviceSettings.VideoBitrate))
-        {
-            argBuilder.Add($"--video-bit-rate={deviceSettings.VideoBitrate}");
-        }
-
-        if (!string.IsNullOrEmpty(deviceSettings.VideoBuffer))
-        {
-            argBuilder.Add($"--video-buffer={deviceSettings.VideoBuffer}");
-        }
-
-        if (!string.IsNullOrEmpty(deviceSettings.FrameRate))
-        {
-            argBuilder.Add($"--max-fps={deviceSettings.FrameRate}");
-        }
-
-        if (!string.IsNullOrEmpty(deviceSettings.Crop))
-        {
-            argBuilder.Add($"--crop={deviceSettings.Crop}");
-        }
-
-        if (deviceSettings.DisplayOrientation != 0)
-        {
-            argBuilder.Add($"--orientation={adbService.DisplayOrientationOptions[deviceSettings.DisplayOrientation].Command}");
-        }
-
-        if (!string.IsNullOrEmpty(deviceSettings.Display))
-        {
-            argBuilder.Add($"--display-id={deviceSettings.Display}");
-        }
-
-        // Audio deviceSettings
-        if (!string.IsNullOrEmpty(deviceSettings.AudioBitrate))
-        {
-            argBuilder.Add($"--audio-bit-rate={deviceSettings.AudioBitrate}");
-        }
-
-        if (!string.IsNullOrEmpty(deviceSettings.AudioBuffer))
-        {
-            argBuilder.Add($"--audio-buffer={deviceSettings.AudioBuffer}");
-        }
-
-        if (!string.IsNullOrEmpty(deviceSettings.AudioOutputBuffer))
-        {
-            argBuilder.Add($"--audio-output-buffer={deviceSettings.AudioOutputBuffer}");
-        }
-
-        if (deviceSettings.ForwardMicrophone)
-        {
-            argBuilder.Add("--audio-source=mic");
-        }
-
-        switch (deviceSettings.AudioOutputMode)
-        {
-            case AudioOutputModeType.Remote:
-                argBuilder.Add("--no-audio");
-                break;
-            case AudioOutputModeType.Both:
-                argBuilder.Add("--audio-dup");
-                break;
-        }
-
-        if (deviceSettings.AudioCodec != 0)
-        {
-            var audioOptions = adbService.GetAudioCodecOptions(deviceModel);
-            if (deviceSettings.AudioCodec < audioOptions.Count)
-            {
-                argBuilder.Add($"{audioOptions[deviceSettings.AudioCodec].Command}");
-            }
-        }
-
-        return argBuilder;
     }
 
     private void StartProcessMonitoring(Process process, CancellationTokenSource processCts, string deviceSerial)

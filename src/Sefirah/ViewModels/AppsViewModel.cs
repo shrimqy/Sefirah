@@ -28,6 +28,7 @@ public sealed partial class AppsViewModel : BaseViewModel
 
     public bool IsEmpty => !Apps.Any() && !IsLoading;
     public bool HasPinnedApps => PinnedApps.Any();
+    public PairedDevice? ActiveDevice => DeviceManager.ActiveDevice;
 
     #endregion
 
@@ -130,10 +131,10 @@ public sealed partial class AppsViewModel : BaseViewModel
                 Apps.Clear();
                 PinnedApps.Clear();
 
-                if (DeviceManager.ActiveDevice is null) return;
+                if (ActiveDevice is null) return;
 
                 IsLoading = true;
-                Apps = RemoteAppsRepository.GetApplicationsForDevice(DeviceManager.ActiveDevice.Id).ToObservableCollection();
+                Apps = RemoteAppsRepository.GetApplicationsForDevice(ActiveDevice.Id).ToObservableCollection();
                 PinnedApps = Apps.Where(a => a.DeviceInfo.Pinned).ToObservableCollection();
                 foreach (var app in Apps) 
                 {
@@ -154,12 +155,13 @@ public sealed partial class AppsViewModel : BaseViewModel
 
     private void OnActiveDeviceChanged(object? sender, PairedDevice? _)
     {
+        OnPropertyChanged(nameof(ActiveDevice));
         LoadApps();
     }
 
     private void OnApplicationListUpdated(object? sender, string deviceId)
     {   
-        if (DeviceManager.ActiveDevice?.Id != deviceId) return;
+        if (ActiveDevice?.Id != deviceId) return;
         LoadApps();
     }
 
@@ -168,7 +170,7 @@ public sealed partial class AppsViewModel : BaseViewModel
         var (deviceId, appInfo, packageName) = args;
 
         // Only update if this is for the active device
-        if (DeviceManager.ActiveDevice?.Id != deviceId || IsLoading) return;
+        if (ActiveDevice?.Id != deviceId || IsLoading) return;
 
         App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
         {
@@ -234,8 +236,7 @@ public sealed partial class AppsViewModel : BaseViewModel
             try
             {
                 Logger.Debug($"Opening app: {app.AppName}");
-                IconUtils.SetScrcpyWindowIcon(app.PackageName);
-                var started = await ScreenMirrorService.StartScrcpy(DeviceManager.ActiveDevice!, $"--start-app={app.PackageName} --window-title=\"{app.AppName}\"");
+                var started = await ScreenMirrorService.StartScrcpy(ActiveDevice!, app);
                 if (started)
                 {
                     await Task.Delay(2000);

@@ -4,7 +4,7 @@ namespace Sefirah.Data.Contracts;
 
 public interface IScreenMirrorService
 {
-    Task<bool> StartScrcpy(PairedDevice device, string? customArgs = null, string? iconPath = null);
+    Task<bool> StartScrcpy(PairedDevice device, ApplicationItem? app = null);
 
     void LaunchAppByPackage(string package);
 }

@@ -153,12 +153,12 @@ public sealed partial class MainPageViewModel : BaseViewModel
             NotificationKey = notification.Key,
             InfoType = NotificationInfoType.Invoke
         };
-        string? appIcon = string.Empty;
-        if (!string.IsNullOrEmpty(notification.AppPackage))
-        {
-            appIcon = IconUtils.GetAppIconFilePath(notification.AppPackage);
-        }
-        var started = await ScreenMirrorService.StartScrcpy(Device!, $"--new-display --start-app={notification.AppPackage}", appIcon);
+        if (string.IsNullOrEmpty(notification.AppPackage)) return;
+
+        var app = RemoteAppsRepository.GetApplicationForDevice(Device!.Id, notification.AppPackage);
+        if (app is null) return;
+
+        var started = await ScreenMirrorService.StartScrcpy(Device!, app);
 
         // Scrcpy doesn't have a way of opening notifications afaik, so we will just have the notification listener on Android to open it for us
         // Plus we have to wait (2s will do ig?) until the app is actually launched to send the intent for launching the notification since Google added a lot more restrictions in this particular case

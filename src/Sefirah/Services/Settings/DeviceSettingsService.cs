@@ -150,7 +150,7 @@ internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSh
 
     public string? VideoBitrate
     {
-        get => Get("8M");
+        get => Get(string.Empty);
         set => Set(value);
     }
 
@@ -160,21 +160,21 @@ internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSh
         set => Set(value);
     }
 
-    public string? VideoBuffer
+    public int VideoBuffer
     {
-        get => Get("0");
+        get => Get(0);
         set => Set(value);
     }
 
     public string? AudioBitrate
     {
-        get => Get("128K");
+        get => Get(string.Empty);
         set => Set(value);
     }
 
-    public string? AudioBuffer
+    public int AudioBuffer
     {
-        get => Get(string.Empty);
+        get => Get(0);
         set => Set(value);
     }
 
@@ -196,9 +196,9 @@ internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSh
         set => Set(value);
     }
 
-    public string? FrameRate
+    public int FrameRate
     {
-        get => Get("60");
+        get => Get(60);
         set => Set(value);
     }
 
@@ -226,9 +226,9 @@ internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSh
         set => Set(value);
     }
 
-    public string? RotationAngle
+    public int RotationAngle
     {
-        get => Get("0");
+        get => Get(0);
         set => Set(value);
     }
 
@@ -244,9 +244,9 @@ internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSh
         set => Set(value);
     }
 
-    public string? AudioOutputBuffer
+    public int AudioOutputBuffer
     {
-        get => Get(string.Empty);
+        get => Get(0);
         set => Set(value);
     }
 
@@ -277,6 +277,12 @@ internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSh
     public bool IsVirtualDisplayEnabled
     {
         get => Get(true);
+        set => Set(value);
+    }
+
+    public bool FlexDisplay
+    {
+        get => Get(false);
         set => Set(value);
     }
 

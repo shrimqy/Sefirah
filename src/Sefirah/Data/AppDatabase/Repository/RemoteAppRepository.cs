@@ -18,6 +18,15 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
             .OrderBy(a => a.AppName);
     }
 
+    public ApplicationItem? GetApplicationForDevice(string deviceId, string packageName)
+    {
+        var entity = context.Database.Find<ApplicationEntity>(packageName);
+        if (entity is null || !HasDevice(entity, deviceId))
+            return null;
+
+        return entity.ToApplicationItem(deviceId);
+    }
+
     public async Task AddOrUpdateApplicationForDevice(ApplicationInfo application, string deviceId)
     {
         ApplicationItem appInfo;

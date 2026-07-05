@@ -38,9 +38,9 @@
                     <wuc:SettingsExpander.Items>
                         <wuc:SettingsCard Header="{helpers:ResourceString Name=ConnectionPreference}">
                             <ComboBox
-                                Width="150"
                                 ItemsSource="{x:Bind ViewModel.ScrcpyDevicePreferenceOptions.Values}"
-                                SelectedItem="{x:Bind ViewModel.SelectedScrcpyDevicePreference, Mode=TwoWay}" />
+                                SelectedItem="{x:Bind ViewModel.SelectedScrcpyDevicePreference, Mode=TwoWay}"
+                                Width="150" />
                         </wuc:SettingsCard>
 
                         <wuc:SettingsCard Header="{helpers:ResourceString Name=ScreenOff}">
@@ -167,6 +167,8 @@
                                     Minimum="0"
                                     PlaceholderText="0 (disabled)"
                                     SmallChange="5"
+                                    SpinButtonPlacementMode="Inline"
+                                    Width="150"
                                     Value="{x:Bind ViewModel.UnlockTimeout, Mode=TwoWay}" />
 
                                 <TextBox
@@ -196,28 +198,48 @@
 
                         <wuc:SettingsCard Header="{helpers:ResourceString Name=VideoCodec}">
                             <ComboBox
-                                Width="220"
+                                MinWidth="150"
                                 DisplayMemberPath="Display"
                                 ItemsSource="{x:Bind ViewModel.VideoCodecOptions}"
                                 SelectedIndex="{x:Bind ViewModel.VideoCodec, Mode=TwoWay}" />
                         </wuc:SettingsCard>
 
                         <wuc:SettingsCard Header="{helpers:ResourceString Name=Bitrate}">
-                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.VideoBitrate, Mode=TwoWay}" />
+                            <TextBox
+                                Width="150"
+                                KeyDown="OnKeyDown"
+                                PlaceholderText="{helpers:ResourceString Name=VideoBitratePlaceholder}"
+                                Text="{x:Bind ViewModel.VideoBitrate, Mode=TwoWay}"
+                                ToolTipService.ToolTip="{helpers:ResourceString Name=VideoBitrateToolTip}" />
                         </wuc:SettingsCard>
 
                         <wuc:SettingsCard Header="{helpers:ResourceString Name=FrameRate}">
-                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.FrameRate, Mode=TwoWay}" />
+                            <NumberBox
+                                Width="150"
+                                LargeChange="15"
+                                Maximum="240"
+                                Minimum="0"
+                                PlaceholderText="60"
+                                SmallChange="1"
+                                SpinButtonPlacementMode="Inline"
+                                Value="{x:Bind ViewModel.FrameRate, Mode=TwoWay}"
+                                KeyDown="OnKeyDown" />
                         </wuc:SettingsCard>
 
                         <wuc:SettingsCard Header="{helpers:ResourceString Name=Crop}">
-                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.Crop, Mode=TwoWay}" />
+                            <TextBox
+                                Width="150"
+                                KeyDown="OnKeyDown"
+                                PlaceholderText="{helpers:ResourceString Name=CropPlaceholder}"
+                                Text="{x:Bind ViewModel.Crop, Mode=TwoWay}"
+                                ToolTipService.ToolTip="{helpers:ResourceString Name=CropToolTip}" />
                         </wuc:SettingsCard>
 
                         <wuc:SettingsCard Header="{helpers:ResourceString Name=Display}">
                             <TextBox
                                 KeyDown="OnKeyDown"
                                 PlaceholderText="{helpers:ResourceString Name=Default}"
+                                Width="150"
                                 Text="{x:Bind ViewModel.Display, Mode=TwoWay}" />
                         </wuc:SettingsCard>
 
@@ -226,23 +248,49 @@
                         </wuc:SettingsCard>
 
                         <wuc:SettingsCard Header="{helpers:ResourceString Name=VirtualDisplaySize}">
-                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.VirtualDisplaySize, Mode=TwoWay}" />
+                            <TextBox
+                                Width="150"
+                                KeyDown="OnKeyDown"
+                                PlaceholderText="{helpers:ResourceString Name=VirtualDisplaySizePlaceholder}"
+                                Text="{x:Bind ViewModel.VirtualDisplaySize, Mode=TwoWay}"
+                                ToolTipService.ToolTip="{helpers:ResourceString Name=VirtualDisplaySizeToolTip}" />
+                        </wuc:SettingsCard>
+
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=FlexDisplay}">
+                            <ToggleSwitch IsOn="{x:Bind ViewModel.FlexDisplay, Mode=TwoWay}" />
                         </wuc:SettingsCard>
 
                         <wuc:SettingsCard Header="{helpers:ResourceString Name=DisplayOrientation}">
                             <ComboBox
-                                Width="150"
                                 DisplayMemberPath="Display"
                                 ItemsSource="{x:Bind ViewModel.DisplayOrientationOptions}"
-                                SelectedIndex="{x:Bind ViewModel.DisplayOrientation, Mode=TwoWay}" />
+                                SelectedIndex="{x:Bind ViewModel.DisplayOrientation, Mode=TwoWay}"
+                                Width="150" />
                         </wuc:SettingsCard>
 
                         <wuc:SettingsCard Header="{helpers:ResourceString Name=RotationAngle}">
-                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.RotationAngle, Mode=TwoWay}" />
+                            <NumberBox
+                                Width="150"
+                                KeyDown="OnKeyDown"
+                                LargeChange="90"
+                                Maximum="360"
+                                Minimum="0"
+                                PlaceholderText="0"
+                                SmallChange="1"
+                                SpinButtonPlacementMode="Inline"
+                                Value="{x:Bind ViewModel.RotationAngle, Mode=TwoWay}" />
                         </wuc:SettingsCard>
 
                         <wuc:SettingsCard Header="{helpers:ResourceString Name=Buffer}">
-                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.VideoBuffer, Mode=TwoWay}" />
+                            <NumberBox
+                                Width="150"
+                                KeyDown="OnKeyDown"
+                                LargeChange="50"
+                                Minimum="0"
+                                PlaceholderText="0"
+                                SmallChange="10"
+                                SpinButtonPlacementMode="Inline"
+                                Value="{x:Bind ViewModel.VideoBuffer, Mode=TwoWay}" />
                         </wuc:SettingsCard>
                     </wuc:SettingsExpander.Items>
                 </wuc:SettingsExpander>
@@ -253,35 +301,55 @@
                         <FontIcon Glyph="&#xE767;" />
                     </wuc:SettingsExpander.HeaderIcon>
                     <wuc:SettingsExpander.Items>
-                        <wuc:SettingsCard Header="{helpers:ResourceString Name=AudioOutputMode}">
-                            <ComboBox
-                                Width="150"
-                                ItemsSource="{x:Bind ViewModel.AudioOutputModeOptions.Values}"
-                                SelectedItem="{x:Bind ViewModel.SelectedAudioOutputMode, Mode=TwoWay}" />
-                        </wuc:SettingsCard>
-
                         <wuc:SettingsCard Header="{helpers:ResourceString Name=ForwardMicrophone}">
                             <ToggleSwitch IsOn="{x:Bind ViewModel.ForwardMicrophone, Mode=TwoWay}" />
+                        </wuc:SettingsCard>
+                        <wuc:SettingsCard Header="{helpers:ResourceString Name=AudioOutputMode}">
+                            <ComboBox
+                                ItemsSource="{x:Bind ViewModel.AudioOutputModeOptions.Values}"
+                                SelectedItem="{x:Bind ViewModel.SelectedAudioOutputMode, Mode=TwoWay}"
+                                Width="150" />
                         </wuc:SettingsCard>
 
                         <wuc:SettingsCard Header="{helpers:ResourceString Name=AudioCodec}">
                             <ComboBox
-                                Width="220"
                                 DisplayMemberPath="Display"
                                 ItemsSource="{x:Bind ViewModel.AudioCodecOptions}"
-                                SelectedIndex="{x:Bind ViewModel.AudioCodec, Mode=TwoWay}" />
+                                SelectedIndex="{x:Bind ViewModel.AudioCodec, Mode=TwoWay}"
+                                MinWidth="150" />
                         </wuc:SettingsCard>
 
                         <wuc:SettingsCard Header="{helpers:ResourceString Name=Bitrate}">
-                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.AudioBitrate, Mode=TwoWay}" />
+                            <TextBox
+                                Width="150"
+                                KeyDown="OnKeyDown"
+                                PlaceholderText="{helpers:ResourceString Name=AudioBitratePlaceholder}"
+                                Text="{x:Bind ViewModel.AudioBitrate, Mode=TwoWay}"
+                                ToolTipService.ToolTip="{helpers:ResourceString Name=AudioBitrateToolTip}" />
                         </wuc:SettingsCard>
 
                         <wuc:SettingsCard Header="{helpers:ResourceString Name=AudioOutputBuffer}">
-                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.AudioOutputBuffer, Mode=TwoWay}" />
+                            <NumberBox
+                                Width="150"
+                                KeyDown="OnKeyDown"
+                                LargeChange="50"
+                                Minimum="0"
+                                PlaceholderText="0"
+                                SmallChange="10"
+                                SpinButtonPlacementMode="Inline"
+                                Value="{x:Bind ViewModel.AudioOutputBuffer, Mode=TwoWay}" />
                         </wuc:SettingsCard>
 
                         <wuc:SettingsCard Header="{helpers:ResourceString Name=Buffer}">
-                            <TextBox KeyDown="OnKeyDown" Text="{x:Bind ViewModel.AudioBuffer, Mode=TwoWay}" />
+                            <NumberBox
+                                Width="150"
+                                KeyDown="OnKeyDown"
+                                LargeChange="50"
+                                Minimum="0"
+                                PlaceholderText="0"
+                                SmallChange="10"
+                                SpinButtonPlacementMode="Inline"
+                                Value="{x:Bind ViewModel.AudioBuffer, Mode=TwoWay}" />
                         </wuc:SettingsCard>
                     </wuc:SettingsExpander.Items>
                 </wuc:SettingsExpander>

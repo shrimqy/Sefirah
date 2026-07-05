@@ -1,7 +1,5 @@
 using System.Collections.Specialized;
 using Sefirah.Data.AppDatabase.Repository;
-using Sefirah.Data.Contracts;
-using Sefirah.Data.Enums;
 using Sefirah.Data.Items;
 using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
@@ -364,7 +362,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         }
     }
 
-    public string? FrameRate
+    public int FrameRate
     {
         get => DeviceSettings.FrameRate;
         set
@@ -416,6 +414,19 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         }
     }
 
+    public bool FlexDisplay
+    {
+        get => DeviceSettings.FlexDisplay;
+        set
+        {
+            if (DeviceSettings.FlexDisplay != value)
+            {
+                DeviceSettings.FlexDisplay = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public string? VirtualDisplaySize
     {
         get => DeviceSettings.VirtualDisplaySize;
@@ -442,7 +453,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         }
     }
 
-    public string? RotationAngle
+    public int RotationAngle
     {
         get => DeviceSettings.RotationAngle;
         set
@@ -455,12 +466,12 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         }
     }
 
-    public string? VideoBuffer
+    public int VideoBuffer
     {
-        get => DeviceSettings?.VideoBuffer;
+        get => DeviceSettings.VideoBuffer;
         set
         {
-            if (DeviceSettings != null && DeviceSettings.VideoBuffer != value)
+            if (DeviceSettings.VideoBuffer != value)
             {
                 DeviceSettings.VideoBuffer = value;
                 OnPropertyChanged();
@@ -544,7 +555,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         }
     }
 
-    public string? AudioOutputBuffer
+    public int AudioOutputBuffer
     {
         get => DeviceSettings.AudioOutputBuffer;
         set
@@ -557,7 +568,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         }
     }
 
-    public string? AudioBuffer
+    public int AudioBuffer
     {
         get => DeviceSettings.AudioBuffer;
         set

@@ -8,11 +8,43 @@ namespace Sefirah.Utils;
 public static class IconUtils
 {
     private const string AppIconsFolderName = "AppIcons";
+    private const string ScrcpyIconsFolderName = "scrcpy-icons";
+    private const string ScrcpyWindowIconFileName = "scrcpy.png";
 
-    /// <summary>
-    /// Gets or creates the AppIcons folder in the local app data
-    /// </summary>
-    /// <returns>The AppIcons folder</returns>
+    public static string ScrcpyIconsDirectory =>
+        Path.Combine(ApplicationData.Current.LocalFolder.Path, ScrcpyIconsFolderName);
+
+    public static string ScrcpyWindowIconPath =>
+        Path.Combine(ScrcpyIconsDirectory, ScrcpyWindowIconFileName);
+
+    public static void SetScrcpyWindowIcon(string packageName)
+    {
+        SetScrcpyWindowIcon(packageName, ApplicationData.Current.LocalFolder.Path);
+    }
+
+    public static void SetScrcpyWindowIcon(string packageName, string localFolderPath)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(packageName))
+            {
+                return;
+            }
+
+            var appIconPath = Path.Combine(localFolderPath, AppIconsFolderName, $"{packageName}.png");
+            if (!File.Exists(appIconPath))
+            {
+                return;
+            }
+
+            var scrcpyIconsDirectory = Path.Combine(localFolderPath, ScrcpyIconsFolderName);
+            var scrcpyWindowIconPath = Path.Combine(scrcpyIconsDirectory, ScrcpyWindowIconFileName);
+            Directory.CreateDirectory(scrcpyIconsDirectory);
+            File.Copy(appIconPath, scrcpyWindowIconPath, true);
+        }
+        catch (Exception) { }
+    }
+
     public static async Task<StorageFolder> GetAppIconsFolderAsync()
     {
         var localFolder = ApplicationData.Current.LocalFolder;
