@@ -792,6 +792,12 @@ input text %pwd%</value>
   <data name="StartScreenMirroring" xml:space="preserve">
     <value>Start screen mirroring</value>
   </data>
+  <data name="Connect" xml:space="preserve">
+    <value>Connect</value>
+  </data>
+  <data name="Disconnect" xml:space="preserve">
+    <value>Disconnect</value>
+  </data>
   <data name="PreviousTrack" xml:space="preserve">
     <value>Previous track</value>
   </data>
@@ -809,6 +815,9 @@ input text %pwd%</value>
   </data>
   <data name="RefreshApps" xml:space="preserve">
     <value>Refresh apps</value>
+  </data>
+  <data name="InstallApp" xml:space="preserve">
+    <value>Install app</value>
   </data>
   <data name="ContextMenu" xml:space="preserve">
     <value>Context menu</value>
@@ -906,4 +915,40 @@ input text %pwd%</value>
   <data name="CallAudioRouteToPc" xml:space="preserve">
     <value>Transfer to PC</value>
   </data>
+  <data name="FlexDisplay" xml:space="preserve">
+    <value>Flex display</value>
+  </data>
+  <data name="VideoBitratePlaceholder" xml:space="preserve">
+    <value>8M</value>
+  </data>
+  <data name="VideoBitrateToolTip" xml:space="preserve">
+    <value>Format: 8M, 8000000</value>
+  </data>
+  <data name="AudioBitratePlaceholder" xml:space="preserve">
+    <value>128K</value>
+  </data>
+  <data name="AudioBitrateToolTip" xml:space="preserve">
+    <value>Format: 128K, 128000</value>
+  </data>
+  <data name="CropPlaceholder" xml:space="preserve">
+    <value>No crop</value>
+  </data>
+  <data name="CropToolTip" xml:space="preserve">
+    <value>Format: 1224:1440:0:0</value>
+  </data>
+  <data name="VirtualDisplaySizePlaceholder" xml:space="preserve">
+    <value>Device default</value>
+  </data>
+  <data name="VirtualDisplaySizeToolTip" xml:space="preserve">
+    <value>Format: 1920x1080</value>
+  </data>
+  <data name="VideoBitrateMbps" xml:space="preserve">
+    <value>Mbps</value>
+  </data>
+  <data name="RemoveAllSyncRoots" xml:space="preserve">
+    <value>Remove all sync roots</value>
+  </data>
+  <data name="RemoveAllSyncRootsDescription" xml:space="preserve">
+    <value>Unregister all sync roots registered by the app</value>
+   </data>
 </root>
