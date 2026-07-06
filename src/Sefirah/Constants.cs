@@ -29,8 +29,6 @@ public static class Constants
     {
         public const string DateTimeFormat = "datetimeformat";
 
-        public const string SettingsFolderName = "settings";
-        public const string UserSettingsFileName = "user_settings.json";
         public const string PhoneFrameScrollTeachingTipShown = "PhoneFrameScrollTeachingTipShown";
         public const string MainNavigationSelection = "MainNavigationSelection";
         public const string DatabaseFileName = "sefirah.db";

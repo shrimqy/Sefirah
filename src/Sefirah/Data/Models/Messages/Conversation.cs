@@ -1,19 +1,42 @@
-using Microsoft.UI.Xaml.Media.Imaging;
+using System.Globalization;
+using Sefirah.Utils;
+using Windows.Storage.Streams;
 
 namespace Sefirah.Data.Models.Messages;
 
 public partial class Conversation : ObservableObject
 {
+    public string ConversationKey { get; set; } = string.Empty;
+
     public long ThreadId { get; set; }
 
-    public List<ParticipantInfo> Contacts { get; set; } = [];
+    public List<Contact> Contacts { get; set; } = [];
 
-    public string? AvatarGlyph { get; set; } = string.Empty;
+    public bool IsGroup => Contacts.Count > 1;
 
-    public BitmapImage? AvatarImage { get; set; }
+    public Contact? PrimaryContact => Contacts.Count == 1 ? Contacts[0] : null;
 
-    public string DisplayName => Contacts.Count != 0 ? string.Join(", ", Contacts.Select(s => !string.IsNullOrEmpty(s.DisplayName) ? s.DisplayName : s.Address)) : "Unknown";
+    public string DisplayName => Contacts.Count != 0
+        ? string.Join(", ", Contacts.Select(c => c.DisplayName))
+        : "Unknown";
 
+    public string SubtitleAddress => PrimaryContact?.Address ?? string.Empty;
+
+    public IRandomAccessStreamReference? AvatarStream => PrimaryContact?.AvatarStream;
+
+    public bool HasAvatarImage => PrimaryContact?.HasAvatar ?? false;
+
+    public string PlaceholderColorHex => IsGroup
+        ? ContactHelper.GetPlaceholderColorHex(ThreadId.ToString(CultureInfo.InvariantCulture))
+        : PrimaryContact?.PlaceholderColorHex ?? ContactHelper.GetPlaceholderColorHex(ThreadId.ToString(CultureInfo.InvariantCulture));
+
+    public string Initials => IsGroup ? string.Empty : PrimaryContact?.Initials ?? string.Empty;
+
+    public bool ShowGroupGlyph => IsGroup;
+
+    public bool ShowContactInitials => !IsGroup && !string.IsNullOrEmpty(Initials);
+
+    public bool ShowContactGlyph => !IsGroup && string.IsNullOrEmpty(Initials);
 
     private string lastMessage = string.Empty;
     public string LastMessage
@@ -42,8 +65,15 @@ public partial class Conversation : ObservableObject
         LastMessageTimestamp = other.LastMessageTimestamp;
         HasRead = other.HasRead;
         Contacts = other.Contacts;
-        AvatarGlyph = other.AvatarGlyph;
-        AvatarImage = other.AvatarImage;
         OnPropertyChanged(nameof(DisplayName));
+        OnPropertyChanged(nameof(SubtitleAddress));
+        OnPropertyChanged(nameof(AvatarStream));
+        OnPropertyChanged(nameof(HasAvatarImage));
+        OnPropertyChanged(nameof(IsGroup));
+        OnPropertyChanged(nameof(PlaceholderColorHex));
+        OnPropertyChanged(nameof(Initials));
+        OnPropertyChanged(nameof(ShowGroupGlyph));
+        OnPropertyChanged(nameof(ShowContactInitials));
+        OnPropertyChanged(nameof(ShowContactGlyph));
     }
 }

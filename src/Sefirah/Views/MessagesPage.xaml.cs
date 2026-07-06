@@ -1,10 +1,8 @@
-using CommunityToolkit.WinUI.Helpers;
 using Microsoft.UI.Xaml.Input;
 using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
 using Sefirah.ViewModels;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.UI;
 
 namespace Sefirah.Views;
 
@@ -12,159 +10,11 @@ public sealed partial class MessagesPage : Page
 {
     public MessagesViewModel ViewModel { get; }
 
-    private readonly Random random = new();
-    private readonly Dictionary<long, Windows.UI.Color> conversationColors = [];
-    private readonly Dictionary<string, Windows.UI.Color> contactColors = [];
-
     public MessagesPage()
     {
         InitializeComponent();
         ViewModel = Ioc.Default.GetRequiredService<MessagesViewModel>();
         DataContext = ViewModel;
-
-        Loaded += (s, e) => {
-            ViewModel.PropertyChanged += (sender, args) => {
-                if (args.PropertyName is nameof(ViewModel.SelectedConversation))
-                {
-                    DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () => {
-                        UpdateAvatarColors();
-                    });
-                }
-            };
-        };
-        
-        ViewModel.PropertyChanged += (sender, args) => {
-            if (args.PropertyName is nameof(ViewModel.Conversations))
-            {
-                DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () => {
-                    UpdateConversationListColors();
-                });
-            }
-        };
-    }
-
-    private void UpdateAvatarColors()
-    {
-        if (ViewModel.SelectedConversation is null) return;
-
-        var conversationId = ViewModel.SelectedConversation.ThreadId;
-        var backgroundColor = GetOrCreateConversationColor(conversationId);
-
-        AvatarGlyphBorder.Background = new SolidColorBrush(backgroundColor);
-    }
-
-    private void UpdateConversationListColors()
-    {
-        if (ViewModel.Conversations is null) return;
-
-        foreach (var conversation in ViewModel.Conversations)
-        {
-            var conversationId = conversation.ThreadId;
-            GetOrCreateConversationColor(conversationId);
-        }
-    }
-
-    private Color GetOrCreateConversationColor(long conversationId)
-    {
-        if (!conversationColors.TryGetValue(conversationId, out var color))
-        {
-            color = GenerateRandomColor();
-            conversationColors[conversationId] = color;
-        }
-        return color;
-    }
-
-    private Color GetOrCreateContactColor(string address)
-    {
-        if (!contactColors.TryGetValue(address, out var color))
-        {
-            color = GenerateRandomColor();
-            contactColors[address] = color;
-        }
-        return color;
-    }
-
-    private static readonly string[] PredefinedColors = [
-        "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7",
-        "#DDA0DD", "#98D8C8", "#F7DC6F", "#BB8FCE", "#85C1E9",
-        "#F8C471", "#82E0AA", "#F1948A", "#85C1E9", "#D7BDE2",
-        "#A9DFBF", "#F9E79F", "#AED6F1", "#FADBD8", "#D5DBDB"
-    ];
-
-    private Color GenerateRandomColor()
-    {
-        var randomColorHex = PredefinedColors[random.Next(PredefinedColors.Length)];
-        return randomColorHex.ToColor();
-    }
-
-    private static readonly char[] separator = [' ', '\t', '\n', '\r'];
-    private static string GetInitials(string displayName)
-    {
-        if (string.IsNullOrWhiteSpace(displayName))
-            return "?";
-
-        var words = displayName.Trim().Split(separator, StringSplitOptions.RemoveEmptyEntries);
-        
-        if (words.Length == 0)
-            return "?";
-        
-        if (words.Length == 1)
-        {
-            // Single word - take first two characters or just first if only one character
-            return words[0][..1].ToUpper();
-        }
-        
-        // Multiple words - take first letter of first two words
-        return (string.Concat(words[0].AsSpan()[..1], words[1].AsSpan(0, 1))).ToUpper();
-    }
-
-
-    private void ConversationAvatarBorder_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
-    {
-        if (sender is Border border)
-        {
-            if (border.DataContext is Conversation conversation)
-            {
-                var conversationId = conversation.ThreadId;
-                var backgroundColor = GetOrCreateConversationColor(conversationId);
-                border.Background = new SolidColorBrush(backgroundColor);
-                
-                // Set initials for text content if it's a TextBlock
-                if (border.Child is TextBlock textBlock)
-                {
-                    textBlock.Text = GetInitials(conversation.DisplayName);
-                }
-            }
-            else if (border.DataContext is ParticipantInfo contact)
-            {
-                // Handle contact suggestion avatars
-                var backgroundColor = GetOrCreateContactColor(contact.Address);
-                border.Background = new SolidColorBrush(backgroundColor);
-                
-                // Set initials for text content if it's a TextBlock
-                if (border.Child is TextBlock textBlock)
-                {
-                    textBlock.Text = GetInitials(contact.DisplayName);
-                }
-            }
-        }
-    }
-
-
-    private void MessageAvatarBorder_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
-    {
-        if (sender is Border border && border.DataContext is MessageGroup messageGroup)
-        {
-            // Use sender's address as the key so all messages from same sender have same color
-            var backgroundColor = GetOrCreateContactColor(messageGroup.Sender.Address);
-            border.Background = new SolidColorBrush(backgroundColor);
-            
-            // Set initials for text content if it's a TextBlock
-            if (border.Child is TextBlock textBlock)
-            {
-                textBlock.Text = GetInitials(messageGroup.Sender.DisplayName);
-            }
-        }
     }
 
     private void SendButton_Click(object sender, RoutedEventArgs e)
@@ -181,7 +31,7 @@ public sealed partial class MessagesPage : Page
         if (e.Key is Windows.System.VirtualKey.Enter)
         {
             var shiftPressed = Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Shift).HasFlag(Windows.UI.Core.CoreVirtualKeyStates.Down);
-            
+
             if (!shiftPressed && !string.IsNullOrWhiteSpace(MessageTextBox.Text))
             {
                 e.Handled = true;
@@ -264,7 +114,7 @@ public sealed partial class MessagesPage : Page
         var address = args.QueryText;
         if (!string.IsNullOrWhiteSpace(address))
         {
-            ViewModel.AddAddress(new Contact(address, address, address));
+            ViewModel.AddAddress(new Contact(address));
         }
 
         sender.Text = string.Empty;

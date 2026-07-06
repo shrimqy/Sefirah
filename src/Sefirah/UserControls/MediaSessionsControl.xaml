@@ -1,0 +1,167 @@
+﻿<UserControl
+    x:Class="Sefirah.UserControls.MediaSessionsControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:Sefirah.Converters"
+    xmlns:helpers="using:Sefirah.Helpers"
+    xmlns:models="using:Sefirah.Data.Models">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <converters:EmptyObjectToVisibilityConverter x:Key="EmptyObjectToVisibilityConverter" />
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <converters:CountToBooleanConverter x:Key="InverseCountToBooleanConverter" Inverse="True" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <FlipView
+        x:Name="MediaSessionFlipView"
+        Background="Transparent"
+        MaxHeight="124"
+        ItemsSource="{x:Bind ViewModel.Device.RemotePlaybackSessions, Mode=OneWay}"
+        x:Load="{x:Bind ViewModel.Device.RemotePlaybackSessions.Count, Converter={StaticResource InverseCountToBooleanConverter}, Mode=OneWay}">
+        <FlipView.ItemTemplate>
+            <DataTemplate x:DataType="models:MediaSession">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            Grid.Column="0"
+                            Width="94"
+                            Height="94"
+                            Background="Transparent"
+                            CornerRadius="4"
+                            Visibility="{x:Bind Thumbnail, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}">
+                            <Image Source="{x:Bind Thumbnail, Mode=OneWay}" Stretch="UniformToFill" />
+                        </Border>
+                        <StackPanel Grid.Column="1" Spacing="6" VerticalAlignment="Center">
+                            <TextBlock
+                                FontSize="12"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Text="{x:Bind AppName, Mode=OneWay}"
+                                TextTrimming="CharacterEllipsis"
+                                Visibility="{x:Bind AppName, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}" />
+                            <TextBlock
+                                FontSize="14"
+                                FontWeight="Medium"
+                                Text="{x:Bind TrackTitle, Mode=OneWay}"
+                                TextTrimming="CharacterEllipsis"
+                                TextWrapping="NoWrap"
+                                Visibility="{x:Bind TrackTitle, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}" />
+                            <TextBlock
+                                FontSize="12"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Text="{x:Bind Artist, Mode=OneWay}"
+                                TextTrimming="CharacterEllipsis"
+                                TextWrapping="NoWrap"
+                                Visibility="{x:Bind Artist, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}" />
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <Button
+                                    AutomationProperties.Name="{helpers:ResourceString Name=PreviousTrack}"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    Click="PreviousButton_Click"
+                                    Visibility="{x:Bind CanGoPrevious, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
+                                    <FontIcon FontSize="14" Glyph="&#xE892;" />
+                                </Button>
+                                <Button
+                                    AutomationProperties.Name="{helpers:ResourceString Name=PlayOrPause}"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    Click="PlayPauseButton_Click">
+                                    <FontIcon FontSize="14" Glyph="{x:Bind PlayPauseGlyph, Mode=OneWay}" />
+                                </Button>
+                                <Button
+                                    AutomationProperties.Name="{helpers:ResourceString Name=NextTrack}"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    Click="NextButton_Click"
+                                    Visibility="{x:Bind CanGoNext, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
+                                    <FontIcon FontSize="14" Glyph="&#xE893;" />
+                                </Button>
+                                <Button
+                                    AutomationProperties.Name="{helpers:ResourceString Name=MediaVolume}"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    Click="VolumeButton_Click"
+                                    Tag="{x:Bind}">
+                                    <FontIcon FontSize="14" Glyph="&#xE767;" />
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                    <Grid
+                        Grid.Row="1"
+                        ColumnSpacing="8"
+                        Visibility="{x:Bind IsVolumeSliderVisible, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="24" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            FontSize="14"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Glyph="&#xE767;" />
+                        <Slider
+                            Grid.Column="1"
+                            IsThumbToolTipEnabled="False"
+                            Maximum="100"
+                            Minimum="0"
+                            PointerCaptureLost="MediaVolumeSlider_PointerCaptureLost"
+                            Tag="{x:Bind}"
+                            Value="{x:Bind Volume, Mode=TwoWay}" />
+                        <TextBlock
+                            Grid.Column="2"
+                            VerticalAlignment="Center"
+                            FontSize="12"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="{x:Bind VolumePercentText, Mode=OneWay}" />
+                    </Grid>
+                    <Grid
+                        Grid.Row="2"
+                        ColumnSpacing="8"
+                        Visibility="{x:Bind IsPositionSliderVisible, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="24" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Grid.Column="0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            FontSize="12"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="{x:Bind PositionText, Mode=OneWay}" />
+                        <Slider
+                            Grid.Column="1"
+                            IsThumbToolTipEnabled="False"
+                            Maximum="{x:Bind MaxSeekTime, Mode=OneWay}"
+                            Minimum="{x:Bind MinSeekTime, Mode=OneWay}"
+                            PointerCaptureLost="MediaPositionSlider_PointerCaptureLost"
+                            Tag="{x:Bind}"
+                            Value="{x:Bind Position, Mode=TwoWay}" />
+                        <TextBlock
+                            Grid.Column="2"
+                            VerticalAlignment="Center"
+                            FontSize="12"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="{x:Bind MaxSeekTimeText, Mode=OneWay}" />
+                    </Grid>
+                </Grid>
+            </DataTemplate>
+        </FlipView.ItemTemplate>
+    </FlipView>
+</UserControl>

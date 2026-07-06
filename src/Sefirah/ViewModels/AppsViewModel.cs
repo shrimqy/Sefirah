@@ -72,15 +72,15 @@ public sealed partial class AppsViewModel : BaseViewModel
     {
         try
         {
-            if (app.DeviceInfo.Pinned)
+            if (app.Pinned)
             {
-                app.DeviceInfo.Pinned = false;
+                app.Pinned = false;
                 RemoteAppsRepository.UnpinApp(app, DeviceManager.ActiveDevice!.Id);
                 PinnedApps.Remove(app);
             }
             else
             {
-                app.DeviceInfo.Pinned = true;
+                app.Pinned = true;
                 RemoteAppsRepository.PinApp(app, DeviceManager.ActiveDevice!.Id);
                 PinnedApps.Add(app);
             }
@@ -117,12 +117,12 @@ public sealed partial class AppsViewModel : BaseViewModel
     {
         try
         {
-            if (!app.AppShortcutRegistered) 
+            if (app.AppShortcutRegistered) 
             {
                 await AppShortcutService.RemoveAppShortcutAsync(app.PackageName);
             }
 
-            var result = await AdbService.UninstallApp(DeviceManager.ActiveDevice!.Id, app.PackageName);
+            var result = await AdbService.UninstallApp(ActiveDevice!.Id, app.PackageName);
             if (!result) return;
 
             await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
@@ -132,7 +132,7 @@ public sealed partial class AppsViewModel : BaseViewModel
                 OnPropertyChanged(nameof(IsEmpty));
                 OnPropertyChanged(nameof(HasPinnedApps));
             });
-            await RemoteAppsRepository.RemoveDeviceFromApplication(app.PackageName, DeviceManager.ActiveDevice!.Id);
+            await RemoteAppsRepository.RemoveDeviceFromApplication(app.PackageName, ActiveDevice!.Id);
         }
         catch (Exception ex)
         {
@@ -157,7 +157,7 @@ public sealed partial class AppsViewModel : BaseViewModel
 
                 IsLoading = true;
                 Apps = RemoteAppsRepository.GetApplicationsForDevice(ActiveDevice.Id).ToObservableCollection();
-                PinnedApps = Apps.Where(a => a.DeviceInfo.Pinned).ToObservableCollection();
+                PinnedApps = Apps.Where(a => a.Pinned).ToObservableCollection();
                 foreach (var app in Apps) 
                 {
                     app.AppShortcutRegistered = AppShortcutService.IsShortcutRegistered(app.PackageName);
@@ -221,14 +221,15 @@ public sealed partial class AppsViewModel : BaseViewModel
                     existingApp.PackageName = appInfo.PackageName;
                     existingApp.AppName = appInfo.AppName;
                     existingApp.IconPath = appInfo.IconPath;
-                    existingApp.DeviceInfo = appInfo.DeviceInfo;
-                    
+                    existingApp.Pinned = appInfo.Pinned;
+                    existingApp.Filter = appInfo.Filter;
+
                     // Update pinned apps
-                    if (appInfo.DeviceInfo.Pinned && !PinnedApps.Contains(existingApp))
+                    if (appInfo.Pinned && !PinnedApps.Contains(existingApp))
                     {
                         PinnedApps.Add(existingApp);
                     }
-                    else if (!appInfo.DeviceInfo.Pinned && PinnedApps.Contains(existingApp))
+                    else if (!appInfo.Pinned && PinnedApps.Contains(existingApp))
                     {
                         PinnedApps.Remove(existingApp);
                     }
@@ -238,7 +239,7 @@ public sealed partial class AppsViewModel : BaseViewModel
                     // Add new app if it doesn't exist
                     appInfo.AppShortcutRegistered = AppShortcutService.IsShortcutRegistered(appInfo.PackageName);
                     Apps.Add(appInfo);
-                    if (appInfo.DeviceInfo.Pinned)
+                    if (appInfo.Pinned)
                     {
                         PinnedApps.Add(appInfo);
                     }
@@ -276,7 +277,7 @@ public sealed partial class AppsViewModel : BaseViewModel
     public AppsViewModel()
     {
         LoadApps();
-        
+
         RemoteAppsRepository.ApplicationListUpdated += OnApplicationListUpdated;
         RemoteAppsRepository.ApplicationItemUpdated += OnApplicationItemUpdated;
         DeviceManager.ActiveDeviceChanged += OnActiveDeviceChanged;

@@ -55,7 +55,7 @@ public class PairedDeviceEntity
             Name = Name,
             Model = Model,
             Certificate = Certificate,
-            Addresses = Addresses,
+            Addresses = [with(Addresses)],
             PhoneNumbers = PhoneNumbers,
             Wallpaper = await ImageHelper.ToBitmapAsync(WallpaperBytes),
             CallsTransportDeviceId = CallsTransportDeviceId,

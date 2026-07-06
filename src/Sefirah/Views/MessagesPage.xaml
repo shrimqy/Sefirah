@@ -7,6 +7,7 @@
     xmlns:data="using:Sefirah.Data.Models"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:entity="using:Sefirah.Data.AppDatabase.Models"
+    xmlns:controls="using:Sefirah.UserControls"
     xmlns:helpers="using:Sefirah.Helpers"
     xmlns:local="using:Sefirah.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -31,6 +32,59 @@
             TrueValue="{ThemeResource SystemControlForegroundBaseMediumBrush}"
             FalseValue="{ThemeResource TextFillColorPrimaryBrush}" />
 
+        <DataTemplate x:Key="ConversationSearchSuggestionTemplate" x:DataType="models:Conversation">
+            <StackPanel
+                Margin="0,8,0,8"
+                VerticalAlignment="Center"
+                Orientation="Horizontal">
+                <controls:ContactAvatar
+                    Width="36"
+                    Height="36"
+                    ImageProvider="{x:Bind AvatarStream, Mode=OneWay}"
+                    Initials="{x:Bind Initials, Mode=OneWay}"
+                    PlaceholderColorHex="{x:Bind PlaceholderColorHex, Mode=OneWay}"
+                    IsGroup="{x:Bind IsGroup, Mode=OneWay}" />
+                <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                    <TextBlock
+                        FontWeight="SemiBold"
+                        Text="{x:Bind DisplayName, Mode=OneWay}"
+                        TextTrimming="CharacterEllipsis" />
+                    <TextBlock
+                        Margin="0,4,0,0"
+                        FontSize="12"
+                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                        Text="{x:Bind LastMessage, Mode=OneWay}"
+                        TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ContactSearchSuggestionTemplate" x:DataType="data:Contact">
+            <StackPanel
+                Margin="0,8,0,8"
+                VerticalAlignment="Center"
+                Orientation="Horizontal">
+                <controls:ContactAvatar
+                    Width="36"
+                    Height="36"
+                    ImageProvider="{x:Bind AvatarStream, Mode=OneWay}"
+                    Initials="{x:Bind Initials, Mode=OneWay}"
+                    PlaceholderColorHex="{x:Bind PlaceholderColorHex, Mode=OneWay}" />
+                <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                    <TextBlock
+                        FontWeight="SemiBold"
+                        Text="{x:Bind DisplayName, Mode=OneWay}"
+                        TextTrimming="CharacterEllipsis" />
+                    <TextBlock
+                        Margin="0,4,0,0"
+                        FontSize="12"
+                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                        Text="{x:Bind Address, Mode=OneWay}"
+                        TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+
         <DataTemplate x:Key="MessageItemTemplate" x:DataType="models:Conversation">
             <Grid Height="72" Padding="12">
                 <Grid.ColumnDefinitions>
@@ -38,31 +92,16 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <!--  Avatar Column  -->
-                <Grid
+                <controls:ContactAvatar
                     Grid.Column="0"
                     Width="48"
                     Height="48"
                     Margin="0,0,12,0"
-                    VerticalAlignment="Center">
-                    <PersonPicture
-                        Width="48"
-                        DisplayName="{x:Bind DisplayName}"
-                        ProfilePicture="{x:Bind AvatarImage}"
-                        Visibility="{x:Bind AvatarImage, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
-                    <Border
-                        Width="48"
-                        Height="48"
-                        CornerRadius="24"
-                        DataContextChanged="ConversationAvatarBorder_DataContextChanged"
-                        Visibility="{x:Bind AvatarImage, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}">
-                        <FontIcon
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            FontSize="22"
-                            Glyph="{x:Bind AvatarGlyph}" />
-                    </Border>
-                </Grid>
+                    VerticalAlignment="Center"
+                    ImageProvider="{x:Bind AvatarStream}"
+                    Initials="{x:Bind Initials}"
+                    PlaceholderColorHex="{x:Bind PlaceholderColorHex}"
+                    IsGroup="{x:Bind IsGroup}" />
 
                 <!--  Text Column  -->
                 <Grid Grid.Column="1" VerticalAlignment="Center">
@@ -135,11 +174,17 @@
                     <Button
                         x:Name="NewMessageButton"
                         Grid.Column="1"
+                        Width="38"
+                        Height="38"
                         Margin="8,12,16,12"
+                        Padding="0"
+                        VerticalAlignment="Center"
                         AutomationProperties.Name="{helpers:ResourceString Name=NewMessage}"
                         Click="NewMessageButton_Click"
+                        CornerRadius="19"
+                        Style="{ThemeResource AccentButtonStyle}"
                         ToolTipService.ToolTip="{helpers:ResourceString Name=NewMessage}">
-                        <FontIcon FontSize="20" Glyph="&#xE932;" />
+                        <FontIcon FontSize="17" Glyph="&#xE932;" />
                     </Button>
                 </Grid>
 
@@ -150,72 +195,13 @@
                     Margin="16,0,16,12"
                     VerticalAlignment="Center"
                     AutomationProperties.Name="Messages AutoSuggestBox"
-
+                    ItemTemplate="{StaticResource ConversationSearchSuggestionTemplate}"
                     PlaceholderText="{helpers:ResourceString Name=SearchMessages}"
                     QueryIcon="Find"
                     QuerySubmitted="SearchBox_QuerySubmitted"
                     SuggestionChosen="SearchBox_SuggestionChosen"
                     TextChanged="SearchBox_TextChanged"
-                    UpdateTextOnSelect="False">
-                    <AutoSuggestBox.ItemTemplate>
-                        <DataTemplate x:DataType="models:Conversation">
-                            <Grid Margin="0,8,0,8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-
-                                <!--  Avatar Column  -->
-                                <Grid
-                                    Grid.Column="0"
-                                    Width="40"
-                                    Height="40"
-                                    Margin="0,0,12,0"
-                                    VerticalAlignment="Center">
-                                    <PersonPicture
-                                        Width="40"
-                                        DisplayName="{x:Bind DisplayName}"
-                                        ProfilePicture="{x:Bind AvatarImage}"
-                                        Visibility="{x:Bind AvatarImage, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
-                                    <Border
-                                        Width="40"
-                                        Height="40"
-                                        CornerRadius="20"
-                                        DataContextChanged="ConversationAvatarBorder_DataContextChanged"
-                                        Visibility="{x:Bind AvatarImage, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}">
-                                        <FontIcon
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            FontSize="20"
-                                            Glyph="{x:Bind AvatarGlyph}" />
-                                    </Border>
-                                </Grid>
-
-                                <!--  Text Column  -->
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <TextBlock
-                                        MaxWidth="280"
-                                        FontWeight="SemiBold"
-                                        Text="{x:Bind DisplayName}"
-                                        TextTrimming="CharacterEllipsis" />
-                                    <TextBlock
-                                        MaxWidth="280"
-                                        Margin="0,4,0,0"
-                                        FontSize="12"
-                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                                        Text="{x:Bind LastMessage}"
-                                        TextTrimming="CharacterEllipsis" />
-                                </StackPanel>
-                            </Grid>
-                        </DataTemplate>
-                    </AutoSuggestBox.ItemTemplate>
-                    <AutoSuggestBox.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <Setter Property="Padding" Value="12,8" />
-                            <Setter Property="MinHeight" Value="60" />
-                        </Style>
-                    </AutoSuggestBox.ItemContainerStyle>
-                </AutoSuggestBox>
+                    UpdateTextOnSelect="False" />
 
                 <ListView
                     x:Name="MessagesList"
@@ -293,32 +279,16 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <!--  Avatar  -->
-                    <Grid
+                    <controls:ContactAvatar
                         Grid.Column="0"
                         Width="48"
                         Height="48"
                         Margin="0,0,12,0"
-                        VerticalAlignment="Top">
-                        <PersonPicture
-                            Width="48"
-                            DisplayName="{x:Bind ViewModel.SelectedConversation.DisplayName, Mode=OneWay}"
-                            ProfilePicture="{x:Bind ViewModel.SelectedConversation.AvatarImage, Mode=OneWay}"
-                            Visibility="{x:Bind ViewModel.SelectedConversation.AvatarImage, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
-                        <Border
-                            x:Name="AvatarGlyphBorder"
-                            Width="48"
-                            Height="48"
-                            CornerRadius="24"
-                            Visibility="{x:Bind ViewModel.SelectedConversation.AvatarImage, Mode=OneWay, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}">
-                            <FontIcon
-                                x:Name="AvatarGlyphIcon"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                FontSize="24"
-                                Glyph="{x:Bind ViewModel.SelectedConversation.AvatarGlyph, Mode=OneWay}" />
-                        </Border>
-                    </Grid>
+                        VerticalAlignment="Top"
+                        ImageProvider="{x:Bind ViewModel.SelectedConversation.AvatarStream, Mode=OneWay}"
+                        Initials="{x:Bind ViewModel.SelectedConversation.Initials, Mode=OneWay}"
+                        PlaceholderColorHex="{x:Bind ViewModel.SelectedConversation.PlaceholderColorHex, Mode=OneWay}"
+                        IsGroup="{x:Bind ViewModel.SelectedConversation.IsGroup, Mode=OneWay}" />
 
                     <!--  Name and Address  -->
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
@@ -332,7 +302,7 @@
                             FontSize="14"
                             Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                             IsTextSelectionEnabled="True"
-                            Text="{x:Bind ViewModel.SelectedConversation.Contacts[0].Address, Mode=OneWay, FallbackValue=''}"
+                            Text="{x:Bind ViewModel.SelectedConversation.SubtitleAddress, Mode=OneWay, FallbackValue=''}"
                             TextWrapping="Wrap" />
                     </StackPanel>
                 </Grid>
@@ -345,65 +315,12 @@
                     <AutoSuggestBox
                         x:Name="AddressInput"
                         AutomationProperties.Name="New conversation address input"
-                        ItemsSource="{x:Bind ViewModel.SearchContactsResults, Mode=OneWay}"
+                        ItemTemplate="{StaticResource ContactSearchSuggestionTemplate}"
                         PlaceholderText="{helpers:ResourceString Name=AddressInputPlaceholder}"
                         QuerySubmitted="AddressInput_QuerySubmitted"
                         SuggestionChosen="AddressInput_SuggestionChosen"
                         TextChanged="AddressInput_TextChanged"
-                        UpdateTextOnSelect="False">
-                        <AutoSuggestBox.ItemTemplate>
-                            <DataTemplate x:DataType="data:Contact">
-                                <Grid Margin="0,8,0,8">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-
-                                    <!--  Avatar Column  -->
-                                    <Grid
-                                        Grid.Column="0"
-                                        Width="40"
-                                        Height="40"
-                                        Margin="0,0,12,0"
-                                        VerticalAlignment="Center">
-                                        <PersonPicture
-                                            Width="40"
-                                            DisplayName="{x:Bind DisplayName}"
-                                            ProfilePicture="{x:Bind Avatar}"
-                                            Visibility="{x:Bind Avatar, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
-                                        <Border
-                                            Width="40"
-                                            Height="40"
-                                            VerticalAlignment="Center"
-                                            CornerRadius="20"
-                                            DataContextChanged="ConversationAvatarBorder_DataContextChanged"
-                                            Visibility="{x:Bind Avatar, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}">
-                                            <TextBlock
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                FontSize="18" />
-                                        </Border>
-                                    </Grid>
-
-                                    <!--  Text Column  -->
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                        <TextBlock
-                                            MaxWidth="280"
-                                            FontWeight="SemiBold"
-                                            Text="{x:Bind DisplayName}"
-                                            TextTrimming="CharacterEllipsis" />
-                                        <TextBlock
-                                            MaxWidth="280"
-                                            Margin="0,4,0,0"
-                                            FontSize="12"
-                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                                            Text="{x:Bind Address}"
-                                            TextTrimming="CharacterEllipsis" />
-                                    </StackPanel>
-                                </Grid>
-                            </DataTemplate>
-                        </AutoSuggestBox.ItemTemplate>
-                    </AutoSuggestBox>
+                        UpdateTextOnSelect="False" />
                 </Grid>
 
                 <!--  Address list  -->
@@ -431,30 +348,15 @@
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <Grid
+                                        <controls:ContactAvatar
                                             Grid.Column="0"
                                             Width="24"
                                             Height="24"
                                             Margin="0,0,12,0"
-                                            VerticalAlignment="Center">
-                                            <PersonPicture
-                                                Width="24"
-                                                DisplayName="{x:Bind DisplayName}"
-                                                ProfilePicture="{x:Bind Avatar}"
-                                                Visibility="{x:Bind Avatar, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
-                                            <Border
-                                                Width="24"
-                                                Height="24"
-                                                VerticalAlignment="Center"
-                                                CornerRadius="12"
-                                                DataContextChanged="ConversationAvatarBorder_DataContextChanged"
-                                                Visibility="{x:Bind Avatar, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}">
-                                                <TextBlock
-                                                    HorizontalAlignment="Center"
-                                                    VerticalAlignment="Center"
-                                                    FontSize="18" />
-                                            </Border>
-                                        </Grid>
+                                            VerticalAlignment="Center"
+                                            ImageProvider="{x:Bind AvatarStream}"
+                                            Initials="{x:Bind Initials}"
+                                            PlaceholderColorHex="{x:Bind PlaceholderColorHex}" />
                                         <TextBlock
                                             Grid.Column="1"
                                             Margin="0,0,12,0"
@@ -543,31 +445,15 @@
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
-                                <!--  Avatar  -->
-                                <Grid
+                                <controls:ContactAvatar
                                     Grid.Column="0"
                                     Width="32"
                                     Height="32"
                                     Margin="0,0,8,0"
-                                    VerticalAlignment="Top">
-                                    <PersonPicture
-                                        Width="32"
-                                        Height="32"
-                                        DisplayName="{x:Bind Sender.DisplayName}"
-                                        ProfilePicture="{x:Bind Sender.Avatar}"
-                                        Visibility="{x:Bind Sender.Avatar, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
-                                    <Border
-                                        Width="32"
-                                        Height="32"
-                                        CornerRadius="16"
-                                        DataContextChanged="MessageAvatarBorder_DataContextChanged"
-                                        Visibility="{x:Bind Sender.Avatar, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}">
-                                        <TextBlock
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            FontSize="14" />
-                                    </Border>
-                                </Grid>
+                                    VerticalAlignment="Top"
+                                    ImageProvider="{x:Bind Sender.AvatarStream}"
+                                    Initials="{x:Bind Sender.Initials}"
+                                    PlaceholderColorHex="{x:Bind Sender.PlaceholderColorHex}" />
 
                                 <StackPanel Grid.Column="1">
                                     <!--  Sender Name  -->

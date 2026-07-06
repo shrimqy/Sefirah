@@ -2,6 +2,8 @@ namespace Sefirah.Data.Contracts;
 
 public interface IPhoneCall : IDisposable
 {
+    string TransportDeviceId { get; }
+
     string CallId { get; }
 
     CallingPhoneCallStatus Status { get; }

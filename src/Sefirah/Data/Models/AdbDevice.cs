@@ -1,5 +1,4 @@
 using AdvancedSharpAdbClient.Models;
-using Sefirah.Data.Enums;
 
 namespace Sefirah.Data.Models;
 
@@ -67,7 +66,8 @@ public partial class AdbDevice : ObservableObject
         {
             if (SetProperty(ref type, value))
             {
-                OnPropertyChanged(nameof(TypeDisplay));
+                OnPropertyChanged(nameof(TypeIconGlyph));
+                OnPropertyChanged(nameof(CanDisconnect));
             }
         }
     }
@@ -86,7 +86,9 @@ public partial class AdbDevice : ObservableObject
         set => SetProperty(ref isConnected, value);
     }
 
-    public string TypeDisplay => Type is DeviceType.WIFI ? "WiFi" : "USB";
+    public string TypeIconGlyph => Type is DeviceType.WIFI ? "\uECF1" : "\uE88E";
+
+    public bool CanDisconnect => Type is DeviceType.WIFI;
     
     public bool IsOnline => State is DeviceState.Online;
 

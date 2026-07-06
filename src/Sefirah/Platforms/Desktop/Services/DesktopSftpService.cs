@@ -9,9 +9,15 @@ public class DesktopSftpService(ILogger<DesktopSftpService> logger) : ISftpServi
 
     public async Task InitializeAsync(PairedDevice device, SftpServerInfo info)
     {
-        logger.Info($"Initializing SFTP service for device {device.Name}, IP: {info.IpAddress}, Port: {info.Port}");
+        if (string.IsNullOrEmpty(device.Address))
+        {
+            logger.Warn($"Cannot initialize SFTP service for {device.Name}: device has no address");
+            return;
+        }
 
-        var sftpUri = $"sftp://{info.Username}@{info.IpAddress}:{info.Port}/";
+        logger.Info($"Initializing SFTP service for device {device.Name}, IP: {device.Address}, Port: {info.Port}");
+
+        var sftpUri = $"sftp://{info.Username}@{device.Address}:{info.Port}/";
         
         logger.Info($"Mounting SFTP for device {device.Name}");
 

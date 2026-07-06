@@ -8,22 +8,28 @@ public class CallLogRepository(
     ContactRepository contactRepository,
     ILogger logger)
 {
+    public const int MaxCallLogsPerDevice = 200;
+
     public event EventHandler<(string deviceId, CallLog callLog)>? CallLogUpdated;
 
     public async Task<List<CallLog>> GetCallLogsAsync(string deviceId)
     {
         try
         {
-            var logEntities = await Task.Run(() => context.Database.Table<CallLogEntity>()
-                .Where(log => log.DeviceId == deviceId)
-                .OrderByDescending(log => log.TimestampMillis)
-                .ToList());
+            var logEntities = await Task.Run(() =>
+            {
+                TrimCallLogs(deviceId);
+                return context.Database.Table<CallLogEntity>()
+                    .Where(log => log.DeviceId == deviceId)
+                    .OrderByDescending(log => log.TimestampMillis)
+                    .ToList();
+            });
 
             var logs = new List<CallLog>(logEntities.Count);
             foreach (var logEntity in logEntities)
             {
-                var contact = contactRepository.GetCallerContactByPhoneNumber(logEntity.PhoneNumber);
-                var log = logEntity.ToCallLogAsync(contact);
+                var contact = contactRepository.GetContact(logEntity.DeviceId, logEntity.PhoneNumber);
+                var log = logEntity.ToCallLog(contact);
                 logs.Add(log);
             }
 
@@ -40,18 +46,14 @@ public class CallLogRepository(
     {
         try
         {
+            if (log.ContactInfo is not null)
+                await contactRepository.SaveContactAsync(deviceId, log.ContactInfo);
+
             var entity = CallLogEntity.FromModel(deviceId, log);
             await Task.Run(() => context.Database.InsertOrReplace(entity));
 
-            if (log.ContactInfo is not null)
-            {
-                await contactRepository.SaveContactAsync(deviceId, log.ContactInfo);
-            }
-
-            var contact = contactRepository.GetCallerContactByPhoneNumber(log.PhoneNumber);
-
-            var callLog = entity.ToCallLogAsync(contact);
-            CallLogUpdated?.Invoke(this, (deviceId, callLog));
+            var contact = contactRepository.GetContact(deviceId, log.PhoneNumber);
+            CallLogUpdated?.Invoke(this, (deviceId, entity.ToCallLog(contact)));
         }
         catch (Exception ex)
         {
@@ -59,6 +61,18 @@ public class CallLogRepository(
         }
     }
 
+    private void TrimCallLogs(string deviceId)
+    {
+        var count = context.Database.Table<CallLogEntity>().Count(log => log.DeviceId == deviceId);
+
+        if (count <= MaxCallLogsPerDevice)
+            return;
+
+        var excess = count - MaxCallLogsPerDevice;
+        context.Database.Execute(
+            "DELETE FROM CallLogEntity WHERE DeviceId = ? AND Key IN (SELECT Key FROM CallLogEntity WHERE DeviceId = ? ORDER BY TimestampMillis ASC LIMIT ?)",
+            deviceId, deviceId, excess);
+    }
 
     /// <summary>
     /// Deletes all call log entries for a device. Call when a device is removed.

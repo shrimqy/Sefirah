@@ -50,16 +50,11 @@ public class NotificationService(
         await notificationLock.WaitAsync();
         try
         {
-            var entities = await notificationRepository.GetNotificationsAsync(device.Id);
-            await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
+            var notifications = await notificationRepository.GetNotificationsAsync(device.Id);
+            await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
             {
                 Notifications.Clear();
-                foreach (var entity in entities)
-                {
-                    var notification = await entity.ToNotificationAsync();
-                    if (notification is not null) Notifications.Add(notification);
-                }
-                SortNotifications();
+                Notifications.AddRange(notifications);
                 UpdateBadge();
             });
         }
@@ -99,16 +94,15 @@ public class NotificationService(
 
             if (filter is NotificationFilter.Disabled) return;
 
-            notificationRepository.SaveNotification(message, device.Id);
+            await notificationRepository.SaveNotificationAsync(message, device.Id);
+
+            var notification = notificationRepository.GetNotification(device.Id, message.NotificationKey)?.ToNotification();
+            if (notification is null) return;
 
             await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
             {
-                var notification = await Notification.FromMessage(message);
-
                 if (device == deviceManager.ActiveDevice)
-                {
-                    await HandleNotificationForActiveDevice(notification);
-                }
+                    HandleNotificationForActiveDevice(notification);
 
                 if (message.InfoType is NotificationInfoType.New && filter is NotificationFilter.ToastFeed)
                 {
@@ -128,19 +122,19 @@ public class NotificationService(
         }
     }
 
-    private async Task HandleNotificationForActiveDevice(Notification notification)
+    private void HandleNotificationForActiveDevice(Notification notification)
     {
         var existing = Notifications.FirstOrDefault(n => n.Key == notification.Key);
         if (existing is not null)
         {
             var index = Notifications.IndexOf(existing);
-            notification.Pinned = existing.Pinned;
             Notifications[index] = notification;
         }
         else
         {
             Notifications.Insert(0, notification);
         }
+
         SortNotifications();
         UpdateBadge();
     }
@@ -178,7 +172,7 @@ public class NotificationService(
         });
 
         UpdateBadge();
-        notificationRepository.UpdateNotificationPin(notification, activeDevice.Id);
+        await notificationRepository.UpdateNotificationPinAsync(notification, activeDevice.Id);
     }
 
     public async void RemoveNotification(PairedDevice device, Notification notification)
@@ -268,7 +262,7 @@ public class NotificationService(
         await notificationLock.WaitAsync();
         try
         {
-            notificationRepository.ClearHistoryForDevice(device.Id);
+            await notificationRepository.ClearHistoryForDeviceAsync(device.Id);
 
             if (device == deviceManager.ActiveDevice)
             {
@@ -296,18 +290,15 @@ public class NotificationService(
     {
         var sortedNotifications = Notifications
             .OrderByDescending(n => n.Pinned)
-            .ThenByDescending(n => n.TimeStamp)
+            .ThenByDescending(n => n.TimestampMillis)
             .ToList();
 
-        // Move items to their correct positions
-        for (int targetIndex = 0; targetIndex < sortedNotifications.Count; targetIndex++)
+        for (var targetIndex = 0; targetIndex < sortedNotifications.Count; targetIndex++)
         {
             var targetNotification = sortedNotifications[targetIndex];
             var currentIndex = Notifications.IndexOf(targetNotification);
             if (currentIndex != targetIndex)
-            {
                 Notifications.Move(currentIndex, targetIndex);
-            }
         }
     }
 

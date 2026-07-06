@@ -139,7 +139,10 @@ public sealed class WindowsPhoneLineService(
             var result = await line.GetAllActivePhoneCallsAsync();
             foreach (var activeCall in result.AllActivePhoneCalls)
             {
-                CallStateChanged?.Invoke(this, new PhoneCall(activeCall));
+                if (string.IsNullOrEmpty(line.TransportDeviceId))
+                    continue;
+
+                CallStateChanged?.Invoke(this, new PhoneCall(activeCall, line.TransportDeviceId));
             }
         }
         catch (Exception ex)
@@ -160,7 +163,12 @@ public sealed class WindowsPhoneLineService(
                 foreach (var activeCall in result.AllActivePhoneCalls)
                 {
                     if (seenCallIds.Add(activeCall.CallId))
-                        CallStateChanged?.Invoke(this, new PhoneCall(activeCall));
+                    {
+                        if (string.IsNullOrEmpty(line.TransportDeviceId))
+                            continue;
+
+                        CallStateChanged?.Invoke(this, new PhoneCall(activeCall, line.TransportDeviceId));
+                    }
                 }
             }
             catch (Exception ex)
@@ -172,7 +180,7 @@ public sealed class WindowsPhoneLineService(
 
     public async Task DialAsync(string phoneNumber, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(ActiveTransportId))
+        if (string.IsNullOrEmpty(ActiveTransportId) || ActiveDevice is null)
             return;
 
         var line = FindLineByTransport(ActiveTransportId);
@@ -194,7 +202,7 @@ public sealed class WindowsPhoneLineService(
             }
 
             await phoneCall.ChangeAudioDeviceAsync(PhoneCallAudioDevice.LocalDevice);
-            CallStateChanged?.Invoke(this, new PhoneCall(phoneCall));
+            CallStateChanged?.Invoke(this, new PhoneCall(phoneCall, ActiveTransportId));
         }
         catch (Exception ex)
         {

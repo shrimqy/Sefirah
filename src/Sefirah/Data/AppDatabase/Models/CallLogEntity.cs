@@ -6,7 +6,7 @@ namespace Sefirah.Data.AppDatabase.Models;
 public class CallLogEntity
 {
     [PrimaryKey]
-    public string LogKey { get; set; } = string.Empty;
+    public string Key { get; set; } = string.Empty;
 
     [Indexed]
     public string DeviceId { get; set; } = string.Empty;
@@ -21,35 +21,27 @@ public class CallLogEntity
 
     public CallLogType CallType { get; set; }
 
-    public static CallLogEntity FromModel(string deviceId, CallLogInfo log)
-    {
-        return new CallLogEntity
-        {
-            LogKey = $"{deviceId}:id:{log.CallLogId}",
-            DeviceId = deviceId,
-            CallLogId = log.CallLogId,
-            PhoneNumber = log.PhoneNumber,
-            TimestampMillis = log.TimestampMillis,
-            DurationSeconds = log.DurationSeconds,
-            CallType = log.CallType,
-        };
-    }
+    public static string GetKey(string deviceId, long callLogId) => $"{deviceId}:{callLogId}";
 
-    public CallLog ToCallLogAsync(CallerContact? contact = null)
+    public static CallLogEntity FromModel(string deviceId, CallLogInfo log) => new()
     {
-        var displayName = contact is null || string.IsNullOrWhiteSpace(contact.DisplayName)
-            ? PhoneNumber
-            : contact.DisplayName;
+        Key = GetKey(deviceId, log.CallLogId),
+        DeviceId = deviceId,
+        CallLogId = log.CallLogId,
+        PhoneNumber = log.PhoneNumber,
+        TimestampMillis = log.TimestampMillis,
+        DurationSeconds = log.DurationSeconds,
+        CallType = log.CallType,
+    };
 
-        return new CallLog
+    public CallLog ToCallLog(Contact? contact = null)
+    {
+        return new CallLog(contact ?? new Contact(PhoneNumber))
         {
             CallLogId = CallLogId,
-            PhoneNumber = PhoneNumber,
             TimestampMillis = TimestampMillis,
             DurationSeconds = DurationSeconds,
             CallType = CallType,
-            DisplayName = displayName,
-            AvatarImage = contact?.Avatar,
         };
     }
 }

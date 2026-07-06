@@ -12,8 +12,7 @@ public static class NetworkHelper
         
         foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
         {
-            if (ni.NetworkInterfaceType is NetworkInterfaceType.Wireless80211 or NetworkInterfaceType.Ethernet &&
-                ni.OperationalStatus is OperationalStatus.Up)
+            if (ni.OperationalStatus is OperationalStatus.Up)
             {
                 var gateway = ni.GetIPProperties().GatewayAddresses
                     .FirstOrDefault(g => g.Address.AddressFamily is AddressFamily.InterNetwork)?.Address;

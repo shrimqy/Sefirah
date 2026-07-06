@@ -31,6 +31,11 @@ public interface IDeviceManager
     PairedDevice? FindDeviceById(string deviceId);
 
     /// <summary>
+    /// Finds a paired device by its Windows phone-line transport device ID.
+    /// </summary>
+    PairedDevice? FindDeviceByTransportId(string transportDeviceId);
+
+    /// <summary>
     /// Gets the device info.
     /// </summary>
     Task<PairedDeviceEntity> GetPairedDevice(string deviceId);
@@ -41,9 +46,9 @@ public interface IDeviceManager
     Task RemoveDevice(PairedDevice device);
 
     /// <summary>
-    /// Updates the device in the database.
+    /// Persists the paired device's current state to the database.
     /// </summary>
-    Task UpdateDevice(PairedDeviceEntity device);
+    Task UpdateDevice(PairedDevice device);
 
     /// <summary>
     /// Gets the local device.

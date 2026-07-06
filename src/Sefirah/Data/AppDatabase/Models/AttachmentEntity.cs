@@ -9,13 +9,13 @@ public class AttachmentEntity
     public int Id { get; set; }
 
     [Indexed]
-    public long MessageUniqueId { get; set; }
+    public string MessageKey { get; set; } = string.Empty;
 
     public byte[]? Data { get; set; }
 
-    public static AttachmentEntity FromAttachment(SmsAttachment attachment, long messageUniqueId) => new()
+    public static AttachmentEntity FromAttachment(SmsAttachment attachment, string messageKey) => new()
     {
-        MessageUniqueId = messageUniqueId,
+        MessageKey = messageKey,
         Data = Convert.FromBase64String(attachment.Base64EncodedFile!)
     };
 }

@@ -1,4 +1,3 @@
-using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
@@ -25,7 +24,7 @@ public class SmsHandlerService(
             var list = new List<Conversation>();
             foreach (var entity in conversationEntities)
             {
-                var conversation = await entity.ToConversationAsync(contactRepository);
+                var conversation = entity.ToConversation(contactRepository);
                 list.Add(conversation);
             }
             return list;
@@ -64,16 +63,13 @@ public class SmsHandlerService(
         }
     }
 
-    private async Task<List<Message>> ToMessagesAsync(string deviceId, List<TextMessage> textMessages)
+    private static List<Message> ToMessages(string deviceId, List<TextMessage> textMessages, ContactRepository contactRepository)
     {
-        var messages = new List<Message>();
+        List<Message> messages = [];
         foreach (var tm in textMessages)
         {
             var address = tm.Addresses.Count > 0 ? tm.Addresses[0] : string.Empty;
-            var contactEntity = await contactRepository.GetContactAsync(deviceId, address);
-            var participant = contactEntity is not null
-                ? await App.MainWindow.DispatcherQueue.EnqueueAsync(() => contactEntity.ToParticipantInfo())
-                : new ParticipantInfo(address, address);
+            var participant = contactRepository.GetContact(deviceId, address);
             messages.Add(new Message
             {
                 UniqueId = tm.UniqueId,
@@ -117,8 +113,8 @@ public class SmsHandlerService(
 
             await smsRepository.SaveConversationAsync(conversationEntity);
             await SaveMessagesFromConversation(deviceId, textConversation);
-            var conversation = await conversationEntity.ToConversationAsync(contactRepository);
-            var newMessages = await ToMessagesAsync(deviceId, textConversation.Messages);
+            var conversation = conversationEntity.ToConversation(contactRepository);
+            var newMessages = ToMessages(deviceId, textConversation.Messages, contactRepository);
             ConversationUpdated?.Invoke(this, (deviceId, textConversation.ThreadId, conversation, newMessages));
         }
         catch (Exception ex)
@@ -163,7 +159,7 @@ public class SmsHandlerService(
             
         foreach (var entity in messageEntities)
         {
-            var message = await entity.ToMessageAsync(contactRepository);
+            var message = entity.ToMessage(contactRepository);
             messages.Add(message);
         }
         return messages;

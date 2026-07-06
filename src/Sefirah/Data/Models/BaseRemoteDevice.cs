@@ -29,8 +29,6 @@ public abstract partial class BaseRemoteDevice : ObservableObject
 
     public byte[] Certificate { get; set; } = null!;
 
-    public string Address { get; set; } = string.Empty;
-
     public ServerSession? Session { get; set; }
 
     public Client? Client { get; set; }

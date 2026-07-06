@@ -1,8 +1,6 @@
 using Sefirah.Data.AppDatabase.Repository;
-using Sefirah.Data.Contracts;
-using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
-using Sefirah.Utils;
+using Sefirah.Data.Models.Messages;
 
 namespace Sefirah.ViewModels;
 
@@ -16,6 +14,7 @@ public sealed partial class MainPageViewModel : BaseViewModel
     private ISessionManager SessionManager { get; } = Ioc.Default.GetRequiredService<ISessionManager>();
     private IUpdateService UpdateService { get; } = Ioc.Default.GetRequiredService<IUpdateService>();
     private IFileTransferService FileTransferService { get; } = Ioc.Default.GetRequiredService<IFileTransferService>();
+    private IAdbService AdbService { get; } = Ioc.Default.GetRequiredService<IAdbService>();
     #endregion
 
     #region Properties
@@ -42,18 +41,13 @@ public sealed partial class MainPageViewModel : BaseViewModel
 
     #region Commands
 
-
     [RelayCommand]
-    public void ToggleConnection()
+    public void RefreshConnection()
     {
         if (Device!.IsConnected)
-        {
-            SessionManager.DisconnectDevice(Device, true);
-        }
-        else
-        {
-            SessionManager.ConnectTo(Device);
-        }
+            SessionManager.DisconnectDevice(Device);
+
+        SessionManager.Connect(Device);
     }
 
     [RelayCommand]
@@ -146,6 +140,24 @@ public sealed partial class MainPageViewModel : BaseViewModel
 
     #region Methods
 
+    public void ConnectToAddress(AddressEntry address)
+    {
+        if (Device!.IsConnected)
+            SessionManager.DisconnectDevice(Device);
+
+        SessionManager.Connect(Device, address.Address);
+    }
+
+    public void DisconnectConnection()
+    {
+        SessionManager.DisconnectDevice(Device!, true);
+    }
+
+    public async Task DisconnectAdbDevice(AdbDevice device)
+    {
+        await AdbService.DisconnectDeviceAsync(device);
+    }
+
     public async Task OpenApp(Notification notification)
     {
         var notificationToInvoke = new NotificationInfo
@@ -222,10 +234,7 @@ public sealed partial class MainPageViewModel : BaseViewModel
 
     public MainPageViewModel()
     {
-        DeviceManager.ActiveDeviceChanged += (s, e) =>
-        {
-           OnPropertyChanged(nameof(Device));
-        };
+        DeviceManager.ActiveDeviceChanged += (_, _) => OnPropertyChanged(nameof(Device));
 
         IsUpdateAvailable = UpdateService.IsUpdateAvailable;
         IsUpdating = UpdateService.IsUpdating;

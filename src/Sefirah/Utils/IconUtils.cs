@@ -1,5 +1,3 @@
-using Windows.Storage.Streams;
-
 namespace Sefirah.Utils;
 
 /// <summary>
@@ -7,7 +5,6 @@ namespace Sefirah.Utils;
 /// </summary>
 public static class IconUtils
 {
-    private const string AppIconsFolderName = "AppIcons";
     private const string ScrcpyIconsFolderName = "scrcpy-icons";
     private const string ScrcpyWindowIconFileName = "scrcpy.png";
 
@@ -17,138 +14,58 @@ public static class IconUtils
     public static string ScrcpyWindowIconPath =>
         Path.Combine(ScrcpyIconsDirectory, ScrcpyWindowIconFileName);
 
-    public static void SetScrcpyWindowIcon(string packageName)
-    {
-        SetScrcpyWindowIcon(packageName, ApplicationData.Current.LocalFolder.Path);
-    }
-
-    public static void SetScrcpyWindowIcon(string packageName, string localFolderPath)
+    public static void SetScrcpyWindowIcon(string deviceId, string packageName)
     {
         try
         {
-            if (string.IsNullOrEmpty(packageName))
-            {
+            if (string.IsNullOrEmpty(deviceId) || string.IsNullOrEmpty(packageName))
                 return;
-            }
 
-            var appIconPath = Path.Combine(localFolderPath, AppIconsFolderName, $"{packageName}.png");
+            var appIconPath = LocalAppPaths.GetAppIconFilePath(deviceId, packageName);
             if (!File.Exists(appIconPath))
-            {
                 return;
-            }
 
-            var scrcpyIconsDirectory = Path.Combine(localFolderPath, ScrcpyIconsFolderName);
-            var scrcpyWindowIconPath = Path.Combine(scrcpyIconsDirectory, ScrcpyWindowIconFileName);
-            Directory.CreateDirectory(scrcpyIconsDirectory);
-            File.Copy(appIconPath, scrcpyWindowIconPath, true);
+            Directory.CreateDirectory(ScrcpyIconsDirectory);
+            File.Copy(appIconPath, ScrcpyWindowIconPath, true);
         }
         catch (Exception) { }
     }
 
-    public static async Task<StorageFolder> GetAppIconsFolderAsync()
+    public static Uri? GetAppIconUri(string deviceId, string packageName)
     {
-        var localFolder = ApplicationData.Current.LocalFolder;
-        try
-        {
-            return await localFolder.GetFolderAsync(AppIconsFolderName);
-        }
-        catch (FileNotFoundException)
-        {
-            return await localFolder.CreateFolderAsync(AppIconsFolderName);
-        }
-    }
-
-    /// <summary>
-    /// Saves a base64 encoded image to a file and returns the URI
-    /// </summary>
-    /// <param name="base64">Base64 encoded image data</param>
-    /// <param name="fileName">Name of the file to save</param>
-    /// <returns>URI to the saved file</returns>
-    public static async Task<Uri> SaveBase64ToFileAsync(string base64, string fileName)
-    {
-        var bytes = Convert.FromBase64String(base64);
-        var localFolder = ApplicationData.Current.LocalFolder;
-        var file = await localFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
-
-        using var stream = await file.OpenAsync(FileAccessMode.ReadWrite);
-        using var dataWriter = new DataWriter(stream);
-        dataWriter.WriteBytes(bytes);
-        await dataWriter.StoreAsync();
-
-        return new Uri($"ms-appdata:///local/{fileName}");
-    }
-
-
-    /// <summary>
-    /// Gets the URI for an app icon file in the AppIcons folder
-    /// </summary>
-    /// <param name="packageName">Name of the app icon file</param>
-    /// <returns>URI to the app icon file</returns>
-    public static async Task<Uri?> GetAppIconUriAsync(string packageName)
-    {
-        try
-        {
-            var appIconsFolder = await GetAppIconsFolderAsync();
-            await appIconsFolder.GetFileAsync(packageName);
-            return new Uri($"ms-appdata:///local/{AppIconsFolderName}/{packageName}");
-        }
-        catch (FileNotFoundException)
-        {
+        if (!File.Exists(LocalAppPaths.GetAppIconFilePath(deviceId, packageName)))
             return null;
-        }
+
+        return new Uri(LocalAppPaths.GetAppIconPath(deviceId, packageName));
     }
 
-    public static string GetAppIconFilePath(string packageName)
-    {
-        return $"{ApplicationData.Current.LocalFolder.Path}\\{AppIconsFolderName}\\{packageName}.png";
-    }
-
-    public static string GetAppIconPath(string packageName)
-    {
-        return $"ms-appdata:///local/{AppIconsFolderName}/{packageName}.png";
-    }
-
-    /// <summary>
-    /// Saves app icon bytes to the AppIcons folder and returns the file system path
-    /// </summary>
-    /// <param name="appIconBase64">Base64 encoded app icon data</param>
-    /// <param name="appPackage">Package name of the app</param>
-    /// <returns>Task representing the async operation</returns>
-    public static async Task SaveAppIconToPathAsync(string? appIconBase64, string appPackage)
+    public static async Task SaveAppIconToPathAsync(string? appIconBase64, string deviceId, string appPackage)
     {
         try
         {
-            if (string.IsNullOrEmpty(appIconBase64)) return;
-            
+            if (string.IsNullOrEmpty(appIconBase64))
+                return;
+
             var bytes = Convert.FromBase64String(appIconBase64);
-            var appIconsFolder = await GetAppIconsFolderAsync();
-            var file = await appIconsFolder.CreateFileAsync($"{appPackage}.png", CreationCollisionOption.ReplaceExisting);
-            using var stream = await file.OpenAsync(FileAccessMode.ReadWrite);
-            using var dataWriter = new DataWriter(stream);
-            dataWriter.WriteBytes(bytes);
-            await dataWriter.StoreAsync();
+            var filePath = LocalAppPaths.GetAppIconFilePath(deviceId, appPackage);
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+            await File.WriteAllBytesAsync(filePath, bytes);
         }
         catch (Exception)
         {
         }
     }
 
-    /// <summary>
-    /// Deletes an app icon file from the AppIcons folder
-    /// </summary>
-    /// <param name="appPackage">Package name of the app</param>
-    public static void DeleteAppIcon(string appPackage)
+    public static void DeleteAppIcon(string deviceId, string appPackage)
     {
         try
         {
-            var filePath = GetAppIconFilePath(appPackage);
+            var filePath = LocalAppPaths.GetAppIconFilePath(deviceId, appPackage);
             if (File.Exists(filePath))
-            {
                 File.Delete(filePath);
-            }
         }
         catch (Exception)
         {
         }
     }
-} 
+}

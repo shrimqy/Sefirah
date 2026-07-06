@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
@@ -9,10 +8,12 @@ namespace Sefirah.Data.AppDatabase.Models;
 public class ConversationEntity
 {
     [PrimaryKey]
-    public long ThreadId { get; set; }
+    public string Key { get; set; } = string.Empty;
 
     [Indexed]
     public string DeviceId { get; set; } = string.Empty;
+
+    public long ThreadId { get; set; }
 
     public string? AddressesJson { get; set; }
 
@@ -28,13 +29,16 @@ public class ConversationEntity
     public List<string> Addresses { get; set; } = [];
 
     #region Helpers
+    public static string GetKey(string deviceId, long threadId) => $"{deviceId}:{threadId}";
+
     public static ConversationEntity FromMessage(ConversationInfo thread, string deviceId)
     {
         var latestMessage = thread.Messages.OrderByDescending(m => m.Timestamp).First();
         return new ConversationEntity
         {
-            ThreadId = thread.ThreadId,
+            Key = GetKey(deviceId, thread.ThreadId),
             DeviceId = deviceId,
+            ThreadId = thread.ThreadId,
             AddressesJson = JsonSerializer.Serialize(thread.Recipients),
             HasRead = thread.Messages.Any(m => m.Read),
             TimeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
@@ -43,47 +47,27 @@ public class ConversationEntity
         };
     }
 
-    internal async Task<Conversation> ToConversationAsync(ContactRepository contactRepository)
+    internal Conversation ToConversation(ContactRepository contactRepository)
     {
         if (!string.IsNullOrEmpty(AddressesJson))
-        {
             Addresses = JsonSerializer.Deserialize<List<string>>(AddressesJson) ?? [];
-        }
 
-        var contacts = new List<ParticipantInfo>();
+        var contacts = new List<Contact>();
         foreach (var address in Addresses)
         {
-            var contact = contactRepository.GetContactByPhoneNumber(address);
-            if (contact is not null)
-            {
-                contacts.Add(new ParticipantInfo(contact.Address, contact.DisplayName, contact.Avatar));
-            }
-            else
-            {
-                contacts.Add(new ParticipantInfo(address, address));
-            }
+            var contact = contactRepository.GetContact(DeviceId, address);
+            if (!contacts.Contains(contact))
+                contacts.Add(contact);
         }
-
-        string avatarGlyph = string.Empty;
-        if (contacts.Count == 1 && contacts[0].Avatar is null)
-        {
-            avatarGlyph = "\uE77B";
-        }
-        else if (contacts.Count > 1)
-        {
-            avatarGlyph = "\uE716";
-        }
-        var avatarImage = contacts.Count > 0 ? contacts[0].Avatar : null;
 
         return new Conversation
         {
+            ConversationKey = Key,
             ThreadId = ThreadId,
             Contacts = contacts,
             LastMessage = LastMessage ?? string.Empty,
             LastMessageTimestamp = LastMessageTimestamp,
             HasRead = HasRead,
-            AvatarGlyph = avatarGlyph,
-            AvatarImage = avatarImage,
         };
     }
     #endregion

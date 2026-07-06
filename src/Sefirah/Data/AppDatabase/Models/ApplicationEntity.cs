@@ -1,44 +1,55 @@
-using Sefirah.Data.Enums;
 using Sefirah.Data.Models;
 using Sefirah.Utils;
 using SQLite;
 
 namespace Sefirah.Data.AppDatabase.Models;
 
-public partial class ApplicationEntity
+public class ApplicationEntity
 {
     [PrimaryKey]
+    public string AppKey { get; set; } = string.Empty;
+
+    [Indexed]
+    public string DeviceId { get; set; } = string.Empty;
+
+    [Indexed]
     public string PackageName { get; set; } = string.Empty;
 
     public string AppName { get; set; } = string.Empty;
 
-    [Column("AppDeviceInfo")]
-    public string AppDeviceInfoJson { get; set; } = string.Empty;
+    public bool Pinned { get; set; }
 
-    [Ignore]
-    public List<AppDeviceInfo> AppDeviceInfoList
-    {
-        get => JsonSerializer.Deserialize<List<AppDeviceInfo>>(AppDeviceInfoJson) ?? [];
-        set => AppDeviceInfoJson = JsonSerializer.Serialize(value);
-    }
+    public NotificationFilter Filter { get; set; } = NotificationFilter.ToastFeed;
 
     #region Helpers
-    internal ApplicationItem ToApplicationItem(string deviceId)
-    {
-        var deviceInfo = AppDeviceInfoList.FirstOrDefault(d => d.DeviceId == deviceId) ?? new AppDeviceInfo(deviceId, NotificationFilter.ToastFeed);
-        return new ApplicationItem(PackageName, AppName, IconUtils.GetAppIconPath(PackageName), deviceInfo);
-    }
 
-    internal static async Task<ApplicationEntity> FromApplicationInfo(ApplicationInfo info, string deviceId)
+    public static string GetKey(string deviceId, string packageName) => $"{deviceId}:{packageName}";
+
+    public static async Task<ApplicationEntity> FromApplicationInfo(
+        ApplicationInfo info,
+        string deviceId,
+        bool pinned = false,
+        NotificationFilter filter = NotificationFilter.ToastFeed)
     {
-        List<AppDeviceInfo> appDeviceInfoList = [new(deviceId, NotificationFilter.ToastFeed)];
-        await IconUtils.SaveAppIconToPathAsync(info.AppIcon, info.PackageName);
+        await IconUtils.SaveAppIconToPathAsync(info.AppIcon, deviceId, info.PackageName);
+
         return new ApplicationEntity
         {
+            AppKey = GetKey(deviceId, info.PackageName),
+            DeviceId = deviceId,
             PackageName = info.PackageName,
             AppName = info.AppName,
-            AppDeviceInfoJson = JsonSerializer.Serialize(appDeviceInfoList)
+            Pinned = pinned,
+            Filter = filter,
         };
     }
+
+    internal ApplicationItem ToApplicationItem() =>
+        new(DeviceId, PackageName, AppName, LocalAppPaths.GetAppIconPath(DeviceId, PackageName))
+        {
+            Pinned = Pinned,
+            Filter = Filter,
+        };
+
     #endregion
 }

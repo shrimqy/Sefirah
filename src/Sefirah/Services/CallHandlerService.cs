@@ -1,7 +1,7 @@
 using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Models;
-using Sefirah.Utils;
+using Sefirah.Helpers;
 using Sefirah.ViewModels;
 using Sefirah.Views.WindowViews;
 
@@ -12,6 +12,7 @@ public class CallHandlerService(
     IPhoneLineService phoneLineService,
     CallLogRepository callLogRepository,
     ContactRepository contactRepository,
+    IDeviceManager deviceManager,
     ILogger logger) : ICallHandler, ICallManager
 {
     private CallWindow? ActiveCallWindow { get; set; }
@@ -41,14 +42,17 @@ public class CallHandlerService(
         {
             var callTag = BuildCallTag(device.Id, callInfo.PhoneNumber);
 
-            Uri? icon = null;
-            if (!string.IsNullOrEmpty(callInfo.ContactInfo?.PhotoBase64))
-            {
-                icon = await IconUtils.SaveBase64ToFileAsync(callInfo.ContactInfo.PhotoBase64, "callContact.png");
-            }
+            if (callInfo.ContactInfo is not null)
+                await contactRepository.SaveContactAsync(device.Id, callInfo.ContactInfo);
 
+            var contact = contactRepository.GetContact(
+                device.Id,
+                callInfo.PhoneNumber,
+                callInfo.ContactInfo?.DisplayName);
+
+            var icon = contact.HasAvatar ? await contact.GetToastAvatarUriAsync() : null;
             var title = callInfo.CallState is CallState.Ringing ? "CallIncoming".GetLocalizedResource() : "CallMissed".GetLocalizedResource();
-            await platformNotificationHandler.ShowCallNotification(title, GetDisplayText(callInfo), callTag, callInfo.CallState, icon);
+            await platformNotificationHandler.ShowCallNotification(title, contact.DisplayName, callTag, callInfo.CallState, icon);
         }
         catch (Exception ex)
         {
@@ -57,9 +61,6 @@ public class CallHandlerService(
     }
 
     private static string BuildCallTag(string deviceId, string phoneNumber) => $"call_{deviceId}_{phoneNumber}";
-
-    private static string GetDisplayText(CallInfo callInfo) =>
-        !string.IsNullOrWhiteSpace(callInfo.ContactInfo?.DisplayName) ? callInfo.ContactInfo.DisplayName : callInfo.PhoneNumber;
 
     private async void OnPhoneLineCallStateChanged(object? sender, IPhoneCall call)
     {
@@ -77,12 +78,12 @@ public class CallHandlerService(
                 case CallingPhoneCallStatus.Incoming:
                 {
                     var title = "CallIncoming".GetLocalizedResource();
-                    var (displayName, number, avatarUri) = await GetContactInfoAsync(call);
-                    // dispose call object since we don't need this anymore
+                    var (displayName, _, avatarUri) = await GetContactInfoAsync(call);
+                    var transportDeviceId = call.TransportDeviceId;
                     call.Dispose();
                     try
                     {
-                        await platformNotificationHandler.ShowCallNotification(callId, title, displayName, avatarUri);
+                        await platformNotificationHandler.ShowCallNotification(callId, transportDeviceId, title, displayName, avatarUri);
                     }
                     catch (Exception ex)
                     {
@@ -222,35 +223,19 @@ public class CallHandlerService(
         ActiveCallWindow?.UpdateWindowSize(SecondaryCall is not null);
     }
 
-    private async Task<CallerContact> GetContactAsync(IPhoneCall call)
+    private async Task<Contact> GetContactAsync(IPhoneCall call)
     {
         var info = await call.GetPhoneCallInfoAsync();
-        var number = info.PhoneNumber;
-
-        var contact = contactRepository.GetCallerContactByPhoneNumber(number);
-        if (contact is null)
-        {
-            var displayName = !string.IsNullOrWhiteSpace(info.DisplayName) ? info.DisplayName : null;
-            return new CallerContact(number, displayName);
-        }
-
-        return contact;
+        return contactRepository.GetContact(ResolveDeviceId(call), info.PhoneNumber, info.DisplayName);
     }
 
     private async Task<(string displayName, string phoneNumber, Uri? avatarUri)> GetContactInfoAsync(IPhoneCall call)
     {
         var info = await call.GetPhoneCallInfoAsync();
-        var number = info.PhoneNumber;
-
-        var contactEntity = await contactRepository.GetContactByPhoneNumberAsync(number);
-
-        if (contactEntity is null)
-        {
-            var displayName = !string.IsNullOrWhiteSpace(info.DisplayName) ? info.DisplayName : number;
-            return (displayName, number, null);
-        }
-
-        var avatarUri = contactEntity.Avatar is not null ? await IconUtils.SaveBase64ToFileAsync(Convert.ToBase64String(contactEntity.Avatar), "incomingCallContact.png") : null;
-        return (contactEntity.DisplayName, number, avatarUri);
+        var contact = contactRepository.GetContact(ResolveDeviceId(call), info.PhoneNumber, info.DisplayName);
+        var avatarUri = contact.HasAvatar ? await contact.GetToastAvatarUriAsync() : null;
+        return (contact.DisplayName, info.PhoneNumber, avatarUri);
     }
+
+    private string? ResolveDeviceId(IPhoneCall call) => deviceManager.FindDeviceByTransportId(call.TransportDeviceId)?.Id ?? deviceManager.ActiveDevice?.Id;
 }

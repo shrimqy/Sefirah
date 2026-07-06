@@ -1,4 +1,3 @@
-using CommunityToolkit.WinUI.Helpers;
 using Microsoft.UI.Xaml.Input;
 using Sefirah.Data.Models;
 using Sefirah.ViewModels;
@@ -8,17 +7,7 @@ namespace Sefirah.Views;
 public sealed partial class CallsPage : Page
 {
     public CallsPageViewModel ViewModel { get; }
-    private readonly Random random = new();
-    private readonly Dictionary<string, Windows.UI.Color> contactColors = [];
     private bool suppressZeroClick;
-
-    private static readonly string[] PredefinedColors =
-    [
-        "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7",
-        "#DDA0DD", "#98D8C8", "#F7DC6F", "#BB8FCE", "#85C1E9",
-        "#F8C471", "#82E0AA", "#F1948A", "#85C1E9", "#D7BDE2",
-        "#A9DFBF", "#F9E79F", "#AED6F1", "#FADBD8", "#D5DBDB"
-    ];
 
     public CallsPage()
     {
@@ -47,7 +36,7 @@ public sealed partial class CallsPage : Page
         if (args.Reason is AutoSuggestionBoxTextChangeReason.UserInput)
         {
             sender.ItemsSource = ViewModel.SearchContacts(sender.Text);
-    }
+        }
     }
 
     private void ContactSearch_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
@@ -73,18 +62,6 @@ public sealed partial class CallsPage : Page
         ViewModel.ApplySearchQueryAsNumber(args.QueryText);
         sender.Text = string.Empty;
         sender.ItemsSource = null;
-    }
-
-    private void CallAvatarBorder_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
-    {
-        if (sender is not Border border || border.DataContext is not CallLog callLog)
-        {
-            return;
-        }
-
-        var key = callLog.PhoneNumber;
-        var color = GetOrCreateContactColor(key);
-        border.Background = new SolidColorBrush(color);
     }
 
     private void CallLogs_ItemClick(object sender, ItemClickEventArgs e)
@@ -141,22 +118,5 @@ public sealed partial class CallsPage : Page
         }
 
         ViewModel.PhoneNumber = ViewModel.PhoneNumber[..^1];
-    }
-
-    private Windows.UI.Color GetOrCreateContactColor(string key)
-    {
-        if (!contactColors.TryGetValue(key, out var color))
-        {
-            color = GenerateRandomColor();
-            contactColors[key] = color;
-        }
-
-        return color;
-    }
-
-    private Windows.UI.Color GenerateRandomColor()
-    {
-        var randomColorHex = PredefinedColors[random.Next(PredefinedColors.Length)];
-        return randomColorHex.ToColor();
     }
 }

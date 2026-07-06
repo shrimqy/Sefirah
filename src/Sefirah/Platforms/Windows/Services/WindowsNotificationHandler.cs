@@ -1,7 +1,10 @@
 using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
+using Sefirah.Data.AppDatabase.Repository;
+using Sefirah.Data.Models;
 using Sefirah.Platforms.Windows.Calling;
 using Sefirah.Services;
+using Sefirah.Helpers;
 using Sefirah.Utils;
 using Windows.System;
 using static Sefirah.Constants;
@@ -13,10 +16,12 @@ namespace Sefirah.Platforms.Windows.Services;
 /// </summary>
 public class WindowsNotificationHandler(
     ILogger logger,
-    IDeviceManager deviceManager) : IPlatformNotificationHandler
+    IDeviceManager deviceManager,
+    RemoteAppRepository remoteAppRepository,
+    IScreenMirrorService screenMirrorService) : IPlatformNotificationHandler
 {
     /// <inheritdoc />
-    public async Task ShowRemoteNotification(Data.Models.NotificationInfo message, string deviceId)
+    public async Task ShowRemoteNotification(NotificationInfo message, string deviceId)
     {
         try
         {
@@ -29,18 +34,36 @@ public class WindowsNotificationHandler(
 
             if (!string.IsNullOrEmpty(message.LargeIcon))
             {
-                var fileUri = await IconUtils.SaveBase64ToFileAsync(message.LargeIcon, "largeIcon.png");
-                builder.SetAppLogoOverride(fileUri, AppNotificationImageCrop.Circle);
+                var fileUri = await ImageHelper.SaveToTemporaryFileFromBase64Async(message.LargeIcon);
+                if (fileUri is not null)
+                    builder.SetAppLogoOverride(fileUri, AppNotificationImageCrop.Circle);
             }
             else if (!string.IsNullOrEmpty(message.AppPackage))
             {
-                var iconUri = await IconUtils.GetAppIconUriAsync(message.AppPackage);
+                var iconUri = IconUtils.GetAppIconUri(deviceId, message.AppPackage);
                 if (iconUri is not null)
                 {
                     builder.SetAppLogoOverride(iconUri, AppNotificationImageCrop.Circle);
                 }
             }
             
+            if (!string.IsNullOrEmpty(message.AppPackage))
+            {
+                builder
+                    .AddArgument("notificationType", ToastNotificationType.RemoteNotification)
+                    .AddArgument("action", "OpenApp")
+                    .AddArgument("tag", message.NotificationKey)
+                    .AddArgument("deviceId", deviceId)
+                    .AddArgument("appPackage", message.AppPackage)
+                    .AddButton(new AppNotificationButton(string.Format("NotificationFilterButton".GetLocalizedResource(), message.AppName))
+                        .AddArgument("notificationType", ToastNotificationType.RemoteNotification)
+                        .AddArgument("action", "FilterApp")
+                        .AddArgument("tag", message.NotificationKey)
+                        .AddArgument("deviceId", deviceId)
+                        .AddArgument("appPackage", message.AppPackage)
+                        .SetContextMenuPlacement());
+            }
+
             // add textbox if a reply action exists
             if (!string.IsNullOrEmpty(message.ReplyResultKey))
             {
@@ -232,7 +255,7 @@ public class WindowsNotificationHandler(
     }
 
     /// <inheritdoc />
-    public Task ShowCallNotification(string callId, string title, string subtitle, Uri? icon = null)
+    public Task ShowCallNotification(string callId, string transportDeviceId, string title, string subtitle, Uri? icon = null)
     {
         try
         {
@@ -240,18 +263,20 @@ public class WindowsNotificationHandler(
                 .AddText(title, new AppNotificationTextProperties().SetMaxLines(1))
                 .AddText(subtitle)
                 .SetTag(callId)
-                .SetGroup(Notification.IncomingPhoneCallGroup)
+                .SetGroup(Constants.Notification.IncomingPhoneCallGroup)
                 .SetAudioEvent(AppNotificationSoundEvent.Call)
                 .AddButton(new AppNotificationButton("ConnectionRequestAcceptButton".GetLocalizedResource())
                     .SetButtonStyle(AppNotificationButtonStyle.Success)
                     .AddArgument("notificationType", ToastNotificationType.IncomingPhoneCall)
                     .AddArgument("action", "accept")
-                    .AddArgument("callId", callId))
+                    .AddArgument("callId", callId)
+                    .AddArgument("transportDeviceId", transportDeviceId))
                 .AddButton(new AppNotificationButton("ConnectionRequestRejectButton".GetLocalizedResource())
                     .SetButtonStyle(AppNotificationButtonStyle.Critical)
                     .AddArgument("notificationType", ToastNotificationType.IncomingPhoneCall)
                     .AddArgument("action", "decline")
-                    .AddArgument("callId", callId));
+                    .AddArgument("callId", callId)
+                    .AddArgument("transportDeviceId", transportDeviceId));
 
             if (icon is not null)
             {
@@ -329,7 +354,7 @@ public class WindowsNotificationHandler(
                     break;
                 
                 case ToastNotificationType.RemoteNotification:
-                    HandleMessageNotification(args);
+                    await HandleMessageNotificationAsync(args);
                     break;
 
                 case ToastNotificationType.Clipboard:
@@ -415,14 +440,16 @@ public class WindowsNotificationHandler(
     {
         if (!args.Arguments.TryGetValue("action", out var action) ||
             !args.Arguments.TryGetValue("callId", out var callId) ||
-            string.IsNullOrWhiteSpace(callId))
+            !args.Arguments.TryGetValue("transportDeviceId", out var transportDeviceId) ||
+            string.IsNullOrWhiteSpace(callId) ||
+            string.IsNullOrWhiteSpace(transportDeviceId))
         {
             return;
         }
 
         await AppNotificationManager.Default.RemoveByTagAsync(callId).AsTask();
 
-        var call = PhoneCall.FromCallId(callId);
+        var call = PhoneCall.FromCallId(callId, transportDeviceId);
         if (call is null)
         {
             logger.Info($"Incoming call notification action {action}: no session for {callId}");
@@ -462,7 +489,7 @@ public class WindowsNotificationHandler(
         call.Dispose();
     }
 
-    private void HandleMessageNotification(AppNotificationActivatedEventArgs args)
+    private async Task HandleMessageNotificationAsync(AppNotificationActivatedEventArgs args)
     {
         if (!args.Arguments.TryGetValue("action", out var actionType))
             return;
@@ -486,6 +513,27 @@ public class WindowsNotificationHandler(
                 if (args.Arguments.TryGetValue("actionIndex", out var actionIndexStr))
                 {
                     NotificationActionUtils.ProcessClickAction(device, notificationKey, int.Parse(actionIndexStr));
+                }
+                break;
+            case "OpenApp":
+                if (args.Arguments.TryGetValue("appPackage", out var appPackage) && !string.IsNullOrEmpty(appPackage))
+                {
+                    var app = remoteAppRepository.GetApplicationForDevice(device.Id, appPackage);
+                    if (app is not null && await screenMirrorService.StartScrcpy(device, app) && device.IsConnected)
+                    {
+                        await Task.Delay(2000);
+                        device.SendMessage(new NotificationInfo
+                        {
+                            NotificationKey = notificationKey,
+                            InfoType = NotificationInfoType.Invoke
+                        });
+                    }
+                }
+                break;
+            case "FilterApp":
+                if (args.Arguments.TryGetValue("appPackage", out var filterPackage) && !string.IsNullOrEmpty(filterPackage))
+                {
+                    remoteAppRepository.UpdateAppNotificationFilter(device.Id, filterPackage, NotificationFilter.Disabled);
                 }
                 break;
         }

@@ -1,4 +1,4 @@
-using Sefirah.Data.Contracts;
+using Sefirah.Utils;
 using Sefirah.Utils.Serialization;
 using Sefirah.Utils.Serialization.Implementation;
 
@@ -11,14 +11,12 @@ internal sealed class UserSettingsService : BaseJsonSettings, IUserSettingsServi
         get => GetSettingsService(ref _generalSettingsService);
     }
 
-    // Cache for device-specific settings
     private readonly Dictionary<string, IDeviceSettingsService> _deviceSettingsCache = [];
 
     public UserSettingsService()
     {
         SettingsSerializer = new SettingsSerializer();
-
-        Initialize(Path.Combine(ApplicationData.Current.LocalFolder.Path, Constants.LocalSettings.SettingsFolderName, Constants.LocalSettings.UserSettingsFileName));
+        Initialize(LocalAppPaths.GetUserSettingsPath());
 
         JsonSettingsSerializer = new JsonSettingsSerializer();
         JsonSettingsDatabase = new CachingJsonSettingsDatabase(SettingsSerializer, JsonSettingsSerializer);
@@ -36,7 +34,7 @@ internal sealed class UserSettingsService : BaseJsonSettings, IUserSettingsServi
         }
 
         // Create new device-specific settings instance (it manages its own file)
-        var deviceSettings = new DeviceSettingsService(deviceId, this);
+        var deviceSettings = new DeviceSettingsService(deviceId);
         _deviceSettingsCache[deviceId] = deviceSettings;
 
         return deviceSettings;

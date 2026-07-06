@@ -1,6 +1,4 @@
 using Sefirah.Data.Models;
-using Sefirah.Data.Models.Messages;
-using Sefirah.Helpers;
 using SQLite;
 
 namespace Sefirah.Data.AppDatabase.Models;
@@ -8,43 +6,41 @@ namespace Sefirah.Data.AppDatabase.Models;
 public class ContactEntity
 {
     [PrimaryKey]
-    public string Id { get; set; } = string.Empty;
+    public string Key { get; set; } = string.Empty;
 
     [Indexed]
     public string DeviceId { get; set; } = string.Empty;
 
-    public string? LookupKey { get; set; }
+    public string ContactId { get; set; } = string.Empty;
+
+    public string LookupKey { get; set; } = string.Empty;
 
     public string DisplayName { get; set; } = string.Empty;
-
-    public string Number { get; set; } = string.Empty;
 
     public byte[]? Avatar { get; set; }
 
     #region Helpers
-    public static ContactEntity FromMessage(ContactInfo message, string deviceId) => new()
-    {
-        Id = message.Id,
-        DeviceId = deviceId,
-        LookupKey = message.LookupKey,
-        DisplayName = message.DisplayName,
-        Number = message.Number,
-        Avatar = message.PhotoBase64 is not null ? Convert.FromBase64String(message.PhotoBase64) : null
-    };
+    public static string GetKey(string deviceId, string contactId) => $"{deviceId}:{contactId}";
 
-    internal async Task<Contact> ToContact()
+    public static ContactEntity FromMessage(ContactInfo message, string deviceId) 
+    
     {
-        return new Contact(Id, Number, DisplayName, Avatar is not null ? await Avatar.ToBitmapAsync() : null);
-    }
+        byte[]? avatar = null;
+        try
+        {
+            avatar = Convert.FromBase64String(message.PhotoBase64);
+        }
+        catch (Exception) { }
 
-    internal async Task<ParticipantInfo> ToParticipantInfo()
-    {
-        return new ParticipantInfo(Number, DisplayName, Avatar is not null ? await Avatar.ToBitmapAsync() : null);
-    }
-
-    internal async Task<CallerContact> ToCallerContact()
-    {
-        return new CallerContact(Number, DisplayName, Avatar is not null ? await Avatar.ToBitmapAsync() : null);
+        return new ContactEntity
+        {
+            Key = GetKey(deviceId, message.Id),
+            DeviceId = deviceId,
+            ContactId = message.Id,
+            LookupKey = message.LookupKey,
+            DisplayName = message.DisplayName,
+            Avatar = avatar,
+        };
     }
     #endregion
 }

@@ -105,7 +105,7 @@ public class FileTransferService(
         {
             var files = storageItems.OfType<StorageFile>().ToArray();
             var devices = deviceManager.PairedDevices.Where(d => d.IsConnected).ToList();
-            List<PairedDevice> selectedDevices = new();
+            List<PairedDevice> selectedDevices = [];
 
             if (devices.Count == 0)
             {

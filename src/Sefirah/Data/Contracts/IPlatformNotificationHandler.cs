@@ -42,7 +42,7 @@ public interface IPlatformNotificationHandler
     /// <summary>
     /// incoming linked call with Accept / Decline actions.
     /// </summary>
-    Task ShowCallNotification(string callId, string title, string displayName, Uri? icon = null);
+    Task ShowCallNotification(string callId, string transportDeviceId, string title, string displayName, Uri? icon = null);
 
     /// <summary>
     /// Registers for platform-specific notification events

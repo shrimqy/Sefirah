@@ -8,13 +8,17 @@ namespace Sefirah.Data.AppDatabase.Models;
 public class MessageEntity
 {
     [PrimaryKey]
-    public long UniqueId { get; set; }
+    public string Key { get; set; } = string.Empty;
 
     [Indexed]
-    public long ThreadId { get; set; }
+    public string ConversationKey { get; set; } = string.Empty;
 
     [Indexed]
     public string DeviceId { get; set; } = string.Empty;
+
+    public long UniqueId { get; set; }
+
+    public long ThreadId { get; set; }
 
     public string Body { get; set; } = string.Empty;
 
@@ -32,26 +36,30 @@ public class MessageEntity
     public List<SmsAttachment> Attachments { get; set; } = [];
 
     #region Helpers
+    public static string GetKey(string deviceId, long uniqueId) => $"{deviceId}:{uniqueId}";
+
     public static MessageEntity FromMessage(TextMessage message, string deviceId) => new()
     {
+        Key = GetKey(deviceId, message.UniqueId),
+        ConversationKey = ConversationEntity.GetKey(deviceId, message.ThreadId),
+        DeviceId = deviceId,
         UniqueId = message.UniqueId,
         ThreadId = message.ThreadId,
-        DeviceId = deviceId,
         Body = message.Body,
         Timestamp = message.Timestamp,
         Read = message.Read,
         SubscriptionId = message.SubscriptionId,
         MessageType = message.MessageType,
-        Address = message.Addresses[0]
+        Address = message.Addresses.Count > 0 ? message.Addresses[0] : string.Empty
     };
 
-    internal async Task<Message> ToMessageAsync(ContactRepository contactRepository)
+    internal Message ToMessage(ContactRepository contactRepository)
     {
-        var contact = await contactRepository.GetContactAsync(DeviceId, Address);
-        var participant = contact is not null ? await contact.ToParticipantInfo() : new ParticipantInfo(Address, Address);
+        var participant = contactRepository.GetContact(DeviceId, Address);
 
         return new Message
         {
+            MessageKey = Key,
             UniqueId = UniqueId,
             ThreadId = ThreadId,
             Body = Body,

@@ -4,6 +4,8 @@ namespace Sefirah.Data.Models;
 
 public partial class DiscoveredDevice : BaseRemoteDevice
 {
+    public string Address { get; set; } = string.Empty;
+
     public int Port { get; set; }
 
     public bool IsPairing { get; set; }
@@ -19,7 +21,8 @@ public partial class DiscoveredDevice : BaseRemoteDevice
             Certificate = Certificate,
             Session = Session,
             Client = Client,
-            Addresses = [new AddressEntry { Address = Address, IsEnabled = true, Priority = 0 }],
+            Address = Address,
+            Addresses = [with([new AddressEntry { Address = Address, IsEnabled = true }])],
             ConnectionStatus = new Connected(),
             Port = Port,
         };

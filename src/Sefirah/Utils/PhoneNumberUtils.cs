@@ -34,6 +34,13 @@ public static partial class PhoneNumberUtils
         return matchType is PhoneNumberUtil.MatchType.EXACT_MATCH or PhoneNumberUtil.MatchType.NSN_MATCH;
     }
 
+    /// <summary>
+    /// Whether two address strings refer to the same phone number (case-insensitive exact, then libphonenumber semantic).
+    /// </summary>
+    public static bool IsMatch(string? left, string? right) =>
+        string.Equals(left, right, StringComparison.OrdinalIgnoreCase)
+        || IsSemanticMatch(left, right);
+
     private static PhoneNumber? TryParse(string value)
     {
         var normalizedInput = value.Trim();
@@ -50,6 +57,24 @@ public static partial class PhoneNumberUtils
         {
             return null;
         }
+    }
+
+    public static bool IsPhoneNumber(string? value) =>
+        !string.IsNullOrWhiteSpace(value) && LooksLikePhoneNumber(value.Trim());
+
+    /// <summary>
+    /// Canonical form for storage and cache keys (E.164 when parseable, otherwise trimmed input).
+    /// </summary>
+    public static string Normalize(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return string.Empty;
+
+        var trimmed = value.Trim();
+        var parsed = TryParse(trimmed);
+        return parsed is not null
+            ? phoneNumberUtil.Format(parsed, PhoneNumberFormat.E164)
+            : trimmed;
     }
 
     private static bool LooksLikePhoneNumber(string value)

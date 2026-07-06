@@ -1,37 +1,49 @@
-using Sefirah.Data.Enums;
-
 namespace Sefirah.Data.Models;
 
-public partial class ApplicationItem(string packageName, string appName, string? iconPath, AppDeviceInfo deviceInfo) : ObservableObject
+public partial class ApplicationItem(string deviceId, string packageName, string appName, string? iconPath) : ObservableObject
 {
+    private string deviceId = deviceId;
+    public string DeviceId
+    {
+        get => deviceId;
+        set => SetProperty(ref deviceId, value);
+    }
+
     private string packageName = packageName;
-    public string PackageName 
-    { 
+    public string PackageName
+    {
         get => packageName;
         set => SetProperty(ref packageName, value);
     }
-    
+
     private string appName = appName;
-    public string AppName 
-    { 
+    public string AppName
+    {
         get => appName;
         set => SetProperty(ref appName, value);
     }
-    
+
     private string? iconPath = iconPath;
     public string? IconPath
     {
         get => iconPath;
         set => SetProperty(ref iconPath, value);
     }
-    
-    private AppDeviceInfo deviceInfo = deviceInfo;
-    public AppDeviceInfo DeviceInfo 
-    { 
-        get => deviceInfo;
-        set => SetProperty(ref deviceInfo, value);
+
+    private bool pinned;
+    public bool Pinned
+    {
+        get => pinned;
+        set => SetProperty(ref pinned, value);
     }
-    
+
+    private NotificationFilter filter = NotificationFilter.ToastFeed;
+    public NotificationFilter Filter
+    {
+        get => filter;
+        set => SetProperty(ref filter, value);
+    }
+
     private bool isLoading;
     public bool IsLoading
     {
@@ -49,7 +61,7 @@ public partial class ApplicationItem(string packageName, string appName, string?
     private string? selectedNotificationFilter;
     public string SelectedNotificationFilter
     {
-        get => selectedNotificationFilter ?? NotificationFilterTypes[DeviceInfo.Filter];
+        get => selectedNotificationFilter ?? NotificationFilterTypes[Filter];
         set => SetProperty(ref selectedNotificationFilter, value);
     }
 

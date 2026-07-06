@@ -1,6 +1,6 @@
 using Microsoft.UI.Dispatching;
-using Microsoft.UI.Xaml.Media.Imaging;
 using Sefirah.Data.Models;
+using Windows.Storage.Streams;
 
 namespace Sefirah.ViewModels;
 
@@ -25,7 +25,10 @@ public sealed partial class CallSessionViewModel : BaseViewModel, IDisposable
     public partial string CallerNumber { get; set; }
 
     [ObservableProperty]
-    public partial BitmapImage? CallerAvatar { get; set; }
+    public partial IRandomAccessStreamReference? CallerAvatar { get; set; }
+
+    [ObservableProperty]
+    public partial string CallerInitials { get; set; }
 
     [ObservableProperty]
     public partial string StatusText { get; set; }
@@ -48,12 +51,13 @@ public sealed partial class CallSessionViewModel : BaseViewModel, IDisposable
     [ObservableProperty]
     public partial bool IsMuteActive { get; set; }
 
-    public CallSessionViewModel(IPhoneCall call, CallerContact callerContact) : base()
+    public CallSessionViewModel(IPhoneCall call, Contact callContact) : base()
     {
         PhoneCall = call;
-        CallerHeadline = callerContact.DisplayName;
-        CallerNumber = callerContact.Address;
-        CallerAvatar = callerContact.Avatar;
+        CallerHeadline = callContact.DisplayName;
+        CallerNumber = callContact.Address;
+        CallerAvatar = callContact.AvatarStream;
+        CallerInitials = callContact.Initials;
         StatusText = string.Empty;
         AudioRouteButtonText = string.Empty;
         IsHoldActive = false;

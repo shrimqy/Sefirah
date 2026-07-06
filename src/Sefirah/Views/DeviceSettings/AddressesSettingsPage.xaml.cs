@@ -27,7 +27,7 @@ public sealed partial class AddressesSettingsPage : Page
 
     private void OnAddressEnabledChanged(object sender, RoutedEventArgs e)
     {
-        ViewModel.SaveAddresses();
+        ViewModel.SaveDevice();
     }
 }
 

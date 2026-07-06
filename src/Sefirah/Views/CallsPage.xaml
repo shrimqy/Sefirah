@@ -2,6 +2,7 @@
     x:Class="Sefirah.Views.CallsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Sefirah.UserControls"
     xmlns:helpers="using:Sefirah.Helpers"
     xmlns:converters="using:Sefirah.Converters"
     xmlns:wctconverters="using:CommunityToolkit.WinUI.Converters"
@@ -19,6 +20,32 @@
         <wctconverters:EmptyStringToObjectConverter x:Key="EmptyStringToObjectConverter" EmptyValue="False" NotEmptyValue="True" />
         <wctconverters:StringVisibilityConverter x:Key="StringVisibilityConverter" />
         <wctconverters:StringVisibilityConverter x:Key="InverseStringVisibilityConverter" EmptyValue="Visible" NotEmptyValue="Collapsed" />
+
+        <DataTemplate x:Key="ContactSearchSuggestionTemplate" x:DataType="models:Contact">
+            <StackPanel
+                Margin="0,8,0,8"
+                VerticalAlignment="Center"
+                Orientation="Horizontal">
+                <controls:ContactAvatar
+                    Width="36"
+                    Height="36"
+                    ImageProvider="{x:Bind AvatarStream, Mode=OneWay}"
+                    Initials="{x:Bind Initials, Mode=OneWay}"
+                    PlaceholderColorHex="{x:Bind PlaceholderColorHex, Mode=OneWay}" />
+                <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                    <TextBlock
+                        FontWeight="SemiBold"
+                        Text="{x:Bind DisplayName, Mode=OneWay, FallbackValue='Unknown'}"
+                        TextTrimming="CharacterEllipsis" />
+                    <TextBlock
+                        Margin="0,4,0,0"
+                        FontSize="12"
+                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                        Text="{x:Bind Address, Mode=OneWay}"
+                        TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
 
         <Style x:Key="DialPadKeyStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
             <Setter Property="MinHeight" Value="52"/>
@@ -83,29 +110,16 @@
                                     Height="40"
                                     Margin="0,0,12,0"
                                     VerticalAlignment="Center">
-                                    <PersonPicture
+                                    <controls:ContactAvatar
                                         Width="40"
                                         Height="40"
-                                        DisplayName="{x:Bind PrimaryLabel, Mode=OneWay}"
-                                        ProfilePicture="{x:Bind AvatarImage, Mode=OneWay}"
-                                        Visibility="{x:Bind AvatarImage, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
-                                    <Border
-                                        Width="40"
-                                        Height="40"
-                                        CornerRadius="20"
-                                        DataContextChanged="CallAvatarBorder_DataContextChanged"
-                                        BorderThickness="1"
-                                        Visibility="{x:Bind AvatarImage, Mode=OneWay, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}">
-                                        <FontIcon
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            FontSize="18"
-                                            Glyph="&#xE77B;" />
-                                    </Border>
+                                        ImageProvider="{x:Bind CallContact.AvatarStream, Mode=OneWay}"
+                                        Initials="{x:Bind CallContact.Initials, Mode=OneWay}"
+                                        PlaceholderColorHex="{x:Bind CallContact.PlaceholderColorHex, Mode=OneWay}" />
                                 </Grid>
 
                                 <StackPanel Grid.Column="1" Spacing="2">
-                                    <TextBlock Text="{x:Bind PrimaryLabel, Mode=OneWay}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{x:Bind CallContact.DisplayName, Mode=OneWay}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
                                     <TextBlock
                                         FontSize="12"
                                         Opacity="0.7"
@@ -255,89 +269,41 @@
                 Visibility="{x:Bind ViewModel.ShowDialer, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
 
                 <AutoSuggestBox
-                    VerticalAlignment="Top" 
+                    x:Name="ContactSearchBox"
+                    VerticalAlignment="Top"
+                    ItemTemplate="{StaticResource ContactSearchSuggestionTemplate}"
                     PlaceholderText="{helpers:ResourceString Name=SearchContacts}"
                     UpdateTextOnSelect="False"
                     TextChanged="ContactSearch_TextChanged"
                     QuerySubmitted="ContactSearch_QuerySubmitted"
-                    SuggestionChosen="ContactSearch_SuggestionChosen">
-                    <AutoSuggestBox.ItemTemplate>
-                        <DataTemplate x:DataType="models:Contact">
-                            <Grid Margin="0,8,0,8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-
-                                <PersonPicture
-                                    Grid.Column="0"
-                                    Width="40"
-                                    Height="40"
-                                    Margin="0,0,12,0"
-                                    VerticalAlignment="Center"
-                                    DisplayName="{x:Bind DisplayName}"
-                                    ProfilePicture="{x:Bind Avatar}" />
-
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <TextBlock
-                                        MaxWidth="280"
-                                        FontWeight="SemiBold"
-                                        Text="{x:Bind DisplayName, Mode=OneWay, FallbackValue='Unknown'}"
-                                        TextTrimming="CharacterEllipsis" />
-                                    <TextBlock
-                                        MaxWidth="280"
-                                        Margin="0,4,0,0"
-                                        FontSize="12"
-                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                                        Text="{x:Bind Address, Mode=OneWay}"
-                                        TextTrimming="CharacterEllipsis" />
-                                </StackPanel>
-                            </Grid>
-                        </DataTemplate>
-                    </AutoSuggestBox.ItemTemplate>
-                    <AutoSuggestBox.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <Setter Property="Padding" Value="12,8" />
-                            <Setter Property="MinHeight" Value="60" />
-                        </Style>
-                    </AutoSuggestBox.ItemContainerStyle>
-                </AutoSuggestBox>
+                    SuggestionChosen="ContactSearch_SuggestionChosen" />
 
                 <StackPanel VerticalAlignment="Center" Spacing="12">
                     <Grid Width="68" Height="68" HorizontalAlignment="Center">
-                        <PersonPicture
+                        <controls:ContactAvatar
                             Width="68"
                             Height="68"
-                            DisplayName="{x:Bind ViewModel.DialContactDisplayName, Mode=OneWay}"
-                            ProfilePicture="{x:Bind ViewModel.DialContactAvatar, Mode=OneWay}"
-                            Visibility="{x:Bind ViewModel.DialContactAvatar, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
-                        <Border
+                            UseThemePlaceholder="True"
+                            Visibility="{x:Bind ViewModel.DialContact, Mode=OneWay, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}" />
+                        <controls:ContactAvatar
                             Width="68"
                             Height="68"
-                            CornerRadius="34"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                            BorderThickness="1"
-                            Visibility="{x:Bind ViewModel.DialContactAvatar, Mode=OneWay, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}">
-                            <FontIcon
-                                Glyph="&#xE77B;"
-                                FontSize="24"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"/>
-                        </Border>
+                            UseThemePlaceholder="True"
+                            Visibility="{x:Bind ViewModel.DialContact, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}"
+                            ImageProvider="{x:Bind ViewModel.DialContact.AvatarStream, Mode=OneWay}"
+                            Initials="{x:Bind ViewModel.DialContact.Initials, Mode=OneWay}"
+                            PlaceholderColorHex="{x:Bind ViewModel.DialContact.PlaceholderColorHex, Mode=OneWay}" />
                     </Grid>
 
                     <TextBlock
-                        Text="{x:Bind ViewModel.DialContactDisplayName, Mode=OneWay}"
+                        Text="{x:Bind ViewModel.DialContact.DisplayName, Mode=OneWay}"
                         FontSize="18"
                         FontWeight="SemiBold"
                         TextAlignment="Center"
                         HorizontalAlignment="Center"
                         MaxWidth="300"
                         TextTrimming="CharacterEllipsis"
-                        Visibility="{x:Bind ViewModel.DialContactDisplayName, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}}" />
+                        Visibility="{x:Bind ViewModel.DialContact, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
 
                     <TextBlock
                         Text="{x:Bind ViewModel.PhoneNumber, Mode=OneWay}"
@@ -349,7 +315,7 @@
                         VerticalAlignment="Center"
                         TextTrimming="CharacterEllipsis"
                         MaxWidth="300"
-                        Visibility="{x:Bind ViewModel.DialContactDisplayName, Mode=OneWay, Converter={StaticResource InverseStringVisibilityConverter}}" />
+                        Visibility="{x:Bind ViewModel.DialContact, Mode=OneWay, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}" />
 
                     <TextBlock
                         Text="{x:Bind ViewModel.PhoneNumber, Mode=OneWay}"
@@ -359,7 +325,7 @@
                         TextTrimming="CharacterEllipsis"
                         MaxWidth="300"
                         Foreground="{ThemeResource TextFillColorSecondary}"
-                        Visibility="{x:Bind ViewModel.DialContactDisplayName, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}}" />
+                        Visibility="{x:Bind ViewModel.DialContact, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
 
                     <Grid ColumnSpacing="10" RowSpacing="10" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Grid.RowDefinitions>

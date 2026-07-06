@@ -2,7 +2,7 @@ using Sefirah.Utils.Serialization;
 
 namespace Sefirah.Services.Settings;
 
-internal sealed partial class DeviceSettingsService(string deviceId, ISettingsSharingContext settingsSharingContext) : BaseDeviceAwareJsonSettings(deviceId, settingsSharingContext), IDeviceSettingsService
+internal sealed partial class DeviceSettingsService(string deviceId) : BaseDeviceAwareJsonSettings(deviceId), IDeviceSettingsService
 {
     public bool ClipboardReceive
     {

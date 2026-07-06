@@ -84,10 +84,14 @@ public partial class MediaSession : ObservableObject
     public partial bool? CanGoPrevious { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsPositionSliderVisible))]
     public partial bool? CanSeek { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsPositionSliderVisible))]
     public partial bool IsVolumeSliderVisible { get; set; }
+
+    public bool IsPositionSliderVisible => CanSeek == true && !IsVolumeSliderVisible;
 
     public MediaSession()
     {

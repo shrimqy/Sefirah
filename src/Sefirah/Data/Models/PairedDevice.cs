@@ -6,28 +6,67 @@ namespace Sefirah.Data.Models;
 
 public partial class PairedDevice : BaseRemoteDevice
 {
-    public List<AddressEntry> Addresses { get; set; } = [];
+    private string address = string.Empty;
+    public string Address
+    {
+        get => address;
+        set
+        {
+            if (SetProperty(ref address, value))
+                RefreshAddressConnectionStates();
+        }
+    }
+
+    private ObservableCollection<AddressEntry> addresses = [];
+    public ObservableCollection<AddressEntry> Addresses
+    {
+        get => addresses;
+        set
+        {
+            if (SetProperty(ref addresses, value))
+                RefreshAddressConnectionStates();
+        }
+    }
 
     /// <summary>
-    /// Gets enabled addresses sorted by priority.
+    /// Gets enabled addresses
     /// </summary>
     public List<string> GetEnabledAddresses()
     {
         var enabledAddresses = Addresses
             .Where(ip => ip.IsEnabled)
-            .OrderBy(ip => ip.Priority)
             .Select(ip => ip.Address);
         
         // If no addresses are enabled, return all addresses
         if (!enabledAddresses.Any())
         {
             return Addresses
-                .OrderBy(ip => ip.Priority)
                 .Select(ip => ip.Address)
                 .ToList();
         }
         
         return enabledAddresses.ToList();
+    }
+
+    /// <summary>
+    /// Adds an address to the list if it is not already present.
+    /// </summary>
+    /// <returns>True if the address was added.</returns>
+    public bool TryAddAddress(string address)
+    {
+        if (string.IsNullOrWhiteSpace(address))
+            return false;
+
+        address = address.Trim();
+        if (Addresses.Any(a => a.Address.Equals(address, StringComparison.OrdinalIgnoreCase)))
+            return false;
+
+        Addresses.Add(new AddressEntry
+        {
+            Address = address,
+            IsEnabled = true
+        });
+        return true;
     }
 
     public int Port { get; set; } = 5150;
@@ -51,9 +90,21 @@ public partial class PairedDevice : BaseRemoteDevice
             {
                 OnPropertyChanged(nameof(ConnectionStatusText));
                 OnPropertyChanged(nameof(IsConnected));
+                OnPropertyChanged(nameof(IsConnecting));
                 OnPropertyChanged(nameof(IsForcedDisconnect));
                 OnPropertyChanged(nameof(IsConnectedOrConnecting));
+                RefreshAddressConnectionStates();
             }
+        }
+    }
+
+    private void RefreshAddressConnectionStates()
+    {
+        foreach (var entry in Addresses)
+        {
+            entry.IsConnected = IsConnected
+                && !string.IsNullOrEmpty(Address)
+                && entry.Address.Equals(Address, StringComparison.OrdinalIgnoreCase);
         }
     }
 

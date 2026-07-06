@@ -824,7 +824,6 @@ public class AdbService(
         try
         {
             var result = adbClient.Disconnect(device.Serial);
-            logger.Info($"ADB disconnect {device.Serial}: {result}");
         }
         catch (Exception ex)
         {

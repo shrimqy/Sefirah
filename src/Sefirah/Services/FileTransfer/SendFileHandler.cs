@@ -196,7 +196,7 @@ public partial class SendFileHandler(
         {
             try
             {
-                server = new Server(sslContext, IPAddress.Any, port, this)
+                server = new Server(sslContext, IPAddress.IPv6Any, port, this)
                 {
                     OptionDualMode = true,
                 };

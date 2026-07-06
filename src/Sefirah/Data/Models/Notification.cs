@@ -1,15 +1,16 @@
-using Microsoft.UI.Xaml.Media.Imaging;
-using Sefirah.Helpers;
+using Sefirah.Utils;
 
 namespace Sefirah.Data.Models;
 
 public class Notification
 {
+    public string DeviceId { get; set; } = string.Empty;
+
     public string Key { get; set; } = string.Empty;
 
-    public bool Pinned { get; set; } = false;
+    public bool Pinned { get; set; }
 
-    public string? TimeStamp { get; set; }
+    public long TimestampMillis { get; set; }
 
     public string? AppName { get; set; }
 
@@ -31,7 +32,17 @@ public class Notification
 
     public string? ReplyResultKey { get; set; }
 
-    public BitmapImage? Icon { get; set; }
+    /// <summary>
+    /// Notification-specific image. App icons come from <see cref="AppPackage"/>.
+    /// </summary>
+    public byte[]? LargeIcon { get; set; }
+
+    public bool HasLargeIcon => LargeIcon is { Length: > 0 };
+
+    public bool HasDisplayIcon => HasLargeIcon
+        || (!string.IsNullOrEmpty(AppPackage)
+            && !string.IsNullOrEmpty(DeviceId)
+            && IconUtils.GetAppIconUri(DeviceId, AppPackage) is not null);
 
     public bool ShouldShowTitle
     {
@@ -47,42 +58,8 @@ public class Notification
     }
 
     public string FlyoutFilterString => string.Format("NotificationFilterButton".GetLocalizedResource(), AppName);
-
+    
     #region Helpers
-    public static async Task<Notification> FromMessage(NotificationInfo message)
-    {
-        var notification = new Notification
-        {
-            Key = message.NotificationKey,
-            TimeStamp = message.TimeStamp,
-            AppName = message.AppName,
-            AppPackage = message.AppPackage,
-            Title = message.Title,
-            Text = message.Text,
-            GroupedMessages = GroupBySender(message.Messages),
-            Tag = message.Tag,
-            GroupKey = message.GroupKey,
-            Actions = message.Actions,
-            ReplyResultKey = message.ReplyResultKey
-        };
-
-        // Handle icon conversion
-        try
-        {
-            if (!string.IsNullOrEmpty(message.LargeIcon))
-            {
-                notification.Icon = await Convert.FromBase64String(message.LargeIcon).ToBitmapAsync();
-            }
-            else if (!string.IsNullOrEmpty(message.AppIcon))
-            {
-                notification.Icon = await Convert.FromBase64String(message.AppIcon).ToBitmapAsync();
-            }
-        }
-        catch { }
-
-        return notification;
-    }
-
     internal static List<NotificationGroup> GroupBySender(List<NotificationMessage> messages)
     {
         if (messages.Count == 0) return [];

@@ -8,6 +8,10 @@ using Sefirah.Utils;
 using Sefirah.Views.Settings;
 using Windows.ApplicationModel.DataTransfer;
 
+#if WINDOWS
+using Sefirah.Platforms.Windows.HostedApp;
+#endif
+
 namespace Sefirah.Services;
 public class ScreenMirrorService(
     ILogger logger,
@@ -36,7 +40,7 @@ public class ScreenMirrorService(
         {
             logger.Warn($"No application found for package {package} on device {device.Id}");
             return;
-    }
+        }
 
         await StartScrcpy(device, app);
     }
@@ -82,7 +86,7 @@ public class ScreenMirrorService(
             var isStartApp = app is not null;
             if (isStartApp)
             {
-                IconUtils.SetScrcpyWindowIcon(app!.PackageName);
+                IconUtils.SetScrcpyWindowIcon(device.Id, app!.PackageName);
                 argBuilder.Add($"--start-app={app.PackageName}");
                 if (!string.IsNullOrEmpty(app.AppName))
                     argBuilder.Add($"--window-title=\"{app.AppName}\"");
@@ -331,6 +335,16 @@ public class ScreenMirrorService(
             }
 
             StartProcessMonitoring(process, processCts, selectedDeviceSerial);
+
+#if WINDOWS
+            if (isStartApp)
+            {
+                var appUserModelId = HostedPackageIdentity.GetAppUserModelId(app!.PackageName);
+                if (!string.IsNullOrEmpty(appUserModelId))
+                    _ = WindowShellBinder.TryBindAsync(process, appUserModelId, processCts.Token);
+            }
+#endif
+
             return true;
         }
         catch (Exception ex)

@@ -31,6 +31,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IActionService, WindowsActionService>();
         services.AddSingleton<IUpdateService, WindowsUpdateService>();
         services.AddSingleton<IAppShortcutService, WindowsAppShortcutService>();
+        services.AddSingleton<ISystemTrayService, WindowsTrayIconService>();
 
         // Remote Storage
         services.AddSftpRemoteServices();

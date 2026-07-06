@@ -12,6 +12,7 @@ public partial class DevicesViewModel : ObservableObject
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
     private ISftpService SftpService { get; } = Ioc.Default.GetRequiredService<ISftpService>();
     private RemoteAppRepository RemoteAppRepository { get; } = Ioc.Default.GetRequiredService<RemoteAppRepository>();
+    private ContactRepository ContactRepository { get; } = Ioc.Default.GetRequiredService<ContactRepository>();
     private SmsRepository SmsRepository { get; } = Ioc.Default.GetRequiredService<SmsRepository>();
     private CallLogRepository CallLogRepository { get; } = Ioc.Default.GetRequiredService<CallLogRepository>();
     private NotificationRepository NotificationRepository { get; } = Ioc.Default.GetRequiredService<NotificationRepository>();
@@ -70,6 +71,8 @@ public partial class DevicesViewModel : ObservableObject
         {
             try
             {
+                var deviceId = device.Id;
+
                 // First disconnect if this is the currently connected device
                 if (device.IsConnected)
                 {
@@ -78,11 +81,16 @@ public partial class DevicesViewModel : ObservableObject
 
                 await DeviceManager.RemoveDevice(device);
 
-                SftpService.Remove(device.Id);
-                RemoteAppRepository.RemoveAllAppsForDeviceAsync(device.Id);
-                SmsRepository.DeleteAllDataForDevice(device.Id);
-                CallLogRepository.DeleteAllCallLogsForDevice(device.Id);
-                NotificationRepository.RemoveNotificationsForDevice(device.Id);
+                SftpService.Remove(deviceId);
+
+                await Task.Run(() =>
+                {
+                    RemoteAppRepository.RemoveAllAppsForDevice(deviceId);
+                    SmsRepository.DeleteAllDataForDevice(deviceId);
+                    ContactRepository.DeleteAllContactsForDevice(deviceId);
+                    CallLogRepository.DeleteAllCallLogsForDevice(deviceId);
+                    NotificationRepository.RemoveNotificationsForDevice(deviceId);
+                });
             }
             catch (Exception ex)
             {

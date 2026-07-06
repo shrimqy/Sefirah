@@ -1,0 +1,50 @@
+﻿<UserControl
+    x:Class="Sefirah.UserControls.ContactAvatar"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid>
+        <Border
+            x:Name="PhotoBorder"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Visibility="Collapsed">
+            <Image
+                x:Name="PhotoImage"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Stretch="UniformToFill" />
+        </Border>
+
+        <Border
+            x:Name="PlaceholderBorder"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            BorderThickness="1">
+            <Grid>
+                <FontIcon
+                    x:Name="GroupGlyphIcon"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Glyph="&#xE716;"
+                    Visibility="Collapsed" />
+                <FontIcon
+                    x:Name="PersonGlyphIcon"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Glyph="&#xE77B;"
+                    Visibility="Collapsed" />
+                <TextBlock
+                    x:Name="InitialsText"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontWeight="SemiBold"
+                    TextAlignment="Center"
+                    Visibility="Collapsed" />
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

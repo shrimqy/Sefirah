@@ -2,6 +2,7 @@
     x:Class="Sefirah.UserControls.CallView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Sefirah.UserControls"
     xmlns:converters="using:Sefirah.Converters"
     xmlns:helpers="using:Sefirah.Helpers"
     xmlns:wctconverters="using:CommunityToolkit.WinUI.Converters"
@@ -44,28 +45,13 @@
                 Width="60"
                 Height="60"
                 VerticalAlignment="Bottom">
-                <PersonPicture
+                <controls:ContactAvatar
                     Width="60"
                     Height="60"
-                    DisplayName="{x:Bind ViewModel.PrimaryCall.CallerHeadline, Mode=OneWay}"
-                    ProfilePicture="{x:Bind ViewModel.PrimaryCall.CallerAvatar, Mode=OneWay}"
-                    Visibility="{x:Bind ViewModel.PrimaryCall.CallerAvatar, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
-                <Border
-                    Width="60"
-                    Height="60"
-                    CornerRadius="30"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                    BorderThickness="1"
-                    Visibility="{x:Bind ViewModel.PrimaryCall.CallerAvatar, Mode=OneWay, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}">
-                    <FontIcon
-                        Glyph="&#xE77B;"
-                        FontSize="28"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center" />
-                </Border>
+                    VerticalAlignment="Bottom"
+                    UseThemePlaceholder="True"
+                    ImageProvider="{x:Bind ViewModel.PrimaryCall.CallerAvatar, Mode=OneWay}"
+                    Initials="{x:Bind ViewModel.PrimaryCall.CallerInitials, Mode=OneWay}" />
             </Grid>
 
             <StackPanel
@@ -208,28 +194,13 @@
                     Height="38"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center">
-                    <PersonPicture
+                    <controls:ContactAvatar
                         Width="38"
                         Height="38"
-                        DisplayName="{x:Bind ViewModel.SecondaryCall.CallerHeadline, Mode=OneWay}"
-                        ProfilePicture="{x:Bind ViewModel.SecondaryCall.CallerAvatar, Mode=OneWay}"
-                        Visibility="{x:Bind ViewModel.SecondaryCall.CallerAvatar, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
-                    <Border
-                        Width="38"
-                        Height="38"
-                        CornerRadius="19"
-                        HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="1"
-                        Visibility="{x:Bind ViewModel.SecondaryCall.CallerAvatar, Mode=OneWay, Converter={StaticResource InverseEmptyObjectToVisibilityConverter}}">
-                        <FontIcon
-                            Glyph="&#xE77B;"
-                            FontSize="16"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center" />
-                    </Border>
+                        UseThemePlaceholder="True"
+                        ImageProvider="{x:Bind ViewModel.SecondaryCall.CallerAvatar, Mode=OneWay}"
+                        Initials="{x:Bind ViewModel.SecondaryCall.CallerInitials, Mode=OneWay}" />
                 </Grid>
 
                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">

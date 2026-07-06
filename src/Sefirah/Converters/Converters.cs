@@ -202,61 +202,6 @@ internal sealed partial class CountToBooleanConverter : IValueConverter
     }
 }
 
-internal sealed partial class DateTimeConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, string language)
-    {
-        if (value is string timestampStr && DateTime.TryParseExact(timestampStr, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime timestamp))
-        {
-            if (timestamp.Date == DateTime.Today)
-            {
-                // Return only the time if the date is the same as today
-                return timestamp.ToString("t"); // Short time pattern
-            }
-            else
-            {
-                // Return the short date and time pattern otherwise
-                return timestamp.ToString("g"); // Short date and time pattern
-            }
-        }
-
-        return string.Empty; // Return an empty string if the timestamp is null or invalid
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-internal sealed partial class DateTimeDevicesConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, string language)
-    {
-        if (value is DateTime timestamp)
-        {
-            // Check if the date is today
-            if (timestamp.Date == DateTime.Today)
-            {
-                // Return only the time if the date is the same as today
-                return timestamp.ToString("t", CultureInfo.CurrentCulture); // Short time pattern
-            }
-            else
-            {
-                // Return the short date and time pattern otherwise
-                return timestamp.ToString("g", CultureInfo.CurrentCulture); // Short date and time pattern
-            }
-        }
-
-        return string.Empty; // Return an empty string if the value is not a DateTime
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        throw new NotImplementedException();
-    }
-}
-
 internal sealed partial class BatteryStatusToIconConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
@@ -339,14 +284,13 @@ internal sealed partial class RingerModeToIconConverter : IValueConverter
         {
             return ringerMode switch
             {
-                2 => "\uEA8F",    // Ringer
-                1 => "\uE877",    // Vibrate
-                0 => "\uE7ED",    // Silent Ringer
-                _ => "\uE995" 
+                2 => "\uEA8F",  // Ringer
+                1 => "\uE877",  // Vibrate
+                _ => "\uE7ED"   // Default
             };
         }
 
-        return "\uE995";
+        return "\uE7ED";
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)

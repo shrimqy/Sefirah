@@ -22,6 +22,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IPhoneLineService, DesktopPhoneLineService>();
         services.AddSingleton<IBluetoothPairingService, BluetoothPairingService>();
         services.AddSingleton<BluetoothPairingService>(sp => (BluetoothPairingService)sp.GetRequiredService<IBluetoothPairingService>());
+        services.AddSingleton<ISystemTrayService, DesktopSystemTrayService>();
         return services;
     }
 } 

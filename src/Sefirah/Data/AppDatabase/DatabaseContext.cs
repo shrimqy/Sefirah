@@ -1,14 +1,17 @@
 using Sefirah.Data.AppDatabase.Migrations;
 using Sefirah.Data.AppDatabase.Models;
 using SQLite;
+
 namespace Sefirah.Data.AppDatabase;
 
 public class DatabaseContext
 {
-    private const int CurrentSchemaVersion = 4;
+    private const int CurrentSchemaVersion = 5;
 
-    private static readonly IMigration[] Migrations =
-        [new SchemaVersion2Migration(), new SchemaVersion4Migration()];
+    private static readonly IMigration[] Migrations = 
+    [
+        new SchemaVersion2Migration(),
+    ];
 
     public SQLiteConnection Database { get; private set; }
 
@@ -28,12 +31,17 @@ public class DatabaseContext
 
     private static SQLiteConnection TryCreateDatabase(ILogger logger)
     {
-        var databasePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "sefirah.db");
-        var db = new SQLiteConnection(databasePath);
+        var databasePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, Constants.LocalSettings.DatabaseFileName);
+        var db = new SQLiteConnection(databasePath)
+        {
+            BusyTimeout = TimeSpan.FromSeconds(5),
+        };
 
         db.CreateTable<SchemaVersionEntity>();
 
-        int? storedSchemaVersion = db.Table<SchemaVersionEntity>().FirstOrDefault()?.Version;
+        int? storedSchemaVersion = db.Table<SchemaVersionEntity>()
+            .OrderByDescending(v => v.Version)
+            .FirstOrDefault()?.Version;
 
         // If schema version doesn't match, run migrations when they exist; otherwise destructive fallback
         if (storedSchemaVersion != CurrentSchemaVersion)
@@ -108,6 +116,7 @@ public class DatabaseContext
         db.CreateTable<PairedDeviceEntity>();
         db.CreateTable<ApplicationEntity>();
         db.CreateTable<ContactEntity>();
+        db.CreateTable<PhoneNumberEntity>();
         db.CreateTable<ConversationEntity>();
         db.CreateTable<MessageEntity>();
         db.CreateTable<AttachmentEntity>();
@@ -120,6 +129,7 @@ public class DatabaseContext
         db.DropTable<LocalDeviceEntity>();
         db.DropTable<PairedDeviceEntity>();
         db.DropTable<ApplicationEntity>();
+        db.DropTable<PhoneNumberEntity>();
         db.DropTable<ContactEntity>();
         db.DropTable<ConversationEntity>();
         db.DropTable<MessageEntity>();

@@ -2,7 +2,6 @@ using System.Net;
 using System.Text;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Sefirah.Data.AppDatabase.Models;
-using Sefirah.Data.Contracts;
 using Sefirah.Data.EventArguments;
 using Sefirah.Data.Models;
 using Sefirah.Helpers;
@@ -94,7 +93,7 @@ public class DiscoveryService(
 
     private void OnDiscoveredMdnsService(object? sender, DiscoveredMdnsServiceArgs e)
     {
-        sessionManager.ConnectTo(e.DeviceId, e.Address, e.Port);
+        sessionManager.Connect(e.DeviceId, e.Address, e.Port);
     }
 
     private async void BroadcastDeviceInfoAsync(UdpBroadcast udpBroadcast)
@@ -126,7 +125,7 @@ public class DiscoveryService(
 
             if (broadcast.DeviceId == localDevice?.DeviceId || address is null) return;
 
-            sessionManager.ConnectTo(broadcast.DeviceId, address.ToString(), broadcast.Port);
+            sessionManager.Connect(broadcast.DeviceId, address.ToString(), broadcast.Port);
         }
         catch (Exception ex)
         {

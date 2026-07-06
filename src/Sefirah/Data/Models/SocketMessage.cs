@@ -204,7 +204,7 @@ public class ThreadRequest : SocketMessage
 
 public class ContactInfo : SocketMessage
 {
-    public required string Id { get; set; }
+    public string Id { get; set; }
 
     public required string LookupKey { get; set; }
 
@@ -212,7 +212,7 @@ public class ContactInfo : SocketMessage
 
     public required string Number { get; set; }
 
-    public string? PhotoBase64 { get; set; }
+    public string PhotoBase64 { get; set; } = string.Empty;
 }
 
 // --- Notifications ---
@@ -222,7 +222,7 @@ public class NotificationInfo : SocketMessage
 
     public NotificationInfoType InfoType { get; set; }
 
-    public string? TimeStamp { get; set; }
+    public long TimestampMillis { get; set; }
 
     public string? AppPackage { get; set; }
 
@@ -244,7 +244,7 @@ public class NotificationInfo : SocketMessage
 
     public string? AppIcon { get; set; }
 
-    public string? LargeIcon { get; set; }
+    public string LargeIcon { get; set; } = string.Empty;
 }
 
 public record NotificationMessage(string Sender, string Text);

@@ -1,6 +1,5 @@
 using Sefirah.Data.AppDatabase;
 using Sefirah.Data.AppDatabase.Repository;
-using Sefirah.Data.Contracts;
 using Sefirah.Models;
 #if WINDOWS
 using Sefirah.Platforms.Windows;
@@ -89,9 +88,9 @@ public static class AppLifecycleHelper
                                 LogLevel.Warning)
 
                         // Default filters for core Uno Platform namespaces
-                        .CoreLogLevel(LogLevel.Warning);
+                        .CoreLogLevel(LogLevel.Error);
 
-                }, enableUnoLogging: true)
+                }, enableUnoLogging: false)
                 .UseSerilog(
                     consoleLoggingEnabled: true,
                     fileLoggingEnabled: true,

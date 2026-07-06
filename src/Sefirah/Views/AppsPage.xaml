@@ -9,10 +9,12 @@
     xmlns:local="using:Sefirah.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:Sefirah.Data.Models"
+    xmlns:not_win="http://uno.ui/not_win"
     xmlns:vm="using:Sefirah.ViewModels"
+    xmlns:win="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     x:Name="AppPageRoot"
     Background="Transparent"
-    mc:Ignorable="d">
+    mc:Ignorable="d not_win">
 
     <Page.Resources>
         <wctconverters:BoolToObjectConverter x:Key="BoolToPinGlyphConverter" FalseValue="&#xE718;" TrueValue="&#xE77A;" />
@@ -40,19 +42,19 @@
                         <MenuFlyoutItem
                             Click="PinAppClick"
                             DataContext="{x:Bind}"
-                            Text="{x:Bind DeviceInfo.Pinned, Mode=OneWay, Converter={StaticResource BoolToPinTextConverter}}">
+                            Text="{x:Bind Pinned, Mode=OneWay, Converter={StaticResource BoolToPinTextConverter}}">
                             <MenuFlyoutItem.Icon>
-                                <FontIcon Glyph="{x:Bind DeviceInfo.Pinned, Mode=OneWay, Converter={StaticResource BoolToPinGlyphConverter}}" />
+                                <FontIcon Glyph="{x:Bind Pinned, Mode=OneWay, Converter={StaticResource BoolToPinGlyphConverter}}" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
-                        <MenuFlyoutItem
+                        <win:MenuFlyoutItem
                             Click="AppShortcutClick"
                             DataContext="{x:Bind}"
                             Text="{x:Bind AppShortcutRegistered, Mode=OneWay, Converter={StaticResource BoolToShortcutTextConverter}}">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon Glyph="{x:Bind AppShortcutRegistered, Mode=OneWay, Converter={StaticResource BoolToShortcutGlyphConverter}}" />
                             </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
+                        </win:MenuFlyoutItem>
                         <MenuFlyoutItem
                             Click="UninstallAppClick"
                             DataContext="{x:Bind}"

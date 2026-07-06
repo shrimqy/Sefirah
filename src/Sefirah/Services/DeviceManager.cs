@@ -27,6 +27,10 @@ public partial class DeviceManager(
     /// Finds a device session by device ID
     /// </summary>
     public PairedDevice? FindDeviceById(string deviceId) => PairedDevices.FirstOrDefault(device => device.Id == deviceId);
+
+    public PairedDevice? FindDeviceByTransportId(string transportDeviceId) =>
+        PairedDevices.FirstOrDefault(d =>
+            string.Equals(d.CallsTransportDeviceId, transportDeviceId, StringComparison.OrdinalIgnoreCase));
     
     public async Task<PairedDeviceEntity> GetPairedDevice(string deviceId)
     {
@@ -40,8 +44,10 @@ public partial class DeviceManager(
 
     public async Task RemoveDevice(PairedDevice device)
     {
-        var result = repository.DeletePairedDevice(device.Id);
-        if (!result) throw new Exception($"Failed to remove device {device.Id}");
+        var deleted = await Task.Run(() => repository.DeletePairedDevice(device.Id));
+        if (!deleted) throw new Exception($"Failed to remove device {device.Id}");
+
+        LocalAppPaths.DeleteDeviceData(device.Id);
 
         await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {
@@ -52,9 +58,20 @@ public partial class DeviceManager(
         });
     }
 
-    public Task UpdateDevice(PairedDeviceEntity device)
+    public async Task UpdateDevice(PairedDevice device)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var entity = await repository.GetPairedDevice(device.Id);
+            if (entity is null) return;
+
+            entity.Addresses = [.. device.Addresses];
+            repository.AddOrUpdateRemoteDevice(entity);
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"Error updating device {device.Id}", ex);
+        }
     }
 
     private static PairedDeviceEntity CreateDeviceEntity(DiscoveredDevice device)
@@ -67,7 +84,7 @@ public partial class DeviceManager(
             Model = device.Model,
             Certificate = device.Certificate,
             WallpaperBytes = null,
-            Addresses = [new AddressEntry { Address = device.Address, IsEnabled = true, Priority = 0 }],
+            Addresses = [new AddressEntry { Address = device.Address, IsEnabled = true }],
             PhoneNumbers = []
         };
     }

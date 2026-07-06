@@ -709,12 +709,12 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         }
     }
 
-    private readonly DeviceRepository DeviceRepository = Ioc.Default.GetRequiredService<DeviceRepository>();
+    private readonly IDeviceManager deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
 
     private bool isDragging = true;
     private bool isBulkOperation;
 
-    public ObservableCollection<AddressEntry> Addresses { get; set; } = [];
+    public ObservableCollection<AddressEntry> Addresses => Device.Addresses;
 
     private string newAddress = string.Empty;
     public string NewAddress
@@ -738,16 +738,8 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         OnPropertyChanged(nameof(SelectedAudioOutputMode));
         OnPropertyChanged(nameof(SelectedScrcpyDevicePreference));
         LoadApps(device.Id);
-        LoadAddresses();
-        
-        Addresses.CollectionChanged += Addresses_CollectionChanged;
-    }
 
-    private void LoadAddresses()
-    {
-        isBulkOperation = true;
-        Addresses = Device.Addresses.ToObservableCollection();        
-        isBulkOperation = false;
+        Device.Addresses.CollectionChanged += Addresses_CollectionChanged;
     }
 
     private void Addresses_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -762,28 +754,12 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         isDragging = true;
         
         OnPropertyChanged(nameof(CanRemoveAddress));
-        SaveAddresses();
+        SaveDevice();
     }
 
-    public async void SaveAddresses()
+    public async void SaveDevice()
     {
-        // Update priorities based on current order
-        for (int i = 0; i < Addresses.Count; i++)
-        {
-            Addresses[i].Priority = i;
-        }
-
-        // Update device's addresses
-        Device.Addresses = Addresses.ToList();
-
-        // Save to database
-        var deviceEntity = await DeviceRepository.GetPairedDevice(Device.Id);
-        if (deviceEntity is not null)
-        {
-            deviceEntity.Addresses = Addresses.ToList();
-            DeviceRepository.AddOrUpdateRemoteDevice(deviceEntity);
-        }
-
+        await deviceManager.UpdateDevice(Device);
         OnPropertyChanged(nameof(DisplayAddresses));
     }
 
@@ -793,21 +769,12 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         if (string.IsNullOrWhiteSpace(NewAddress))
             return;
 
-        var address = NewAddress.Trim();
-        
         isBulkOperation = true;
-        var newEntry = new AddressEntry
-        {
-            Address = address,
-            IsEnabled = true,
-            Priority = Addresses.Count
-        };
-
-        Addresses.Add(newEntry);
+        Device.TryAddAddress(NewAddress);
         isBulkOperation = false;
         NewAddress = string.Empty;
         OnPropertyChanged(nameof(CanRemoveAddress));
-        SaveAddresses();
+        SaveDevice();
     }
         
 
@@ -815,10 +782,10 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
     private void RemoveAddress(AddressEntry entry)
     {
         isBulkOperation = true;
-        Addresses.Remove(entry);
+        Device.Addresses.Remove(entry);
         isBulkOperation = false;
         OnPropertyChanged(nameof(CanRemoveAddress));
-        SaveAddresses();
+        SaveDevice();
     }
 
     public void LoadApps(string id)
@@ -846,7 +813,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
     {
         RemoteAppsRepository.UpdateAppNotificationFilter(Device!.Id, appPackage, filter);
         var app = RemoteApps.First(p => p.PackageName == appPackage);
-        app.DeviceInfo.Filter = filter;
+        app.Filter = filter;
         app.SelectedNotificationFilter = ApplicationItem.NotificationFilterTypes[filter];
     }
 
@@ -861,7 +828,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
         foreach (var app in RemoteApps)
         {
-            app.DeviceInfo.Filter = filter;
+            app.Filter = filter;
             app.SelectedNotificationFilter = ApplicationItem.NotificationFilterTypes[filter];
         }
     }

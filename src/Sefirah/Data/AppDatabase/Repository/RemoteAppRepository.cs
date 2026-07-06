@@ -9,129 +9,99 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
     public event EventHandler<string>? ApplicationListUpdated;
     public event EventHandler<(string deviceId, ApplicationItem? appInfo, string? packageName)>? ApplicationItemUpdated;
 
-    public IEnumerable<ApplicationItem> GetApplicationsForDevice(string deviceId)
-    {
-        return context.Database.Table<ApplicationEntity>()
-            .ToList()
-            .Where(a => HasDevice(a, deviceId))
-            .Select(a => a.ToApplicationItem(deviceId))
-            .OrderBy(a => a.AppName);
-    }
+    public IEnumerable<ApplicationItem> GetApplicationsForDevice(string deviceId) =>
+        context.Database.Table<ApplicationEntity>()
+            .Where(a => a.DeviceId == deviceId)
+            .OrderBy(a => a.AppName)
+            .Select(a => a.ToApplicationItem());
 
     public ApplicationItem? GetApplicationForDevice(string deviceId, string packageName)
     {
-        var entity = context.Database.Find<ApplicationEntity>(packageName);
-        if (entity is null || !HasDevice(entity, deviceId))
-            return null;
+        var entity = context.Database.Find<ApplicationEntity>(
+            ApplicationEntity.GetKey(deviceId, packageName));
 
-        return entity.ToApplicationItem(deviceId);
+        return entity?.ToApplicationItem();
     }
 
     public async Task AddOrUpdateApplicationForDevice(ApplicationInfo application, string deviceId)
     {
-        ApplicationItem appInfo;
-        var existingApp = context.Database.Find<ApplicationEntity>(application.PackageName);        
-        if (existingApp is not null)
-        {
-            await IconUtils.SaveAppIconToPathAsync(application.AppIcon, application.PackageName);
+        var appKey = ApplicationEntity.GetKey(deviceId, application.PackageName);
+        var existing = context.Database.Find<ApplicationEntity>(appKey);
+        var entity = await ApplicationEntity.FromApplicationInfo(
+            application,
+            deviceId,
+            existing?.Pinned ?? false,
+            existing?.Filter ?? NotificationFilter.ToastFeed);
 
-            // Add device to existing app if not already present
-            if (!HasDevice(existingApp, deviceId))
-            {
-                var deviceInfoList = existingApp.AppDeviceInfoList;
-                deviceInfoList.Add(new AppDeviceInfo(deviceId, NotificationFilter.ToastFeed));
-                existingApp.AppDeviceInfoJson = JsonSerializer.Serialize(deviceInfoList);
-            }
-            
-            context.Database.Update(existingApp);
-            appInfo = existingApp.ToApplicationItem(deviceId);
-        }
-        else
-        {
-            var applicationEntity = await ApplicationEntity.FromApplicationInfo(application, deviceId);
-            context.Database.Insert(applicationEntity);
-            appInfo = applicationEntity.ToApplicationItem(deviceId);
-        }
-        
-        ApplicationItemUpdated?.Invoke(this, (deviceId, appInfo, null));
+        context.Database.InsertOrReplace(entity);
+        ApplicationItemUpdated?.Invoke(this, (deviceId, entity.ToApplicationItem(), null));
     }
 
-    public async Task<NotificationFilter> GetOrCreateAppNotificationFilter(string deviceId, string appPackage, string appName, string? appIcon = null)
+    public async Task<NotificationFilter> GetOrCreateAppNotificationFilter(
+        string deviceId,
+        string appPackage,
+        string appName,
+        string? appIcon = null)
     {
-        var app = context.Database.Find<ApplicationEntity>(appPackage);
-        if (app is not null && HasDevice(app, deviceId, out var deviceInfo))
-        {
-            return deviceInfo?.Filter ?? NotificationFilter.ToastFeed;
-        }
-        
-        // App doesn't exist or device not associated
+        var exisiting = context.Database.Find<ApplicationEntity>(ApplicationEntity.GetKey(deviceId, appPackage));
+
+        if (exisiting is not null)
+            return exisiting.Filter;
+
         var newAppInfo = new ApplicationInfo
         {
             PackageName = appPackage,
             AppName = appName,
-            AppIcon = appIcon
+            AppIcon = appIcon,
         };
 
-        await AddOrUpdateApplicationForDevice(newAppInfo, deviceId);
+        var entity = await ApplicationEntity.FromApplicationInfo(newAppInfo, deviceId);
+        context.Database.InsertOrReplace(entity);
+        ApplicationItemUpdated?.Invoke(this, (deviceId, entity.ToApplicationItem(), null));
+
         return NotificationFilter.ToastFeed;
     }
 
     public void UpdateAppNotificationFilter(string deviceId, string appPackage, NotificationFilter filter)
     {
-        var app = context.Database.Find<ApplicationEntity>(appPackage);
-        var deviceInfoList = app.AppDeviceInfoList;
-        deviceInfoList.First(d => d.DeviceId == deviceId).Filter = filter;
-        app.AppDeviceInfoJson = JsonSerializer.Serialize(deviceInfoList);
-        context.Database.Update(app);
+        var entity = context.Database.Find<ApplicationEntity>(
+            ApplicationEntity.GetKey(deviceId, appPackage));
+        if (entity is null)
+            return;
+
+        entity.Filter = filter;
+        context.Database.Update(entity);
     }
 
     public void UpdateAllAppNotificationFilters(string deviceId, NotificationFilter filter)
     {
-        var appsToUpdate = context.Database.Table<ApplicationEntity>()
-            .ToList()
-            .Where(app => HasDevice(app, deviceId))
+        var apps = context.Database.Table<ApplicationEntity>()
+            .Where(a => a.DeviceId == deviceId)
             .ToList();
 
-        if (appsToUpdate.Count == 0)
-        {
+        if (apps.Count == 0)
             return;
-        }
 
         context.Database.RunInTransaction(() =>
         {
-            foreach (var app in appsToUpdate)
+            foreach (var app in apps)
             {
-                var deviceInfoList = app.AppDeviceInfoList;
-                var deviceInfo = deviceInfoList.First(d => d.DeviceId == deviceId);
-                deviceInfo.Filter = filter;
-                app.AppDeviceInfoJson = JsonSerializer.Serialize(deviceInfoList);
+                app.Filter = filter;
                 context.Database.Update(app);
             }
         });
     }
 
-    public async Task RemoveDeviceFromApplication(string appPackage, string deviceId)
+    public Task RemoveDeviceFromApplication(string appPackage, string deviceId)
     {
-        var app = context.Database.Find<ApplicationEntity>(appPackage);
-        if (app is not null)
+        var appKey = ApplicationEntity.GetKey(deviceId, appPackage);
+        if (context.Database.Delete<ApplicationEntity>(appKey) > 0)
         {
-            var deviceInfoList = app.AppDeviceInfoList;
-            deviceInfoList.RemoveAll(d => d.DeviceId == deviceId);
-            app.AppDeviceInfoJson = JsonSerializer.Serialize(deviceInfoList);
-            
-            if (deviceInfoList.Count == 0)
-            {
-                context.Database.Delete(app);
-                IconUtils.DeleteAppIcon(appPackage);
-            }
-            else
-            {
-                context.Database.Update(app);
-            }
-            
-            // Fire event with null appInfo and packageName to signal removal
+            IconUtils.DeleteAppIcon(deviceId, appPackage);
             ApplicationItemUpdated?.Invoke(this, (deviceId, null, appPackage));
         }
+
+        return Task.CompletedTask;
     }
 
     public async Task UpdateApplicationList(PairedDevice pairedDevice, ApplicationList applicationList)
@@ -139,26 +109,17 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
         try
         {
             var currentPackageNames = context.Database.Table<ApplicationEntity>()
-                .ToList()
-                .Where(a => HasDevice(a, pairedDevice.Id))
+                .Where(a => a.DeviceId == pairedDevice.Id)
                 .Select(a => a.PackageName)
                 .ToHashSet();
 
-            // Get new app package names
             var newPackageNames = applicationList.AppList.Select(a => a.PackageName).ToHashSet();
-            
-            // Find apps that need to be removed (in current but not in new)
-            var appsToRemove = currentPackageNames.Except(newPackageNames).ToList();
-            foreach (var packageName in appsToRemove)
-            {
+
+            foreach (var packageName in currentPackageNames.Except(newPackageNames))
                 await RemoveDeviceFromApplication(packageName, pairedDevice.Id);
-            }
-            
-            // Add or update apps from the new list
+
             foreach (var appInfo in applicationList.AppList)
-            {
                 await AddOrUpdateApplicationForDevice(appInfo, pairedDevice.Id);
-            }
 
             ApplicationListUpdated?.Invoke(this, pairedDevice.Id);
         }
@@ -168,81 +129,35 @@ public class RemoteAppRepository(DatabaseContext context, ILogger logger)
         }
     }
 
-    public void RemoveAllAppsForDeviceAsync(string deviceId)
+    public void RemoveAllAppsForDevice(string deviceId)
     {
-        var allApps = context.Database.Table<ApplicationEntity>();
-        List<ApplicationEntity> appsToDelete = [];
-        foreach (var app in allApps)
-        {
-            if (HasDevice(app, deviceId))
-            {
-                var deviceInfoList = app.AppDeviceInfoList;
-                deviceInfoList.RemoveAll(d => d.DeviceId == deviceId);
-                app.AppDeviceInfoJson = JsonSerializer.Serialize(deviceInfoList);
-                
-                if (deviceInfoList.Count == 0)
-                {
-                    appsToDelete.Add(app);
-                }
-                else
-                {
-                    context.Database.Update(app);
-                }
-            }
-        }
-        
-        // Delete apps that no longer have any devices
-        foreach (var app in appsToDelete)
-        {
-            context.Database.Delete(app);
-            IconUtils.DeleteAppIcon(app.PackageName);
-        }
+        context.Database.Table<ApplicationEntity>()
+            .Where(a => a.DeviceId == deviceId)
+            .Delete();
 
+        LocalAppPaths.DeleteDeviceIcons(deviceId);
         ApplicationListUpdated?.Invoke(this, deviceId);
     }
 
     public void PinApp(ApplicationItem appInfo, string deviceId)
     {
-        var app = context.Database.Find<ApplicationEntity>(appInfo.PackageName);
-        var deviceInfoList = app.AppDeviceInfoList;
-        deviceInfoList.First(d => d.DeviceId == deviceId).Pinned = true;
-        app.AppDeviceInfoJson = JsonSerializer.Serialize(deviceInfoList);
-        context.Database.Update(app);
+        var entity = context.Database.Find<ApplicationEntity>(
+            ApplicationEntity.GetKey(deviceId, appInfo.PackageName));
+        if (entity is null)
+            return;
+
+        entity.Pinned = true;
+        context.Database.Update(entity);
     }
 
     public void UnpinApp(ApplicationItem appInfo, string deviceId)
     {
-        var app = context.Database.Find<ApplicationEntity>(appInfo.PackageName);
-        var deviceInfoList = app.AppDeviceInfoList;
-        deviceInfoList.First(d => d.DeviceId == deviceId).Pinned = false;
-        app.AppDeviceInfoJson = JsonSerializer.Serialize(deviceInfoList);
-        context.Database.Update(app);
-    }
-    
-    #region Helpers
-    private static bool HasDevice(ApplicationEntity entity, string deviceId)
-    {
-        return entity.AppDeviceInfoList.Any(d => d.DeviceId == deviceId);
-    }
+        var entity = context.Database.Find<ApplicationEntity>(
+            ApplicationEntity.GetKey(deviceId, appInfo.PackageName));
+        if (entity is null)
+            return;
 
-    private static bool HasDevice(ApplicationEntity entity, string deviceId, out AppDeviceInfo? deviceInfo)
-    {
-        deviceInfo = null;
-        
-        if (string.IsNullOrEmpty(entity.AppDeviceInfoJson))
-            return false;
-            
-        try
-        {
-            var deviceInfoList = entity.AppDeviceInfoList;
-            deviceInfo = deviceInfoList.FirstOrDefault(d => d.DeviceId == deviceId);
-            return deviceInfo != null;
-        }
-        catch (JsonException)
-        {
-            return false;
-        }
+        entity.Pinned = false;
+        context.Database.Update(entity);
     }
-
-    #endregion
 }

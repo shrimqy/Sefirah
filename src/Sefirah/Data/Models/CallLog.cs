@@ -1,10 +1,10 @@
 namespace Sefirah.Data.Models;
 
-public partial class CallLog : ObservableObject
+public partial class CallLog(Contact callContact) : ObservableObject
 {
-    public long CallLogId { get; set; }
+    public Contact CallContact { get; } = callContact;
 
-    public string PhoneNumber { get; set; } = string.Empty;
+    public long CallLogId { get; set; }
 
     public long TimestampMillis { get; set; }
 
@@ -12,18 +12,12 @@ public partial class CallLog : ObservableObject
 
     public CallLogType CallType { get; set; }
 
-    public string? DisplayName { get; set; }
-
-    public ImageSource? AvatarImage { get; set; }
-
     private bool isSelected;
     public bool IsSelected
     {
         get => isSelected;
         set => SetProperty(ref isSelected, value);
     }
-
-    public string PrimaryLabel => string.IsNullOrWhiteSpace(DisplayName) ? PhoneNumber : DisplayName;
 
     public DateTimeOffset LocalTimestamp => DateTimeOffset.FromUnixTimeMilliseconds(TimestampMillis).ToLocalTime();
 

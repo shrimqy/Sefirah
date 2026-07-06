@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 using Sefirah.Data.Models;
 using Sefirah.Platforms.Windows.HostedApp;
 using Windows.Management.Deployment;
-using static Sefirah.Utils.IconUtils;
+using Sefirah.Utils;
 using RegisterPackageOptions = Windows.Management.Deployment.RegisterPackageOptions;
 
 namespace Sefirah.Platforms.Windows.Services;
@@ -49,7 +49,7 @@ public sealed class WindowsAppShortcutService(ILogger logger) : IAppShortcutServ
 
             Directory.CreateDirectory(imagesPath);
 
-            await CopyHostedAppImagesAsync(app.PackageName, folderPath);
+            await CopyHostedAppImagesAsync(app.DeviceId, app.PackageName, folderPath);
 
             var manifestPath = Path.Combine(folderPath, "AppxManifest.xml");
             var manifestXml = BuildHostedAppManifest(identityName, app, hostName, hostPublisher, hostVersion);
@@ -206,9 +206,9 @@ public sealed class WindowsAppShortcutService(ILogger logger) : IAppShortcutServ
             .Replace("'", "&apos;");
     }
 
-    private static async Task CopyHostedAppImagesAsync(string packageName, string packageRoot)
+    private static async Task CopyHostedAppImagesAsync(string deviceId, string packageName, string packageRoot)
     {
-        var sourcePath = GetAppIconFilePath(packageName);
+        var sourcePath = LocalAppPaths.GetAppIconFilePath(deviceId, packageName);
         await HostedAppIconGenerator.GenerateAsync(sourcePath, packageRoot);
     }
 }

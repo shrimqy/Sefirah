@@ -1,22 +1,20 @@
 using Sefirah.Data.AppDatabase.Models;
-using Sefirah.Data.Models;
 
 namespace Sefirah.Data.AppDatabase.Repository;
 
-public class SmsRepository(DatabaseContext context, ContactRepository contactRepository, ILogger logger)
+public class SmsRepository(DatabaseContext context, ILogger logger)
 {
     #region Conversation Operations
 
     public async Task<ConversationEntity?> GetConversationAsync(string deviceId, long threadId)
     {
-        return await Task.Run(() => 
-            context.Database.Table<ConversationEntity>()
-                .FirstOrDefault(c => c.DeviceId == deviceId && c.ThreadId == threadId));
+        return await Task.Run(() =>
+            context.Database.Find<ConversationEntity>(ConversationEntity.GetKey(deviceId, threadId)));
     }
 
     public async Task<List<ConversationEntity>> GetConversationsAsync(string deviceId)
     {
-        return await Task.Run(() => 
+        return await Task.Run(() =>
             context.Database.Table<ConversationEntity>()
                 .Where(c => c.DeviceId == deviceId)
                 .OrderByDescending(c => c.LastMessageTimestamp)
@@ -32,14 +30,11 @@ public class SmsRepository(DatabaseContext context, ContactRepository contactRep
     {
         try
         {
+            var conversationKey = ConversationEntity.GetKey(deviceId, threadId);
             await Task.Run(() =>
             {
-                // Delete conversation
-                context.Database.Delete<ConversationEntity>(threadId);
-                
-                // Delete associated messages
-                context.Database.Execute("DELETE FROM TextMessageEntity WHERE DeviceId = ? AND ThreadId = ?", deviceId, threadId);
-                
+                context.Database.Delete<ConversationEntity>(conversationKey);
+                context.Database.Table<MessageEntity>().Where(m => m.ConversationKey == conversationKey).Delete();
             });
             return true;
         }
@@ -50,24 +45,19 @@ public class SmsRepository(DatabaseContext context, ContactRepository contactRep
         }
     }
 
-    /// <summary>
-    /// Deletes all SMS data (conversations, messages, contacts, attachments) for a device.
-    /// Call when a device is removed.
-    /// </summary>
     public void DeleteAllDataForDevice(string deviceId)
     {
-        // Order matters: attachments reference messages, so delete attachments first.
-        var messageIds = context.Database.Table<MessageEntity>()
+        var messageKeys = context.Database.Table<MessageEntity>()
             .Where(m => m.DeviceId == deviceId)
-            .Select(m => m.UniqueId)
+            .Select(m => m.Key)
             .ToList();
+
         context.Database.Table<AttachmentEntity>()
-            .Where(a => messageIds.Contains(a.MessageUniqueId))
+            .Where(a => messageKeys.Contains(a.MessageKey))
             .Delete();
 
         context.Database.Table<MessageEntity>().Where(m => m.DeviceId == deviceId).Delete();
         context.Database.Table<ConversationEntity>().Where(c => c.DeviceId == deviceId).Delete();
-        contactRepository.DeleteAllContactsForDevice(deviceId);
 
         logger.Info($"Deleted all SMS data for device {deviceId}");
     }
@@ -78,9 +68,10 @@ public class SmsRepository(DatabaseContext context, ContactRepository contactRep
 
     public async Task<List<MessageEntity>> GetMessagesAsync(string deviceId, long threadId)
     {
-        return await Task.Run(() => 
+        var conversationKey = ConversationEntity.GetKey(deviceId, threadId);
+        return await Task.Run(() =>
             context.Database.Table<MessageEntity>()
-                .Where(m => m.DeviceId == deviceId && m.ThreadId == threadId)
+                .Where(m => m.ConversationKey == conversationKey)
                 .OrderBy(m => m.Timestamp)
                 .ToList());
     }
@@ -89,55 +80,12 @@ public class SmsRepository(DatabaseContext context, ContactRepository contactRep
     {
         try
         {
-            var messages = await GetMessagesAsync(deviceId, threadId);
-            
-            //// Load attachments for each message
-            //foreach (var message in messages)
-            //{
-            //    var attachments = await GetAttachmentsAsync(message.UniqueId);
-            //    // Convert attachments to TextMessage.Attachments format if needed
-            //    if (attachments.Count > 0)
-            //    {
-            //        //message.Attachments = attachments.Select(a => new SmsAttachment
-            //        //{
-            //        //    Base64Data = a.Data
-            //        //}).ToList();
-            //    }
-            //}
-            
-            return messages;
+            return await GetMessagesAsync(deviceId, threadId);
         }
         catch (Exception ex)
         {
             logger.Error($"Error getting messages with attachments for device {deviceId}, thread {threadId}", ex);
             return [];
-        }
-    }
-
-    public List<MessageEntity>? GetMessageAsync(string deviceId, long uniqueId)
-    {
-        try
-        {
-            return context.Database.Table<MessageEntity>().Where(m => m.DeviceId == deviceId && m.UniqueId == uniqueId).ToList();
-        }
-        catch (Exception ex)
-        {
-            logger.Error($"Error getting message {uniqueId} for device {deviceId}", ex);
-            return null;
-        }
-    }
-
-    public async Task<bool> SaveMessageAsync(MessageEntity message)
-    {
-        try
-        {
-            await Task.Run(() => context.Database.InsertOrReplace(message));
-            return true;
-        }
-        catch (Exception ex)
-        {
-            logger.Error($"Error saving message {message.UniqueId} for device {message.DeviceId}", ex);
-            return false;
         }
     }
 
@@ -155,40 +103,22 @@ public class SmsRepository(DatabaseContext context, ContactRepository contactRep
         }
     }
 
-    public async Task<bool> DeleteMessageAsync(string deviceId, long uniqueId)
-    {
-        try
-        {
-            await Task.Run(() =>
-            {
-                context.Database.Execute("DELETE FROM TextMessageEntity WHERE DeviceId = ? AND UniqueId = ?", deviceId, uniqueId);
-                // Note: Attachment deletion removed for now as per user request
-            });
-            return true;
-        }
-        catch (Exception ex)
-        {
-            logger.Error($"Error deleting message {uniqueId} for device {deviceId}", ex);
-            return false;
-        }
-    }
-
     #endregion
 
     #region Attachment Operations
 
-    public async Task<List<AttachmentEntity>> GetAttachmentsAsync(long messageUniqueId)
+    public async Task<List<AttachmentEntity>> GetAttachmentsAsync(string messageKey)
     {
         try
         {
-            return await Task.Run(() => 
+            return await Task.Run(() =>
                 context.Database.Table<AttachmentEntity>()
-                    .Where(a => a.MessageUniqueId == messageUniqueId)
+                    .Where(a => a.MessageKey == messageKey)
                     .ToList());
         }
         catch (Exception ex)
         {
-            logger.Error($"Error getting attachments for message {messageUniqueId}", ex);
+            logger.Error($"Error getting attachments for message {messageKey}", ex);
             return [];
         }
     }
@@ -202,7 +132,7 @@ public class SmsRepository(DatabaseContext context, ContactRepository contactRep
         }
         catch (Exception ex)
         {
-            logger.Error($"Error saving attachment for message {attachment.MessageUniqueId}", ex);
+            logger.Error($"Error saving attachment for message {attachment.MessageKey}", ex);
             return false;
         }
     }
@@ -222,4 +152,4 @@ public class SmsRepository(DatabaseContext context, ContactRepository contactRep
     }
 
     #endregion
-} 
+}

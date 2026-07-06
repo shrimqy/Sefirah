@@ -3,13 +3,15 @@ using WinRTPhoneCall = Windows.ApplicationModel.Calls.PhoneCall;
 
 namespace Sefirah.Platforms.Windows.Calling;
 
-public sealed partial class PhoneCall(WinRTPhoneCall call) : IPhoneCall
+public sealed partial class PhoneCall(WinRTPhoneCall call, string transportDeviceId) : IPhoneCall
 {
     private readonly Lock eventLock = new();
     private EventHandler? audioDeviceChanged;
     private EventHandler? statusChanged;
     private EventHandler? isMutedChanged;
     private bool disposed;
+
+    public string TransportDeviceId { get; } = transportDeviceId;
 
     public CallingPhoneCallAudioDevice AudioDevice => MapAudioDevice(call.AudioDevice);
     public string CallId => call.CallId;
@@ -82,11 +84,11 @@ public sealed partial class PhoneCall(WinRTPhoneCall call) : IPhoneCall
         }
     }
 
-    public static IPhoneCall? FromCallId(string callId)
+    public static IPhoneCall? FromCallId(string callId, string transportDeviceId)
     {
         if (string.IsNullOrEmpty(callId)) return null;
         var c = WinRTPhoneCall.GetFromId(callId);
-        return c is null ? null : new PhoneCall(c);
+        return c is null ? null : new PhoneCall(c, transportDeviceId);
     }
 
     public async Task<CallingPhoneCallOperationStatus> ChangeAudioDeviceAsync(CallingPhoneCallAudioDevice device) =>

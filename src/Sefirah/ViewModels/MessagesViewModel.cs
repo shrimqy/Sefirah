@@ -202,13 +202,13 @@ public sealed partial class MessagesViewModel : BaseViewModel
     public List<Conversation> SearchConversations(string searchText)
     {
         if (string.IsNullOrWhiteSpace(searchText) || searchText.Length < 2) return [];
-        
+
         return Conversations
             .Where(c => c.DisplayName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
                        c.LastMessage.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
                        c.Contacts.Any(s => s.Address.Contains(searchText, StringComparison.OrdinalIgnoreCase)))
-            .OrderByDescending(c => c.LastMessageTimestamp) 
-            .Take(10) 
+            .OrderByDescending(c => c.LastMessageTimestamp)
+            .Take(10)
             .ToList();
     }
 
@@ -291,9 +291,8 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
             if (shouldStartNewGroup)
             {
-                currentGroup = new MessageGroup
+                currentGroup = new MessageGroup(message.Participant)
                 {
-                    Sender = message.Participant,
                     Messages = []
                 };
                 MessageGroups.Add(currentGroup);
@@ -319,9 +318,8 @@ public sealed partial class MessagesViewModel : BaseViewModel
         if (MessageGroups.Count == 0)
         {
             // First message - create new group
-            MessageGroups.Add(new MessageGroup
+            MessageGroups.Add(new MessageGroup(message.Participant)
             {
-                Sender = message.Participant,
                 Messages = [message]
             });
             return;
@@ -336,9 +334,8 @@ public sealed partial class MessagesViewModel : BaseViewModel
                 lastGroup.Messages.Add(message);
                 return;
             }
-            MessageGroups.Add(new MessageGroup
+            MessageGroups.Add(new MessageGroup(message.Participant)
             {
-                Sender = message.Participant,
                 Messages = [message]
             });
             return;
@@ -353,9 +350,8 @@ public sealed partial class MessagesViewModel : BaseViewModel
                 firstGroup.Messages.Insert(0, message);
                 return;
             }
-            MessageGroups.Insert(0, new MessageGroup
+            MessageGroups.Insert(0, new MessageGroup(message.Participant)
             {
-                Sender = message.Participant,
                 Messages = [message]
             });
             return;
@@ -366,9 +362,8 @@ public sealed partial class MessagesViewModel : BaseViewModel
         if (TryAddToExistingGroup(message, insertIndex))
             return;
 
-        MessageGroups.Insert(insertIndex, new MessageGroup
+        MessageGroups.Insert(insertIndex, new MessageGroup(message.Participant)
         {
-            Sender = message.Participant,
             Messages = [message]
         });
     }

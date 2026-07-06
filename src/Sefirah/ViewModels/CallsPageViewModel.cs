@@ -1,5 +1,4 @@
 using CommunityToolkit.WinUI;
-using Microsoft.UI.Xaml.Media.Imaging;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Models;
 using Sefirah.Dialogs;
@@ -47,29 +46,20 @@ public sealed partial class CallsPageViewModel : BaseViewModel
 
     partial void OnPhoneNumberChanged(string oldValue, string newValue)
     {
-        if (!string.IsNullOrEmpty(newValue))
+        if (string.IsNullOrEmpty(newValue))
         {
-            var contact = contactRepository.GetContactByPhoneNumber(newValue);
-
-            if (contact is not null)
-            {
-                DialContactDisplayName = contact.DisplayName;
-                DialContactAvatar = contact.Avatar;
-                return;
-            }
-            ClearDialContactVisual();
+            DialContact = null;
+            return;
         }
+        
+        DialContact = contactRepository.LookupContact(ActiveDevice!.Id, newValue);
     }
 
     [ObservableProperty]
     public partial CallLog? SelectedCallLog { get; set; }
 
-
     [ObservableProperty]
-    public partial string? DialContactDisplayName { get; set; }
-
-    [ObservableProperty]
-    public partial BitmapImage? DialContactAvatar { get; set; }
+    public partial Contact? DialContact { get; set; }
 
     private bool isLoadingCallLogs;
     public bool IsLoadingCallLogs
@@ -117,8 +107,7 @@ public sealed partial class CallsPageViewModel : BaseViewModel
 
     private void ClearDialContactVisual()
     {
-        DialContactDisplayName = null;
-        DialContactAvatar = null;
+        DialContact = null;
     }
 
     private void OnCallLogUpdated(object? sender, (string deviceId, CallLog callLog) args)
@@ -228,9 +217,7 @@ public sealed partial class CallsPageViewModel : BaseViewModel
     public void ApplyContactToDialer(Contact contact)
     {
         PhoneNumber = contact.Address;
-        DialContactDisplayName = contact.DisplayName;
-        DialContactAvatar = contact.Avatar;
-
+        DialContact = contact;
     }
 
     public void ApplySearchQueryAsNumber(string? query)
@@ -277,7 +264,7 @@ public sealed partial class CallsPageViewModel : BaseViewModel
 
     public async Task DialSelectedCallLogAsync(CallLog callLog)
     {
-        var number = callLog.PhoneNumber;
+        var number = callLog.CallContact.Address;
         if (string.IsNullOrWhiteSpace(number)) return;
 
         await phoneLineService.DialAsync(number);

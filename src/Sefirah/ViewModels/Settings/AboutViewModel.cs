@@ -114,7 +114,7 @@ public partial class AboutViewModel : ObservableObject
         new("https://github.com/SharpAdb/AdvancedSharpAdbClient", "AdvancedSharpAdbClient"),
         
         // Windows Integration
-        new("https://github.com/HavenDV/H.NotifyIcon", "H.NotifyIcon"),
+        new("https://github.com/0x5bfa/DesktopFlyouts", "DesktopFlyouts"),
         new("https://github.com/dotMorten/WinUIEx", "WinUIEx"),
         new("https://github.com/dahall/vanara", "Vanara.PInvoke"),
         

@@ -1,5 +1,3 @@
-using Sefirah.Data.Contracts;
-
 namespace Sefirah.Platforms.Desktop.Services;
 public partial class DesktopUpdateService : ObservableObject, IUpdateService
 {
