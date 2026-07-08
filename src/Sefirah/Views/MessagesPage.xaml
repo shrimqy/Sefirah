@@ -116,12 +116,19 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock
-                            Grid.Column="0"
-                            FontWeight="SemiBold"
-                            Foreground="{x:Bind HasRead, Mode=OneWay, Converter={StaticResource BooleanToTextColorConverter}}"
-                            Text="{x:Bind DisplayName, Mode=OneWay, FallbackValue='Unknown'}"
-                            TextTrimming="CharacterEllipsis" />
+<StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontWeight="SemiBold"
+                                        Foreground="{x:Bind HasRead, Mode=OneWay, Converter={StaticResource BooleanToTextColorConverter}}"
+                                        Text="{x:Bind DisplayName, Mode=OneWay, FallbackValue='Unknown'}"
+                                        TextTrimming="CharacterEllipsis" />
+                                    <TextBlock
+                                        FontSize="11"
+                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                        Text="{x:Bind SubtitleAddress, Mode=OneWay}"
+                                        TextTrimming="CharacterEllipsis"
+                                        Visibility="{x:Bind SubtitleAddress, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
+                                </StackPanel>
 
                         <TextBlock
                             Grid.Column="1"
