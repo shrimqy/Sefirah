@@ -151,6 +151,8 @@ public partial class App : Application
 
             // Place the frame in the current Window
             MainWindow.Content = rootFrame;
+                            // Set a reasonable default size on first launch
+                MainWindow.AppWindow.Resize(new SizeInt32 { Width = 1100, Height = 700 });
         }
 
         return rootFrame;
