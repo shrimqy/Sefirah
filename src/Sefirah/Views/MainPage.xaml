@@ -69,6 +69,7 @@
                 <userControls:DeviceControlCenter
                     x:Name="ConnectedDevicePane"
                     Grid.Row="0"
+                    PaneFlyoutPlacement="Bottom"
                     Visibility="{x:Bind ViewModel.Device, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}" />
 
                 <StackPanel

@@ -1,6 +1,6 @@
 <Project Sdk="Uno.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>net9.0-windows10.0.26100;net9.0-desktop</TargetFrameworks>
+        <TargetFrameworks>net10.0-windows10.0.26100;net10.0-desktop</TargetFrameworks>
 
         <OutputType>Exe</OutputType>
         <UnoSingleProject>true</UnoSingleProject>
@@ -66,15 +66,26 @@
         <UnoIconBackgroundColor Condition="'$(IsWinAppSdk)' == 'true'">Transparent</UnoIconBackgroundColor>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100'">
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100'">
         <StartupObject>Sefirah.Platforms.Windows.Program</StartupObject>
         <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-desktop'">
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
         <StartupObject>Program</StartupObject>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100'">
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
+        <PackageReference Include="Tmds.DBus.Protocol" />
+        <PackageReference Include="Tmds.DBus.Generator">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <AdditionalFiles Include="Platforms\Desktop\Tray\DBusXml\com.canonical.dbusmenu.xml" Namespace="Sefirah.Platforms.Desktop.Tray.DBus" DBusGeneratorMode="Handler" />
+        <AdditionalFiles Include="Platforms\Desktop\Tray\DBusXml\org.kde.StatusNotifierItem.xml" Namespace="Sefirah.Platforms.Desktop.Tray.DBus" DBusGeneratorMode="Handler" />
+        <AdditionalFiles Include="Platforms\Desktop\Tray\DBusXml\org.kde.StatusNotifierWatcher.xml" Namespace="Sefirah.Platforms.Desktop.Tray.DBus" DBusGeneratorMode="Proxy" />
+    </ItemGroup>
+
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100'">
         <PublishTrimmed>false</PublishTrimmed>
         <TrimMode>partial</TrimMode>
         <!-- Disable ILLink  -->
@@ -83,13 +94,20 @@
         <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
     </PropertyGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100'">
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100'">
+        <PackageReference Include="DesktopFlyouts.WinUI" />
         <RuntimeHostConfigurationOption Include="System.Runtime.InteropServices.BuiltInComInterop.IsSupported" Value="true" />
         <RuntimeHostConfigurationOption Include="System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization" Value="false" />
     </ItemGroup>
 
     <ItemGroup>
         <Content Include="Assets\Icons\IconResource.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="Assets\Icons\SefirahDark.ico">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="Assets\Icons\SefirahLight.ico">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
@@ -100,14 +118,12 @@
         <PackageReference Include="CommunityToolkit.WinUI.Converters" />
         <PackageReference Include="CommunityToolkit.WinUI.Extensions" />
         <PackageReference Include="CommunityToolkit.WinUI.Controls.Segmented" />
-        <PackageReference Include="H.NotifyIcon.Uno.WinUI" />
         <PackageReference Include="libphonenumber-csharp" />
         <PackageReference Include="MeaMod.DNS" />
         <PackageReference Include="NAudio" />
         <PackageReference Include="NetCoreServer" />
         <PackageReference Include="sqlite-net-pcl" />
         <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" />
-        <PackageReference Include="SQLitePCLRaw.provider.sqlite3" />
         <PackageReference Include="SSH.NET" />
         <PackageReference Include="Tmds.DBus" />
         <PackageReference Include="Vanara.PInvoke.CldApi" />
@@ -116,6 +132,11 @@
         <PackageReference Include="QRCoder" />
     </ItemGroup>
     
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100'">
+        <PackageReference Include="Microsoft.Windows.SDK.BuildTools" VersionOverride="10.0.28000.1839" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" />
+    </ItemGroup>
+
     <ItemGroup>
         <UnoSplashScreen Update="Assets\Splash\splash_screen.svg">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -123,22 +144,19 @@
     </ItemGroup>
 
     <!-- Hosted app PRI generation: bundle Windows SDK mrmsupport.dll into the MSIX package. -->
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100'">
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100'">
         <SefirahMrmSupportSdkVersion Condition="'$(SefirahMrmSupportSdkVersion)' == ''">10.0.26100.0</SefirahMrmSupportSdkVersion>
         <SefirahMrmSupportSdkArch Condition="'$(Platform)' == 'ARM64'">arm64</SefirahMrmSupportSdkArch>
         <SefirahMrmSupportSdkArch Condition="'$(SefirahMrmSupportSdkArch)' == ''">x64</SefirahMrmSupportSdkArch>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100' and '$(SefirahMrmSupportDll)' == '' and Exists('C:\Program Files (x86)\Windows Kits\10\bin\$(SefirahMrmSupportSdkVersion)\$(SefirahMrmSupportSdkArch)\mrmsupport.dll')">
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100' and '$(SefirahMrmSupportDll)' == '' and Exists('C:\Program Files (x86)\Windows Kits\10\bin\$(SefirahMrmSupportSdkVersion)\$(SefirahMrmSupportSdkArch)\mrmsupport.dll')">
         <SefirahMrmSupportDll>C:\Program Files (x86)\Windows Kits\10\bin\$(SefirahMrmSupportSdkVersion)\$(SefirahMrmSupportSdkArch)\mrmsupport.dll</SefirahMrmSupportDll>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100' and '$(SefirahMrmSupportDll)' == '' and Exists('C:\Program Files\Windows Kits\10\bin\$(SefirahMrmSupportSdkVersion)\$(SefirahMrmSupportSdkArch)\mrmsupport.dll')">
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100' and '$(SefirahMrmSupportDll)' == '' and Exists('C:\Program Files\Windows Kits\10\bin\$(SefirahMrmSupportSdkVersion)\$(SefirahMrmSupportSdkArch)\mrmsupport.dll')">
         <SefirahMrmSupportDll>C:\Program Files\Windows Kits\10\bin\$(SefirahMrmSupportSdkVersion)\$(SefirahMrmSupportSdkArch)\mrmsupport.dll</SefirahMrmSupportDll>
     </PropertyGroup>
-    <Target Name="IncludeMrmSupportDll"
-            BeforeTargets="PrepareForBuild"
-            Condition="'$(TargetFramework)' == 'net9.0-windows10.0.26100' and '$(Platform)' != 'Any CPU' and '$(Platform)' != 'x86'">
-        <Error Condition="'$(SefirahMrmSupportDll)' == '' or !Exists('$(SefirahMrmSupportDll)')"
-               Text="Windows SDK mrmsupport.dll was not found. Install the Windows SDK or set SefirahMrmSupportDll." />
+    <Target Name="IncludeMrmSupportDll" BeforeTargets="PrepareForBuild" Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100' and '$(Platform)' != 'Any CPU' and '$(Platform)' != 'x86'">
+        <Error Condition="'$(SefirahMrmSupportDll)' == '' or !Exists('$(SefirahMrmSupportDll)')" Text="Windows SDK mrmsupport.dll was not found. Install the Windows SDK or set SefirahMrmSupportDll." />
         <ItemGroup>
             <Content Include="$(SefirahMrmSupportDll)">
                 <Link>mrmsupport.dll</Link>

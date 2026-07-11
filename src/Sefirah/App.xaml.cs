@@ -6,15 +6,16 @@ using Sefirah.Views;
 using Sefirah.Views.Onboarding;
 using Windows.ApplicationModel.Activation;
 using LaunchActivatedEventArgs = Microsoft.UI.Xaml.LaunchActivatedEventArgs;
-using H.NotifyIcon;
 using System.Runtime.InteropServices;
 using Microsoft.UI.Windowing;
 using WinRT.Interop;
 using Sefirah.Data.Models;
 using Sefirah.Views.WindowViews;
 
+
 #if WINDOWS
 using Sefirah.Platforms.Windows.Helpers;
+using Sefirah.Platforms.Windows.Interop;
 #endif
 
 namespace Sefirah;
@@ -64,8 +65,7 @@ public partial class App : Application
             var appActivationArguments = Microsoft.Windows.AppLifecycle.AppInstance.GetCurrent().GetActivatedEventArgs();
             isStartupTask = appActivationArguments.Data is IStartupTaskActivatedEventArgs;
 
-            HookEventsForWindow();
-            bool isStartupRegistered = ApplicationData.Current.LocalSettings.Values["isStartupRegistered"] == null;
+            bool isStartupRegistered = ApplicationData.Current.LocalSettings.Values["isStartupRegistered"] is null;
             if (isStartupRegistered)
             {
                 await AppLifecycleHelper.HandleStartupTaskAsync(true);
@@ -75,6 +75,9 @@ public partial class App : Application
             if (appActivationArguments.Data is ProtocolActivatedEventArgs protocolArgs)
                 HandleProtocolActivationArgs(protocolArgs);
 #endif
+            HookEventsForWindow();
+            _ = Ioc.Default.GetRequiredService<ISystemTrayService>();
+
             var rootFrame = EnsureWindowIsInitialized();
             if (rootFrame is null)
                 return;
@@ -211,21 +214,74 @@ public partial class App : Application
         }
     }
 
+#endif
+
     private void HookEventsForWindow()
     {
+#if WINDOWS
         MainWindow.Activated += Window_Activated;
+#endif
         MainWindow.Closed += Window_Closed;
     }
 
     private void Window_Closed(object sender, WindowEventArgs args)
     {
-        if (HandleClosedEvents)
-        {
-            args.Handled = true;
-            MainWindow.Hide();
-        }
+        if (!HandleClosedEvents)
+            return;
+
+        if (Ioc.Default.GetService<ISystemTrayService>() is not { IsAvailable: true })
+            return;
+
+        args.Handled = true;
+        MainWindow.AppWindow.Hide();
     }
 
+    public static void TrayStartScrcpy()
+    {
+        var device = Ioc.Default.GetRequiredService<IDeviceManager>().ActiveDevice;
+        if (device is not null)
+            _ = Ioc.Default.GetRequiredService<IScreenMirrorService>().StartScrcpy(device);
+    }
+
+    public static void TrayToggleWindow()
+    {
+        MainWindow.DispatcherQueue.TryEnqueue(() =>
+        {
+            var presenter = MainWindow.AppWindow.Presenter as OverlappedPresenter;
+            var isMinimized = presenter?.State is OverlappedPresenterState.Minimized;
+
+            if (!MainWindow.Visible || isMinimized)
+            {
+                ShowMainWindow();
+                return;
+            }
+
+            MainWindow.AppWindow.Hide();
+        });
+    }
+
+    public static void ShowMainWindow()
+    {
+        var presenter = MainWindow.AppWindow.Presenter as OverlappedPresenter;
+        if (presenter?.State is OverlappedPresenterState.Minimized)
+            presenter.Restore();
+
+        MainWindow.AppWindow.Show();
+        MainWindow.Activate();
+#if WINDOWS
+        InteropHelpers.SetForegroundWindow(WindowHandle);
+#endif
+    }
+
+    public static void TrayExitApplication()
+    {
+        HandleClosedEvents = false;
+        Ioc.Default.GetService<ISystemTrayService>()?.Dispose();
+        MainWindow?.Close();
+        Current.Exit();
+    }
+
+#if WINDOWS
     private void Window_Activated(object sender, WindowActivatedEventArgs args)
     {
         if (args.WindowActivationState is WindowActivationState.CodeActivated ||

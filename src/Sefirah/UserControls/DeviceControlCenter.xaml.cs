@@ -1,24 +1,40 @@
 using System.Collections.Specialized;
+using System.Numerics;
 using CommunityToolkit.WinUI.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
 using Sefirah.Utils;
 using Sefirah.ViewModels;
+using Windows.Foundation;
 
 namespace Sefirah.UserControls;
 
 public sealed partial class DeviceControlCenter : UserControl
 {
+    public static readonly DependencyProperty PaneFlyoutPlacementProperty =
+        DependencyProperty.Register(
+            nameof(PaneFlyoutPlacement),
+            typeof(FlyoutPlacementMode),
+            typeof(DeviceControlCenter),
+            new PropertyMetadata(FlyoutPlacementMode.Bottom));
+
     public MainPageViewModel ViewModel { get; } = Ioc.Default.GetRequiredService<MainPageViewModel>();
+
+    public FlyoutPlacementMode PaneFlyoutPlacement
+    {
+        get => (FlyoutPlacementMode)GetValue(PaneFlyoutPlacementProperty);
+        set => SetValue(PaneFlyoutPlacementProperty, value);
+    }
 
     private Storyboard? currentOverlayAnimation;
 
     private static bool IsPhoneFrameScrollTeachingTipShown
     {
         get => ApplicationData.Current.LocalSettings.Values[Constants.LocalSettings.PhoneFrameScrollTeachingTipShown] is true;
-        set => ApplicationData.Current.LocalSettings.Values[Constants.LocalSettings.PhoneFrameScrollTeachingTipShown] = value;
+        set => ApplicationData.Current.LocalSettings.Values[Constants.LocalSettings.PhoneFrameScrollTeachingTipShown] = true;
     }
 
     public DeviceControlCenter()
@@ -84,6 +100,42 @@ public sealed partial class DeviceControlCenter : UserControl
     {
         if (sender is Slider slider && slider.Tag is AudioStream stream)
             ViewModel.SetAudioLevel(stream.StreamType, (int)slider.Value);
+    }
+
+    private void PaneFlyout_Opened(object sender, object e)
+    {
+        if (sender is Flyout flyout)
+            CenterFlyout(flyout);
+    }
+
+    private void CenterFlyout(Flyout flyout)
+    {
+        if ((flyout.Content as FrameworkElement)?.Parent is not FlyoutPresenter presenter)
+            return;
+
+        if (Root.ActualWidth <= 0 || presenter.ActualWidth <= 0)
+            return;
+
+        presenter.Translation = Vector3.Zero;
+
+        var offsetX = GetPaneCenterOffsetX(Root, presenter);
+        if (offsetX is null)
+            return;
+
+        presenter.Translation = new Vector3((float)offsetX.Value, 0, 0);
+    }
+
+    private static double? GetPaneCenterOffsetX(FrameworkElement pane, FlyoutPresenter presenter)
+    {
+        try
+        {
+            var paneBounds = pane.TransformToVisual(presenter).TransformBounds(new Rect(0, 0, pane.ActualWidth, pane.ActualHeight));
+            return (paneBounds.X + (paneBounds.Width / 2)) - (presenter.ActualWidth / 2);
+        }
+        catch (InvalidOperationException)
+        {
+            return null;
+        }
     }
 
     private void AddressListView_ItemClick(object sender, ItemClickEventArgs e)

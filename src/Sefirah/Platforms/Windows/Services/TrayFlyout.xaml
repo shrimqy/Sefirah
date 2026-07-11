@@ -1,0 +1,40 @@
+﻿<local:DesktopFlyout
+    x:Class="Sefirah.Platforms.Windows.Services.TrayFlyout"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:Sefirah.Converters"
+    xmlns:local="using:DesktopFlyouts"
+    xmlns:userControls="using:Sefirah.UserControls"
+    FlyoutWidth="368">
+
+    <local:DesktopFlyout.Resources>
+        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
+    </local:DesktopFlyout.Resources>
+
+    <!--  Island 1: Notifications  -->
+    <local:DesktopFlyoutIsland
+        x:Name="NotificationIsland"
+        IslandHeight="*"
+        Visibility="{x:Bind ViewModel.Notifications.Count, Mode=OneWay, Converter={StaticResource CountToVisibilityConverter}}">
+        <userControls:NotificationsControl
+            Margin="12,8,12,0" />
+    </local:DesktopFlyoutIsland>
+
+    <!--  Island 2: Media sessions  -->
+    <local:DesktopFlyoutIsland
+        x:Name="MediaIsland"
+        IslandHeight="158"
+        Visibility="{x:Bind ViewModel.Device.RemotePlaybackSessions.Count, Converter={StaticResource CountToVisibilityConverter}, Mode=OneWay}">
+        <userControls:MediaSessionsControl
+            Margin="12,4,12,0" />
+    </local:DesktopFlyoutIsland>
+
+    <!--  Island 3: Device info + quick actions  -->
+    <local:DesktopFlyoutIsland IslandHeight="Auto">
+        <userControls:DeviceControlCenter
+            HorizontalAlignment="Stretch"
+            Margin="12"
+            PaneFlyoutPlacement="Top" />
+    </local:DesktopFlyoutIsland>
+
+</local:DesktopFlyout>
