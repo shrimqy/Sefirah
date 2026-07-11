@@ -138,6 +138,7 @@
 
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <Button
+                        x:Name="AudioButton"
                         Padding="4"
                         AutomationProperties.Name="{helpers:ResourceString Name=DeviceAudio}"
                         Background="Transparent"
@@ -146,10 +147,13 @@
                             Glyph="{x:Bind ViewModel.Device.RingerMode, Converter={StaticResource RingerModeToIconConverter}, Mode=OneWay}"
                             Opacity="{x:Bind ViewModel.Device.IsConnected, Mode=OneWay, Converter={StaticResource BoolToConnectedOpacityConverter}}" />
                         <Button.Flyout>
-                            <Flyout Placement="Bottom">
+                            <Flyout
+                                x:Name="AudioFlyout"
+                                Opened="PaneFlyout_Opened"
+                                Placement="{x:Bind PaneFlyoutPlacement, Mode=OneWay}"
+                                ShouldConstrainToRootBounds="False">
                                 <Flyout.FlyoutPresenterStyle>
                                     <Style BasedOn="{StaticResource DefaultFlyoutPresenterStyle}" TargetType="FlyoutPresenter">
-                                        <Setter Property="Margin" Value="4,0" />
                                         <Setter Property="MinWidth" Value="280" />
                                     </Style>
                                 </Flyout.FlyoutPresenterStyle>
@@ -244,10 +248,13 @@
                         <TextBlock Text="{x:Bind ViewModel.Device.ConnectionStatusText, Mode=OneWay}" />
 
                         <Button.Flyout>
-                            <Flyout x:Name="ConnectionFlyout">
+                            <Flyout
+                                x:Name="ConnectionFlyout"
+                                Opened="PaneFlyout_Opened"
+                                Placement="{x:Bind PaneFlyoutPlacement, Mode=OneWay}"
+                                ShouldConstrainToRootBounds="False">
                                 <Flyout.FlyoutPresenterStyle>
                                     <Style BasedOn="{StaticResource DefaultFlyoutPresenterStyle}" TargetType="FlyoutPresenter">
-                                        <Setter Property="Margin" Value="4,0" />
                                         <Setter Property="MinWidth" Value="354" />
                                     </Style>
                                 </Flyout.FlyoutPresenterStyle>
