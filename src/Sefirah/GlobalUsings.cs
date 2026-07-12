@@ -29,3 +29,4 @@ global using ApplicationExecutionState = Windows.ApplicationModel.Activation.App
 global using global::Sefirah.Extensions;
 global using global::Sefirah.Data.Contracts;
 global using global::Sefirah.Data.Enums;
+global using global::Sefirah.Features;

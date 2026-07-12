@@ -9,7 +9,7 @@ public sealed partial class MainPageViewModel : BaseViewModel
     #region Services
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
     private IScreenMirrorService ScreenMirrorService { get; } = Ioc.Default.GetRequiredService<IScreenMirrorService>();
-    private INotificationService NotificationService { get; } = Ioc.Default.GetRequiredService<INotificationService>();
+    private INotificationFeature NotificationFeature { get; } = Ioc.Default.GetRequiredService<INotificationFeature>();
     private RemoteAppRepository RemoteAppsRepository { get; } = Ioc.Default.GetRequiredService<RemoteAppRepository>();
     private ISessionManager SessionManager { get; } = Ioc.Default.GetRequiredService<ISessionManager>();
     private IUpdateService UpdateService { get; } = Ioc.Default.GetRequiredService<IUpdateService>();
@@ -36,7 +36,7 @@ public sealed partial class MainPageViewModel : BaseViewModel
     /// <summary>
     /// Active device's notifications
     /// </summary>
-    public ObservableCollection<Notification> Notifications => NotificationService.Notifications;
+    public ObservableCollection<Notification> Notifications => NotificationFeature.Notifications;
     #endregion
 
     #region Commands
@@ -109,7 +109,7 @@ public sealed partial class MainPageViewModel : BaseViewModel
     [RelayCommand]
     public void ClearAllNotifications()
     {
-        NotificationService.ClearAllNotification();
+        NotificationFeature.ClearAllNotification();
     }
 
     [RelayCommand]
@@ -121,13 +121,13 @@ public sealed partial class MainPageViewModel : BaseViewModel
     [RelayCommand]
     public void RemoveNotification(Notification notification)
     {
-        NotificationService.RemoveNotification(Device!, notification);
+        NotificationFeature.RemoveNotification(Device!, notification);
     }
 
     [RelayCommand]
     public void HandleNotificationAction(NotificationAction action)
     {
-        NotificationService.ProcessClickAction(Device!, action.NotificationKey, action.ActionIndex);
+        NotificationFeature.ProcessClickAction(Device!, action.NotificationKey, action.ActionIndex);
     }
 
     [RelayCommand]
@@ -188,7 +188,7 @@ public sealed partial class MainPageViewModel : BaseViewModel
 
     public void ToggleNotificationPin(Notification notification)
     {
-        NotificationService.TogglePinNotification(notification);
+        NotificationFeature.TogglePinNotification(notification);
     }
 
     public void SendFiles(IReadOnlyList<IStorageItem> storageItems)
@@ -198,7 +198,7 @@ public sealed partial class MainPageViewModel : BaseViewModel
 
     public void HandleNotificationReply(Notification notification, string replyText)
     {
-        NotificationService.ProcessReplyAction(Device!, notification.Key, notification.ReplyResultKey!, replyText);
+        NotificationFeature.ProcessReplyAction(Device!, notification.Key, notification.ReplyResultKey!, replyText);
     }
 
     public void SetRingerMode(int mode)

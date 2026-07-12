@@ -677,7 +677,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
                 // If storage access is disabled, remove the sync root
                 if (!value)
                 {
-                    sftpService.Remove(Device.Id);
+                    sftpFeature.Remove(Device.Id);
                 }
             }
         }
@@ -685,7 +685,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     #endregion
 
-    private readonly ISftpService sftpService = Ioc.Default.GetRequiredService<ISftpService>();
+    private readonly ISftpFeature sftpFeature = Ioc.Default.GetRequiredService<ISftpFeature>();
     private readonly IAdbService AdbService = Ioc.Default.GetRequiredService<IAdbService>();
     private readonly IPlatformNotificationHandler platformNotificationHandler = Ioc.Default.GetRequiredService<IPlatformNotificationHandler>();
     private readonly IDeviceSettingsService DeviceSettings;

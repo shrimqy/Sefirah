@@ -7,7 +7,7 @@ using Sefirah.Platforms.Windows;
 using Sefirah.Platforms.Desktop;
 #endif
 using Sefirah.Services;
-using Sefirah.Services.FileTransfer;
+using Sefirah.Services.Transfer;
 using Sefirah.Services.Settings;
 using Sefirah.Services.Socket;
 using Sefirah.ViewModels;
@@ -31,32 +31,19 @@ public static class AppLifecycleHelper
     public static async Task InitializeAppComponentsAsync()
     {
         var discoveryService = Ioc.Default.GetRequiredService<IDiscoveryService>();
-        var clipboardService = Ioc.Default.GetRequiredService<IClipboardService>();
         var networkService = Ioc.Default.GetRequiredService<INetworkService>();
-        var notificationService = Ioc.Default.GetRequiredService<INotificationService>();
         var deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
         var adbService = Ioc.Default.GetRequiredService<IAdbService>();
-        var playbackService = Ioc.Default.GetRequiredService<IMediaService>();
-        var actionService = Ioc.Default.GetRequiredService<IActionService>();
         var updateService = Ioc.Default.GetRequiredService<IUpdateService>();
         var phoneLineService = Ioc.Default.GetRequiredService<IPhoneLineService>();
-        var callManager = Ioc.Default.GetRequiredService<ICallManager>();
-        var batteryService = Ioc.Default.GetRequiredService<IBatteryService>();
 #if WINDOWS
-        var windowsNotificationHandler = Ioc.Default.GetRequiredService<IPlatformNotificationHandler>();
-        await windowsNotificationHandler.RegisterForNotifications();
+        var notificationHandler = Ioc.Default.GetRequiredService<IPlatformNotificationHandler>();
+        await notificationHandler.RegisterForNotifications();
 #endif
 
         await deviceManager.Initialize();
 
-        await Task.WhenAll(
-            playbackService.InitializeAsync(),
-            actionService.InitializeAsync(),
-            notificationService.Initialize(),
-            clipboardService.Initialize(),
-            batteryService.InitializeAsync(),
-            callManager.Initialize()
-        );
+        await Task.WhenAll(Ioc.Default.GetServices<IFeature>().Select(feature => feature.InitializeAsync()));
 
         await networkService.StartServerAsync();
         await discoveryService.StartDiscoveryAsync();
@@ -64,7 +51,7 @@ public static class AppLifecycleHelper
         await Task.WhenAll(
             adbService.StartAsync(),
             updateService.CheckForUpdatesAsync(),
-            phoneLineService.Initialize()
+            phoneLineService.InitializeAsync()
         );
 
         App.SplashScreenLoadingTCS?.TrySetResult();
@@ -128,11 +115,7 @@ public static class AppLifecycleHelper
                 .AddSingleton<NotificationRepository>()
 
                 // Platform-specific services
-#if WINDOWS
-                .AddWindowsServices()
-#else
-                .AddDesktopServices()
-#endif
+                .AddPlatformServices()
                 // Services
                 .AddSingleton<IDeviceManager, DeviceManager>()
                 .AddSingleton(sp => (ITcpServerProvider)sp.GetRequiredService<INetworkService>())
@@ -141,19 +124,19 @@ public static class AppLifecycleHelper
                 .AddSingleton<IDiscoveryService, DiscoveryService>()
                 .AddSingleton<INetworkService, NetworkService>()
 
-                .AddSingleton<INotificationService, NotificationService>()
-                .AddSingleton<IBatteryAlertService, BatteryAlertService>()
-                .AddSingleton<IClipboardService, ClipboardService>()
-                .AddSingleton<IRemoteMediaHandler, RemoteMediaHandler>()
-                .AddSingleton<SmsHandlerService>()
-                .AddSingleton<ICallHandler, CallHandlerService>()
-                .AddSingleton<ICallManager>(sp => (CallHandlerService)sp.GetRequiredService<ICallHandler>())
+                .AddFeature<INotificationFeature, NotificationFeature>()
+                .AddFeature<IBatteryAlertFeature, BatteryAlertFeature>()
+                .AddFeature<IClipboardFeature, ClipboardFeature>()
+                .AddFeature<IRemoteMediaFeature, RemoteMediaFeature>()
+                .AddFeature<IActionFeature, ActionFeature>()
+                .AddSingleton<IFileTransferService, FileTransferService>()
+                .AddFeature<ISmsFeature, SmsFeature>()
+                .AddFeature<ICallFeature, CallFeature>()
 
                 .AddSingleton<IMessageHandler, MessageHandler>()
                 .AddSingleton<Lazy<IMessageHandler>>(sp => new Lazy<IMessageHandler>(() => sp.GetRequiredService<IMessageHandler>()))
                 .AddSingleton<IAdbService, AdbService>()
                 .AddSingleton<IScreenMirrorService, ScreenMirrorService>()
-                .AddSingleton<IFileTransferService, FileTransferService>()
 
                 // ViewModels
                 .AddSingleton<MainPageViewModel>()

@@ -10,7 +10,7 @@ public partial class DevicesViewModel : ObservableObject
     private readonly DispatcherQueue Dispatcher;
     private ISessionManager SessionManager { get; } = Ioc.Default.GetRequiredService<ISessionManager>();
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
-    private ISftpService SftpService { get; } = Ioc.Default.GetRequiredService<ISftpService>();
+    private ISftpFeature SftpFeature { get; } = Ioc.Default.GetRequiredService<ISftpFeature>();
     private RemoteAppRepository RemoteAppRepository { get; } = Ioc.Default.GetRequiredService<RemoteAppRepository>();
     private ContactRepository ContactRepository { get; } = Ioc.Default.GetRequiredService<ContactRepository>();
     private SmsRepository SmsRepository { get; } = Ioc.Default.GetRequiredService<SmsRepository>();
@@ -81,7 +81,7 @@ public partial class DevicesViewModel : ObservableObject
 
                 await DeviceManager.RemoveDevice(device);
 
-                SftpService.Remove(deviceId);
+                SftpFeature.Remove(deviceId);
 
                 await Task.Run(() =>
                 {

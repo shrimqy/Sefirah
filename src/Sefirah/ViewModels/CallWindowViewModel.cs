@@ -1,19 +1,17 @@
-using Sefirah.Services;
-
 namespace Sefirah.ViewModels;
 
 public sealed partial class CallWindowViewModel : BaseViewModel, IDisposable
 {
-    private readonly ICallManager callManager = Ioc.Default.GetRequiredService<ICallManager>();
+    private readonly ICallFeature callFeature = Ioc.Default.GetRequiredService<ICallFeature>();
     private bool disposed;
 
-    public CallSessionViewModel? PrimaryCall => callManager.PrimaryCall;
+    public CallSessionViewModel? PrimaryCall => callFeature.PrimaryCall;
 
-    public CallSessionViewModel? SecondaryCall => callManager.SecondaryCall;
+    public CallSessionViewModel? SecondaryCall => callFeature.SecondaryCall;
 
     public CallWindowViewModel()
     {
-        callManager.ActiveCallChanged += OnActiveCallChanged;
+        callFeature.ActiveCallChanged += OnActiveCallChanged;
     }
 
     private void OnActiveCallChanged(object? sender, EventArgs e) 
@@ -24,12 +22,12 @@ public sealed partial class CallWindowViewModel : BaseViewModel, IDisposable
 
 
     [RelayCommand]
-    private Task SwapCallsAsync() => callManager.SwapCallsAsync();
+    private Task SwapCallsAsync() => callFeature.SwapCallsAsync();
 
     public void Dispose()
     {
         if (disposed) return;
         disposed = true;
-        callManager.ActiveCallChanged -= OnActiveCallChanged;
+        callFeature.ActiveCallChanged -= OnActiveCallChanged;
     }
 }

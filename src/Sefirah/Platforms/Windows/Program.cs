@@ -102,7 +102,7 @@ internal class Program
 
     private static string? GetHostedAppPackage(string[] args)
     {
-        var prefix = WindowsAppShortcutService.HostedPackageParamPrefix;
+        var prefix = AppShortcutService.HostedPackageParamPrefix;
         foreach (var arg in args)
         {
             if (string.IsNullOrWhiteSpace(arg))

@@ -1,7 +1,9 @@
 using System.Threading.Channels;
 using Microsoft.Extensions.Configuration;
 using Renci.SshNet;
-using Sefirah.Data.Contracts;
+using Sefirah.Platforms.Windows.Bluetooth;
+using Sefirah.Platforms.Windows.Calling;
+using Sefirah.Platforms.Windows.Features;
 using Sefirah.Platforms.Windows.RemoteStorage.Abstractions;
 using Sefirah.Platforms.Windows.RemoteStorage.Configuration;
 using Sefirah.Platforms.Windows.RemoteStorage.Remote;
@@ -12,9 +14,7 @@ using Sefirah.Platforms.Windows.RemoteStorage.Shell.Commands;
 using Sefirah.Platforms.Windows.RemoteStorage.Shell.Local;
 using Sefirah.Platforms.Windows.RemoteStorage.Worker;
 using Sefirah.Platforms.Windows.RemoteStorage.Worker.IO;
-using Sefirah.Platforms.Windows.Bluetooth;
 using Sefirah.Platforms.Windows.Services;
-using Sefirah.Platforms.Windows.Calling;
 
 namespace Sefirah.Platforms.Windows;
 
@@ -23,15 +23,15 @@ namespace Sefirah.Platforms.Windows;
 /// </summary>
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddWindowsServices(this IServiceCollection services)
+    public static IServiceCollection AddPlatformServices(this IServiceCollection services)
     {
-        services.AddSingleton<IPlatformNotificationHandler, WindowsNotificationHandler>();
-        services.AddSingleton<IMediaService, WindowsMediaService>();
-        services.AddSingleton<IBatteryService, WindowsBatteryService>();
-        services.AddSingleton<IActionService, WindowsActionService>();
-        services.AddSingleton<IUpdateService, WindowsUpdateService>();
-        services.AddSingleton<IAppShortcutService, WindowsAppShortcutService>();
-        services.AddSingleton<ISystemTrayService, WindowsTrayIconService>();
+        services.AddSingleton<IPlatformNotificationHandler, NotificationHandler>();
+        services.AddFeature<IMediaFeature, MediaFeature>();
+        services.AddFeature<IBatteryFeature, BatteryFeature>();
+        services.AddFeature<ISftpFeature, SftpFeature>();
+        services.AddSingleton<IUpdateService, UpdateService>();
+        services.AddSingleton<IAppShortcutService, AppShortcutService>();
+        services.AddSingleton<ISystemTrayService, SystemTrayService>();
 
         // Remote Storage
         services.AddSftpRemoteServices();
@@ -43,8 +43,7 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<ShellWorker>();
 
         services.AddSingleton<SyncProviderWorker>();
-        services.AddSingleton<ISftpService, WindowsSftpService>();
-        services.AddSingleton<IPhoneLineService, WindowsPhoneLineService>();
+        services.AddSingleton<IPhoneLineService, PhoneLineService>();
         services.AddSingleton<BluetoothRadioManager>();
         services.AddSingleton<IBluetoothPairingService, BluetoothPairingService>();
         services.AddSingleton<BluetoothPairingService>(sp => (BluetoothPairingService)sp.GetRequiredService<IBluetoothPairingService>());

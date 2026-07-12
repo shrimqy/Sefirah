@@ -1,0 +1,516 @@
+using Sefirah.Data.Models;
+using Sefirah.Utils;
+using Tmds.DBus.Protocol;
+
+namespace Sefirah.Platforms.Desktop.Services;
+
+/// <summary>
+/// Desktop implementation of the platform notification handler using D-Bus
+/// </summary>
+public class NotificationHandler(
+    ILogger<NotificationHandler> logger,
+    IDeviceManager deviceManager) : IPlatformNotificationHandler, IDisposable
+{
+    private DBusConnection? _connection;
+    private NotificationsService? _notificationService;
+    private Notifications? _notifications;
+    private bool _isInitialized = false;
+    private readonly Dictionary<string, uint> _notificationIds = [];
+    private readonly Dictionary<uint, NotificationActionData> _notificationActions = [];
+    private IDisposable? _actionWatcher;
+
+    private async Task<bool> EnsureInitializedAsync()
+    {
+        if (_isInitialized && _notifications != null)
+            return true;
+
+        try
+        {
+            // Check if we have a session bus address
+            string? sessionBusAddress = DBusAddress.Session;
+            if (sessionBusAddress is null)
+            {
+                logger.Warn($"Cannot determine session bus address. D-Bus may not be available on this system.");
+                return false;
+            }
+
+            // Create connection to the session bus
+            _connection = new DBusConnection(sessionBusAddress);
+            await _connection.ConnectAsync();
+            logger.Debug($"Connected to D-Bus session bus");
+
+            // Create the notifications service
+            _notificationService = new NotificationsService(_connection, "org.freedesktop.Notifications");
+            _notifications = _notificationService.CreateNotifications("/org/freedesktop/Notifications");
+
+            // Test if the notification service is available
+            var serverInfo = await _notifications.GetServerInformationAsync();
+            logger.Debug($"Notification server: {serverInfo.Name} {serverInfo.Version}, Vendor: {serverInfo.Vendor}");
+
+            // Set up action watching
+            _actionWatcher = await _notifications.WatchActionInvokedAsync(OnActionInvoked);
+            logger.Debug($"Action watcher registered for D-Bus notifications");
+
+            _isInitialized = true;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"Failed to initialize D-Bus notifications", ex);
+            return false;
+        }
+    }
+
+    public async Task ShowRemoteNotification(NotificationInfo message, string deviceId)
+    {
+        if (!await EnsureInitializedAsync() || _notifications == null)
+            return;
+
+        try
+        {
+            var hints = new Dictionary<string, VariantValue>();
+            var categoryHint = NotificationHints.Category("device.added");
+            var urgencyHint = NotificationHints.NormalUrgency();
+            var soundHint = NotificationHints.SuppressSound(false);
+            var soundNameHint = NotificationHints.SoundName("message-new-instant"); 
+            
+            hints.Add(categoryHint.Key, categoryHint.Value);
+            hints.Add(urgencyHint.Key, urgencyHint.Value);
+            hints.Add(soundHint.Key, soundHint.Value);
+            hints.Add(soundNameHint.Key, soundNameHint.Value);
+
+            // Prepare actions (exclude reply actions since Linux doesn't support text input)
+            var actions = new List<string>();
+            var actionData = new NotificationActionData
+            {
+                NotificationType = "RemoteNotification",
+                DeviceId = deviceId,
+                NotificationKey = message.NotificationKey,
+                Actions = []
+            };
+
+            foreach (var action in message.Actions)
+            {
+                if (action is null || action?.Label is null) continue; // Skip reply actions
+
+                var actionId = $"action_{action.ActionIndex}";
+                actions.Add(actionId);
+                actions.Add(action.Label);
+
+                actionData.Actions.Add(new NotificationActionInfo
+                {
+                    ActionId = actionId,
+                    ActionIndex = action.ActionIndex,
+                    Label = action.Label
+                });
+            }
+
+            var notificationId = await _notifications.NotifyAsync(
+                appName: message.AppName ?? "Sefirah",
+                replacesId: 0,
+                appIcon: "smartphone", // Generic smartphone icon
+                summary: message.Title ?? "Remote Notification",
+                body: message.Text ?? "",
+                actions: actions.ToArray(),
+                hints: hints,
+                expireTimeout: 8000 // 8 seconds
+            );
+
+            if (!string.IsNullOrEmpty(message.NotificationKey))
+            {
+                _notificationIds[message.NotificationKey] = notificationId;
+            }
+
+            // Store action data for this notification
+            if (actionData.Actions.Count > 0)
+            {
+                _notificationActions[notificationId] = actionData;
+            }
+
+            logger.Debug($"Remote notification sent with ID: {notificationId}, Actions: {actionData.Actions.Count}");
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"Failed to show remote notification", ex);
+        }
+    }
+
+    public Task ShowCallNotification(string callId, string transportDeviceId, string title, string subtitle, Uri? icon = null) =>
+        Task.CompletedTask;
+
+    public async Task ShowCallNotification(string title, string text, string tag, Data.Enums.CallState callState, Uri? icon = null)
+    {
+        if (!await EnsureInitializedAsync() || _notifications is null)
+            return;
+
+        try
+        {
+            var hints = new Dictionary<string, VariantValue>();
+            var categoryHint = NotificationHints.Category("phone");
+            var urgencyHint = NotificationHints.NormalUrgency();
+            var soundHint = NotificationHints.SuppressSound(false);
+            hints.Add(categoryHint.Key, categoryHint.Value);
+            hints.Add(urgencyHint.Key, urgencyHint.Value);
+            hints.Add(soundHint.Key, soundHint.Value);
+
+            var appIcon = "call-start";
+
+            var replacesId = _notificationIds.GetValueOrDefault(tag, 0u);
+            var notificationId = await _notifications.NotifyAsync(
+                appName: "Sefirah",
+                replacesId: replacesId,
+                appIcon: appIcon,
+                summary: title,
+                body: text,
+                actions: [],
+                hints: hints,
+                expireTimeout: 10000
+            );
+            _notificationIds[tag] = notificationId;
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"Failed to show call notification", ex);
+        }
+    }
+
+    public async Task ShowBatteryNotification(string title, string text, string tag)
+    {
+        if (!await EnsureInitializedAsync() || _notifications is null)
+            return;
+
+        try
+        {
+            var hints = new Dictionary<string, VariantValue>();
+            var categoryHint = NotificationHints.Category("battery");
+            var urgencyHint = NotificationHints.NormalUrgency();
+
+            hints.Add(categoryHint.Key, categoryHint.Value);
+            hints.Add(urgencyHint.Key, urgencyHint.Value);
+
+            var replacesId = _notificationIds.GetValueOrDefault(tag, 0u);
+            var notificationId = await _notifications.NotifyAsync(
+                appName: "Sefirah",
+                replacesId: replacesId,
+                appIcon: "battery-low",
+                summary: title,
+                body: text,
+                actions: [],
+                hints: hints,
+                expireTimeout: 8000);
+
+            _notificationIds[tag] = notificationId;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to show battery notification");
+        }
+    }
+
+    public async void ShowClipboardNotification(string title, string text, string? actionLabel = null, string? actionData = null)
+    {
+        if (!await EnsureInitializedAsync() || _notifications is null) return;
+
+        var hasAction = !string.IsNullOrEmpty(actionLabel) && !string.IsNullOrEmpty(actionData);
+
+        try
+        {
+            var hints = new Dictionary<string, VariantValue>();
+            var categoryHint = NotificationHints.Category(hasAction ? "clipboard.action" : "");
+            hints.Add(categoryHint.Key, categoryHint.Value);
+            var urgencyHint = NotificationHints.NormalUrgency();
+            var soundHint = NotificationHints.SuppressSound(false);
+            hints.Add(urgencyHint.Key, urgencyHint.Value);
+            hints.Add(soundHint.Key, soundHint.Value);
+
+            var appIcon = hasAction ? "edit-copy" : "dialog-information";
+
+            var actions = new List<string>();
+            var notificationActionData = new NotificationActionData
+            {
+                NotificationType = "Clipboard",
+                Actions = []
+            };
+
+            if (hasAction)
+            {
+                actions.Add("clipboard_action");
+                actions.Add(actionLabel!);
+                notificationActionData.Actions.Add(new NotificationActionInfo
+                {
+                    ActionId = "clipboard_action",
+                    ActionIndex = 0,
+                    Label = actionLabel!,
+                    Data = actionData
+                });
+            }
+
+            var notificationId = await _notifications.NotifyAsync(
+                appName: "Sefirah",
+                replacesId: 0,
+                appIcon: appIcon,
+                summary: title,
+                body: text,
+                actions: actions.ToArray(),
+                hints: hints,
+                expireTimeout: 5000);
+
+            if (notificationActionData.Actions.Count > 0)
+                _notificationActions[notificationId] = notificationActionData;
+
+            logger.Debug($"Clipboard notification sent with ID: {notificationId}, Actions: {notificationActionData.Actions.Count}");
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"Failed to show clipboard notification", ex);
+        }
+    }
+
+    public async void ShowCompletedFileTransferNotification(string subtitle, string transferId, string? filePath = null, string? folderPath = null)
+    {
+        if (!await EnsureInitializedAsync() || _notifications is null)
+            return;
+
+        try
+        {
+            var hints = new Dictionary<string, VariantValue>();
+            var categoryHint = NotificationHints.Category("transfer.complete");
+            var urgencyHint = NotificationHints.NormalUrgency();
+            var soundHint = NotificationHints.SuppressSound(false);
+            
+            hints.Add(categoryHint.Key, categoryHint.Value);
+            hints.Add(urgencyHint.Key, urgencyHint.Value);
+            hints.Add(soundHint.Key, soundHint.Value);
+
+            var notificationId = await _notifications.NotifyAsync(
+                appName: "Sefirah",
+                replacesId: 0,
+                appIcon: "folder-download",
+                summary: "FileTransferNotification.Completed".GetLocalizedResource(),
+                body: subtitle,
+                actions: [], 
+                hints: hints,
+                expireTimeout: 6000 // 6 seconds
+            );
+
+            logger.Debug($"File transfer notification sent with ID: {notificationId}");
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"Failed to show file transfer notification", ex);
+        }
+    }
+
+    public void ShowFileTransferNotification(
+        string notificationTitle,
+        string progressTitle,
+        string status,
+        string transferId,
+        uint notificationSequence,
+        double progress)
+    {
+        // Not implemented for D-Bus notifications
+        return;
+    }
+
+    public async Task RegisterForNotifications()
+    {
+        await EnsureInitializedAsync();
+    }
+
+    public async Task RemoveNotificationByTag(string? notificationKey)
+    {
+        if (!_isInitialized || _notifications is null || string.IsNullOrEmpty(notificationKey))
+            return;
+
+        try
+        {
+            if (_notificationIds.TryGetValue(notificationKey, out uint notificationId))
+            {
+                await _notifications.CloseNotificationAsync(notificationId);
+                _notificationIds.Remove(notificationKey);
+                logger.Debug($"Removed notification with key: {notificationKey}");
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Warn($"Failed to remove notification with key {notificationKey}", ex);
+        }
+    }
+
+    public Task RemoveNotificationsByGroup(string? groupKey)
+    {
+        // D-Bus notifications don't have group concept like Windows, so we ignore this
+        return Task.CompletedTask;
+    }
+
+    public Task RemoveNotificationsByTagAndGroup(string? tag, string? groupKey)
+    {
+        // D-Bus notifications don't have group concept like Windows, so we ignore this
+        return Task.CompletedTask;
+    }
+
+    public Task ClearAllNotifications()
+    {
+        // D-Bus doesn't have a clear all method, would need to track all IDs to close individually
+        // For simplicity, we ignore this since notifications will expire anyway
+        return Task.CompletedTask;
+    }
+
+    private async void OnActionInvoked(Exception? ex, (uint Id, string ActionKey) args)
+    {
+        if (ex != null)
+        {
+            logger.Error($"Error in action invoked handler", ex);
+            return;
+        }
+
+        try
+        {
+            logger.Debug($"Action invoked - ID: {args.Id}, ActionKey: {args.ActionKey}");
+
+            if (!_notificationActions.TryGetValue(args.Id, out var actionData))
+            {
+                logger.Warn($"No action data found for notification ID: {args.Id}");
+                return;
+            }
+
+            // Handle the action directly
+            await HandleNotificationAction(args.Id, args.ActionKey, actionData);
+
+            // Clean up action data
+            _notificationActions.Remove(args.Id);
+        }
+        catch (Exception actionEx)
+        {
+            logger.Error($"Error handling notification action", actionEx);
+        }
+    }
+
+    private async Task HandleNotificationAction(uint notificationId, string actionKey, NotificationActionData actionData)
+    {
+        try
+        {
+            logger.Debug($"Handling notification action - ID: {notificationId}, ActionKey: {actionKey}");
+
+            var action = actionData.Actions.FirstOrDefault(a => a.ActionId == actionKey);
+            if (action == null)
+            {
+                logger.Warn($"Action not found: {actionKey} for notification ID: {notificationId}");
+                return;
+            }
+
+            // Route to appropriate handler based on notification type
+            switch (actionData.NotificationType)
+            {
+                case "RemoteNotification":
+                    await HandleRemoteNotificationAction(actionData, action);
+                    break;
+                
+                case "Clipboard":
+                    await HandleClipboardAction(action);
+                    break;
+                
+                default:
+                    logger.Warn($"Unhandled notification type: {actionData.NotificationType}");
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"Error handling notification action", ex);
+        }
+    }
+
+    private async Task HandleRemoteNotificationAction(NotificationActionData actionData, NotificationActionInfo action)
+    {
+        if (string.IsNullOrEmpty(actionData.DeviceId) || string.IsNullOrEmpty(actionData.NotificationKey))
+        {
+            logger.Warn($"Missing device ID or notification key for remote notification action");
+            return;
+        }
+
+        // Find the device by ID
+        var device = deviceManager.FindDeviceById(actionData.DeviceId);
+        if (device is null)
+        {
+            logger.Warn($"Could not find device with ID: {actionData.DeviceId}");
+            return;
+        }
+
+        // Process the click action using the static utility
+        NotificationActionUtils.ProcessClickAction(device, actionData.NotificationKey, action.ActionIndex);
+        logger.Debug($"Processed remote notification action for device {actionData.DeviceId}, action index: {action.ActionIndex}");
+    }
+
+    private async Task HandleClipboardAction(NotificationActionInfo action)
+    {
+        if (string.IsNullOrEmpty(action.Data))
+        {
+            logger.Warn($"No data provided for clipboard action");
+            return;
+        }
+
+        // Handle clipboard action - open URL
+        if (Uri.TryCreate(action.Data, UriKind.Absolute, out Uri? uri))
+        {
+            try
+            {
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = uri.ToString(),
+                        UseShellExecute = true
+                    }
+                };
+                process.Start();
+                logger.Debug($"Opened URL: {uri}");
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Failed to open URL: {uri}", ex);
+            }
+        }
+        else
+        {
+            logger.Warn($"Invalid URL in clipboard action: {action.Data}");
+        }
+    }
+
+    public void Dispose()
+    {
+        try
+        {
+            _actionWatcher?.Dispose();
+            _connection?.Dispose();
+        }
+        catch (Exception ex)
+        {
+            logger.Warn($"Error disposing D-Bus connection", ex);
+        }
+    }
+}
+
+/// <summary>
+/// Data structure to store notification action information for D-Bus notifications
+/// </summary>
+internal class NotificationActionData
+{
+    public string NotificationType { get; set; } = string.Empty;
+    public string? DeviceId { get; set; }
+    public string? NotificationKey { get; set; }
+    public List<NotificationActionInfo> Actions { get; set; } = [];
+}
+
+/// <summary>
+/// Information about a specific notification action
+/// </summary>
+internal class NotificationActionInfo
+{
+    public string ActionId { get; set; } = string.Empty;
+    public int ActionIndex { get; set; }
+    public string Label { get; set; } = string.Empty;
+    public string? Data { get; set; }
+}
+
