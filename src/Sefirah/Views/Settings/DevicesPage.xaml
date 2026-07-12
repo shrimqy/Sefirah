@@ -1,4 +1,4 @@
-﻿<Page
+<Page
     x:Class="Sefirah.Views.Settings.DevicesPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -27,7 +27,7 @@
         <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
         <converters:CountToVisibilityConverter x:Key="InverseCountToVisibilityConverter" Inverse="True" />
         <wctconverters:EmptyObjectToObjectConverter x:Key="EmptyObjectToOpacityConverter" EmptyValue="1.0" NotEmptyValue="0.0" />
-        <converters:EmptyObjectToBooleanConverter x:Key="EmptyObjectToFalseBooleanConverter" Inverse="True" />
+        <converters:EmptyObjectToVisibilityConverter x:Key="EmptyObjectToVisibilityConverter" />
     </Page.Resources>
 
     <Page.DataContext>
@@ -103,9 +103,9 @@
                                             </Border.Background>
                                             <Image
                                                 x:Name="WallpaperImage"
-                                                x:Load="{x:Bind Wallpaper, Converter={StaticResource EmptyObjectToFalseBooleanConverter}, Mode=OneWay}"
                                                 Source="{x:Bind Wallpaper, Mode=OneWay}"
-                                                Stretch="UniformToFill" />
+                                                Stretch="UniformToFill"
+                                                Visibility="{x:Bind Wallpaper, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}" />
                                         </Border>
                                     </Grid>
                                     <StackPanel Margin="15,0,0,0" VerticalAlignment="Center">
