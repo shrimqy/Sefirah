@@ -8,7 +8,7 @@ public interface IPhoneLineService
 
     event EventHandler<IPhoneCall>? CallStateChanged;
 
-    Task Initialize();
+    Task InitializeAsync();
 
     Task RefreshStateAsync(CancellationToken cancellationToken = default);
 

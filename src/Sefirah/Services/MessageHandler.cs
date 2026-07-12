@@ -8,17 +8,17 @@ public class MessageHandler(
     CallLogRepository callLogRepository,
     ContactRepository contactRepository,
     IDeviceManager deviceManager,
-    INotificationService notificationService,
-    IBatteryAlertService batteryAlertService,
-    IClipboardService clipboardService,
-    SmsHandlerService smsHandlerService,
+    INotificationFeature notificationFeature,
+    IBatteryAlertFeature batteryAlertFeature,
+    IClipboardFeature clipboardFeature,
+    ISmsFeature smsFeature,
     IFileTransferService fileTransferService,
-    IMediaService playbackService,
-    IRemoteMediaHandler remotePlaybackService,
-    IActionService actionService,
-    ISftpService sftpService,
+    IMediaFeature mediaFeature,
+    IRemoteMediaFeature remoteMediaFeature,
+    IActionFeature actionFeature,
+    ISftpFeature sftpFeature,
     ISessionManager sessionManager,
-    ICallHandler callHandler,
+    ICallFeature callFeature,
     IBluetoothPairingService bluetoothPairingService,
     ILogger<MessageHandler> logger) : IMessageHandler
 {
@@ -37,19 +37,19 @@ public class MessageHandler(
                     break;
 
                 case NotificationInfo notificationMessage:
-                    await notificationService.HandleNotificationMessage(device, notificationMessage);
+                    await notificationFeature.HandleNotificationMessage(device, notificationMessage);
                     break;
 
                 case MediaAction action:
-                    await playbackService.HandleMediaActionAsync(action);
+                    await mediaFeature.HandleMediaActionAsync(action);
                     break;
 
                 case PlaybackInfo playbackSession:
-                    await remotePlaybackService.HandleRemotePlaybackSessionAsync(device, playbackSession);
+                    await remoteMediaFeature.HandleRemotePlaybackSessionAsync(device, playbackSession);
                     break;
 
                 case BatteryState batteryStatus:
-                    await batteryAlertService.HandleBatteryStateAsync(device, batteryStatus);
+                    await batteryAlertFeature.HandleBatteryStateAsync(device, batteryStatus);
                     break;
 
                 case RingerModeState ringerMode:
@@ -66,11 +66,11 @@ public class MessageHandler(
                     break;
 
                 case ClipboardInfo clipboard:
-                    await clipboardService.SetContentAsync(clipboard.Content, device);
+                    await clipboardFeature.SetContentAsync(clipboard.Content, device);
                     break;
 
                 case ConversationInfo textConversation:
-                    await smsHandlerService.HandleTextMessage(device.Id, textConversation);
+                    await smsFeature.HandleTextMessage(device.Id, textConversation);
                     break;
 
                 case ContactInfo contactMessage:
@@ -78,11 +78,11 @@ public class MessageHandler(
                     break;
 
                 case ActionInfo action:
-                    actionService.HandleActionMessage(action);
+                    actionFeature.HandleActionMessage(action);
                     break;
 
                 case SftpServerInfo sftpServerInfo:
-                    await sftpService.InitializeAsync(device, sftpServerInfo);
+                    await sftpFeature.InitializeAsync(device, sftpServerInfo);
                     break;
 
                 case FileTransferInfo fileTransfer:
@@ -94,7 +94,7 @@ public class MessageHandler(
                     break;
 
                 case CallInfo callInfo:
-                    await callHandler.HandleCallInfoAsync(device, callInfo);
+                    await callFeature.HandleCallInfoAsync(device, callInfo);
                     break;
 
                 case CallLogInfo callLogInfo:

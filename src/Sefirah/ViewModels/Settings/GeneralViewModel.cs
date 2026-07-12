@@ -11,7 +11,7 @@ public sealed partial class GeneralViewModel : BaseViewModel
     private readonly IAppThemeModeService AppThemeModeService = Ioc.Default.GetRequiredService<IAppThemeModeService>();
     private readonly IDeviceManager _deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
     private readonly IAdbService AdbService = Ioc.Default.GetRequiredService<IAdbService>();
-    private readonly ISftpService SftpService = Ioc.Default.GetRequiredService<ISftpService>();
+    private readonly ISftpFeature SftpFeature = Ioc.Default.GetRequiredService<ISftpFeature>();
     #endregion
 
     #region Properties
@@ -198,7 +198,7 @@ public sealed partial class GeneralViewModel : BaseViewModel
             if (value != UserSettingsService.GeneralSettingsService.RemoteStoragePath)
             {
                 UserSettingsService.GeneralSettingsService.RemoteStoragePath = value;
-                var sftpService = Ioc.Default.GetRequiredService<ISftpService>();
+                var sftpService = Ioc.Default.GetRequiredService<ISftpFeature>();
                 //sftpService.RemoveAllSyncRoots();
                 OnPropertyChanged();
             }
@@ -219,7 +219,7 @@ public sealed partial class GeneralViewModel : BaseViewModel
     [RelayCommand]
     private void RemoveAllSyncRoots()
     {
-        SftpService.RemoveAll();
+        SftpFeature.RemoveAll();
     }
 
     private void LoadLocalDeviceName()

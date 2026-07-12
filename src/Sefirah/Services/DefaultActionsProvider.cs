@@ -9,12 +9,5 @@ namespace Sefirah.Services;
 
 public static class DefaultActionsProvider
 {
-    public static IEnumerable<BaseAction> GetDefaultActions()
-    {
-#if WINDOWS
-        return WindowsDefaultActions.GetDefaultActions();
-#elif DESKTOP
-        return DesktopDefaultActions.GetDefaultActions();
-#endif
-    }
-} 
+    public static IEnumerable<BaseAction> GetDefaultActions() => DefaultActions.GetDefaultActions();
+}

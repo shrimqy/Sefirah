@@ -2,7 +2,7 @@ using Sefirah.Data.Models.Actions;
 
 namespace Sefirah.Platforms.Desktop;
 
-public class DesktopDefaultActions
+public class DefaultActions
 {
     public static IReadOnlyList<BaseAction> GetDefaultActions()
     {

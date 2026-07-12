@@ -2,13 +2,12 @@ using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
-using Sefirah.Services;
 
 namespace Sefirah.ViewModels;
 public sealed partial class MessagesViewModel : BaseViewModel
 {
     #region Services
-    private readonly SmsHandlerService smsHandlerService = Ioc.Default.GetRequiredService<SmsHandlerService>();
+    private readonly ISmsFeature smsFeature = Ioc.Default.GetRequiredService<ISmsFeature>();
     private readonly ContactRepository contactRepository = Ioc.Default.GetRequiredService<ContactRepository>();
     private readonly IDeviceManager deviceManager = Ioc.Default.GetRequiredService<IDeviceManager>();
     #endregion
@@ -65,8 +64,8 @@ public sealed partial class MessagesViewModel : BaseViewModel
     public MessagesViewModel()
     {
         deviceManager.ActiveDeviceChanged += OnActiveDeviceChanged;
-        smsHandlerService.ConversationRemoved += OnConversationRemoved;
-        smsHandlerService.ConversationUpdated += OnConversationUpdated;
+        smsFeature.ConversationRemoved += OnConversationRemoved;
+        smsFeature.ConversationUpdated += OnConversationUpdated;
         InitializeAsync();
     }
 
@@ -94,7 +93,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
     {
         try
         {
-            var conversations = await smsHandlerService.LoadConversationAsync(ActiveDevice!.Id);
+            var conversations = await smsFeature.LoadConversationAsync(ActiveDevice!.Id);
             await dispatcher.EnqueueAsync(() =>
             {
                 Conversations.Clear();
@@ -111,7 +110,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
     {
         if (SelectedConversation is null || ActiveDevice is null) return;
 
-        var dbMessages = await smsHandlerService.LoadMessagesForConversation(ActiveDevice.Id, SelectedConversation.ThreadId);
+        var dbMessages = await smsFeature.LoadMessagesForConversation(ActiveDevice.Id, SelectedConversation.ThreadId);
         if (dbMessages.Count > 0)
         {
             MessageGroups.Clear();
@@ -123,7 +122,7 @@ public sealed partial class MessagesViewModel : BaseViewModel
         }
 
         // Request thread history from device
-        await SmsHandlerService.RequestThreadHistory(ActiveDevice, SelectedConversation.ThreadId);
+        await smsFeature.RequestThreadHistory(ActiveDevice, SelectedConversation.ThreadId);
     }
 
     public void SendMessage(string messageText)
