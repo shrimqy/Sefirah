@@ -284,19 +284,34 @@ public class PlaceholdersService(
     public void DeleteBulk(string relativeDirectory)
     {
         var clientDirectory = Path.Join(RootDirectory, relativeDirectory);
-        var clientSubDirectories = Directory.EnumerateDirectories(clientDirectory);
-        foreach (var clientSubDirectory in clientSubDirectories)
+        var entries = Directory.EnumerateDirectories(clientDirectory)
+            .Concat(Directory.EnumerateFiles(clientDirectory))
+            .ToArray();
+
+        if (entries.Length == 0)
         {
-            Directory.Delete(clientSubDirectory, recursive: true);
+            return;
         }
 
-        var clientFiles = Directory.EnumerateFiles(clientDirectory);
-        foreach (var clientFile in clientFiles)
+        try
         {
-            File.Delete(clientFile);
+            RecycleBin.MoveToRecycleBin(entries);
+        }
+        catch (Exception ex)
+        {
+            logger.Warn($"Failed to move items under {clientDirectory} to Recycle Bin, deleting permanently", ex);
+            foreach (var clientSubDirectory in Directory.EnumerateDirectories(clientDirectory))
+            {
+                Directory.Delete(clientSubDirectory, recursive: true);
+            }
+            foreach (var clientFile in Directory.EnumerateFiles(clientDirectory))
+            {
+                File.Delete(clientFile);
+            }
         }
     }
 
+    // for now move the file to the recycle bin
     public void Delete(string relativePath)
     {
         var clientPath = Path.Join(RootDirectory, relativePath);
@@ -305,15 +320,22 @@ public class PlaceholdersService(
             return;
         }
         var isDirectory = File.GetAttributes(clientPath).HasFlag(FileAttributes.Directory);
-        if (isDirectory)
+        try
         {
-            Directory.Delete(clientPath, recursive: true);
+            RecycleBin.MoveToRecycleBin(clientPath);
         }
-        else
+        catch (Exception ex)
         {
-            File.Delete(clientPath);
+            logger.Warn($"Failed to move {clientPath} to Recycle Bin, deleting permanently", ex);
+            if (isDirectory)
+            {
+                Directory.Delete(clientPath, recursive: true);
+            }
+            else
+            {
+                File.Delete(clientPath);
+            }
+            ShellNotify.NotifyDelete(clientPath, isDirectory);
         }
-
-        ShellNotify.NotifyDelete(clientPath, isDirectory);
     }
 }
