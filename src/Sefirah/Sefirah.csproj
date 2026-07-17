@@ -1,4 +1,4 @@
-<Project Sdk="Uno.Sdk">
+﻿<Project Sdk="Uno.Sdk">
     <PropertyGroup>
         <TargetFrameworks>net10.0-windows10.0.26100;net10.0-desktop</TargetFrameworks>
 
@@ -10,8 +10,8 @@
         <!-- App Identifier -->
         <ApplicationId>com.sefirah.castle</ApplicationId>
         <!-- Versions -->
-        <ApplicationDisplayVersion>2.4.0</ApplicationDisplayVersion>
-        <ApplicationVersion>8</ApplicationVersion>
+        <ApplicationDisplayVersion>3.0.0</ApplicationDisplayVersion>
+        <ApplicationVersion>9</ApplicationVersion>
         <!-- Package Publisher -->
         <ApplicationPublisher>shrimqy</ApplicationPublisher>
         <!-- Package Description -->
@@ -51,19 +51,22 @@
 
 
     <PropertyGroup Condition="'$(UapAppxPackageBuildMode)' == 'StoreUpload'">
-        <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
+        <GenerateTemporaryStoreCertificate>false</GenerateTemporaryStoreCertificate>
+        <PackageCertificateThumbprint></PackageCertificateThumbprint>
+        <PackageCertificateKeyFile></PackageCertificateKeyFile>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(UapAppxPackageBuildMode)' == 'Sideloading'">
         <GenerateTemporaryStoreCertificate>False</GenerateTemporaryStoreCertificate>
-        <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
         <PackageCertificateKeyFile>Sefirah_TemporaryKey.pfx</PackageCertificateKeyFile>
-        <PackageCertificateThumbprint>276047138A50F9695B57C0E0763E5A414C03B049</PackageCertificateThumbprint>
+        <PackageCertificateThumbprint>15cbc5825d3fe452c20ec20aa3191c836a6e302d</PackageCertificateThumbprint>
     </PropertyGroup>
 
     <PropertyGroup>
         <UnoIconForegroundFile>Assets\Icons\icon_foreground.svg</UnoIconForegroundFile>
         <UnoIconBackgroundColor Condition="'$(IsWinAppSdk)' == 'true'">Transparent</UnoIconBackgroundColor>
+        <GenerateTestArtifacts>False</GenerateTestArtifacts>
+        <AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100'">
@@ -132,7 +135,7 @@
         <PackageReference Include="Vanara.PInvoke.Shell32" />
         <PackageReference Include="QRCoder" />
     </ItemGroup>
-    
+
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100'">
         <PackageReference Include="Microsoft.Windows.SDK.BuildTools" VersionOverride="10.0.28000.1839" />
         <PackageReference Include="Microsoft.WindowsAppSDK" />

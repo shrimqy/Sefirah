@@ -26,7 +26,7 @@
     xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
     IgnorableNamespaces="uap rescap rescap5 uap3 uap13 desktop2 desktop3 desktop4 desktop6 desktop7 cloudfiles cloudfiles2 mp">
     
-        <Identity  Version="2.4.0.0" Name="shrimqy.Seki-PhoneLink" Publisher="CN=BEC0F2AA-07EB-4762-A2FE-13550AF289A5"/>
+        <Identity  Version="3.0.0.0" Name="shrimqy.Seki-PhoneLink" Publisher="CN=BEC0F2AA-07EB-4762-A2FE-13550AF289A5"/>
     
     <Properties >
         <DisplayName>Sefirah</DisplayName>
@@ -140,7 +140,6 @@
         <uap3:Capability Name="userNotificationListener"/>
         <rescap:Capability Name="appDiagnostics"/>
         <rescap:Capability Name="packageManagement"/>
-        <rescap:Capability Name="phoneCallSystem" />
         <rescap:Capability Name="phoneLineTransportManagement" />
         <rescap:Capability Name="runFullTrust" />
         <DeviceCapability Name="bluetooth"/>
