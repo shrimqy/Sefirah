@@ -44,7 +44,7 @@
             ThemeService;
             SkiaRenderer;
         </UnoFeatures>
-        <Platforms>x64;ARM64;x86</Platforms>
+        <Platforms>x64;ARM64</Platforms>
         <LangVersion>Preview</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
@@ -155,7 +155,7 @@
     <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100' and '$(SefirahMrmSupportDll)' == '' and Exists('C:\Program Files\Windows Kits\10\bin\$(SefirahMrmSupportSdkVersion)\$(SefirahMrmSupportSdkArch)\mrmsupport.dll')">
         <SefirahMrmSupportDll>C:\Program Files\Windows Kits\10\bin\$(SefirahMrmSupportSdkVersion)\$(SefirahMrmSupportSdkArch)\mrmsupport.dll</SefirahMrmSupportDll>
     </PropertyGroup>
-    <Target Name="IncludeMrmSupportDll" BeforeTargets="PrepareForBuild" Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100' and '$(Platform)' != 'Any CPU' and '$(Platform)' != 'x86'">
+    <Target Name="IncludeMrmSupportDll" BeforeTargets="PrepareForBuild" Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100' and '$(Platform)' != 'Any CPU'">
         <Error Condition="'$(SefirahMrmSupportDll)' == '' or !Exists('$(SefirahMrmSupportDll)')" Text="Windows SDK mrmsupport.dll was not found. Install the Windows SDK or set SefirahMrmSupportDll." />
         <ItemGroup>
             <Content Include="$(SefirahMrmSupportDll)">
