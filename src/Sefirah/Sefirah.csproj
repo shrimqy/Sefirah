@@ -81,6 +81,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <AdditionalFiles Include="Platforms\Desktop\Tray\DBusXml\com.canonical.dbusmenu.xml" Namespace="Sefirah.Platforms.Desktop.Tray.DBus" DBusGeneratorMode="Handler" />
+        <AdditionalFiles Include="Platforms\Desktop\Tray\DBusXml\com.castle.sefirah.SingleInstance.xml" Namespace="Sefirah.Platforms.Desktop.Tray.DBus" DBusGeneratorMode="Handler" />
         <AdditionalFiles Include="Platforms\Desktop\Tray\DBusXml\org.kde.StatusNotifierItem.xml" Namespace="Sefirah.Platforms.Desktop.Tray.DBus" DBusGeneratorMode="Handler" />
         <AdditionalFiles Include="Platforms\Desktop\Tray\DBusXml\org.kde.StatusNotifierWatcher.xml" Namespace="Sefirah.Platforms.Desktop.Tray.DBus" DBusGeneratorMode="Proxy" />
     </ItemGroup>
