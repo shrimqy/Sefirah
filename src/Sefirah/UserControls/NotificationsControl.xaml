@@ -12,6 +12,7 @@
         <ResourceDictionary>
             <converters:EmptyObjectToVisibilityConverter x:Key="EmptyObjectToVisibilityConverter" />
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" Inverse="True" />
             <wctconverters:BoolToObjectConverter
                 x:Key="BoolToPinTextConverter"
                 FalseValue="{helpers:ResourceString Name=Pin}"
@@ -20,7 +21,6 @@
                 x:Key="BoolToPinGlyphConverter"
                 FalseValue="&#xE718;"
                 TrueValue="&#xE77A;" />
-            <wctconverters:BoolNegationConverter x:Key="BoolNegationConverter" />
             <converters:UnixTimestampConverter x:Key="UnixTimestampConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
@@ -170,23 +170,23 @@
                                     </Grid>
                                     <TextBlock
                                         x:Name="TitleTextBlock"
-                                        x:Load="{x:Bind ShouldShowTitle}"
                                         FontWeight="SemiBold"
                                         Text="{x:Bind Title}"
                                         IsTextSelectionEnabled="True"
-                                        TextWrapping="Wrap" />
+                                        TextWrapping="Wrap"
+                                        Visibility="{x:Bind ShouldShowTitle, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                     <TextBlock
                                         x:Name="FallbackTextBlock"
-                                        x:Load="{x:Bind HasGroupedMessages, Converter={StaticResource BoolNegationConverter}}"
                                         Foreground="{ThemeResource TextFillColorTertiary}"
                                         IsTextSelectionEnabled="True"
                                         Text="{x:Bind Text}"
-                                        TextWrapping="Wrap" />
+                                        TextWrapping="Wrap"
+                                        Visibility="{x:Bind HasGroupedMessages, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
                                     <ItemsRepeater
                                         x:Name="GroupedMessagesRepeater"
                                         HorizontalAlignment="Stretch"
-                                        x:Load="{x:Bind HasGroupedMessages}"
-                                        ItemsSource="{x:Bind GroupedMessages}">
+                                        ItemsSource="{x:Bind GroupedMessages}"
+                                        Visibility="{x:Bind HasGroupedMessages, Converter={StaticResource BooleanToVisibilityConverter}}">
                                         <ItemsRepeater.Layout>
                                             <StackLayout Orientation="Vertical" Spacing="8" />
                                         </ItemsRepeater.Layout>
