@@ -3,6 +3,7 @@ Name=Sefirah
 Comment=Seamless Device Linking
 Exec=Sefirah
 Icon=com.castle.sefirah
+StartupWMClass=shrimqy.Seki-PhoneLink
 Terminal=false
 Type=Application
 Categories=Utility;
