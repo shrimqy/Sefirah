@@ -27,13 +27,10 @@ public interface IPlatformNotificationHandler
     Task ShowBatteryNotification(string title, string text, string tag);
     
     /// <summary>
-    /// Shows a file transfer notification
+    /// Shows a terminal file transfer notification (completed or failed),
+    /// replacing any in-progress toast that shares the same <paramref name="transferId"/>.
     /// </summary>
-    /// <param name="title">Notification title</param>
-    /// <param name="text">Notification text</param>
-    /// <param name="filePath">Path to the transferred file (optional)</param>
-    /// <param name="folderPath">Path to the folder containing the file (optional)</param>
-    void ShowCompletedFileTransferNotification(string subtitle, string transferId, string? filePath = null, string? folderPath = null);
+    void ShowCompletedFileTransferNotification(string title, string subtitle, string transferId, string? filePath = null, string? folderPath = null);
 
     void ShowFileTransferNotification(string notificationTitle, string progressTitle, string status, string transferId, uint notificationSequence, double progress);
 

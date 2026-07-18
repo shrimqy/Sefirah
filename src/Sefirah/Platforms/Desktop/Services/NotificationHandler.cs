@@ -266,7 +266,7 @@ public class NotificationHandler(
         }
     }
 
-    public async void ShowCompletedFileTransferNotification(string subtitle, string transferId, string? filePath = null, string? folderPath = null)
+    public async void ShowCompletedFileTransferNotification(string title, string subtitle, string transferId, string? filePath = null, string? folderPath = null)
     {
         if (!await EnsureInitializedAsync() || _notifications is null)
             return;
@@ -286,7 +286,7 @@ public class NotificationHandler(
                 appName: "Sefirah",
                 replacesId: 0,
                 appIcon: "folder-download",
-                summary: "FileTransferNotification.Completed".GetLocalizedResource(),
+                summary: title,
                 body: subtitle,
                 actions: [], 
                 hints: hints,
@@ -346,8 +346,8 @@ public class NotificationHandler(
 
     public Task RemoveNotificationsByTagAndGroup(string? tag, string? groupKey)
     {
-        // D-Bus notifications don't have group concept like Windows, so we ignore this
-        return Task.CompletedTask;
+        // D-Bus notifications have no group concept; the tag alone identifies the notification.
+        return RemoveNotificationByTag(tag);
     }
 
     public Task ClearAllNotifications()

@@ -159,14 +159,14 @@ public class NotificationHandler(
 
 
     /// <inheritdoc />
-    public async void ShowCompletedFileTransferNotification(string subtitle, string transferId, string? filePath = null, string? folderPath = null)
+    public async void ShowCompletedFileTransferNotification(string title, string subtitle, string transferId, string? filePath = null, string? folderPath = null)
     {
         // TODO: show hero image if available   
         try
         {
             await Task.Delay(500);
             var builder = new AppNotificationBuilder()
-                .AddText("FileTransferNotification.Completed".GetLocalizedResource())
+                .AddText(title)
                 .AddText(subtitle)
                 .SetTag(transferId)
                 .SetGroup(Constants.Notification.FileTransferGroup);
