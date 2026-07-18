@@ -30,7 +30,7 @@ public sealed class BatteryAlertFeature(
             if (!ShouldShowLowBatteryAlert(batteryState, device.DeviceSettings.LowBatteryAlertThreshold))
             {
                 device.DeviceSettings.LowBatteryAlertShown = false;
-                await platformNotificationHandler.RemoveNotificationByTag(notificationTag);
+                await platformNotificationHandler.RemoveNotificationsByTagAndGroup(notificationTag, Constants.Notification.BatteryGroup);
                 return;
             }
 
@@ -59,7 +59,7 @@ public sealed class BatteryAlertFeature(
             return;
         }
 
-        await platformNotificationHandler.RemoveNotificationByTag(Constants.Notification.GetBatteryTag(device.Id));
+        await platformNotificationHandler.RemoveNotificationsByTagAndGroup(Constants.Notification.GetBatteryTag(device.Id), Constants.Notification.BatteryGroup);
     }
 
     private static bool ShouldShowLowBatteryAlert(BatteryState batteryState, int threshold) =>

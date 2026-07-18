@@ -110,6 +110,7 @@ public partial class ReceiveFileHandler(
             if (IsBulkTransfer)
             {
                 notificationHandler.ShowCompletedFileTransferNotification(
+                    "FileTransferNotification.Completed".GetLocalizedResource(),
                     string.Format("FileTransferNotification.CompletedBulk".GetLocalizedResource(), files.Count, device.Name),
                     TransferId.ToString(),
                     folderPath: storageLocation);
@@ -117,6 +118,7 @@ public partial class ReceiveFileHandler(
             else
             {
                 notificationHandler.ShowCompletedFileTransferNotification(
+                    "FileTransferNotification.Completed".GetLocalizedResource(),
                     string.Format("FileTransferNotification.CompletedSingle".GetLocalizedResource(), files[0].FileName, device.Name),
                     TransferId.ToString(),
                     Path.Combine(storageLocation, files[0].FileName));
@@ -126,12 +128,17 @@ public partial class ReceiveFileHandler(
         }
         catch (OperationCanceledException)
         {
-            logger.Info("File transfer cancelled");
+            logger.Info($"File transfer from {device.Name} cancelled");
+            _ = notificationHandler.RemoveNotificationsByTagAndGroup(TransferId.ToString(), Constants.Notification.FileTransferGroup);
             CleanupFailedFile();
         }
         catch (Exception ex)
         {
-            logger.Error("Error during file transfer", ex);
+            logger.Warn($"File transfer from {device.Name} failed: {ex.Message}");
+            notificationHandler.ShowCompletedFileTransferNotification(
+                "FileTransferNotification.Failed".GetLocalizedResource(),
+                string.Format("FileTransferNotification.FailedFrom".GetLocalizedResource(), device.Name),
+                TransferId.ToString());
             CleanupFailedFile();
         }
 
@@ -141,6 +148,8 @@ public partial class ReceiveFileHandler(
     public void Cancel()
     {
         cancellationTokenSource.Cancel();
+        transferCompletionSource?.TrySetCanceled(cancellationTokenSource.Token);
+        handshakeTcs?.TrySetCanceled(cancellationTokenSource.Token);
     }
 
     private void ShowProgressNotification()
@@ -177,7 +186,7 @@ public partial class ReceiveFileHandler(
         while (len >= 1024 && order < sizes.Length - 1)
         {
             order++;
-            len = len / 1024;
+            len /= 1024;
         }
         return $"{len:0.##} {sizes[order]}";
     }
@@ -193,8 +202,6 @@ public partial class ReceiveFileHandler(
 
     private void CleanupFailedFile()
     {
-        notificationHandler.RemoveNotificationByTag(TransferId.ToString());
-        
         // Save file metadata before cleanup
         var fileToDelete = currentFileMetadata;
         

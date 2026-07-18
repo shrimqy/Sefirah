@@ -86,12 +86,14 @@ public partial class SendFileHandler(
             if (IsBulkTransfer)
             {
                 notificationHandler.ShowCompletedFileTransferNotification(
+                    "FileTransferNotification.Completed".GetLocalizedResource(),
                     string.Format("FileTransferNotification.SentBulk".GetLocalizedResource(), files.Count, device.Name),
                     TransferId.ToString());
             }
             else
             {
                 notificationHandler.ShowCompletedFileTransferNotification(
+                    "FileTransferNotification.Completed".GetLocalizedResource(),
                     string.Format("FileTransferNotification.SentSingle".GetLocalizedResource(), files[0].FileName, device.Name),
                     TransferId.ToString());
             }
@@ -100,53 +102,54 @@ public partial class SendFileHandler(
         }
         catch (OperationCanceledException)
         {
-            logger.Info("File transfer cancelled");
-            notificationHandler?.RemoveNotificationByTag(TransferId.ToString());
+            logger.Info($"File transfer to {device.Name} cancelled");
+            _ = notificationHandler.RemoveNotificationsByTagAndGroup(TransferId.ToString(), Constants.Notification.FileTransferGroup);
         }
         catch (Exception ex)
         {
-            logger.Error("Error in SendFileHandler", ex);
-            notificationHandler?.RemoveNotificationByTag(TransferId.ToString());
+            logger.Warn($"File transfer to {device.Name} failed: {ex.Message}");
+            notificationHandler.ShowCompletedFileTransferNotification(
+                "FileTransferNotification.Failed".GetLocalizedResource(),
+                string.Format("FileTransferNotification.FailedTo".GetLocalizedResource(), device.Name),
+                TransferId.ToString());
         }
     }
 
     public void Cancel()
     {
         cancellationTokenSource.Cancel();
+        startMessageSource?.TrySetCanceled(cancellationTokenSource.Token);
+        transferCompletionSource?.TrySetCanceled(cancellationTokenSource.Token);
     }
 
     private async Task SendFileData(FileMetadata metadata, Stream stream)
     {
-        try
+        using (stream)
         {
-            using (stream)
+            var buffer = new byte[FileTransferService.ChunkSize];
+
+            while (bytesTransferred < metadata.FileSize)
             {
-                var buffer = new byte[FileTransferService.ChunkSize];
+                cancellationTokenSource.Token.ThrowIfCancellationRequested();
 
-                while (bytesTransferred < metadata.FileSize && session!.IsConnected)
-                {
-                    cancellationTokenSource.Token.ThrowIfCancellationRequested();
+                // Remote disconnect is a failure, not a cancellation.
+                if (session is null || !session.IsConnected)
+                    throw new IOException("Remote device disconnected during transfer");
 
-                    int bytesRead = await stream.ReadAsync(buffer);
-                    if (bytesRead == 0) break;
+                int bytesRead = await stream.ReadAsync(buffer);
+                if (bytesRead == 0) break;
 
-                    session.Send(buffer, 0, bytesRead);
-                    bytesTransferred += bytesRead;
-                    totalBytesTransferred += bytesRead;
+                session.Send(buffer, 0, bytesRead);
+                bytesTransferred += bytesRead;
+                totalBytesTransferred += bytesRead;
 
-                    notificationSequence++;
-                    ShowProgressNotification();
-                }
+                notificationSequence++;
+                ShowProgressNotification();
             }
+        }
 
-            bytesTransferred = 0;
-            logger.Info($"Completed file transfer for {metadata.FileName}");
-        }
-        catch (Exception ex)
-        {
-            logger.Error("Error in SendFileData", ex);
-            throw;
-        }
+        bytesTransferred = 0;
+        logger.Info($"Completed file transfer for {metadata.FileName}");
     }
 
     private void ShowProgressNotification()
@@ -183,7 +186,7 @@ public partial class SendFileHandler(
         while (len >= 1024 && order < sizes.Length - 1)
         {
             order++;
-            len = len / 1024;
+            len /= 1024;
         }
         return $"{len:0.##} {sizes[order]}";
     }
@@ -227,11 +230,11 @@ public partial class SendFileHandler(
 
     public void OnDisconnected(ServerSession session)
     {
-        if (transferCompletionSource?.Task.IsCompleted is false)
-        {
-            transferCompletionSource.TrySetException(new Exception("Client disconnected"));
-        }
         logger.Info($"Client disconnected from file transfer server: {session.Id}");
+
+        // Unblock any pending waits so the transfer stops instead of hanging.
+        transferCompletionSource?.TrySetException(new IOException("Remote device disconnected during transfer"));
+        startMessageSource?.TrySetException(new IOException("Remote device disconnected before transfer started"));
     }
 
     public void OnReceived(ServerSession session, byte[] buffer, long offset, long size)

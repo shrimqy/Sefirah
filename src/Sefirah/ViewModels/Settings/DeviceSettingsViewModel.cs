@@ -131,7 +131,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
                 if (!value)
                 {
-                    _ = platformNotificationHandler.RemoveNotificationByTag(Constants.Notification.GetBatteryTag(Device.Id));
+                    _ = platformNotificationHandler.RemoveNotificationsByTagAndGroup(Constants.Notification.GetBatteryTag(Device.Id), Constants.Notification.BatteryGroup);
                 }
 
                 OnPropertyChanged();
@@ -150,7 +150,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
             if (DeviceSettings.LowBatteryAlertThreshold != currentThreshold)
             {
                 DeviceSettings.LowBatteryAlertShown = false;
-                _ = platformNotificationHandler.RemoveNotificationByTag(Constants.Notification.GetBatteryTag(Device.Id));
+                _ = platformNotificationHandler.RemoveNotificationsByTagAndGroup(Constants.Notification.GetBatteryTag(Device.Id), Constants.Notification.BatteryGroup);
                 OnPropertyChanged();
             }
         }
