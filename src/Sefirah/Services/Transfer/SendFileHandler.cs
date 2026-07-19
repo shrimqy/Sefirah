@@ -24,6 +24,7 @@ public partial class SendFileHandler(
     private readonly long totalBytes = files.Sum(f => f.FileSize);
     private int currentFileIndex;
     private uint notificationSequence = 1;
+    private long lastNotificationUpdateTimestamp;
     private TaskCompletionSource<ServerSession>? connectionSource;
     private TaskCompletionSource<bool>? transferCompletionSource;
     private TaskCompletionSource<bool>? startMessageSource;
@@ -143,7 +144,6 @@ public partial class SendFileHandler(
                 bytesTransferred += bytesRead;
                 totalBytesTransferred += bytesRead;
 
-                notificationSequence++;
                 ShowProgressNotification();
             }
         }
@@ -154,6 +154,15 @@ public partial class SendFileHandler(
 
     private void ShowProgressNotification()
     {
+        var now = Environment.TickCount64;
+        if (lastNotificationUpdateTimestamp != 0 && now - lastNotificationUpdateTimestamp < 500)
+            return;
+
+        if (lastNotificationUpdateTimestamp != 0)
+            notificationSequence++;
+
+        lastNotificationUpdateTimestamp = now;
+
         var fileName = files[Math.Min(currentFileIndex, files.Count - 1)].FileName;
 
         // Title: fileName (index/total)
