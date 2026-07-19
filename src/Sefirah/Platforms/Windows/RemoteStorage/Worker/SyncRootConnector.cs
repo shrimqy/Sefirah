@@ -89,18 +89,20 @@ public sealed class SyncRootConnector(
     }
     /// <summary>
     /// Removes local placeholders which are removed from the remote since last sync.
+    /// Only deletes in-sync placeholders
     /// </summary>
     public void RemoveStalePlaceholders(string clientDirectory)
     {
         if (!Directory.Exists(clientDirectory))
             return;
 
-        foreach (var clientFile in Directory.GetFiles(clientDirectory))
+        // Files
+        foreach (var clientFile in Directory.EnumerateFiles(clientDirectory))
         {
             var relativePath = PathMapper.GetRelativePath(clientFile, _rootDirectory);
             try
             {
-                if (!remoteService.Exists(relativePath))
+                if (WasPreviouslySynced(clientFile) && !remoteService.Exists(relativePath))
                 {
                     File.Delete(clientFile);
                 }
@@ -108,15 +110,22 @@ public sealed class SyncRootConnector(
             catch (Exception) { }
         }
 
-        // Check and delete directories recursively
-        foreach (var clientDir in Directory.GetDirectories(clientDirectory))
+        // Directories
+        foreach (var clientDir in Directory.EnumerateDirectories(clientDirectory))
         {
             var relativePath = PathMapper.GetRelativePath(clientDir, _rootDirectory);
             try
             {
                 if (!remoteService.Exists(relativePath))
                 {
-                    Directory.Delete(clientDir, recursive: true);
+                    if (WasPreviouslySynced(clientDir))
+                    {
+                        Directory.Delete(clientDir, recursive: true);
+                    }
+                    else
+                    {
+                        RemoveStalePlaceholders(clientDir);
+                    }
                 }
                 else
                 {
@@ -132,6 +141,21 @@ public sealed class SyncRootConnector(
                 }
             }
             catch (Exception) { }
+        }
+    }
+
+    private bool WasPreviouslySynced(string clientPath)
+    {
+        try
+        {
+            var state = CloudFilter.GetPlaceholderState(clientPath);
+            return state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER)
+                && state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC);
+        }
+        catch (Exception ex)
+        {
+            logger.Warn($"Failed to read placeholder state for {clientPath}", ex);
+            return false;
         }
     }
 
