@@ -646,6 +646,15 @@ page.</value>
   <data name="FileTransferNotification.Completed" xml:space="preserve">
     <value>File transfer completed</value>
   </data>
+  <data name="FileTransferNotification.Failed" xml:space="preserve">
+    <value>File transfer failed</value>
+  </data>
+  <data name="FileTransferNotification.FailedTo" xml:space="preserve">
+    <value>Transfer to {0} failed</value>
+  </data>
+  <data name="FileTransferNotification.FailedFrom" xml:space="preserve">
+    <value>Transfer from {0} failed</value>
+  </data>
   <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
     <value>Received {0} from {1}</value>
   </data>
