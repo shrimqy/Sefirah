@@ -23,6 +23,7 @@ public partial class ReceiveFileHandler(
     private readonly long totalBytes = files.Sum(f => f.FileSize);
     private int currentFileIndex = 0;
     private uint notificationSequence = 1;
+    private long lastNotificationUpdateTimestamp;
     private TaskCompletionSource<bool>? handshakeTcs;
     private TaskCompletionSource<bool>? transferCompletionSource;
     private readonly CancellationTokenSource cancellationTokenSource = new();
@@ -154,6 +155,15 @@ public partial class ReceiveFileHandler(
 
     private void ShowProgressNotification()
     {
+        var now = Environment.TickCount64;
+        if (lastNotificationUpdateTimestamp != 0 && now - lastNotificationUpdateTimestamp < 500)
+            return;
+
+        if (lastNotificationUpdateTimestamp != 0)
+            notificationSequence++;
+
+        lastNotificationUpdateTimestamp = now;
+
         var fileName = currentFileMetadata?.FileName ?? files[0].FileName;
 
         // Title: fileName (index/total)
@@ -270,7 +280,6 @@ public partial class ReceiveFileHandler(
             bytesTransferred += size;
             totalBytesTransferred += size;
 
-            notificationSequence++;
             ShowProgressNotification();
 
             if (bytesTransferred >= currentFileMetadata.FileSize)
