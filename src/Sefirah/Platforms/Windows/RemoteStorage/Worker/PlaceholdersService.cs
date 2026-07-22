@@ -195,13 +195,13 @@ public class PlaceholdersService(
             return;
         }
 
-        var pinned = clientFileInfo.Attributes.HasAnySyncFlag(SyncAttributes.PINNED);
+        var pinned = clientFileInfo.Attributes.IsPinned();
         if (pinned)
         {
             // Clear Pinned to avoid 392 ERROR_CLOUD_FILE_PINNED
             CloudFilter.SetPinnedState(hfile, 0);
         }
-        var redownload = downloaded && !clientFileInfo.Attributes.HasAnySyncFlag(SyncAttributes.UNPINNED);
+        var redownload = downloaded && !clientFileInfo.Attributes.HasFlag(SyncAttributes.Unpinned);
         var relativePath = PathMapper.GetRelativePath(clientFile, RootDirectory);
         var usn = downloaded
             ? CloudFilter.UpdateAndDehydratePlaceholder(hfile, relativePath, remoteFileInfo)
@@ -209,7 +209,7 @@ public class PlaceholdersService(
         if (pinned)
         {
             // ClientWatcher calls HydratePlaceholder when both Offline and Pinned are set
-            CloudFilter.SetPinnedState(hfile, SyncAttributes.PINNED);
+            CloudFilter.SetPinnedState(hfile, SyncAttributes.Pinned);
         }
         else if (redownload)
         {
@@ -228,19 +228,17 @@ public class PlaceholdersService(
         }
 
         // Check if the directory is hydrated
-        bool isHydrated = !File.GetAttributes(clientDirectory).HasAnySyncFlag(SyncAttributes.OFFLINE);
+        bool isHydrated = !File.GetAttributes(clientDirectory).HasFlag(FileAttributes.Offline);
 
         // Only update placeholder state if directory is a hydrated directory
         if (isHydrated)
         {
-            logger.Info($"Directory {relativeDirectory} is hydrated");
             if (!CloudFilter.IsPlaceholder(clientDirectory))
             {
                 try
                 {
                     CloudFilter.ConvertToPlaceholder(clientDirectory);
                     CloudFilter.SetInSyncState(clientDirectory);
-                    logger.Info($"Converted to placeholder and updated {relativeDirectory}");
                 }
                 catch (Exception ex)
                 {

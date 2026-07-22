@@ -6,6 +6,7 @@ using Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
 using Vanara.Extensions;
 using Vanara.InteropServices;
 using Vanara.PInvoke;
+using FileAttributes = System.IO.FileAttributes;
 
 namespace Sefirah.Platforms.Windows.Interop;
 
@@ -391,17 +392,17 @@ public static class CloudFilter
     }
 
 
-    public static void SetPinnedState(string clientPath, int pinned)
+    public static void SetPinnedState(string clientPath, FileAttributes pinned)
     {
         using var hfile = CreateHFile(clientPath);
         SetPinnedState(hfile, pinned);
     }
 
-    public static void SetPinnedState(HFILE hfile, int pinned)
+    public static void SetPinnedState(HFILE hfile, FileAttributes pinned)
     {
-        var pinState = SyncAttributes.HasAnyFlag(pinned, SyncAttributes.PINNED)
+        var pinState = pinned.HasFlag(SyncAttributes.Pinned)
             ? CldApi.CF_PIN_STATE.CF_PIN_STATE_PINNED
-            : SyncAttributes.HasAnyFlag(pinned, SyncAttributes.UNPINNED)
+            : pinned.HasFlag(SyncAttributes.Unpinned)
             ? CldApi.CF_PIN_STATE.CF_PIN_STATE_UNPINNED
             : CldApi.CF_PIN_STATE.CF_PIN_STATE_UNSPECIFIED;
         CldApi.CfSetPinState(hfile, pinState, CldApi.CF_SET_PIN_FLAGS.CF_SET_PIN_FLAG_NONE);

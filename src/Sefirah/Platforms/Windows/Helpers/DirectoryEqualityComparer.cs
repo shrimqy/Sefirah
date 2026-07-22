@@ -20,7 +20,7 @@ public class DirectoryEqualityComparer : IEqualityComparer<DirectoryInfo>
     public int GetHashCode([DisallowNull] DirectoryInfo obj) =>
         HashCode.Combine(
             // ignore sync attributes
-            (int)obj.Attributes & ~SyncAttributes.ALL,
+            (int)(obj.Attributes & ~SyncAttributes.All),
             obj.CreationTimeUtc,
             obj.LastWriteTimeUtc
         );
