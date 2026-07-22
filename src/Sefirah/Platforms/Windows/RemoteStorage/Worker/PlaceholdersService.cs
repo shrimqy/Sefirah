@@ -164,7 +164,6 @@ public class PlaceholdersService(
             : CloudFilter.CreateHFile(clientFile, FileAccess.Write);
         var placeholderState = CloudFilter.GetPlaceholderState(hfile);
 
-
         if (!placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER))
         {
             try
@@ -178,15 +177,23 @@ public class PlaceholdersService(
             }
         }
 
-        // Skip if placeholder isn't synced yet (Possibly a local edit and not a remote change)
+        var remoteFileInfo = remoteService.GetFileInfo(relativeFile);
+        var matchesRemote = remoteFileInfo.GetHashCode() == _fileComparer.GetHashCode(clientFileInfo);
+
+        // A downloaded placeholder that isn't in-sync is possibly a local edit and not a remote change,
+        // so don't overwrite it - unless it still matches the remote, in which case it's not a real edit
+        // and we just re-mark it in-sync.
         if (!force && downloaded && !placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
         {
+            if (matchesRemote)
+            {
+                CloudFilter.SetInSyncState(hfile);
+            }
             return;
         }
 
-        var remoteFileInfo = remoteService.GetFileInfo(relativeFile);
-
-        if (!force && remoteFileInfo.GetHashCode() == _fileComparer.GetHashCode(clientFileInfo))
+        // Local matches remote, just make sure it's flagged in-sync.
+        if (!force && matchesRemote)
         {
             if (!placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
             {
