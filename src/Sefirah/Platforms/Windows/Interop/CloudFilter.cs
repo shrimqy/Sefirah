@@ -206,7 +206,7 @@ public static class CloudFilter
     public static SafeMetaHFILE CreateHFile(string path, FileAccess access = 0, FileShare fileShare = FileShare.Read)
     {
         var handle = Kernel32.CreateFile(
-            path,
+            LongPath.EnsureExtendedPrefix(path),
             (Kernel32.FileAccess)access | Kernel32.FileAccess.FILE_READ_ATTRIBUTES,
             fileShare,
             dwCreationDisposition: FileMode.Open,
@@ -218,7 +218,7 @@ public static class CloudFilter
 
     public static SafeMetaHFILE CreateHFileWithOplock(string clientPath, FileAccess access = FileAccess.Read)
     {
-        var hr = CldApi.CfOpenFileWithOplock(clientPath, (CldApi.CF_OPEN_FILE_FLAGS)access | CldApi.CF_OPEN_FILE_FLAGS.CF_OPEN_FILE_FLAG_EXCLUSIVE, out var hcffile);
+        var hr = CldApi.CfOpenFileWithOplock(LongPath.EnsureExtendedPrefix(clientPath), (CldApi.CF_OPEN_FILE_FLAGS)access | CldApi.CF_OPEN_FILE_FLAGS.CF_OPEN_FILE_FLAG_EXCLUSIVE, out var hcffile);
         hr.ThrowIfFailed("Failed to open hfile");
         return hcffile.ToMeta().ThrowIfInvalid(clientPath);
     }
