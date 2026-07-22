@@ -64,15 +64,10 @@ public partial class ClientWatcher : IDisposable
                 var fileInfo = new FileInfo(e.FullPath);
 
                 await _taskWriter.WriteAsync(async () => {
+                    CF_PLACEHOLDER_STATE state;
                     try
                     {
-                        var state = CloudFilter.GetPlaceholderState(e.FullPath);
-
-                        // FileSystemWatcher also fires on hydration updates, so skip if already in-sync.
-                        if (state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
-                        {
-                            return;
-                        }
+                        state = CloudFilter.GetPlaceholderState(e.FullPath);
                     }
                     catch (Exception ex)
                     {
@@ -80,10 +75,21 @@ public partial class ClientWatcher : IDisposable
                         return;
                     }
 
+                    // A fully-present (not partial), unpinned file is a "Free up space" request.
+                    var isDehydrationRequested = fileInfo.Attributes.IsDehydrationRequested()
+                        && !fileInfo.Attributes.HasFlag(FileAttributes.Directory)
+                        && !state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PARTIALLY_ON_DISK);
+
+                    // Skip already-synced files (hydration also raises Changed), but let dehydrate requests through.
+                    if (state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC) && !isDehydrationRequested)
+                    {
+                        return;
+                    }
+
                     var relativePath = PathMapper.GetRelativePath(e.FullPath, RootDirectory);
                     using var locker = await _fileLocker.Lock(relativePath);
 
-                    if (fileInfo.Attributes.HasAllSyncFlags(SyncAttributes.PINNED | (int)FileAttributes.Offline))
+                    if (fileInfo.Attributes.IsPinned() && fileInfo.Attributes.HasFlag(FileAttributes.Offline))
                     {
                         if (fileInfo.Attributes.HasFlag(FileAttributes.Directory))
                         {
@@ -126,11 +132,7 @@ public partial class ClientWatcher : IDisposable
                             }
                         }
                     }
-                    else if (
-                        fileInfo.Attributes.HasAnySyncFlag(SyncAttributes.UNPINNED)
-                        && !fileInfo.Attributes.HasFlag(FileAttributes.Offline)
-                        && !fileInfo.Attributes.HasFlag(FileAttributes.Directory)
-                    )
+                    else if (isDehydrationRequested)
                     {
                         try
                         {
@@ -140,6 +142,7 @@ public partial class ClientWatcher : IDisposable
                         {
                             _logger.Warn($"Unable to dehydrate placeholder for {e.FullPath} - connection may be lost");
                         }
+                        return;
                     }
 
                     if (fileInfo.Attributes.HasFlag(FileAttributes.Directory))

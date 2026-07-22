@@ -4,6 +4,7 @@ using Sefirah.Platforms.Windows.Abstractions;
 using Sefirah.Platforms.Windows.Helpers;
 using Sefirah.Platforms.Windows.RemoteStorage.Abstractions;
 using Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
+using FileAttributes = System.IO.FileAttributes;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Sftp;
 
@@ -199,7 +200,7 @@ public sealed partial class SftpWatcher(
         {
             var clientPath = Path.Join(_syncContext.RootDirectory, relativePath);
             return Path.Exists(clientPath) &&
-                   !File.GetAttributes(clientPath).HasAnySyncFlag(SyncAttributes.OFFLINE);
+                   !File.GetAttributes(clientPath).HasFlag(FileAttributes.Offline);
         }
         catch (Exception ex)
         {

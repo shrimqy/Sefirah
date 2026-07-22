@@ -10,7 +10,7 @@ public static class RemoteFileInfoExtensions
         HashCode.Combine(
             obj.Length,
             // ignore sync attributes
-            (int)obj.Attributes & ~SyncAttributes.ALL,
+            (int)(obj.Attributes & ~SyncAttributes.All),
             obj.CreationTimeUtc,
             obj.LastWriteTimeUtc
         );
