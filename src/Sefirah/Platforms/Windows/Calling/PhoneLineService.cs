@@ -27,6 +27,7 @@ public sealed class PhoneLineService(
 
     private PairedDevice? ActiveDevice => deviceManager.ActiveDevice;
     private string? ActiveTransportId => ActiveDevice?.CallsTransportDeviceId;
+    private readonly bool supportsCallControl = CallingFeatureUtils.SupportsCallControlApis();
 
     public CallingLineStatus LineStatus { get; private set; } = CallingLineStatus.NotLinked;
 
@@ -49,6 +50,9 @@ public sealed class PhoneLineService(
             SetLineStatus(CallingLineStatus.NotSupported);
             return;
         }
+
+        if (!supportsCallControl)
+            logger.Info("CallsPhoneContract v6 not present");
 
         if (!await bluetoothRadioManager.RefreshAsync()) 
         {
@@ -75,7 +79,8 @@ public sealed class PhoneLineService(
 
         await StartPhoneLineWatcherAsync();
 
-        PhoneCallManager.CallStateChanged += OnCallStateChanged;
+        if (supportsCallControl)
+            PhoneCallManager.CallStateChanged += OnCallStateChanged;
 
         _ = RefreshStateAsync();
     }
@@ -107,7 +112,8 @@ public sealed class PhoneLineService(
         logger.Debug($"PhoneLine updated {args.LineId} (DisplayName={line.DisplayName})");
         phoneLinesByLineId[args.LineId] = line;
         await RefreshStateAsync();
-        CheckActiveCalls(line);
+        if (supportsCallControl)
+            CheckActiveCalls(line);
     }
 
     private void OnPhoneLineWatcherStopped(PhoneLineWatcher sender, object args) => logger.Warn("PhoneLine watcher stopped");
@@ -120,7 +126,8 @@ public sealed class PhoneLineService(
         logger.Debug($"PhoneLine added/updated {args.LineId} (DisplayName={line.DisplayName})");
         phoneLinesByLineId[args.LineId] = line;
         await RefreshStateAsync();
-        CheckActiveCalls(line);
+        if (supportsCallControl)
+            CheckActiveCalls(line);
     }
 
     private async void OnPhoneLineRemoved(PhoneLineWatcher sender, PhoneLineWatcherEventArgs args)
@@ -192,6 +199,13 @@ public sealed class PhoneLineService(
 
         try
         {
+            if (!supportsCallControl)
+            {
+                // contract v5
+                line.Dial(phoneNumber, phoneNumber);
+                return;
+            }
+
             var result = await line.DialWithResultAsync(phoneNumber, phoneNumber);
             var phoneCall = result.DialedCall;
 
