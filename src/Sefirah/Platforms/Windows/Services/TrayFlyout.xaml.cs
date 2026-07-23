@@ -28,6 +28,10 @@ public sealed partial class TrayFlyout : DesktopFlyout
 
     public new void Show()
     {
+        // don't show flyout if there are no devices for now atleast
+        if (ViewModel.PairedDevices.Count == 0)
+            return;
+
         UpdatePopupDirection();
         base.Show();
     }
