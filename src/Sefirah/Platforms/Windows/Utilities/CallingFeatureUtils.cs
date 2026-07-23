@@ -6,9 +6,20 @@ internal static class CallingFeatureUtils
 {
     private const string FeatureId = "com.microsoft.windows.applicationmodel.phonelinetransportdevice_v1";
     private const string FeatureKey = "cb9WIvVfhp+8lFhaSrB6V6zUBGqctteKi/f/9AIeoZ4";
+    private const string CallsPhoneContract = "Windows.ApplicationModel.Calls.CallsPhoneContract";
 
+    /// <summary>
+    /// Transport pairing + outbound dial. Available from CallsPhoneContract v5 (Windows 10 1903+).
+    /// </summary>
     internal static bool IsBluetoothCallingSupportedByPlatform() =>
-        ApiInformation.IsApiContractPresent("Windows.ApplicationModel.Calls.CallsPhoneContract", 5);
+        ApiInformation.IsApiContractPresent(CallsPhoneContract, 5);
+
+    /// <summary>
+    /// In-call control (PhoneCall, DialWithResultAsync, GetAllActivePhoneCallsAsync).
+    /// Requires CallsPhoneContract v6 (build 20348+ / Windows 11).
+    /// </summary>
+    internal static bool SupportsCallControlApis() =>
+        ApiInformation.IsApiContractPresent(CallsPhoneContract, 6);
 
     internal static bool TryUnlockPhoneLineTransportDeviceAPIs(ILogger logger) =>
         ShouldSkipLAFCheck() || TryUnlockPhoneLineTransportLimitedAccessFeature(logger);
