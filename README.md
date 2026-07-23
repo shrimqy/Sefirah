@@ -18,7 +18,13 @@
 - **File Sharing**: Share files between your devices easily.
 - **Storage Integration**: Integrate your Android storage into the Windows Explorer.
 - **Notification**: Allows toasting the notifications from your android in desktop.
-- **Screen mirroring**: Mirror and control the Android device via scrcpy. 
+- **Screen mirroring**: Mirror and control the Android device via scrcpy.
+- **SMS Texting**: Send and receive SMS texts from your Android device to your Windows PC.
+- **Phone Call**: View and answer phone calls from your Android device on your Windows PC.
+
+## Linux Status
+
+Support for linux is limited. Some features may not available on Linux that are on Windows.
 
 ## Limitations
 
@@ -73,6 +79,11 @@ adb shell appops set com.castle.sefirah RECEIVE_SENSITIVE_NOTIFICATIONS allow
     - **WARNING**: DO NOT set the remote storage location to a pre-existing folder as it will delete the contents of that folder.
 5. **SMS Texting**:
     - Grant all the permissions required from the permissions page in Android. After that, reconnect and the messages should appear in the Messages tab in the Desktop app. You can now view and send texts as sms. You can also switch sims if your device has dual sims. Attachments have not been implemented yet.
+
+6. **Bluetooth calling**:
+    - Remove your Bluetooth device if you have already registered with another app
+    - Pair your Bluetooth device to PC either through the in-app Bluetooth pairing or through the Windows settings.
+    
 6. **Screen Mirroring using [Scrcpy](https://github.com/Genymobile/scrcpy)**:
     - You would need to [download](https://github.com/Genymobile/scrcpy/releases), extract and set the scrcpy location in App settings. 
     - You can specify your preferences for the scrcpy to launch with in the screen mirroring section. 
@@ -86,13 +97,11 @@ adb shell appops set com.castle.sefirah RECEIVE_SENSITIVE_NOTIFICATIONS allow
   <img alt="Files hero image" src="./.github/readme-images/Screenshot.png" />
 </p>
 
-## Contribute
+## Support
 
-Feel free to open an issue if you want to report a bug, provide feedback, or ask a question. Pull requests are very welcome!
+Feel free to open an issue if you want to report a bug, provide feedback, or ask a question. 
 
 If you have any specific questions or need further details, please reach out to me on [the Discord server](https://discord.gg/MuvMqv4MES) or by email—I would be happy to help.
-
-If you would like to translate the project into your language, you can find it on [Crowdin](https://crowdin.com/project/sefirah)
 
 ## Thanks
 
