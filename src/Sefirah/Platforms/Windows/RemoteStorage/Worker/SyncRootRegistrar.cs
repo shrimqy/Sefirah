@@ -32,7 +32,7 @@ public class SyncRootRegistrar(
 
     public static bool IsRegistered(string id) => StorageProviderSyncRootManager.GetCurrentSyncRoots().Any((x) => x.Id == id);
 
-    public StorageProviderSyncRootInfo Register(RegisterSyncRootCommand command, IStorageFolder directory, SftpContext context)
+    public StorageProviderSyncRootInfo? Register(RegisterSyncRootCommand command, IStorageFolder directory, SftpContext context)
     {
         // Stage 1: Setup
         //--------------------------------------------------------------------------------------------
@@ -41,13 +41,7 @@ public class SyncRootRegistrar(
         clientDirectory.Attributes &= ~System.IO.FileAttributes.NotContentIndexed;
 
         var id = $"{providerOptions.Value.ProviderId}!{WindowsIdentity.GetCurrent().User}!{command.AccountId}";
-
-        var contextBytes = StructBytes.ToBytes(context);
-
-        if (IsRegistered(id))
-        {
-            UpdateCredentials(id, context);
-        }
+        var contextBuffer = CryptographicBuffer.CreateFromByteArray(StructBytes.ToBytes(context));
 
         var info = new StorageProviderSyncRootInfo
         {
@@ -59,7 +53,7 @@ public class SyncRootRegistrar(
             HydrationPolicyModifier = StorageProviderHydrationPolicyModifier.AutoDehydrationAllowed |
                                      StorageProviderHydrationPolicyModifier.AllowFullRestartHydration,
             PopulationPolicy = (StorageProviderPopulationPolicy)command.PopulationPolicy,
-            InSyncPolicy = StorageProviderInSyncPolicy.FileCreationTime | 
+            InSyncPolicy = StorageProviderInSyncPolicy.FileCreationTime |
                            StorageProviderInSyncPolicy.DirectoryCreationTime |
                            StorageProviderInSyncPolicy.FileLastWriteTime |
                            StorageProviderInSyncPolicy.DirectoryLastWriteTime |
@@ -69,10 +63,15 @@ public class SyncRootRegistrar(
             Version = "1.0.0",
             //HardlinkPolicy = StorageProviderHardlinkPolicy.None,
             // RecycleBinUri = new Uri(""),
-            Context = CryptographicBuffer.CreateFromByteArray(contextBytes),
+            Context = contextBuffer,
         };
          //info.StorageProviderItemPropertyDefinitions.Add()
 
+        if (IsRegistered(id))
+        {
+            return info;
+        }
+        
         logger.Debug($"Registering {id}");
         StorageProviderSyncRootManager.Register(info);
 
@@ -88,7 +87,6 @@ public class SyncRootRegistrar(
             GC.Collect();
             GC.WaitForPendingFinalizers();
             StorageProviderSyncRootManager.Unregister(id);
-
         }
         catch (COMException ex) when (ex.HResult == -2147023728)
         {
@@ -97,23 +95,6 @@ public class SyncRootRegistrar(
         catch (Exception ex)
         {
             logger.Error("Unregister sync root failed", ex);
-        }
-    }
-
-    public void UpdateCredentials<T>(string id, T context) where T : struct
-    {
-        try
-        {
-            var roots = StorageProviderSyncRootManager.GetCurrentSyncRoots();
-            var existingRoot = roots.FirstOrDefault(x => x.Id == id) ?? throw new InvalidOperationException($"Sync root {id} not found");
-            var contextBytes = StructBytes.ToBytes(context);
-
-            CloudFilter.UpdateSyncRoot(existingRoot.Path.Path, contextBytes);
-        }
-        catch (Exception ex)
-        {
-            logger.Error("Failed to update credentials", ex);
-            throw;
         }
     }
 }

@@ -408,47 +408,6 @@ public static class CloudFilter
         CldApi.CfSetPinState(hfile, pinState, CldApi.CF_SET_PIN_FLAGS.CF_SET_PIN_FLAG_NONE);
     }
 
-    public static void UpdateSyncRoot(string syncRootPath, byte[] context)
-    {
-        using var contextPtr = new SafeHGlobalHandle(context);
-        var registration = new CldApi.CF_SYNC_REGISTRATION
-        {
-            StructSize = (uint)Marshal.SizeOf<CldApi.CF_SYNC_REGISTRATION>(),
-            ProviderName = "Sefirah",
-            ProviderVersion = "1.0",
-            SyncRootIdentity = contextPtr,
-            SyncRootIdentityLength = (uint)context.Length,
-            FileIdentity = nint.Zero,
-            FileIdentityLength = 0,
-        };
-
-        var policies = new CldApi.CF_SYNC_POLICIES
-        {
-            StructSize = (uint)Marshal.SizeOf<CldApi.CF_SYNC_POLICIES>(),
-            Hydration = new CldApi.CF_HYDRATION_POLICY 
-            { 
-                Primary = CldApi.CF_HYDRATION_POLICY_PRIMARY.CF_HYDRATION_POLICY_FULL,
-                Modifier = CldApi.CF_HYDRATION_POLICY_MODIFIER.CF_HYDRATION_POLICY_MODIFIER_AUTO_DEHYDRATION_ALLOWED
-            },
-            Population = new CldApi.CF_POPULATION_POLICY
-            {
-                Primary = CldApi.CF_POPULATION_POLICY_PRIMARY.CF_POPULATION_POLICY_FULL
-            },
-            InSync = CldApi.CF_INSYNC_POLICY.CF_INSYNC_POLICY_TRACK_FILE_CREATION_TIME | 
-                     CldApi.CF_INSYNC_POLICY.CF_INSYNC_POLICY_TRACK_DIRECTORY_CREATION_TIME |
-                     CldApi.CF_INSYNC_POLICY.CF_INSYNC_POLICY_TRACK_FILE_LAST_WRITE_TIME |
-                     CldApi.CF_INSYNC_POLICY.CF_INSYNC_POLICY_TRACK_DIRECTORY_LAST_WRITE_TIME,
-            HardLink = CldApi.CF_HARDLINK_POLICY.CF_HARDLINK_POLICY_NONE,
-        };
-
-        CldApi.CfRegisterSyncRoot(
-            syncRootPath,
-            in registration,
-            in policies,
-            CldApi.CF_REGISTER_FLAGS.CF_REGISTER_FLAG_UPDATE
-        ).ThrowIfFailed("Update sync root failed");
-    }
-
     internal static class FileTimeHelper
     {
         public static System.Runtime.InteropServices.ComTypes.FILETIME Zero = new System.Runtime.InteropServices.ComTypes.FILETIME
