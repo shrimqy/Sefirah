@@ -487,13 +487,18 @@
     <value>アンインストール</value>
   </data>
   <data name="UnlockDeviceHelpTitle" xml:space="preserve">
-    <value>シェルコマンドのヘルプ</value>
+    <value>Unlock commands help</value>
   </data>
   <data name="UnlockDeviceHelpDescription" xml:space="preserve">
-    <value>The shell commands in the text box will be executed before launching scrcpy. Enter commands that work on your device, separated by line.</value>
+    <value>Commands run in order before launching scrcpy. Set a delay in milliseconds after each command if your device needs time to react. Use 0 for no delay. Use %pwd% as a placeholder to be prompted for your password.</value>
   </data>
   <data name="UnlockDeviceHelpExample" xml:space="preserve">
     <value>例:</value>
+  </data>
+  <data name="UnlockDeviceHelpExampleCommands" xml:space="preserve">
+    <value>input keyevent 224
+input text %pwd%
+input keyevent 66</value>
   </data>
   <data name="PinnedApps" xml:space="preserve">
     <value>ピン留めされたアプリ</value>
@@ -627,6 +632,15 @@
   <data name="UnlockDeviceBeforeLaunch" xml:space="preserve">
     <value>scrcpy を起動する前にデバイスのロックを解除してください</value>
   </data>
+  <data name="UnlockCommandsHeader" xml:space="preserve">
+    <value>Unlock commands</value>
+  </data>
+  <data name="PasswordCacheTimeout" xml:space="preserve">
+    <value>Password cache timeout</value>
+  </data>
+  <data name="PasswordCacheTimeoutDescription" xml:space="preserve">
+    <value>When set to 0, you'll be prompted for password every time. When set to a value greater than 0, your password will be cached for the specified number of minutes and reused automatically.</value>
+  </data>
   <data name="Save" xml:space="preserve">
     <value>保存</value>
   </data>
@@ -682,6 +696,15 @@
     <value>input keyevent 26
 input keyevent 66
 input text %pwd%</value>
+  </data>
+  <data name="UnlockCommandPlaceholder" xml:space="preserve">
+    <value>input keyevent 26</value>
+  </data>
+  <data name="MicrosecondsLabel" xml:space="preserve">
+    <value>ms</value>
+  </data>
+  <data name="Delay" xml:space="preserve">
+    <value>Delay</value>
   </data>
   <data name="FileDropCaption" xml:space="preserve">
     <value>ファイルをドロップで送信</value>
