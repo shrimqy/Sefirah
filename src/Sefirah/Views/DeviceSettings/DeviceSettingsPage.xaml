@@ -133,7 +133,7 @@
                     Header="{helpers:ResourceString Name=NotificationSettings}"
                     IsClickEnabled="True">
                     <wuc:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xF0E3;" />
+                        <FontIcon Glyph="&#xE7E7;" />
                     </wuc:SettingsCard.HeaderIcon>
                     <wuc:SettingsCard.ActionIcon>
                         <FontIcon FontSize="11" Glyph="&#xE76C;" />
