@@ -398,47 +398,52 @@ public class ScreenMirrorService(
                     }
                     break;
             }
-            var commands = deviceSettings.UnlockCommands?.Trim()
-                .Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries)
-                .Select(c => c.Trim())
-                .Where(c => !string.IsNullOrEmpty(c))
-                .ToList();
-            var adbDevice = pairedDevices.FirstOrDefault(d => d.Serial == selectedDeviceSerial);
-            if (adbDevice is null || adbDevice.DeviceData is null) return null;
-
-            if (commands?.Count > 0 && await adbService.IsLocked(adbDevice.DeviceData))
+            if (deviceSettings.UnlockDeviceBeforeLaunch)
             {
-                // Check if any command contains password placeholder
-                var hasPasswordPlaceholder = commands.Any(c => c.Contains("%pwd%"));
-                string? password = null;
+                var commands = deviceSettings.UnlockCommands
+                    .Where(c => !string.IsNullOrWhiteSpace(c.Command))
+                    .ToList();
+                var adbDevice = pairedDevices.FirstOrDefault(d => d.Serial == selectedDeviceSerial);
+                if (adbDevice is null || adbDevice.DeviceData is null) return null;
 
-                if (hasPasswordPlaceholder)
+                if (commands.Count > 0 && await adbService.IsLocked(adbDevice.DeviceData))
                 {
-                    // Only use password caching if timeout is greater than 0
-                    var timeoutSeconds = deviceSettings.UnlockTimeout;
-                    if (timeoutSeconds > 0)
-                    {
-                        // Try to get cached password first
-                        password = GetCachedPassword(device.Id, timeoutSeconds);
-                    }
+                    // Check if any command contains password placeholder
+                    var hasPasswordPlaceholder = commands.Any(c => c.Command.Contains("%pwd%"));
+                    string? password = null;
 
-                    // If no cached password or caching is disabled, ask user for password
-                    if (password is null)
+                    if (hasPasswordPlaceholder)
                     {
-                        password = await ShowPasswordInputDialog();
-                        if (password is null) return null;
-
-                        // Only cache the password if timeout is greater than 0
+                        // Only use password caching if timeout is greater than 0
+                        var timeoutSeconds = deviceSettings.UnlockTimeout;
                         if (timeoutSeconds > 0)
                         {
-                            CachePassword(device.Id, password, timeoutSeconds);
+                            // Try to get cached password first
+                            password = GetCachedPassword(device.Id, timeoutSeconds);
                         }
-                    }
 
-                    // Replace password placeholders with actual password
-                    commands = commands.Select(c => c.Replace("%pwd%", password)).ToList();
+                        // If no cached password or caching is disabled, ask user for password
+                        if (password is null)
+                        {
+                            password = await ShowPasswordInputDialog();
+                            if (password is null) return null;
+
+                            // Only cache the password if timeout is greater than 0
+                            if (timeoutSeconds > 0)
+                            {
+                                CachePassword(device.Id, password, timeoutSeconds);
+                            }
+                        }
+
+                        // Copy so we don't persist the resolved password into settings
+                        commands = [.. commands.Select(c => new UnlockCommandEntry
+                        {
+                            Command = c.Command.Replace("%pwd%", password),
+                            DelayMs = c.DelayMs
+                        })];
+                    }
+                    adbService.UnlockDevice(adbDevice.DeviceData, commands);
                 }
-                adbService.UnlockDevice(adbDevice.DeviceData, commands);
             }
         }
         else if (deviceSettings.AdbTcpipModeEnabled && device.Session is not null)

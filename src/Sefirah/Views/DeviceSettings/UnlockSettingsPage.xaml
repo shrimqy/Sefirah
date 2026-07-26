@@ -1,0 +1,176 @@
+﻿<Page
+    x:Class="Sefirah.Views.DeviceSettings.UnlockSettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:Sefirah.Helpers"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:Sefirah.Data.Models"
+    xmlns:wuc="using:CommunityToolkit.WinUI.Controls"
+    x:Name="PageRoot"
+    mc:Ignorable="d">
+
+    <ScrollViewer>
+        <StackPanel Margin="20" Spacing="8">
+            <wuc:SettingsCard>
+                <wuc:SettingsCard.Header>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Text="{helpers:ResourceString Name=PasswordCacheTimeout}" />
+                        <Button
+                            Padding="4"
+                            VerticalAlignment="Center"
+                            Background="Transparent"
+                            BorderThickness="0">
+                            <FontIcon
+                                FontSize="14"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Glyph="&#xE946;" />
+                            <Button.Flyout>
+                                <Flyout>
+                                    <StackPanel MaxWidth="350" Spacing="5">
+                                        <TextBlock
+                                            FontWeight="SemiBold"
+                                            Foreground="{ThemeResource AccentAAFillColorDefaultBrush}"
+                                            Text="{helpers:ResourceString Name=PasswordCacheTimeout}" />
+                                        <TextBlock
+                                            FontSize="13"
+                                            Text="{helpers:ResourceString Name=PasswordCacheTimeoutDescription}"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </Flyout>
+                            </Button.Flyout>
+                        </Button>
+                    </StackPanel>
+                </wuc:SettingsCard.Header>
+                <NumberBox
+                    LargeChange="30"
+                    Minimum="0"
+                    PlaceholderText="0 (disabled)"
+                    SmallChange="5"
+                    SpinButtonPlacementMode="Inline"
+                    Width="150"
+                    Value="{x:Bind ViewModel.UnlockTimeout, Mode=TwoWay}" />
+            </wuc:SettingsCard>
+
+            <StackPanel Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{helpers:ResourceString Name=UnlockCommandsHeader}" />
+                    <Button
+                        Padding="4"
+                        VerticalAlignment="Center"
+                        Background="Transparent"
+                        BorderThickness="0">
+                        <FontIcon
+                            FontSize="14"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Glyph="&#xE946;" />
+                        <Button.Flyout>
+                            <Flyout>
+                                <StackPanel MaxWidth="350" Spacing="5">
+                                    <TextBlock
+                                        FontWeight="SemiBold"
+                                        Foreground="{ThemeResource AccentAAFillColorDefaultBrush}"
+                                        Text="{helpers:ResourceString Name=UnlockDeviceHelpTitle}" />
+                                    <TextBlock
+                                        FontSize="13"
+                                        Text="{helpers:ResourceString Name=UnlockDeviceHelpDescription}"
+                                        TextWrapping="Wrap" />
+                                    <TextBlock
+                                        FontWeight="SemiBold"
+                                        Foreground="{ThemeResource AccentAAFillColorDefaultBrush}"
+                                        Text="{helpers:ResourceString Name=UnlockDeviceHelpExample}" />
+                                    <TextBlock
+                                        FontFamily="Consolas"
+                                        FontSize="13"
+                                        IsTextSelectionEnabled="True"
+                                        Text="{helpers:ResourceString Name=UnlockDeviceHelpExampleCommands}" />
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                </StackPanel>
+
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox
+                        Grid.Column="0"
+                        PlaceholderText="{helpers:ResourceString Name=UnlockCommandPlaceholder}"
+                        Text="{x:Bind ViewModel.NewUnlockCommand, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        KeyDown="NewUnlockCommand_KeyDown" />
+                    <Button
+                        Grid.Column="1"
+                        Command="{x:Bind ViewModel.AddUnlockCommandCommand}"
+                        Content="{helpers:ResourceString Name=Add}" />
+                </Grid>
+
+                <ListView
+                    AllowDrop="True"
+                    CanReorderItems="True"
+                    ItemsSource="{x:Bind ViewModel.UnlockCommands, Mode=OneWay}"
+                    SelectionMode="None">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListViewItem">
+                                        <ListViewItemPresenter
+                                            Padding="0"
+                                            HorizontalContentAlignment="Stretch"
+                                            VerticalContentAlignment="Stretch"
+                                            ContentMargin="0" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="models:UnlockCommandEntry">
+                            <wuc:SettingsCard HorizontalAlignment="Stretch">
+                                <wuc:SettingsCard.Header>
+                                    <StackPanel
+                                        VerticalAlignment="Center"
+                                        Orientation="Horizontal"
+                                        Spacing="8">
+                                        <TextBox
+                                            MinWidth="300"
+                                            PlaceholderText="{helpers:ResourceString Name=UnlockCommandPlaceholder}"
+                                            Text="{x:Bind Command, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            KeyDown="OnKeyDown" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Text="{helpers:ResourceString Name=Delay}" />
+                                        <NumberBox
+                                            Minimum="0"
+                                            SpinButtonPlacementMode="Hidden"
+                                            KeyDown="OnKeyDown"
+                                            ValueChanged="OnDelayValueChanged"
+                                            Value="{x:Bind DelayMs, Mode=TwoWay}" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Text="{helpers:ResourceString Name=MicrosecondsLabel}" />
+                                    </StackPanel>
+                                </wuc:SettingsCard.Header>
+                                <Button
+                                    Padding="8"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Command="{Binding DataContext.RemoveUnlockCommandCommand, ElementName=PageRoot}"
+                                    CommandParameter="{x:Bind}">
+                                    <FontIcon FontSize="14" Glyph="&#xE894;" />
+                                </Button>
+                            </wuc:SettingsCard>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

@@ -1,3 +1,5 @@
+using Sefirah.Data.Models;
+
 namespace Sefirah.Data.Contracts;
 
 public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyChanged
@@ -150,7 +152,7 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// <summary>
     /// Gets or sets the unlock commands.
     /// </summary>
-    string? UnlockCommands { get; set; }
+    List<UnlockCommandEntry> UnlockCommands { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to disable video forwarding.

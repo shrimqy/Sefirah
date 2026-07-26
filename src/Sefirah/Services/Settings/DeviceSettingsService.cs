@@ -1,4 +1,5 @@
 using Sefirah.Utils.Serialization;
+using Sefirah.Data.Models;
 
 namespace Sefirah.Services.Settings;
 
@@ -142,9 +143,9 @@ internal sealed partial class DeviceSettingsService(string deviceId) : BaseDevic
         set => Set(value);
     }
 
-    public string? UnlockCommands
+    public List<UnlockCommandEntry> UnlockCommands
     {
-        get => Get(string.Empty);
+        get => Get<List<UnlockCommandEntry>>([]) ?? [];
         set => Set(value);
     }
 
