@@ -55,9 +55,6 @@
                             Click="OpenUnlockSettings"
                             Header="{helpers:ResourceString Name=UnlockDeviceBeforeLaunch}"
                             IsClickEnabled="True">
-                            <wuc:SettingsCard.ActionIcon>
-                                <FontIcon FontSize="11" Glyph="&#xE76C;" />
-                            </wuc:SettingsCard.ActionIcon>
                             <ToggleSwitch IsOn="{x:Bind ViewModel.UnlockDeviceBeforeLaunch, Mode=TwoWay}" />
                         </wuc:SettingsCard>
 

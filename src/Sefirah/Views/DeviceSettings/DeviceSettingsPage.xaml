@@ -109,9 +109,6 @@
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xF0E3;" />
                     </wuc:SettingsCard.HeaderIcon>
-                    <wuc:SettingsCard.ActionIcon>
-                        <FontIcon FontSize="11" Glyph="&#xE76C;" />
-                    </wuc:SettingsCard.ActionIcon>
                     <wuc:Segmented SelectionMode="Multiple" SelectionChanged="ClipboardSyncSegmented_SelectionChanged" Loaded="ClipboardSyncSegmented_Loaded">
                         <wuc:SegmentedItem AutomationProperties.Name="{helpers:ResourceString Name=ReceiveClipboard}">
                             <wuc:SegmentedItem.Icon>
@@ -135,9 +132,6 @@
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE7E7;" />
                     </wuc:SettingsCard.HeaderIcon>
-                    <wuc:SettingsCard.ActionIcon>
-                        <FontIcon FontSize="11" Glyph="&#xE76C;" />
-                    </wuc:SettingsCard.ActionIcon>
                     <ToggleSwitch IsOn="{x:Bind ViewModel.NotificationSync, Mode=TwoWay}" />
                 </wuc:SettingsCard>
 
@@ -150,9 +144,6 @@
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEC15;" />
                     </wuc:SettingsCard.HeaderIcon>
-                    <wuc:SettingsCard.ActionIcon>
-                        <FontIcon FontSize="11" Glyph="&#xE76C;" />
-                    </wuc:SettingsCard.ActionIcon>
                 </wuc:SettingsCard>
 
                 <!--  ADB Settings  -->
@@ -164,9 +155,6 @@
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEC7A;" />
                     </wuc:SettingsCard.HeaderIcon>
-                    <wuc:SettingsCard.ActionIcon>
-                        <FontIcon FontSize="11" Glyph="&#xE76C;" />
-                    </wuc:SettingsCard.ActionIcon>
                 </wuc:SettingsCard>
 
                 <!--  Address Settings  -->
@@ -178,9 +166,6 @@
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE8F7;" />
                     </wuc:SettingsCard.HeaderIcon>
-                    <wuc:SettingsCard.ActionIcon>
-                        <FontIcon FontSize="11" Glyph="&#xE76C;" />
-                    </wuc:SettingsCard.ActionIcon>
                 </wuc:SettingsCard>
 
 
@@ -199,9 +184,6 @@
                     <wuc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEA69;" />
                     </wuc:SettingsCard.HeaderIcon>
-                    <wuc:SettingsCard.ActionIcon>
-                        <FontIcon FontSize="11" Glyph="&#xE76C;" />
-                    </wuc:SettingsCard.ActionIcon>
                     <wuc:Segmented SelectionMode="Multiple" SelectionChanged="MediaSessionSyncSegmented_SelectionChanged" Loaded="MediaSessionSyncSegmented_Loaded">
                         <wuc:SegmentedItem AutomationProperties.Name="{helpers:ResourceString Name=ReceiveMediaSessions}">
                             <wuc:SegmentedItem.Icon>
