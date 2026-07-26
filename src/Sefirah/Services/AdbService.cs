@@ -595,18 +595,22 @@ public class AdbService(
         }
     }
 
-    public async void UnlockDevice(DeviceData deviceData, List<string> commands)
+    public async void UnlockDevice(DeviceData deviceData, List<UnlockCommandEntry> commands)
     {
         try
         {
             logger.Info("Unlocking device");
             if (await IsLocked(deviceData))
             {
-                foreach (var command in commands)
+                foreach (var entry in commands)
                 {
-                    logger.Info($"Executing command: {command}");
-                    await adbClient.ExecuteShellCommandAsync(deviceData, command);
-                    await Task.Delay(250);
+                    if (string.IsNullOrWhiteSpace(entry.Command))
+                        continue;
+
+                    logger.Info($"Executing command: {entry.Command}, delayed {entry.DelayMs}");
+                    await adbClient.ExecuteShellCommandAsync(deviceData, entry.Command);
+                    if (entry.DelayMs > 0)
+                        await Task.Delay(entry.DelayMs);
                 }
             }
         }

@@ -293,19 +293,14 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         }
     }
 
-    public string? UnlockCommands
-    {
-        get => DeviceSettings.UnlockCommands;
-        set
-        {
-            if (DeviceSettings.UnlockCommands != value)
-            {
-                DeviceSettings.UnlockCommands = value;
-                OnPropertyChanged();
-            }
-        }
-    }
+    public ObservableCollection<UnlockCommandEntry> UnlockCommands { get; }
 
+    private string newUnlockCommand = string.Empty;
+    public string NewUnlockCommand
+    {
+        get => newUnlockCommand;
+        set => SetProperty(ref newUnlockCommand, value);
+    }
 
     public string? CustomArguments
     {
@@ -739,6 +734,9 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         OnPropertyChanged(nameof(SelectedScrcpyDevicePreference));
         LoadApps(device.Id);
 
+        UnlockCommands = [.. DeviceSettings.UnlockCommands];
+        UnlockCommands.CollectionChanged += UnlockCommands_CollectionChanged;
+
         Device.Addresses.CollectionChanged += Addresses_CollectionChanged;
     }
 
@@ -786,6 +784,55 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         isBulkOperation = false;
         OnPropertyChanged(nameof(CanRemoveAddress));
         SaveDevice();
+    }
+
+    private void UnlockCommands_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (isBulkOperation) return;
+
+        // Reordering ListView updates the collection twice with no dedicated event.
+        if (isDragging)
+        {
+            isDragging = false;
+            return;
+        }
+        isDragging = true;
+        SaveUnlockCommands();
+    }
+
+    public void SaveUnlockCommands() =>
+        DeviceSettings.UnlockCommands =
+        [
+            .. UnlockCommands.Select(static c => new UnlockCommandEntry
+            {
+                Command = c.Command,
+                DelayMs = c.DelayMs
+            })
+        ];
+
+    [RelayCommand]
+    private void AddUnlockCommand()
+    {
+        if (string.IsNullOrWhiteSpace(NewUnlockCommand))
+            return;
+
+        isBulkOperation = true;
+        UnlockCommands.Add(new UnlockCommandEntry
+        {
+            Command = NewUnlockCommand.Trim()
+        });
+        isBulkOperation = false;
+        NewUnlockCommand = string.Empty;
+        SaveUnlockCommands();
+    }
+
+    [RelayCommand]
+    private void RemoveUnlockCommand(UnlockCommandEntry entry)
+    {
+        isBulkOperation = true;
+        UnlockCommands.Remove(entry);
+        isBulkOperation = false;
+        SaveUnlockCommands();
     }
 
     public void LoadApps(string id)

@@ -15,7 +15,7 @@ public interface IAdbService
     Task StopAsync();
     Task<bool> UninstallApp(string deviceId, string appPackage);
     Task<bool> InstallAppAsync(string deviceId, string apkPath);
-    void UnlockDevice(DeviceData deviceData, List<string> unlockCommands);
+    void UnlockDevice(DeviceData deviceData, List<UnlockCommandEntry> unlockCommands);
     bool IsMonitoring { get; }
     AdbClient AdbClient { get; }
     Task<bool> TryConnectTcp(string host, string model);
