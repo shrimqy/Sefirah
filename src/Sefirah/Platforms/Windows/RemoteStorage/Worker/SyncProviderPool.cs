@@ -3,7 +3,6 @@ using Sefirah.Platforms.Windows.Abstractions;
 using Sefirah.Platforms.Windows.RemoteStorage.Abstractions;
 using Sefirah.Platforms.Windows.RemoteStorage.Commands;
 using Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
-using Vanara.PInvoke;
 using Windows.Storage.Provider;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
@@ -37,10 +36,11 @@ public partial class SyncProviderPool(
                 _threads.Remove(syncRootInfo.Id);
             }
 
-            var thread = new CancellableThread((cancellation) => 
+            var thread = new CancellableThread((cancellation) =>
                 Run(syncRootInfo, cancellation), logger);
-            
-            thread.Stopped += (sender, e) => {
+
+            thread.Stopped += (sender, e) =>
+            {
                 lock (_lock)
                 {
                     _threads.Remove(syncRootInfo.Id);
@@ -116,7 +116,8 @@ public partial class SyncProviderPool(
 
         public CancellableThread(Func<CancellationToken, Task> action, ILogger logger)
         {
-            _task = new Task(async () => {
+            _task = new Task(async () =>
+            {
                 try
                 {
                     await action(_cts.Token);
@@ -145,8 +146,8 @@ public partial class SyncProviderPool(
         {
             _cts.Cancel();
             await _task;
-
         }
+
         public void Dispose()
         {
             _cts.Cancel();
