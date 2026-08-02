@@ -52,6 +52,12 @@ internal sealed partial class GeneralSettingsService : BaseObservableJsonSetting
         set => Set(value);
     }
 
+    public StorageMountPreference StorageMountPreference
+    {
+        get => Get(StorageMountPreference.Auto);
+        set => Set(value);
+    }
+
     public List<BaseAction> Actions
     {
         get => Get<List<BaseAction>>([]);
