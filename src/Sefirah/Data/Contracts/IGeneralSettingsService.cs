@@ -37,6 +37,11 @@ public interface IGeneralSettingsService : IBaseSettingsService, INotifyProperty
     string ReceivedFilesPath { get; set; }
 
     /// <summary>
+    /// Gets or sets how device storage is mounted over SFTP on Linux (GVfs vs sshfs).
+    /// </summary>
+    StorageMountPreference StorageMountPreference { get; set; }
+
+    /// <summary>
     /// Gets or sets the list of custom actions.
     /// </summary>
     List<BaseAction> Actions { get; set; }

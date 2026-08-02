@@ -198,10 +198,39 @@ public sealed partial class GeneralViewModel : BaseViewModel
             if (value != UserSettingsService.GeneralSettingsService.RemoteStoragePath)
             {
                 UserSettingsService.GeneralSettingsService.RemoteStoragePath = value;
-                var sftpService = Ioc.Default.GetRequiredService<ISftpFeature>();
-                //sftpService.RemoveAllSyncRoots();
                 OnPropertyChanged();
             }
+        }
+    }
+
+    public StorageMountPreference StorageMountPreference
+    {
+        get => UserSettingsService.GeneralSettingsService.StorageMountPreference;
+        set
+        {
+            if (value != UserSettingsService.GeneralSettingsService.StorageMountPreference)
+            {
+                UserSettingsService.GeneralSettingsService.StorageMountPreference = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public Dictionary<StorageMountPreference, string> StorageMountPreferenceTypes { get; } = new()
+    {
+        { StorageMountPreference.Auto, "Auto".GetLocalizedResource() },
+        { StorageMountPreference.Gvfs, "GVfs".GetLocalizedResource() },
+        { StorageMountPreference.Sshfs, "Sshfs".GetLocalizedResource() }
+    };
+
+    private string selectedStorageMountPreference = string.Empty;
+    public string SelectedStorageMountPreference
+    {
+        get => selectedStorageMountPreference;
+        set
+        {
+            if (SetProperty(ref selectedStorageMountPreference, value))
+                StorageMountPreference = StorageMountPreferenceTypes.First(t => t.Value == value).Key;
         }
     }
     #endregion
@@ -211,15 +240,16 @@ public sealed partial class GeneralViewModel : BaseViewModel
         selectedThemeType = ThemeTypes[CurrentTheme];
         selectedBackdropMaterial = BackdropMaterialTypes[BackdropMaterial];
         selectedStartupType = StartupTypes[StartupOption];
+        selectedStorageMountPreference = StorageMountPreferenceTypes[StorageMountPreference];
         selectedAppLanguageIndex = AppLanguageHelper.SupportedLanguages.IndexOf(AppLanguageHelper.PreferredLanguage);
         // Load initial local device name
         LoadLocalDeviceName();
     }
 
     [RelayCommand]
-    private void RemoveAllSyncRoots()
+    private async Task RemoveAllStorageMounts()
     {
-        SftpFeature.RemoveAll();
+        await SftpFeature.RemoveAll();
     }
 
     private void LoadLocalDeviceName()

@@ -109,21 +109,37 @@
                 <Button Click="SelectSaveLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
             </wuc:SettingsCard>
 
-            <!--  Remote Storage Location  -->
-            <wuc:SettingsCard Description="{x:Bind ViewModel.RemoteStoragePath, Mode=OneWay}" Header="{helpers:ResourceString Name=RemoteStorageLocation}">
-                <wuc:SettingsCard.HeaderIcon>
-                    <SymbolIcon Symbol="SyncFolder" />
-                </wuc:SettingsCard.HeaderIcon>
-                <Button Click="SelectRemoteLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
-            </wuc:SettingsCard>
+            <!--  Linux storage mount preference  -->
+            <not_win:StackPanel Spacing="4">
+                <wuc:SettingsCard
+                    Description="{helpers:ResourceString Name=StorageMountDescription}"
+                    Header="{helpers:ResourceString Name=StorageMount}">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE8B7;" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <ComboBox
+                        MinWidth="180"
+                        ItemsSource="{x:Bind ViewModel.StorageMountPreferenceTypes.Values}"
+                        SelectedItem="{x:Bind ViewModel.SelectedStorageMountPreference, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+            </not_win:StackPanel>
 
+            <!--  Windows remote storage location  -->
             <win:StackPanel Spacing="4">
-                <!--  Remove All Sync Roots  -->
-                <wuc:SettingsCard Description="{helpers:ResourceString Name=RemoveAllSyncRootsDescription}" Header="{helpers:ResourceString Name=RemoveAllSyncRoots}">
+                <wuc:SettingsCard Description="{x:Bind ViewModel.RemoteStoragePath, Mode=OneWay}" Header="{helpers:ResourceString Name=RemoteStorageLocation}">
+                    <wuc:SettingsCard.HeaderIcon>
+                        <SymbolIcon Symbol="SyncFolder" />
+                    </wuc:SettingsCard.HeaderIcon>
+                    <Button Click="SelectRemoteLocation_Click" Content="{helpers:ResourceString Name=SelectLocation}" />
+                </wuc:SettingsCard>
+
+                <wuc:SettingsCard
+                    Description="{helpers:ResourceString Name=RemoveAllStorageMountsDescription}"
+                    Header="{helpers:ResourceString Name=RemoveAllStorageMounts}">
                     <wuc:SettingsCard.HeaderIcon>
                         <SymbolIcon Symbol="Delete" />
                     </wuc:SettingsCard.HeaderIcon>
-                    <Button Command="{x:Bind ViewModel.RemoveAllSyncRootsCommand}" Content="{helpers:ResourceString Name=RemoveAllSyncRoots}" />
+                    <Button Command="{x:Bind ViewModel.RemoveAllStorageMountsCommand}" Content="{helpers:ResourceString Name=Remove}" />
                 </wuc:SettingsCard>
             </win:StackPanel>
 
