@@ -30,11 +30,14 @@ Support for linux is limited. Some features may not available on Linux that are 
 
 ### **Notification Sync**
 - Due to Android's restrictions, sensitive notifications are no longer visible from Android 15 onwards.
-- To work around this limitation, you can grant the necessary permission using ADB. Run the following command:
+- To work around this limitation, grant the necessary permission using ADB:
 
 ```sh
 adb shell appops set com.castle.sefirah RECEIVE_SENSITIVE_NOTIFICATIONS allow
 ```
+
+- On some devices (e.g. OnePlus), this may fail until you disable **system optimization** or **Disable permission monitoring** for apps in **Developer options** → **Apps**. After that, run the command again.
+- If ADB is connected, the desktop app will attempt to grant this permission automatically when the device comes online.
 
 ## Installation
 
