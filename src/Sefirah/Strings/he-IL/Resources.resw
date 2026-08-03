@@ -156,6 +156,18 @@
   <data name="RemoteStorageLocation" xml:space="preserve">
     <value>Remote storage location</value>
   </data>
+  <data name="StorageMount" xml:space="preserve">
+    <value>Storage mount</value>
+  </data>
+  <data name="StorageMountDescription" xml:space="preserve">
+    <value>How device storage is mounted in the file manager. Auto picks GVfs on GNOME and sshfs on KDE. Change applies on the next connection.</value>
+  </data>
+  <data name="GVfs" xml:space="preserve">
+    <value>GVfs</value>
+  </data>
+  <data name="Sshfs" xml:space="preserve">
+    <value>sshfs</value>
+  </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>הצג התראות Windows על סנכרון לוח העתקה</value>
   </data>
@@ -976,10 +988,10 @@ input text %pwd%</value>
   <data name="VideoBitrateMbps" xml:space="preserve">
     <value>Mbps</value>
   </data>
-  <data name="RemoveAllSyncRoots" xml:space="preserve">
-    <value>Remove all sync roots</value>
+  <data name="RemoveAllStorageMounts" xml:space="preserve">
+    <value>Remove all storage mounts</value>
   </data>
-  <data name="RemoveAllSyncRootsDescription" xml:space="preserve">
-    <value>Unregister all sync roots registered by the app</value>
+  <data name="RemoveAllStorageMountsDescription" xml:space="preserve">
+    <value>Unmount and clear all device storage registered by the app</value>
    </data>
 </root>
