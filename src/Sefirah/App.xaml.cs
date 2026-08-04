@@ -119,11 +119,9 @@ public partial class App : Application
 
             rootFrame.Navigate(typeof(Views.SplashScreen));
 
-            SplashScreenLoadingTCS = new TaskCompletionSource();
-            await SplashScreenLoadingTCS!.Task.WithTimeoutAsync(TimeSpan.FromMilliseconds(500));
-            SplashScreenLoadingTCS = null;
-
-            await AppLifecycleHelper.InitializeAppComponentsAsync();
+            await Task.WhenAll(
+                AppLifecycleHelper.InitializeAppComponentsAsync(),
+                Task.Delay(500));
 
             bool isOnboarding = ApplicationData.Current.LocalSettings.Values["HasCompletedOnboarding"] == null;
             if (isOnboarding)
