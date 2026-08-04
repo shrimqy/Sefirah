@@ -53,8 +53,6 @@ public static class AppLifecycleHelper
             updateService.CheckForUpdatesAsync(),
             phoneLineService.InitializeAsync()
         );
-
-        App.SplashScreenLoadingTCS?.TrySetResult();
     }
 
     public static IApplicationBuilder ConfigureApp(this App app, LaunchActivatedEventArgs args)
