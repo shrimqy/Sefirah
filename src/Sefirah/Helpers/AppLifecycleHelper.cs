@@ -48,7 +48,7 @@ public static class AppLifecycleHelper
         await networkService.StartServerAsync();
         await discoveryService.StartDiscoveryAsync();
 
-        await Task.WhenAll(
+        _ = Task.WhenAll(
             adbService.StartAsync(),
             updateService.CheckForUpdatesAsync(),
             phoneLineService.InitializeAsync()
