@@ -600,8 +600,6 @@ public class AdbService(
         try
         {
             logger.Info("Unlocking device");
-            if (await IsLocked(deviceData))
-            {
                 foreach (var entry in commands)
                 {
                     if (string.IsNullOrWhiteSpace(entry.Command))
@@ -613,7 +611,6 @@ public class AdbService(
                         await Task.Delay(entry.DelayMs);
                 }
             }
-        }
         catch (Exception ex)
         { 
             logger.Error($"Error unlocking device: {ex.Message}", ex);
