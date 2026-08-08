@@ -14,7 +14,6 @@ namespace Sefirah.Data.Models;
 [JsonDerivedType(typeof(CallLogInfo), nameof(CallLogInfo))]
 [JsonDerivedType(typeof(ClearNotifications), nameof(ClearNotifications))]
 [JsonDerivedType(typeof(ClipboardInfo), nameof(ClipboardInfo))]
-[JsonDerivedType(typeof(ConnectionAck), nameof(ConnectionAck))]
 [JsonDerivedType(typeof(ContactInfo), nameof(ContactInfo))]
 [JsonDerivedType(typeof(ConversationInfo), nameof(ConversationInfo))]
 [JsonDerivedType(typeof(DeviceInfo), nameof(DeviceInfo))]
@@ -36,8 +35,6 @@ namespace Sefirah.Data.Models;
 [JsonDerivedType(typeof(ThreadRequest), nameof(ThreadRequest))]
 [JsonDerivedType(typeof(UdpBroadcast), nameof(UdpBroadcast))]
 public class SocketMessage;
-
-public class ConnectionAck : SocketMessage;
 
 public class Disconnect : SocketMessage;
 
