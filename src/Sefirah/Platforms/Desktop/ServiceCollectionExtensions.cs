@@ -13,6 +13,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<IPlatformNotificationHandler, NotificationHandler>();
         services.AddFeature<IMediaFeature, MediaFeature>();
+        services.AddFeature<IAudioFeature, AudioFeature>();
         services.AddFeature<IBatteryFeature, BatteryFeature>();
         services.AddFeature<ISftpFeature, SftpFeature>();
         services.AddSingleton<IUpdateService, UpdateService>();
