@@ -7,6 +7,7 @@ namespace Sefirah.Data.Models;
 [JsonDerivedType(typeof(ApplicationInfo), nameof(ApplicationInfo))]
 [JsonDerivedType(typeof(ApplicationList), nameof(ApplicationList))]
 [JsonDerivedType(typeof(Authentication), nameof(Authentication))]
+[JsonDerivedType(typeof(AudioAction), nameof(AudioAction))]
 [JsonDerivedType(typeof(AudioDeviceInfo), nameof(AudioDeviceInfo))]
 [JsonDerivedType(typeof(AudioStreamState), nameof(AudioStreamState))]
 [JsonDerivedType(typeof(BatteryState), nameof(BatteryState))]
@@ -337,6 +338,15 @@ public class PlaybackInfo : SocketMessage
 public class MediaAction : SocketMessage
 {
     public MediaActionType ActionType { get; set; }
+
+    public required string Source { get; set; }
+
+    public double? Value { get; set; }
+}
+
+public class AudioAction : SocketMessage
+{
+    public AudioActionType ActionType { get; set; }
 
     public required string Source { get; set; }
 

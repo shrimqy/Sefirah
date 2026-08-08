@@ -14,6 +14,7 @@ public class MessageHandler(
     ISmsFeature smsFeature,
     IFileTransferService fileTransferService,
     IMediaFeature mediaFeature,
+    IAudioFeature audioFeature,
     IRemoteMediaFeature remoteMediaFeature,
     IActionFeature actionFeature,
     ISftpFeature sftpFeature,
@@ -38,6 +39,10 @@ public class MessageHandler(
 
                 case NotificationInfo notificationMessage:
                     await notificationFeature.HandleNotificationMessage(device, notificationMessage);
+                    break;
+
+                case AudioAction action:
+                    await audioFeature.HandleAudioActionAsync(action);
                     break;
 
                 case MediaAction action:
