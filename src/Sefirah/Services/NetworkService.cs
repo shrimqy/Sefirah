@@ -472,7 +472,11 @@ public class NetworkService(
         var accepted = await tcs.Task;
 
         device.SendMessage(new PairMessage { Pair = accepted });
-        if (accepted) await deviceManager.AddDevice(device);
+        if (accepted)
+        {
+            var pairedDevice = await deviceManager.AddDevice(device);
+            ConnectionStatusChanged?.Invoke(this, pairedDevice);
+        }
     }
 
     private async void HandlePairResponse(DiscoveredDevice device, PairMessage pairMessage)
