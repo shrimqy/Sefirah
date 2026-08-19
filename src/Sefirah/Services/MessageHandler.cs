@@ -87,7 +87,7 @@ public class MessageHandler(
                     break;
 
                 case SftpServerInfo sftpServerInfo:
-                    await sftpFeature.InitializeAsync(device, sftpServerInfo);
+                    await sftpFeature.Mount(device, sftpServerInfo);
                     break;
 
                 case FileTransferInfo fileTransfer:
