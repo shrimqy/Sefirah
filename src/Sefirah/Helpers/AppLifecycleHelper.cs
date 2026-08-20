@@ -126,6 +126,7 @@ public static class AppLifecycleHelper
                 .AddFeature<IBatteryAlertFeature, BatteryAlertFeature>()
                 .AddFeature<IClipboardFeature, ClipboardFeature>()
                 .AddFeature<IRemoteMediaFeature, RemoteMediaFeature>()
+                .AddFeature<IPlaySoundFeature, PlaySoundFeature>()
                 .AddFeature<IActionFeature, ActionFeature>()
                 .AddSingleton<IFileTransferService, FileTransferService>()
                 .AddFeature<ISmsFeature, SmsFeature>()

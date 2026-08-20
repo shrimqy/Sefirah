@@ -101,7 +101,6 @@ public class SftpFeature(
     {
         if (!_sessions.TryGetValue(device.Id, out var session))
         {
-            logger.Warn($"No SFTP session available to browse device {device.Name}");
             return;
         }
 

@@ -67,14 +67,35 @@ public sealed partial class DeviceControlCenter : UserControl
     private void PhoneFrameScrollTeachingTip_Closed(object? _, TeachingTipClosedEventArgs args)
         => IsPhoneFrameScrollTeachingTipShown = true;
 
-    private async void SendFilesButton_Click(object sender, RoutedEventArgs e)
+    private async void SendFilesAction_Click(object sender, RoutedEventArgs e)
     {
+        DeviceActionsFlyout.Hide();
+
         if (ViewModel.Device is null)
             return;
 
         var files = await PickerHelper.PickMultipleFilesAsync();
         if (files.Count > 0)
             ViewModel.SendFiles(files);
+    }
+
+    private async void SendClipboardAction_Click(object sender, RoutedEventArgs e)
+    {
+        DeviceActionsFlyout.Hide();
+        ViewModel.SendClipboard();
+    }
+
+    private async void BrowseFilesAction_Click(object sender, RoutedEventArgs e)
+    {
+        DeviceActionsFlyout.Hide();
+        await ViewModel.BrowseFiles();
+    }
+
+    private async void BrowseFilesAction_RightTapped(object sender, RightTappedRoutedEventArgs e)
+    {
+        e.Handled = true;
+        DeviceActionsFlyout.Hide();
+        await ViewModel.BrowseFilesViaUri();
     }
 
     private void PhoneFrame_PointerWheelChanged(object sender, PointerRoutedEventArgs e)

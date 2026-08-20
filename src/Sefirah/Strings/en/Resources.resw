@@ -869,6 +869,24 @@ input text %pwd%</value>
   <data name="ShareFiles" xml:space="preserve">
     <value>Share files</value>
   </data>
+  <data name="SendFiles" xml:space="preserve">
+    <value>Send files</value>
+  </data>
+  <data name="BrowseFiles" xml:space="preserve">
+    <value>Browse files</value>
+  </data>
+  <data name="BrowseFilesTooltip" xml:space="preserve">
+    <value>Right-click to open the SFTP link and copy it to the clipboard</value>
+  </data>
+  <data name="DeviceActions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="PlaySound" xml:space="preserve">
+    <value>Play sound</value>
+  </data>
+  <data name="PlaySoundDescription" xml:space="preserve">
+    <value>A sound will play on this device for 20 seconds</value>
+  </data>
   <data name="ReceiveClipboard" xml:space="preserve">
     <value>Receive clipboard</value>
   </data>

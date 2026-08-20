@@ -21,6 +21,7 @@ public class MessageHandler(
     ISessionManager sessionManager,
     ICallFeature callFeature,
     IBluetoothPairingService bluetoothPairingService,
+    IPlaySoundFeature playSoundFeature,
     ILogger<MessageHandler> logger) : IMessageHandler
 {
     public async void HandleMessageAsync(PairedDevice device, SocketMessage message)
@@ -108,6 +109,11 @@ public class MessageHandler(
 
                 case BluetoothPairingResult pairingResult:
                     bluetoothPairingService.HandleBluetoothPairingResult(device, pairingResult);
+                    break;
+
+                case PlaySound playSound:
+                    await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+                        playSoundFeature.HandleRemoteState(device, playSound.IsPlaying));
                     break;
 
                 case Disconnect:

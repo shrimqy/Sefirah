@@ -15,6 +15,9 @@ public sealed partial class MainPageViewModel : BaseViewModel
     private IUpdateService UpdateService { get; } = Ioc.Default.GetRequiredService<IUpdateService>();
     private IFileTransferService FileTransferService { get; } = Ioc.Default.GetRequiredService<IFileTransferService>();
     private IAdbService AdbService { get; } = Ioc.Default.GetRequiredService<IAdbService>();
+    private IClipboardFeature ClipboardFeature { get; } = Ioc.Default.GetRequiredService<IClipboardFeature>();
+    private ISftpFeature SftpFeature { get; } = Ioc.Default.GetRequiredService<ISftpFeature>();
+    private IPlaySoundFeature PlaySoundFeature { get; } = Ioc.Default.GetRequiredService<IPlaySoundFeature>();
     #endregion
 
     #region Properties
@@ -131,9 +134,12 @@ public sealed partial class MainPageViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    public void OpenDeviceSettings()
+    public void TogglePlaySound()
     {
-        App.OpenDeviceSettingsWindow(Device!);
+        if (Device is null)
+            return;
+
+        PlaySoundFeature.Toggle(Device);
     }
 
     #endregion
@@ -194,6 +200,30 @@ public sealed partial class MainPageViewModel : BaseViewModel
     public void SendFiles(IReadOnlyList<IStorageItem> storageItems)
     {
         FileTransferService.SendFilesWithPicker(storageItems);
+    }
+
+    public void SendClipboard()
+    {
+        if (Device is null)
+            return;
+
+        ClipboardFeature.SendToDevice(Device);
+    }
+
+    public async Task BrowseFiles()
+    {
+        if (Device is null || !Device.IsConnected)
+            return;
+
+        await SftpFeature.BrowseAsync(Device);
+    }
+
+    public async Task BrowseFilesViaUri()
+    {
+        if (Device is null || !Device.IsConnected)
+            return;
+
+        await SftpFeature.BrowseUriAsync(Device);
     }
 
     public void HandleNotificationReply(Notification notification, string replyText)

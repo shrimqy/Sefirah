@@ -28,6 +28,7 @@ namespace Sefirah.Data.Models;
 [JsonDerivedType(typeof(PairMessage), nameof(PairMessage))]
 [JsonDerivedType(typeof(BluetoothPairingRequest), nameof(BluetoothPairingRequest))]
 [JsonDerivedType(typeof(BluetoothPairingResult), nameof(BluetoothPairingResult))]
+[JsonDerivedType(typeof(PlaySound), nameof(PlaySound))]
 [JsonDerivedType(typeof(PlaybackInfo), nameof(PlaybackInfo))]
 [JsonDerivedType(typeof(RequestApplicationList), nameof(RequestApplicationList))]
 [JsonDerivedType(typeof(RingerModeState), nameof(RingerModeState))]
@@ -351,6 +352,11 @@ public class AudioAction : SocketMessage
     public required string Source { get; set; }
 
     public double? Value { get; set; }
+}
+
+public class PlaySound : SocketMessage
+{
+    public bool IsPlaying { get; set; }
 }
 
 public class ApplicationList : SocketMessage

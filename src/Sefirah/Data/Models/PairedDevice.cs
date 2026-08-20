@@ -94,6 +94,9 @@ public partial class PairedDevice : BaseRemoteDevice
                 OnPropertyChanged(nameof(IsForcedDisconnect));
                 OnPropertyChanged(nameof(IsConnectedOrConnecting));
                 RefreshAddressConnectionStates();
+
+                if (value.IsDisconnected)
+                    IsPlayingSound = false;
             }
         }
     }
@@ -146,6 +149,13 @@ public partial class PairedDevice : BaseRemoteDevice
     {
         get => dndEnabled;
         set => SetProperty(ref dndEnabled, value);
+    }
+
+    private bool isPlayingSound;
+    public bool IsPlayingSound
+    {
+        get => isPlayingSound;
+        set => SetProperty(ref isPlayingSound, value);
     }
 
     public IReadOnlyList<AudioStream> Streams { get; } =
