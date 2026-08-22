@@ -599,6 +599,63 @@ input keyevent 66</value>
   <data name="Reorder" xml:space="preserve">
     <value>Drag to reorder</value>
   </data>
+  <data name="Run" xml:space="preserve">
+    <value>Run</value>
+  </data>
+  <data name="Power" xml:space="preserve">
+    <value>Power</value>
+  </data>
+  <data name="Sleep" xml:space="preserve">
+    <value>Sleep</value>
+  </data>
+  <data name="Hibernate" xml:space="preserve">
+    <value>Hibernate</value>
+  </data>
+  <data name="Restart" xml:space="preserve">
+    <value>Restart</value>
+  </data>
+  <data name="Shutdown" xml:space="preserve">
+    <value>Shutdown</value>
+  </data>
+  <data name="Lock" xml:space="preserve">
+    <value>Lock</value>
+  </data>
+  <data name="LogOff" xml:space="preserve">
+    <value>Log off</value>
+  </data>
+  <data name="Link" xml:space="preserve">
+    <value>Link</value>
+  </data>
+  <data name="EnterLink" xml:space="preserve">
+    <value>https://example.com</value>
+  </data>
+  <data name="RunPath" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="EnterRunPath" xml:space="preserve">
+    <value>File, folder, or application path</value>
+  </data>
+  <data name="ActionIcon" xml:space="preserve">
+    <value>Icon</value>
+  </data>
+  <data name="BrowseCustomIcon" xml:space="preserve">
+    <value>Browse image</value>
+  </data>
+  <data name="ChangeIcon" xml:space="preserve">
+    <value>Change…</value>
+  </data>
+  <data name="SearchIcons" xml:space="preserve">
+    <value>Search icons</value>
+  </data>
+  <data name="UseBuiltInIcon" xml:space="preserve">
+    <value>Use built-in</value>
+  </data>
+  <data name="AskForConfirmation" xml:space="preserve">
+    <value>Ask for confirmation</value>
+  </data>
+  <data name="PowerKind" xml:space="preserve">
+    <value>Power option</value>
+  </data>
   <data name="Edit" xml:space="preserve">
     <value>Редактировать</value>
   </data>
