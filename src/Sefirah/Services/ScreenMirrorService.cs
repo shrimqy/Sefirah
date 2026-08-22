@@ -3,9 +3,9 @@ using System.Text.RegularExpressions;
 using CommunityToolkit.WinUI;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Models;
-using Sefirah.Dialogs;
 using Sefirah.Utils;
 using Sefirah.Views.Settings;
+using Sefirah.Views.WindowViews;
 using Windows.ApplicationModel.DataTransfer;
 
 #if WINDOWS
@@ -143,6 +143,11 @@ public class ScreenMirrorService(
             }
 
             if (string.IsNullOrEmpty(selectedDeviceSerial)) return false;
+
+            // Virtual-display app launches don't need the physical screen unlocked.
+            // Await password prompt if needed; the ADB unlock sequence itself is fire-and-forget.
+            if (!(isStartApp && deviceSettings.IsVirtualDisplayEnabled))
+                await TryUnlockDevice(device, deviceSettings, selectedDeviceSerial);
             
             argBuilder.Add($"-s {selectedDeviceSerial}");
 
@@ -155,6 +160,11 @@ public class ScreenMirrorService(
             if (deviceSettings.PhysicalKeyboard)
             {
                 argBuilder.Add("--keyboard=uhid");
+            }
+
+            if (!deviceSettings.ScrcpyClipboardAutosync)
+            {
+                argBuilder.Add("--no-clipboard-autosync");
             }
 
             // Video deviceSettings
@@ -398,53 +408,6 @@ public class ScreenMirrorService(
                     }
                     break;
             }
-            if (deviceSettings.UnlockDeviceBeforeLaunch)
-            {
-                var commands = deviceSettings.UnlockCommands
-                    .Where(c => !string.IsNullOrWhiteSpace(c.Command))
-                    .ToList();
-                var adbDevice = pairedDevices.FirstOrDefault(d => d.Serial == selectedDeviceSerial);
-                if (adbDevice is null || adbDevice.DeviceData is null) return null;
-
-                if (commands.Count > 0 && await adbService.IsLocked(adbDevice.DeviceData))
-                {
-                    // Check if any command contains password placeholder
-                    var hasPasswordPlaceholder = commands.Any(c => c.Command.Contains("%pwd%"));
-                    string? password = null;
-
-                    if (hasPasswordPlaceholder)
-                    {
-                        // Only use password caching if timeout is greater than 0
-                        var timeoutSeconds = deviceSettings.UnlockTimeout;
-                        if (timeoutSeconds > 0)
-                        {
-                            // Try to get cached password first
-                            password = GetCachedPassword(device.Id, timeoutSeconds);
-                        }
-
-                        // If no cached password or caching is disabled, ask user for password
-                        if (password is null)
-                        {
-                            password = await ShowPasswordInputDialog();
-                            if (password is null) return null;
-
-                            // Only cache the password if timeout is greater than 0
-                            if (timeoutSeconds > 0)
-                            {
-                                CachePassword(device.Id, password, timeoutSeconds);
-                            }
-                        }
-
-                        // Copy so we don't persist the resolved password into settings
-                        commands = [.. commands.Select(c => new UnlockCommandEntry
-                        {
-                            Command = c.Command.Replace("%pwd%", password),
-                            DelayMs = c.DelayMs
-                        })];
-                    }
-                    adbService.UnlockDevice(adbDevice.DeviceData, commands);
-                }
-            }
         }
         else if (deviceSettings.AdbTcpipModeEnabled && device.Session is not null)
         {
@@ -476,6 +439,54 @@ public class ScreenMirrorService(
         }
 
         return selectedDeviceSerial;
+    }
+
+    private async Task TryUnlockDevice(PairedDevice device, IDeviceSettingsService deviceSettings, string selectedDeviceSerial)
+    {
+        if (!deviceSettings.UnlockDeviceBeforeLaunch)
+            return;
+
+        var commands = deviceSettings.UnlockCommands
+            .Where(c => !string.IsNullOrWhiteSpace(c.Command))
+            .ToList();
+        if (commands.Count == 0)
+            return;
+
+        var adbDevice = devices.FirstOrDefault(d => d.Serial == selectedDeviceSerial);
+        if (adbDevice?.DeviceData is null)
+        {
+            logger.Warn($"Cannot unlock: no ADB device found for serial {selectedDeviceSerial}");
+            return;
+        }
+
+        if (!await adbService.IsLocked(adbDevice.DeviceData))
+            return;
+
+        if (commands.Any(c => c.Command.Contains("%pwd%")))
+        {
+            var timeoutSeconds = deviceSettings.UnlockTimeout;
+            string? password = timeoutSeconds > 0 ? GetCachedPassword(device.Id, timeoutSeconds) : null;
+
+            if (password is null)
+            {
+                password = await dispatcher.EnqueueAsync(PasswordInputWindow.ShowAsync);
+                if (password is null)
+                    return;
+
+                if (timeoutSeconds > 0)
+                    CachePassword(device.Id, password, timeoutSeconds);
+            }
+
+            // Copy so we don't persist the resolved password into settings
+            commands = [.. commands.Select(c => new UnlockCommandEntry
+            {
+                Command = c.Command.Replace("%pwd%", password),
+                DelayMs = c.DelayMs
+            })];
+        }
+
+        // Unlock commands run in the background; scrcpy can start immediately after.
+        adbService.UnlockDevice(adbDevice.DeviceData, commands);
     }
 
     private void StartProcessMonitoring(Process process, CancellationTokenSource processCts, string deviceSerial)
@@ -636,27 +647,6 @@ public class ScreenMirrorService(
             return path;
         }
         return string.Empty;
-    }
-
-    private async Task<string?> ShowPasswordInputDialog()
-    {
-        string? password = null;
-        
-        await dispatcher.EnqueueAsync(async () =>
-        {
-            var dialog = new PasswordInputDialog
-            {
-                XamlRoot = App.MainWindow.Content!.XamlRoot
-            };
-
-            var result = await dialog.ShowAsync();
-            if (result == ContentDialogResult.Primary)
-            {
-                password = dialog.Password;
-            }
-        });
-
-        return password;
     }
 
     private string? GetCachedPassword(string deviceId, int currentTimeout)

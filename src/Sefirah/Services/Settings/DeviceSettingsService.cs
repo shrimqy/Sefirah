@@ -131,6 +131,12 @@ internal sealed partial class DeviceSettingsService(string deviceId) : BaseDevic
         set => Set(value);
     }
 
+    public bool ScrcpyClipboardAutosync
+    {
+        get => Get(false);
+        set => Set(value);
+    }
+
     public bool UnlockDeviceBeforeLaunch
     {
         get => Get(false);

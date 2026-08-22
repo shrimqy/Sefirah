@@ -358,6 +358,12 @@ page.</value>
   <data name="PhysicalKeyboard" xml:space="preserve">
     <value>Disable on-screen keyboard</value>
   </data>
+  <data name="ScrcpyClipboardAutosync" xml:space="preserve">
+    <value>Clipboard autosync</value>
+  </data>
+  <data name="ScrcpyClipboardAutosyncDescription" xml:space="preserve">
+    <value>If on, app adds `--no-clipboard-autosync` flag. Consider leaving it off if you use the app's own clipboard sync.</value>
+  </data>
   <data name="Bitrate" xml:space="preserve">
     <value>Bitrate</value>
   </data>
@@ -591,6 +597,9 @@ input keyevent 66</value>
   <data name="AddAction" xml:space="preserve">
     <value>Add action</value>
   </data>
+  <data name="Reorder" xml:space="preserve">
+    <value>Drag to reorder</value>
+  </data>
   <data name="Edit" xml:space="preserve">
     <value>Edit</value>
   </data>
@@ -621,6 +630,12 @@ input keyevent 66</value>
   <data name="EnterPassword" xml:space="preserve">
     <value>Enter password</value>
   </data>
+  <data name="EnterPasswordDescription" xml:space="preserve">
+    <value>Enter the device unlock password to continue.</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
   <data name="Reply" xml:space="preserve">
     <value>Reply</value>
   </data>
@@ -647,6 +662,9 @@ input keyevent 66</value>
   </data>
   <data name="UnlockCommandsHeader" xml:space="preserve">
     <value>Unlock commands</value>
+  </data>
+  <data name="NewUnlockCommand" xml:space="preserve">
+    <value>New command</value>
   </data>
   <data name="PasswordCacheTimeout" xml:space="preserve">
     <value>Password cache timeout</value>

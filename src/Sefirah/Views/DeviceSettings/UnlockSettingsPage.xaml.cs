@@ -25,15 +25,6 @@ public sealed partial class UnlockSettingsPage : Page
             ViewModel = viewModel;
     }
 
-    private void NewUnlockCommand_KeyDown(object sender, KeyRoutedEventArgs e)
-    {
-        if (e.Key is not VirtualKey.Enter)
-            return;
-
-        e.Handled = true;
-        ViewModel.AddUnlockCommandCommand.Execute(null);
-    }
-
     private void OnKeyDown(object sender, KeyRoutedEventArgs e)
     {
         if (e.Key is VirtualKey.Enter)

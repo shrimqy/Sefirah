@@ -267,6 +267,19 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         }
     }
 
+    public bool ScrcpyClipboardAutosync
+    {
+        get => DeviceSettings.ScrcpyClipboardAutosync;
+        set
+        {
+            if (DeviceSettings.ScrcpyClipboardAutosync != value)
+            {
+                DeviceSettings.ScrcpyClipboardAutosync = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public bool UnlockDeviceBeforeLaunch
     {
         get => DeviceSettings.UnlockDeviceBeforeLaunch;
@@ -295,12 +308,7 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     public ObservableCollection<UnlockCommandEntry> UnlockCommands { get; }
 
-    private string newUnlockCommand = string.Empty;
-    public string NewUnlockCommand
-    {
-        get => newUnlockCommand;
-        set => SetProperty(ref newUnlockCommand, value);
-    }
+    public bool HasUnlockCommands => UnlockCommands.Count > 0;
 
     public string? CustomArguments
     {
@@ -788,6 +796,8 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     private void UnlockCommands_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        OnPropertyChanged(nameof(HasUnlockCommands));
+
         if (isBulkOperation) return;
 
         // Reordering ListView updates the collection twice with no dedicated event.
@@ -813,16 +823,9 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
     [RelayCommand]
     private void AddUnlockCommand()
     {
-        if (string.IsNullOrWhiteSpace(NewUnlockCommand))
-            return;
-
         isBulkOperation = true;
-        UnlockCommands.Add(new UnlockCommandEntry
-        {
-            Command = NewUnlockCommand.Trim()
-        });
+        UnlockCommands.Add(new UnlockCommandEntry());
         isBulkOperation = false;
-        NewUnlockCommand = string.Empty;
         SaveUnlockCommands();
     }
 

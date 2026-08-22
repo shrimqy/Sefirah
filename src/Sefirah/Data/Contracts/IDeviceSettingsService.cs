@@ -110,6 +110,11 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     bool PhysicalKeyboard { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether scrcpy's --clipboard-autosync flag is enabled.
+    /// </summary>
+    bool ScrcpyClipboardAutosync { get; set; }
+
+    /// <summary>
     /// Gets or sets a value indicating whether to unlock the device before launching scrcpy.
     /// </summary>
     bool UnlockDeviceBeforeLaunch { get; set; }
