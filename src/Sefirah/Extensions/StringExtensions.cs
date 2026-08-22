@@ -1,5 +1,3 @@
-using System.Collections.Concurrent;
-
 namespace Sefirah.Extensions;
 
 /// <summary>
@@ -16,6 +14,13 @@ public static class StringExtensions
     /// <returns>The localized resource string.</returns>
     public static string GetLocalizedResource(this string resourceKey)
     {
-        return stringLocalizer[resourceKey] ?? string.Empty;
+        try
+        {
+            return stringLocalizer[resourceKey] ?? string.Empty;
+        }
+        catch (Exception)
+        {
+            return resourceKey;
+        }
     }
 }
