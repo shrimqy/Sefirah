@@ -199,9 +199,6 @@ public class AudioFeature(
             Marshal.ThrowExceptionForHR(policyConfig.SetDefaultEndpoint(deviceId, ERole.eConsole));
             Marshal.ThrowExceptionForHR(policyConfig.SetDefaultEndpoint(deviceId, ERole.eMultimedia));
             Marshal.ThrowExceptionForHR(policyConfig.SetDefaultEndpoint(deviceId, ERole.eCommunications));
-
-            if (deviceHandlers.ContainsKey(deviceId))
-                defaultDeviceId = deviceId;
         }
         catch (Exception ex)
         {
@@ -260,6 +257,7 @@ public class AudioFeature(
     public void OnDefaultDeviceChanged(DataFlow flow, Role role, string newDefaultDeviceId)
     {
         if (flow is not DataFlow.Render || (role is not Role.Multimedia && role is not Role.Console)) return;
+        if (newDefaultDeviceId == defaultDeviceId) return;
 
         var previousDefaultId = defaultDeviceId;
         defaultDeviceId = newDefaultDeviceId;
