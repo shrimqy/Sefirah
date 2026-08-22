@@ -21,7 +21,6 @@ using Sefirah.Platforms.Windows.Interop;
 namespace Sefirah;
 public partial class App : Application
 {
-    public static TaskCompletionSource? SplashScreenLoadingTCS { get; private set; }
     public static bool HandleClosedEvents { get; set; } = true;
     public static nint WindowHandle { get; private set; }
     public static Window MainWindow { get; private set; } = null!;
