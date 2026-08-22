@@ -358,6 +358,12 @@ page.</value>
   <data name="PhysicalKeyboard" xml:space="preserve">
     <value>Disable on-screen keyboard</value>
   </data>
+  <data name="ScrcpyClipboardAutosync" xml:space="preserve">
+    <value>Clipboard autosync</value>
+  </data>
+  <data name="ScrcpyClipboardAutosyncDescription" xml:space="preserve">
+    <value>If on, app adds `--no-clipboard-autosync` flag. Consider leaving it off if you use the app's own clipboard sync.</value>
+  </data>
   <data name="Bitrate" xml:space="preserve">
     <value>Bitrate</value>
   </data>
@@ -591,6 +597,9 @@ input keyevent 66</value>
   <data name="AddAction" xml:space="preserve">
     <value>Add action</value>
   </data>
+  <data name="Reorder" xml:space="preserve">
+    <value>Drag to reorder</value>
+  </data>
   <data name="Edit" xml:space="preserve">
     <value>Edit</value>
   </data>
@@ -621,6 +630,12 @@ input keyevent 66</value>
   <data name="EnterPassword" xml:space="preserve">
     <value>Enter password</value>
   </data>
+  <data name="EnterPasswordDescription" xml:space="preserve">
+    <value>Enter the device unlock password to continue.</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
   <data name="Reply" xml:space="preserve">
     <value>Reply</value>
   </data>
@@ -647,6 +662,9 @@ input keyevent 66</value>
   </data>
   <data name="UnlockCommandsHeader" xml:space="preserve">
     <value>Unlock commands</value>
+  </data>
+  <data name="NewUnlockCommand" xml:space="preserve">
+    <value>New command</value>
   </data>
   <data name="PasswordCacheTimeout" xml:space="preserve">
     <value>Password cache timeout</value>
@@ -868,6 +886,24 @@ input text %pwd%</value>
   </data>
   <data name="ShareFiles" xml:space="preserve">
     <value>Share files</value>
+  </data>
+  <data name="SendFiles" xml:space="preserve">
+    <value>Send files</value>
+  </data>
+  <data name="BrowseFiles" xml:space="preserve">
+    <value>Browse files</value>
+  </data>
+  <data name="BrowseFilesTooltip" xml:space="preserve">
+    <value>Right-click to open the SFTP link and copy it to the clipboard</value>
+  </data>
+  <data name="DeviceActions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="PlaySound" xml:space="preserve">
+    <value>Play sound</value>
+  </data>
+  <data name="PlaySoundDescription" xml:space="preserve">
+    <value>A sound will play on this device for 20 seconds</value>
   </data>
   <data name="ReceiveClipboard" xml:space="preserve">
     <value>Receive clipboard</value>
