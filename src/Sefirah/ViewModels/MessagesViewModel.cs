@@ -59,6 +59,13 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
     public bool ShouldShowEmptyState => !IsNewConversation && SelectedConversation is null;
     public bool ShouldShowComposeUI => IsNewConversation || SelectedConversation is not null;
+
+    partial void OnIsNewConversationChanged(bool value)
+    {
+        OnPropertyChanged(nameof(ShouldShowComposeUI));
+        OnPropertyChanged(nameof(ShouldShowEmptyState));
+    }
+    
     #endregion
 
     public MessagesViewModel()
@@ -179,7 +186,6 @@ public sealed partial class MessagesViewModel : BaseViewModel
         SelectedConversation = null;
         NewConversationRecipients.Clear();
         MessageText = string.Empty;
-        OnPropertyChanged(nameof(ShouldShowEmptyState));
     }
 
     public void AddAddress(Contact contact)
