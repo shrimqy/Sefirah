@@ -8,7 +8,10 @@ public static class LocalAppPaths
     public const string ClipboardFolderName = "Clipboard";
     public const string UserSettingsFileName = "user_settings.json";
 
+    private static readonly TimeSpan TemporaryFileMaxAge = TimeSpan.FromHours(24);
+
     private static string LocalFolder => ApplicationData.Current.LocalFolder.Path;
+    private static string TemporaryFolder => ApplicationData.Current.TemporaryFolder.Path;
 
     public static string GetUserSettingsPath() =>
         Path.Combine(LocalFolder, UserSettingsFileName);
@@ -36,6 +39,32 @@ public static class LocalAppPaths
             : extension[0] == '.' ? extension : $".{extension}";
         return Path.Combine(GetClipboardFolder(), $"clipboard_{Guid.NewGuid():N}{ext}");
     }
+
+    public static void PruneTemporaryFolder()
+    {
+        try
+        {
+            var root = TemporaryFolder;
+            if (!Directory.Exists(root)) return;
+
+            var cutoff = DateTime.UtcNow - TemporaryFileMaxAge;
+            foreach (var file in Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    if (File.GetLastWriteTimeUtc(file) < cutoff)
+                        File.Delete(file);
+                }
+                catch
+                {
+                }
+            }
+        }
+        catch
+        {
+        }
+    }
+
     public static string GetAppIconFilePath(string deviceId, string packageName) =>
         Path.Combine(GetDeviceIconsFolder(deviceId), $"{packageName}.png");
 

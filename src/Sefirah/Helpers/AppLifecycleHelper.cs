@@ -10,6 +10,7 @@ using Sefirah.Services;
 using Sefirah.Services.Transfer;
 using Sefirah.Services.Settings;
 using Sefirah.Services.Socket;
+using Sefirah.Utils;
 using Sefirah.ViewModels;
 using Sefirah.ViewModels.Settings;
 using Serilog;
@@ -51,7 +52,8 @@ public static class AppLifecycleHelper
         _ = Task.WhenAll(
             adbService.StartAsync(),
             updateService.CheckForUpdatesAsync(),
-            phoneLineService.InitializeAsync()
+            phoneLineService.InitializeAsync(),
+            Task.Run(LocalAppPaths.PruneTemporaryFolder)
         );
     }
 
