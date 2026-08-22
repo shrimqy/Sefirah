@@ -28,6 +28,8 @@
     <PackageVersion Include="Tmds.DBus" Version="0.94.2" />
     <PackageVersion Include="Tmds.DBus.Generator" Version="0.94.2" />
     <PackageVersion Include="Tmds.DBus.Protocol" Version="0.94.2" />
+    <!-- Uno.WinUI still pins Fluent 2.6.1; direct ref upgrades glyphs (e.g. SignOut U+F3B1). -->
+    <PackageVersion Include="Uno.Fonts.Fluent" Version="2.9.4" />
     <PackageVersion Include="Uno.WinUI.Runtime.Skia.Linux.FrameBuffer" Version="5.6.91" />
     <PackageVersion Include="Uno.WinUI.Runtime.Skia.X11" Version="5.6.91" />
     <PackageVersion Include="Vanara.PInvoke.CldApi" Version="5.0.1" />
