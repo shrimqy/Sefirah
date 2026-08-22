@@ -51,11 +51,15 @@ public partial class DeviceManager(
 
         await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {
-            if (PairedDevices.Remove(device) && ActiveDevice == device)
-            {
-                ActiveDevice = PairedDevices.FirstOrDefault();
-            }
+            if (ActiveDevice == device)
+                ActiveDevice = PairedDevices.FirstOrDefault(d => d != device);
+
+            device.Wallpaper = null;
         });
+
+        await App.MainWindow.DispatcherQueue.EnqueueAsync(
+            () => PairedDevices.Remove(device),
+            Microsoft.UI.Dispatching.DispatcherQueuePriority.Low);
     }
 
     public async Task UpdateDevice(PairedDevice device)
