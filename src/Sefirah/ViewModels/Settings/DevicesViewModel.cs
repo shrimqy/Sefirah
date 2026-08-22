@@ -66,44 +66,43 @@ public partial class DevicesViewModel : ObservableObject
         };
 
         var result = await dialog.ShowAsync();
+        if (result is not ContentDialogResult.Primary)
+            return;
 
-        if (result is ContentDialogResult.Primary)
+        try
         {
-            try
+            var deviceId = device.Id;
+
+            // First disconnect if this is the currently connected device
+            if (device.IsConnected)
             {
-                var deviceId = device.Id;
+                SessionManager.DisconnectDevice(device);
+            }
 
-                // First disconnect if this is the currently connected device
-                if (device.IsConnected)
-                {
-                    SessionManager.DisconnectDevice(device);
-                }
-
+                App.CloseDeviceSettingsWindow(deviceId);
                 await DeviceManager.RemoveDevice(device);
 
-                SftpFeature.Remove(deviceId);
+            SftpFeature.Remove(deviceId);
 
-                await Task.Run(() =>
-                {
-                    RemoteAppRepository.RemoveAllAppsForDevice(deviceId);
-                    SmsRepository.DeleteAllDataForDevice(deviceId);
-                    ContactRepository.DeleteAllContactsForDevice(deviceId);
-                    CallLogRepository.DeleteAllCallLogsForDevice(deviceId);
-                    NotificationRepository.RemoveNotificationsForDevice(deviceId);
-                });
-            }
-            catch (Exception ex)
+            await Task.Run(() =>
             {
-                // Show error dialog
-                var errorDialog = new ContentDialog
-                {
-                    Title = "Error",
-                    Content = $"Failed to remove device: {ex.Message}",
-                    CloseButtonText = "OK",
-                    XamlRoot = App.MainWindow.Content!.XamlRoot
-                };
-                await errorDialog.ShowAsync();
-            }
+                RemoteAppRepository.RemoveAllAppsForDevice(deviceId);
+                SmsRepository.DeleteAllDataForDevice(deviceId);
+                ContactRepository.DeleteAllContactsForDevice(deviceId);
+                CallLogRepository.DeleteAllCallLogsForDevice(deviceId);
+                NotificationRepository.RemoveNotificationsForDevice(deviceId);
+            });
+        }
+        catch (Exception ex)
+        {
+            var errorDialog = new ContentDialog
+            {
+                Title = "Error",
+                Content = $"Failed to remove device: {ex.Message}",
+                CloseButtonText = "OK",
+                XamlRoot = App.MainWindow.Content!.XamlRoot
+            };
+            await errorDialog.ShowAsync();
         }
     }
 

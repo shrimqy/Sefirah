@@ -328,4 +328,22 @@ public partial class App : Application
     {
         DeviceSettingsWindows.Remove(deviceId);
     }
+
+    /// <summary>
+    /// Closes an open DeviceSettingsWindow for the given device, if any.
+    /// </summary>
+    public static void CloseDeviceSettingsWindow(string deviceId)
+    {
+        if (!DeviceSettingsWindows.TryGetValue(deviceId, out var window))
+            return;
+
+        try
+        {
+            window.Close();
+        }
+        catch (Exception)
+        {
+            DeviceSettingsWindows.Remove(deviceId);
+        }
+    }
 }
