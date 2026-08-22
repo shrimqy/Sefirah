@@ -575,7 +575,6 @@
                     x:Name="MessageTextBox"
                     MinHeight="36"
                     MaxHeight="100"
-                    AcceptsReturn="True"
                     AutomationProperties.Name="Message input"
                     PlaceholderText="{helpers:ResourceString Name=MessagePlaceholder}"
                     PreviewKeyDown="MessageTextBox_KeyDown"
