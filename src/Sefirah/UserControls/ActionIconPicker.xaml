@@ -1,0 +1,63 @@
+<UserControl
+    x:Class="Sefirah.UserControls.ActionIconPicker"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:helpers="using:Sefirah.Helpers"
+    xmlns:local="using:Sefirah.UserControls">
+
+    <Grid Width="300" MaxHeight="360" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <AutoSuggestBox
+                x:Name="SearchBox"
+                Grid.Column="0"
+                PlaceholderText="{helpers:ResourceString Name=SearchIcons}"
+                QueryIcon="Find"
+                TextChanged="SearchBox_TextChanged" />
+
+            <Button
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                Click="BrowseCustomIcon_Click"
+                Content="{helpers:ResourceString Name=BrowseCustomIcon}" />
+        </Grid>
+
+        <ScrollViewer Grid.Row="1" MaxHeight="300">
+            <ItemsRepeater ItemsSource="{x:Bind FilteredIcons, Mode=OneWay}">
+                <ItemsRepeater.Layout>
+                    <UniformGridLayout
+                        MaximumRowsOrColumns="7"
+                        MinColumnSpacing="4"
+                        MinItemHeight="40"
+                        MinItemWidth="40"
+                        MinRowSpacing="4"
+                        Orientation="Horizontal" />
+                </ItemsRepeater.Layout>
+                <ItemsRepeater.ItemTemplate>
+                    <DataTemplate x:DataType="local:IconPickItem">
+                        <Button
+                            Width="40"
+                            Height="40"
+                            Padding="4"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Click="IconItem_Click"
+                            Tag="{x:Bind}"
+                            ToolTipService.ToolTip="{x:Bind Tooltip}">
+                            <FontIcon FontSize="20" Glyph="{x:Bind Glyph}" />
+                        </Button>
+                    </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+            </ItemsRepeater>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

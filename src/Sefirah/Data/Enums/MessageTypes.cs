@@ -41,15 +41,14 @@ public enum AudioInfoType
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
-public enum ActionType
+public enum PowerKind
 {
     Lock,
-    Shutdown,
+    LogOff,
     Sleep,
     Hibernate,
     Restart,
-    Logoff,
-    Custom
+    Shutdown,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]

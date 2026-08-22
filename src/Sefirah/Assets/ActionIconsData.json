@@ -1,0 +1,577 @@
+[
+  {
+    "Code": "E8FB",
+    "Name": "Accept",
+    "Tags": [
+      "check",
+      "agree",
+      "approve",
+      "confirm",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E7EF",
+    "Name": "Admin",
+    "Tags": [
+      "elevated",
+      "permissions",
+      "control",
+      "rights",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E709",
+    "Name": "Airplane",
+    "Tags": [
+      "flight",
+      "vehicle",
+      "travel"
+    ]
+  },
+  {
+    "Code": "ED35",
+    "Name": "Apps",
+    "Tags": [
+      "applications"
+    ]
+  },
+  {
+    "Code": "E702",
+    "Name": "Bluetooth",
+    "Tags": [
+      "device",
+      "connection"
+    ]
+  },
+  {
+    "Code": "E706",
+    "Name": "Brightness",
+    "Tags": [
+      "sun",
+      "light",
+      "dark"
+    ]
+  },
+  {
+    "Code": "E722",
+    "Name": "Camera",
+    "Tags": [
+      "image",
+      "photography",
+      "picture",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E711",
+    "Name": "Cancel",
+    "Tags": [
+      "x",
+      "close",
+      "stop",
+      "exit",
+      "abort",
+      "reject",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E943",
+    "Name": "Code",
+    "Tags": [
+      "bracket",
+      "slash"
+    ]
+  },
+  {
+    "Code": "E756",
+    "Name": "CommandPrompt",
+    "Tags": [
+      "terminal",
+      "console",
+      "cmd"
+    ]
+  },
+  {
+    "Code": "E8C8",
+    "Name": "Copy",
+    "Tags": [
+      "share",
+      "paste",
+      "clipboard",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E8C6",
+    "Name": "Cut",
+    "Tags": [
+      "copy",
+      "paste",
+      "share",
+      "move",
+      "transfer",
+      "clipboard",
+      "clip",
+      "edit",
+      "trim",
+      "divide",
+      "scissors",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E74D",
+    "Name": "Delete",
+    "Tags": [
+      "bin",
+      "trash",
+      "can",
+      "remove",
+      "edit",
+      "byee",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "EC7A",
+    "Name": "DeveloperTools",
+    "Tags": [
+      "debugging",
+      "coding",
+      "software"
+    ]
+  },
+  {
+    "Code": "E896",
+    "Name": "Download",
+    "Tags": [
+      "arrow",
+      "file",
+      "save",
+      "retrieve",
+      "transfer",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E70F",
+    "Name": "Edit",
+    "Tags": [
+      "pencil",
+      "update",
+      "create",
+      "draw",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E783",
+    "Name": "Error",
+    "Tags": [
+      "!",
+      "exclamation",
+      "alert"
+    ]
+  },
+  {
+    "Code": "E734",
+    "Name": "FavoriteStar",
+    "Tags": [
+      "star",
+      "favorite",
+      "favourite",
+      "highlight",
+      "bookmark",
+      "like",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E8B7",
+    "Name": "Folder",
+    "Tags": [
+      "collection",
+      "directory",
+      "file",
+      "storage",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E7FC",
+    "Name": "Game",
+    "Tags": [
+      "videogame",
+      "controller"
+    ]
+  },
+  {
+    "Code": "E774",
+    "Name": "Globe",
+    "Tags": [
+      "web",
+      "world",
+      "earth",
+      "global",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "EB51",
+    "Name": "Heart",
+    "Tags": [
+      "love",
+      "emotion",
+      "like"
+    ]
+  },
+  {
+    "Code": "E80F",
+    "Name": "Home",
+    "Tags": [
+      "house",
+      "safety",
+      "location",
+      "space",
+      "wfh",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E946",
+    "Name": "Info",
+    "Tags": [
+      "information",
+      "details",
+      "content"
+    ]
+  },
+  {
+    "Code": "E765",
+    "Name": "KeyboardClassic",
+    "Tags": [
+      "keyboard",
+      "type",
+      "key",
+      "device",
+      "digital",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E945",
+    "Name": "LightningBolt",
+    "Tags": [
+      "thunder",
+      "energy",
+      "power",
+      "electricity",
+      "shock",
+      "storm"
+    ]
+  },
+  {
+    "Code": "E71B",
+    "Name": "Link",
+    "Tags": [
+      "link",
+      "share",
+      "web",
+      "internet",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E72E",
+    "Name": "Lock",
+    "Tags": [
+      "private",
+      "security",
+      "access",
+      "protected",
+      "safety",
+      "permission",
+      "protection",
+      "secure"
+    ]
+  },
+  {
+    "Code": "E715",
+    "Name": "Mail",
+    "Tags": [
+      "envelope",
+      "email",
+      "delivery",
+      "message",
+      "letter",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E74F",
+    "Name": "Mute",
+    "Tags": [
+      "sound",
+      "silence",
+      "volume",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E77F",
+    "Name": "Paste",
+    "Tags": [
+      "clipboard",
+      "copy",
+      "memory",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E769",
+    "Name": "Pause",
+    "Tags": [
+      "control",
+      "playback",
+      "freeze",
+      "symbol-icon",
+      "media",
+      "video",
+      "audio"
+    ]
+  },
+  {
+    "Code": "E717",
+    "Name": "Phone",
+    "Tags": [
+      "device",
+      "mobile",
+      "small screen",
+      "cellular telephone",
+      "apple",
+      "android",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E768",
+    "Name": "Play",
+    "Tags": [
+      "control",
+      "playback",
+      "start",
+      "begin",
+      "symbol-icon",
+      "media",
+      "video",
+      "audio"
+    ]
+  },
+  {
+    "Code": "E7E8",
+    "Name": "PowerButton",
+    "Tags": [
+      "on",
+      "off"
+    ]
+  },
+  {
+    "Code": "EA86",
+    "Name": "Puzzle",
+    "Tags": [
+      "piece",
+      "game",
+      "solution",
+      "challenge"
+    ]
+  },
+  {
+    "Code": "E708",
+    "Name": "QuietHours",
+    "Tags": [
+      "night",
+      "moon"
+    ]
+  },
+  {
+    "Code": "E823",
+    "Name": "Recent",
+    "Tags": [
+      "clock",
+      "time",
+      "history",
+      "latest",
+      "new",
+      "update",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E738",
+    "Name": "Remove",
+    "Tags": [
+      "-",
+      "delete",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E74E",
+    "Name": "Save",
+    "Tags": [
+      "floppy",
+      "disk",
+      "device",
+      "old",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E721",
+    "Name": "Search",
+    "Tags": [
+      "magnifying glass",
+      "zoom",
+      "inspect",
+      "review",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E713",
+    "Name": "Settings",
+    "Tags": [
+      "gear",
+      "options",
+      "cog",
+      "symbol-icon",
+      "configuration"
+    ]
+  },
+  {
+    "Code": "E72D",
+    "Name": "Share",
+    "Tags": [
+      "arrow",
+      "square",
+      "forward",
+      "right",
+      "send",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "F3B1",
+    "Name": "SignOut",
+    "Tags": [
+      "logout",
+      "exit",
+      "disconnect",
+      "leave",
+      "account",
+      "session",
+      "user"
+    ]
+  },
+  {
+    "Code": "E71A",
+    "Name": "Stop",
+    "Tags": [
+      "control",
+      "playback",
+      "start",
+      "begin",
+      "symbol-icon",
+      "media",
+      "video",
+      "audio"
+    ]
+  },
+  {
+    "Code": "E785",
+    "Name": "Unlock",
+    "Tags": [
+      "security",
+      "access",
+      "protected",
+      "safety",
+      "permission",
+      "protection",
+      "secure"
+    ]
+  },
+  {
+    "Code": "E777",
+    "Name": "UpdateRestore",
+    "Tags": [
+      "arrow",
+      "refresh",
+      "recover",
+      "repair"
+    ]
+  },
+  {
+    "Code": "E898",
+    "Name": "Upload",
+    "Tags": [
+      "file",
+      "send",
+      "transfer",
+      "cloud",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E714",
+    "Name": "Video",
+    "Tags": [
+      "film",
+      "clip",
+      "media",
+      "content",
+      "camera",
+      "recording",
+      "capture",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E767",
+    "Name": "Volume",
+    "Tags": [
+      "sound",
+      "audio",
+      "level",
+      "speaker",
+      "symbol-icon"
+    ]
+  },
+  {
+    "Code": "E7BA",
+    "Name": "Warning",
+    "Tags": [
+      "!",
+      "alert",
+      "exclamation",
+      "triangle",
+      "issue"
+    ]
+  },
+  {
+    "Code": "E701",
+    "Name": "Wifi",
+    "Tags": [
+      "wireless fidelity",
+      "connect",
+      "internet",
+      "web",
+      "connection",
+      "network",
+      "wlan",
+      "lan"
+    ]
+  }
+]

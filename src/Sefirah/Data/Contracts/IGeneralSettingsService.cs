@@ -1,4 +1,4 @@
-using Sefirah.Data.Models.Actions;
+using Sefirah.Actions;
 
 namespace Sefirah.Data.Contracts;
 
@@ -42,22 +42,27 @@ public interface IGeneralSettingsService : IBaseSettingsService, INotifyProperty
     StorageMountPreference StorageMountPreference { get; set; }
 
     /// <summary>
-    /// Gets or sets the list of custom actions.
+    /// Gets the list of custom actions.
     /// </summary>
-    List<BaseAction> Actions { get; set; }
+    List<ActionItem> Actions { get; }
+
+    /// <summary>
+    /// Replaces the full actions list (e.g. after reordering).
+    /// </summary>
+    void SetActions(IEnumerable<ActionItem> actions);
 
     /// <summary>
     /// Adds a new action to the settings.
     /// </summary>
-    void AddAction(BaseAction action);
+    void AddAction(ActionItem action);
 
     /// <summary>
     /// Updates an existing action in the settings.
     /// </summary>
-    void UpdateAction(BaseAction action);
+    void UpdateAction(ActionItem action);
 
     /// <summary>
     /// Removes an action from the settings.
     /// </summary>
-    void RemoveAction(BaseAction action);
+    void RemoveAction(ActionItem action);
 }

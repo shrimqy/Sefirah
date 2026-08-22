@@ -2,15 +2,13 @@
     x:Class="Sefirah.Views.Settings.ActionsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:contracts="using:Sefirah.Data.Contracts"
+    xmlns:controls="using:Sefirah.UserControls"
     xmlns:converters="using:Sefirah.Converters"
-    xmlns:wctconverters="using:CommunityToolkit.WinUI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="using:Sefirah.Helpers"
     xmlns:items="using:Sefirah.Data.Items"
-    xmlns:local="using:Sefirah.Views.Settings"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:models_actions="using:Sefirah.Data.Models.Actions"
+    xmlns:models_actions="using:Sefirah.Actions"
     xmlns:vm="using:Sefirah.ViewModels.Settings"
     xmlns:wuc="using:CommunityToolkit.WinUI.Controls"
     x:Name="PageRoot"
@@ -28,7 +26,6 @@
 
     <ScrollViewer Padding="0,0,40,0">
         <StackPanel Spacing="4">
-            <!--  Breadcrumb Navigation with Button  -->
             <Grid Margin="0,0,0,8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -50,11 +47,64 @@
                         </DataTemplate>
                     </BreadcrumbBar.ItemTemplate>
                 </BreadcrumbBar>
-                <Button
-                    Grid.Column="1"
-                    Command="{x:Bind ViewModel.AddActionCommand}"
-                    Style="{ThemeResource AccentButtonStyle}">
-                    <TextBlock Text="{helpers:ResourceString Name=AddAction}" />
+                <Button Grid.Column="1" Style="{ThemeResource AccentButtonStyle}">
+                    <Button.Flyout>
+                        <Flyout
+                            x:Name="AddActionFlyout"
+                            Placement="BottomEdgeAlignedRight">
+                            <ItemsRepeater
+                                x:Name="AvailableActionsRepeater"
+                                ItemsSource="{x:Bind ViewModel.AvailableActions}">
+                                <ItemsRepeater.Layout>
+                                    <UniformGridLayout
+                                        MaximumRowsOrColumns="3"
+                                        MinColumnSpacing="4"
+                                        MinItemHeight="64"
+                                        MinItemWidth="64"
+                                        MinRowSpacing="4"
+                                        Orientation="Horizontal" />
+                                </ItemsRepeater.Layout>
+                                <ItemsRepeater.ItemTemplate>
+                                    <DataTemplate x:DataType="models_actions:ActionMetadata">
+                                        <Button
+                                            Width="64"
+                                            Height="64"
+                                            Padding="4"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Click="AvailableAction_Click"
+                                            Tag="{x:Bind}">
+                                            <Grid RowSpacing="4">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <FontIcon
+                                                    Grid.Row="0"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    FontSize="20"
+                                                    Glyph="{x:Bind helpers:ActionIconHelper.GlyphForIcon(DefaultIcon)}" />
+                                                <TextBlock
+                                                    Grid.Row="1"
+                                                    HorizontalAlignment="Center"
+                                                    MaxLines="2"
+                                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                                    Text="{x:Bind DisplayName}"
+                                                    TextAlignment="Center"
+                                                    TextTrimming="CharacterEllipsis"
+                                                    TextWrapping="Wrap" />
+                                            </Grid>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsRepeater.ItemTemplate>
+                            </ItemsRepeater>
+                        </Flyout>
+                    </Button.Flyout>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock VerticalAlignment="Center" Text="{helpers:ResourceString Name=AddAction}" />
+                        <FontIcon FontSize="12" Glyph="&#xE70D;" />
+                    </StackPanel>
                 </Button>
             </Grid>
 
@@ -66,6 +116,9 @@
                 SelectionMode="None">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="Margin" Value="0" />
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="ListViewItem">
@@ -80,8 +133,46 @@
                     </Style>
                 </ListView.ItemContainerStyle>
                 <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="models_actions:BaseAction">
-                        <wuc:SettingsCard HorizontalAlignment="Stretch" Header="{x:Bind Name}">
+                    <DataTemplate x:DataType="models_actions:ActionItem">
+                        <wuc:SettingsCard HorizontalAlignment="Stretch">
+                            <wuc:SettingsCard.Header>
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <Button
+                                        Padding="4"
+                                        VerticalAlignment="Center"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Tag="{x:Bind}"
+                                        ToolTipService.ToolTip="{helpers:ResourceString Name=ChangeIcon}">
+                                        <Button.Flyout>
+                                            <Flyout Opening="ActionIconFlyout_Opening" Placement="Bottom">
+                                                <controls:ActionIconPicker IconPicked="ActionIconPicker_IconPicked" />
+                                            </Flyout>
+                                        </Button.Flyout>
+                                        <Border Width="28" Height="28" CornerRadius="4">
+                                            <Grid>
+                                                <FontIcon
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    FontSize="16"
+                                                    Glyph="{x:Bind helpers:ActionIconHelper.GlyphForIcon(DisplayIcon), Mode=OneWay}"
+                                                    Visibility="{x:Bind helpers:ActionIconHelper.BuiltInIconVisibility(Icon), Mode=OneWay}" />
+                                                <Image
+                                                    Width="22"
+                                                    Height="22"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Source="{x:Bind helpers:ActionIconHelper.ImageSourceForIcon(Icon), Mode=OneWay}"
+                                                    Stretch="Uniform"
+                                                    Visibility="{x:Bind helpers:ActionIconHelper.CustomIconVisibility(Icon), Mode=OneWay}" />
+                                            </Grid>
+                                        </Border>
+                                    </Button>
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        Text="{x:Bind Name, Mode=OneWay}" />
+                                </StackPanel>
+                            </wuc:SettingsCard.Header>
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <Button
                                     Command="{Binding DataContext.EditActionCommand, ElementName=PageRoot}"

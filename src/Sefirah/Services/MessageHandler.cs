@@ -84,7 +84,7 @@ public class MessageHandler(
                     break;
 
                 case ActionInfo action:
-                    actionFeature.HandleActionMessage(action);
+                    await actionFeature.HandleActionMessage(action);
                     break;
 
                 case SftpServerInfo sftpServerInfo:

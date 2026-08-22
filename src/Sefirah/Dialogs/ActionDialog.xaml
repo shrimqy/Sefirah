@@ -1,0 +1,41 @@
+﻿<ContentDialog
+    x:Class="Sefirah.Dialogs.ActionDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:helpers="using:Sefirah.Helpers"
+    DefaultButton="Primary"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
+    PrimaryButtonText="{helpers:ResourceString Name=Save}"
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
+    SecondaryButtonText="Cancel"
+    Style="{ThemeResource DefaultContentDialogStyle}">
+
+    <StackPanel MinWidth="400" Padding="0" Margin="0" Spacing="12">
+        <TextBox
+            x:Name="NameTextBox"
+            Header="{helpers:ResourceString Name=ActionName}"
+            PlaceholderText="{helpers:ResourceString Name=EnterActionName}"
+            Text="{x:Bind Item.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <ContentPresenter x:Name="ActionSettingsHost" />
+
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Stretch"
+                Text="{helpers:ResourceString Name=AskForConfirmation}" />
+            <ToggleSwitch
+                Grid.Column="1"
+                x:Name="AskForConfirmationToggle"
+                HorizontalAlignment="Right"
+                Padding="0"
+                Margin="-80,0"
+                />
+        </Grid>
+    </StackPanel>
+</ContentDialog>

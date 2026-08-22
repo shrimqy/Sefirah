@@ -4,6 +4,7 @@ namespace Sefirah.Data.Models;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(ActionInfo), nameof(ActionInfo))]
+[JsonDerivedType(typeof(ActionList), nameof(ActionList))]
 [JsonDerivedType(typeof(ApplicationInfo), nameof(ApplicationInfo))]
 [JsonDerivedType(typeof(ApplicationList), nameof(ApplicationList))]
 [JsonDerivedType(typeof(Authentication), nameof(Authentication))]
@@ -378,4 +379,13 @@ public class ActionInfo : SocketMessage
     public required string ActionId { get; set; }
 
     public required string ActionName { get; set; }
+
+    public string? Icon { get; set; }
+
+    public bool AskForConfirmation { get; set; }
+}
+
+public class ActionList : SocketMessage
+{
+    public List<ActionInfo> Actions { get; set; } = [];
 }

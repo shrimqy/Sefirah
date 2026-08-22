@@ -1,0 +1,12 @@
+<UserControl
+    x:Class="Sefirah.Actions.Power.PowerActionSettings"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:helpers="using:Sefirah.Helpers">
+
+    <ComboBox
+        x:Name="PowerOptions"
+        Header="{helpers:ResourceString Name=PowerKind}"
+        HorizontalAlignment="Stretch"
+        SelectionChanged="PowerOptions_SelectionChanged" />
+</UserControl>

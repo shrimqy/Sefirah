@@ -5,7 +5,12 @@ namespace Sefirah.Data.Contracts;
 public interface IActionFeature : IFeature
 {
     /// <summary>
-    /// Handle actions
+    /// Handle an action invocation from a remote device.
     /// </summary>
-    void HandleActionMessage(ActionInfo action);
+    Task HandleActionMessage(ActionInfo action);
+
+    /// <summary>
+    /// Push the current action list to all connected devices.
+    /// </summary>
+    void SyncActions();
 }

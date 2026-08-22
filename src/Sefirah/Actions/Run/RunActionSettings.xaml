@@ -1,0 +1,50 @@
+<UserControl
+    x:Class="Sefirah.Actions.Run.RunActionSettings"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:helpers="using:Sefirah.Helpers">
+
+    <StackPanel Spacing="12">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox
+                x:Name="ActionPathTextBox"
+                Grid.Column="0"
+                Header="{helpers:ResourceString Name=RunPath}"
+                PlaceholderText="{helpers:ResourceString Name=EnterRunPath}"
+                TextChanged="Field_TextChanged" />
+            <Button
+                Grid.Column="1"
+                Margin="8,24,0,0"
+                Click="BrowseForPath_Click"
+                Content="{helpers:ResourceString Name=Browse}" />
+        </Grid>
+
+        <TextBox
+            x:Name="ArgumentsTextBox"
+            Header="{helpers:ResourceString Name=Arguments}"
+            PlaceholderText="{helpers:ResourceString Name=CommandLineArguments}"
+            TextChanged="Field_TextChanged" />
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox
+                x:Name="StartDirectoryTextBox"
+                Grid.Column="0"
+                Header="{helpers:ResourceString Name=StartInDirectory}"
+                PlaceholderText="{helpers:ResourceString Name=WorkingDirectory}"
+                TextChanged="Field_TextChanged" />
+            <Button
+                Grid.Column="1"
+                Margin="8,24,0,0"
+                Click="BrowseForDirectory_Click"
+                Content="{helpers:ResourceString Name=Browse}" />
+        </Grid>
+    </StackPanel>
+</UserControl>
