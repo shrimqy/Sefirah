@@ -21,7 +21,7 @@ public sealed partial class DeviceDiscoveryPage : Page
     {
         BreadcrumbBar.ItemsSource = new ObservableCollection<BreadcrumbBarItemModel>
         {
-            new("Devices".GetLocalizedResource(), typeof(DevicesPage)),
+            new("Devices.Title".GetLocalizedResource(), typeof(DevicesPage)),
             new("AvailableDevices/Title".GetLocalizedResource(), typeof(DeviceDiscoveryPage))
         };
         BreadcrumbBar.ItemClicked += BreadcrumbBar_ItemClicked;
