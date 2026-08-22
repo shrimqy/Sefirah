@@ -601,17 +601,17 @@ public class AdbService(
         try
         {
             logger.Info("Unlocking device");
-                foreach (var entry in commands)
-                {
-                    if (string.IsNullOrWhiteSpace(entry.Command))
-                        continue;
+            foreach (var entry in commands)
+            {
+                if (string.IsNullOrWhiteSpace(entry.Command))
+                    continue;
 
-                    logger.Info($"Executing command: {entry.Command}, delayed {entry.DelayMs}");
-                    await adbClient.ExecuteShellCommandAsync(deviceData, entry.Command);
-                    if (entry.DelayMs > 0)
-                        await Task.Delay(entry.DelayMs);
-                }
+                logger.Info($"Executing command: {entry.Command}, delayed {entry.DelayMs}");
+                await adbClient.ExecuteShellCommandAsync(deviceData, entry.Command);
+                if (entry.DelayMs > 0)
+                    await Task.Delay(entry.DelayMs);
             }
+        }
         catch (Exception ex)
         { 
             logger.Error($"Error unlocking device: {ex.Message}", ex);
@@ -835,16 +835,25 @@ public class AdbService(
         return Task.CompletedTask;
     }
 
-    // executes: adb shell appops set com.castle.sefirah RECEIVE_SENSITIVE_NOTIFICATIONS allow
     private async Task GrantSensitiveNotificationAsync(AdbDevice device)
     {
-
-        logger.Info("Trying to grant sensitive notification permission");
         if (device.DeviceData is null || device.State is not DeviceState.Online) return;
 
         try
         {
-            await adbClient.ExecuteShellCommandAsync(device.DeviceData, $"appops set {SefirahAndroidPackageId} RECEIVE_SENSITIVE_NOTIFICATIONS allow");
+            var receiver = new ConsoleOutputReceiver();
+            await adbClient.ExecuteShellCommandAsync(
+                device.DeviceData,
+                $"appops get {SefirahAndroidPackageId} RECEIVE_SENSITIVE_NOTIFICATIONS",
+                receiver);
+
+            if (receiver.ToString().Contains("allow", StringComparison.OrdinalIgnoreCase))
+                return;
+
+            logger.Info($"Granting RECEIVE_SENSITIVE_NOTIFICATIONS on {device.Serial}");
+            await adbClient.ExecuteShellCommandAsync(
+                device.DeviceData,
+                $"appops set {SefirahAndroidPackageId} RECEIVE_SENSITIVE_NOTIFICATIONS allow");
         }
         catch (Exception ex)
         {
