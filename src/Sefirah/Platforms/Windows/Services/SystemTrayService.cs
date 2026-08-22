@@ -12,37 +12,57 @@ public sealed partial class SystemTrayService : ISystemTrayService
     private const string LightTrayIconName = "SefirahLight.ico";
     private static readonly Guid TrayIconId = new("6B3A1F2E-9C4D-4E5F-8A0B-1D2E3F4A5B6C");
 
-    private readonly SystemTrayIcon trayIcon;
+    private readonly ILogger logger;
     private readonly UISettings uiSettings = new();
 
-    private readonly TrayFlyout trayFlyout;
-    private readonly TrayContextMenu contextMenu;
+    private SystemTrayIcon? trayIcon;
+    private TrayFlyout? trayFlyout;
+    private TrayContextMenu? contextMenu;
 
-    public bool IsAvailable => true;
+    public bool IsAvailable { get; private set; }
 
-    public SystemTrayService()
+    public SystemTrayService(ILogger logger)
     {
-        trayIcon = new SystemTrayIcon(GetTrayIconPath(), "Sefirah", TrayIconId);
-        trayIcon.Show();
+        this.logger = logger;
 
-        trayFlyout = new TrayFlyout();
-        contextMenu = new TrayContextMenu(ToggleMainWindowVisibility, ExitApplication);
+        var iconPath = GetTrayIconPath();
+        try
+        {
+            trayIcon = new SystemTrayIcon(iconPath, "Sefirah", TrayIconId);
+            trayIcon.Show();
 
-        trayIcon.LeftClicked += OnTrayIconLeftClicked;
-        trayIcon.RightClicked += OnTrayIconRightClicked;
-        trayIcon.LeftDoubleClicked += OnTrayIconDoubleClicked;
-        uiSettings.ColorValuesChanged += OnThemeChanged;
+            IsAvailable = trayIcon.IsVisible;
+            trayFlyout = new TrayFlyout();
+            contextMenu = new TrayContextMenu(ToggleMainWindowVisibility, ExitApplication);
+
+            trayIcon.LeftClicked += OnTrayIconLeftClicked;
+            trayIcon.RightClicked += OnTrayIconRightClicked;
+            trayIcon.LeftDoubleClicked += OnTrayIconDoubleClicked;
+            uiSettings.ColorValuesChanged += OnThemeChanged;
+        }
+        catch (Exception ex)
+        {
+            IsAvailable = false;
+            logger.Error("Failed to initialize system tray icon", ex);
+            Dispose();
+        }
     }
 
     public void Dispose()
     {
         uiSettings.ColorValuesChanged -= OnThemeChanged;
-        trayIcon.LeftClicked -= OnTrayIconLeftClicked;
-        trayIcon.RightClicked -= OnTrayIconRightClicked;
-        trayIcon.LeftDoubleClicked -= OnTrayIconDoubleClicked;
-        trayFlyout.Dispose();
-        contextMenu.Dispose();
-        trayIcon.Destroy();
+
+        trayIcon?.LeftClicked -= OnTrayIconLeftClicked;
+        trayIcon?.RightClicked -= OnTrayIconRightClicked;
+        trayIcon?.LeftDoubleClicked -= OnTrayIconDoubleClicked;
+        trayIcon?.Destroy();
+        trayIcon = null;
+
+        trayFlyout?.Dispose();
+        trayFlyout = null;
+        contextMenu?.Dispose();
+        contextMenu = null;
+        IsAvailable = false;
     }
 
     private void OnTrayIconLeftClicked(object? sender, MouseEventReceivedEventArgs e)
@@ -59,12 +79,25 @@ public sealed partial class SystemTrayService : ISystemTrayService
 
     private void ApplyTraySystemTheme()
     {
-        trayIcon.SetIcon(GetTrayIconPath());
-        trayFlyout.ApplySystemTheme();
+        if (trayIcon is null) return;
+
+        try
+        {
+            var iconPath = GetTrayIconPath();
+            logger.Debug($"Applying tray theme icon: {iconPath}");
+            trayIcon.SetIcon(iconPath);
+            trayFlyout?.ApplySystemTheme();
+        }
+        catch (Exception ex)
+        {
+            logger.Warn("Failed to update tray icon theme", ex);
+        }
     }
 
     private void ToggleTrayFlyout()
     {
+        if (trayFlyout is null) return;
+
         if (trayFlyout.IsOpen)
             trayFlyout.Hide();
         else
@@ -73,6 +106,8 @@ public sealed partial class SystemTrayService : ISystemTrayService
 
     private void ShowContextMenu(Point point)
     {
+        if (contextMenu is null) return;
+
         if (contextMenu.IsOpen)
             contextMenu.Hide();
 
@@ -82,7 +117,7 @@ public sealed partial class SystemTrayService : ISystemTrayService
     private static string GetTrayIconPath()
     {
         var iconName = Helpers.SystemThemeHelper.SystemUsesLightTheme() ? LightTrayIconName : DarkTrayIconName;
-        return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Assets", "Icons", iconName));
+        return Path.GetFullPath(Path.Combine(Package.Current.InstalledLocation.Path, "Assets", "Icons", iconName));
     }
 
     private static void ToggleMainWindowVisibility()
