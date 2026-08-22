@@ -1,4 +1,3 @@
-using Microsoft.UI.Xaml.Input;
 using Sefirah.Data.Models;
 using Sefirah.ViewModels;
 using Sefirah.ViewModels.Settings;
@@ -11,6 +10,14 @@ public sealed partial class MainPage : Page
     public MainPageViewModel ViewModel { get; }
     public DevicesViewModel DevicesViewModel { get; }
     private readonly ISessionManager SessionManager = Ioc.Default.GetRequiredService<ISessionManager>();
+
+    private readonly Dictionary<string, Type> Pages = new()
+    {
+        { "Settings", typeof(SettingsPage) },
+        { "Calls", typeof(CallsPage) },
+        { "Messages", typeof(MessagesPage) },
+        { "Apps", typeof(AppsPage) }
+    };
 
     public MainPage()
     {
@@ -25,46 +32,38 @@ public sealed partial class MainPage : Page
 
     private void MainNavigationView_Loaded(object sender, RoutedEventArgs e)
     {
-        if (ViewModel.Device is null)
-        {
-            MainNavigationView.SelectedItem = MainNavigationView.SettingsItem;
-            return;
-        }
+        var savedPage = ApplicationData.Current.LocalSettings.Values[Constants.LocalSettings.MainNavigationSelection] as string;
+        var page = ViewModel.Device is not null && savedPage is not null && Pages.ContainsKey(savedPage)
+            ? savedPage
+            : "Settings";
 
-        if (ApplicationData.Current.LocalSettings.Values[Constants.LocalSettings.MainNavigationSelection] is not string lastActivePage ||
-            !Pages.ContainsKey(lastActivePage))
-        {
-            MainNavigationView.SelectedItem = MainNavigationView.SettingsItem;
-            return;
-        }
-
-        MainNavigationView.SelectedItem = lastActivePage switch
-        {
-            "Settings" => MainNavigationView.SettingsItem,
-            "Calls" => CallsNavigationItem,
-            "Messages" => MessagesNavigationItem,
-            "Apps" => AppsNavigationItem,
-            _ => MainNavigationView.SettingsItem,
-        };
+        NavigateToPage(page);
     }
-
-    private readonly Dictionary<string, Type> Pages = new()
-    {
-        { "Settings", typeof(SettingsPage) },
-        { "Calls", typeof(CallsPage) },
-        { "Messages", typeof(MessagesPage) },
-        { "Apps", typeof(AppsPage) }
-    };
 
     private void NavigationView_SelectionChanged(NavigationView _, NavigationViewSelectionChangedEventArgs args)
     {
-        if (args.SelectedItem is NavigationViewItem selectedItem &&
-            selectedItem.Tag?.ToString() is string tag &&
-            Pages.TryGetValue(tag, out Type? pageType))
+        string? tag = (args.SelectedItem as NavigationViewItem)?.Tag?.ToString();
+
+        if (tag is null || !Pages.TryGetValue(tag, out Type? pageType))
+            return;
+
+        ApplicationData.Current.LocalSettings.Values[Constants.LocalSettings.MainNavigationSelection] = tag;
+        ContentFrame.Navigate(pageType);
+    }
+
+    public void NavigateToPage(string pageTag)
+    {
+        if (!Pages.ContainsKey(pageTag))
+            return;
+
+        MainNavigationView.SelectedItem = pageTag switch
         {
-            ApplicationData.Current.LocalSettings.Values[Constants.LocalSettings.MainNavigationSelection] = tag;
-            ContentFrame.Navigate(pageType);
-        }
+            "Calls" => CallsNavigationItem,
+            "Messages" => MessagesNavigationItem,
+            "Apps" => AppsNavigationItem,
+            "Settings" => MainNavigationView.SettingsItem,
+            _ => MainNavigationView.SelectedItem
+        };
     }
 
     private void DiscoveredDeviceButton_Click(object sender, RoutedEventArgs e)
