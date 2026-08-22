@@ -5,7 +5,12 @@ namespace Sefirah.Data.Contracts;
 public interface IClipboardFeature : IFeature
 {
     /// <summary>
-    /// Sets the content of the clipboard.
+    /// Sets the clipboard from a remote
     /// </summary>
-    Task SetContentAsync(object content, PairedDevice sourceDevice);
+    Task SetContentAsync(ClipboardInfo clipboard, PairedDevice sourceDevice);
+
+    /// <summary>
+    /// Sends the current local clipboard content to the specified device.
+    /// </summary>
+    void SendToDevice(PairedDevice device);
 }

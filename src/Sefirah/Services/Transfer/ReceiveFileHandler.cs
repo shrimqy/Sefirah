@@ -3,6 +3,7 @@ using System.Text;
 using Sefirah.Data.Models;
 using Sefirah.Helpers;
 using Sefirah.Services.Socket;
+using Sefirah.Utils;
 
 namespace Sefirah.Services.Transfer;
 
@@ -12,6 +13,7 @@ public partial class ReceiveFileHandler(
     PairedDevice device,
     byte[] expectedCert,
     string storageLocation,
+    bool isClipboard,
     ILogger logger,
     IPlatformNotificationHandler notificationHandler) : ITcpClientProvider, IDisposable
 {
@@ -66,7 +68,6 @@ public partial class ReceiveFileHandler(
         
         try
         {
-            // Show initial notification
             ShowProgressNotification();
 
             // Process each file
@@ -82,7 +83,9 @@ public partial class ReceiveFileHandler(
                     await transferCompletionSource.Task;
                 }
 
-                string fullPath = Path.Combine(storageLocation, fileMetadata.FileName);
+                string fullPath = isClipboard
+                    ? LocalAppPaths.CreateClipboardFilePath(Path.GetExtension(fileMetadata.FileName))
+                    : Path.Combine(storageLocation, fileMetadata.FileName);
                 Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
 
                 transferCompletionSource = new TaskCompletionSource<bool>();
@@ -107,22 +110,24 @@ public partial class ReceiveFileHandler(
                 CleanupFileStream();
             }
 
-            // Show completion notification
-            if (IsBulkTransfer)
+            if (!isClipboard)
             {
-                notificationHandler.ShowCompletedFileTransferNotification(
-                    "FileTransferNotification.Completed".GetLocalizedResource(),
-                    string.Format("FileTransferNotification.CompletedBulk".GetLocalizedResource(), files.Count, device.Name),
-                    TransferId.ToString(),
-                    folderPath: storageLocation);
-            }
-            else
-            {
-                notificationHandler.ShowCompletedFileTransferNotification(
-                    "FileTransferNotification.Completed".GetLocalizedResource(),
-                    string.Format("FileTransferNotification.CompletedSingle".GetLocalizedResource(), files[0].FileName, device.Name),
-                    TransferId.ToString(),
-                    Path.Combine(storageLocation, files[0].FileName));
+                if (IsBulkTransfer)
+                {
+                    notificationHandler.ShowCompletedFileTransferNotification(
+                        "FileTransferNotification.Completed".GetLocalizedResource(),
+                        string.Format("FileTransferNotification.CompletedBulk".GetLocalizedResource(), files.Count, device.Name),
+                        TransferId.ToString(),
+                        folderPath: storageLocation);
+                }
+                else
+                {
+                    notificationHandler.ShowCompletedFileTransferNotification(
+                        "FileTransferNotification.Completed".GetLocalizedResource(),
+                        string.Format("FileTransferNotification.CompletedSingle".GetLocalizedResource(), files[0].FileName, device.Name),
+                        TransferId.ToString(),
+                        Path.Combine(storageLocation, files[0].FileName));
+                }
             }
 
             logger.Info($"File transfer completed: {currentFileIndex}/{files.Count} files received");
@@ -130,16 +135,20 @@ public partial class ReceiveFileHandler(
         catch (OperationCanceledException)
         {
             logger.Info($"File transfer from {device.Name} cancelled");
-            _ = notificationHandler.RemoveNotificationsByTagAndGroup(TransferId.ToString(), Constants.Notification.FileTransferGroup);
+            if (!isClipboard)
+                _ = notificationHandler.RemoveNotificationsByTagAndGroup(TransferId.ToString(), Constants.Notification.FileTransferGroup);
             CleanupFailedFile();
         }
         catch (Exception ex)
         {
             logger.Warn($"File transfer from {device.Name} failed: {ex.Message}");
-            notificationHandler.ShowCompletedFileTransferNotification(
-                "FileTransferNotification.Failed".GetLocalizedResource(),
-                string.Format("FileTransferNotification.FailedFrom".GetLocalizedResource(), device.Name),
-                TransferId.ToString());
+            if (!isClipboard)
+            {
+                notificationHandler.ShowCompletedFileTransferNotification(
+                    "FileTransferNotification.Failed".GetLocalizedResource(),
+                    string.Format("FileTransferNotification.FailedFrom".GetLocalizedResource(), device.Name),
+                    TransferId.ToString());
+            }
             CleanupFailedFile();
         }
 
@@ -155,6 +164,8 @@ public partial class ReceiveFileHandler(
 
     private void ShowProgressNotification()
     {
+        if (isClipboard) return;
+
         var now = Environment.TickCount64;
         if (lastNotificationUpdateTimestamp != 0 && now - lastNotificationUpdateTimestamp < 500)
             return;

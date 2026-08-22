@@ -28,6 +28,7 @@ public class AdbService(
     private static readonly string DEFAULT = "Default".GetLocalizedResource();
 
     private const string SefirahAndroidPackageId = "com.castle.sefirah";
+    private const string WorkerNiceName = "sefirah_worker";
 
     public AdbClient AdbClient => adbClient;
 
@@ -849,5 +850,48 @@ public class AdbService(
         {
             logger.Warn($"Could not grant RECEIVE_SENSITIVE_NOTIFICATIONS on {device.Serial}: {ex.Message}", ex);
         }
+    }
+
+    /// <summary>Starts the worker via adb shell if it isn't already running.</summary>
+    public async Task TryStartWorkerAsync(PairedDevice device, string command)
+    {
+        if (device.ConnectedAdbDevices.FirstOrDefault() is not { } adbDevice)
+            return;
+
+        if (adbDevice.DeviceData is null || adbDevice.State is not DeviceState.Online) return;
+
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(await ShellAsync(adbDevice, $"pidof {WorkerNiceName}")))
+            {
+                logger.Debug($"Worker already running on {adbDevice.Serial}");
+                return;
+            }
+
+            logger.Info($"Starting worker on {adbDevice.Serial}");
+            await ShellAsync(adbDevice, command);
+            await Task.Delay(1000);
+
+            var pid = (await ShellAsync(adbDevice, $"pidof {WorkerNiceName}")).Trim();
+            if (!string.IsNullOrWhiteSpace(pid))
+            {
+                logger.Info($"Worker running on {adbDevice.Serial} (pid={pid})");
+            }
+            else
+            {
+                logger.Warn($"Worker failed to stay up on {adbDevice.Serial}");
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Warn($"Could not start worker on {adbDevice.Serial}: {ex.Message}", ex);
+        }
+    }
+
+    private async Task<string> ShellAsync(AdbDevice device, string command)
+    {
+        var receiver = new ConsoleOutputReceiver();
+        await adbClient.ExecuteShellCommandAsync(device.DeviceData!, command, receiver);
+        return receiver.ToString();
     }
 }

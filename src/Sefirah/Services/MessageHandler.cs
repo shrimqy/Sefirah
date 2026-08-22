@@ -22,6 +22,7 @@ public class MessageHandler(
     ICallFeature callFeature,
     IBluetoothPairingService bluetoothPairingService,
     IPlaySoundFeature playSoundFeature,
+    IAdbService adbService,
     ILogger<MessageHandler> logger) : IMessageHandler
 {
     public async void HandleMessageAsync(PairedDevice device, SocketMessage message)
@@ -72,7 +73,7 @@ public class MessageHandler(
                     break;
 
                 case ClipboardInfo clipboard:
-                    await clipboardFeature.SetContentAsync(clipboard.Content, device);
+                    await clipboardFeature.SetContentAsync(clipboard, device);
                     break;
 
                 case ConversationInfo textConversation:
@@ -114,6 +115,10 @@ public class MessageHandler(
                 case PlaySound playSound:
                     await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
                         playSoundFeature.HandleRemoteState(device, playSound.IsPlaying));
+                    break;
+
+                case RequestWorkerLaunch requestWorkerLaunch:
+                    await adbService.TryStartWorkerAsync(device, requestWorkerLaunch.Command);
                     break;
 
                 case Disconnect:

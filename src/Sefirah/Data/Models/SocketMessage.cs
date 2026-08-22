@@ -32,6 +32,7 @@ namespace Sefirah.Data.Models;
 [JsonDerivedType(typeof(PlaySound), nameof(PlaySound))]
 [JsonDerivedType(typeof(PlaybackInfo), nameof(PlaybackInfo))]
 [JsonDerivedType(typeof(RequestApplicationList), nameof(RequestApplicationList))]
+[JsonDerivedType(typeof(RequestWorkerLaunch), nameof(RequestWorkerLaunch))]
 [JsonDerivedType(typeof(RingerModeState), nameof(RingerModeState))]
 [JsonDerivedType(typeof(SftpServerInfo), nameof(SftpServerInfo))]
 [JsonDerivedType(typeof(TextMessage), nameof(TextMessage))]
@@ -44,6 +45,11 @@ public class Disconnect : SocketMessage;
 public class ClearNotifications : SocketMessage;
 
 public class RequestApplicationList : SocketMessage;
+
+public class RequestWorkerLaunch : SocketMessage
+{
+    public required string Command { get; set; }
+}
 
 public class Authentication : SocketMessage
 {

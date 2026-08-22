@@ -3,6 +3,7 @@ using CommunityToolkit.WinUI;
 using Sefirah.Data.Models;
 using Sefirah.Dialogs;
 using Sefirah.Helpers;
+using Sefirah.Utils;
 
 namespace Sefirah.Services.Transfer;
 
@@ -66,12 +67,17 @@ public class FileTransferService(
             return;
         }
 
+        var savePath = data.IsClipboard
+            ? LocalAppPaths.GetClipboardFolder()
+            : StorageLocation;
+
         var handler = new ReceiveFileHandler(
             data.Files,
             data.ServerInfo,
             device,
             device.Certificate,
-            StorageLocation,
+            savePath,
+            data.IsClipboard,
             logger,
             notificationHandler);
 
@@ -82,7 +88,7 @@ public class FileTransferService(
 
             var file = await handler.ReceiveAsync();
 
-            if (file is not null && device.DeviceSettings.ClipboardFiles)
+            if (file is not null && (data.IsClipboard || device.DeviceSettings.ClipboardFiles))
             {
                 FileReceived?.Invoke(this, (device, file));
             }
