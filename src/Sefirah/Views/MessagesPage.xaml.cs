@@ -3,6 +3,9 @@ using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
 using Sefirah.ViewModels;
 using Windows.ApplicationModel.DataTransfer;
+#if WINDOWS
+using Windows.UI.ViewManagement.Core;
+#endif
 
 namespace Sefirah.Views;
 
@@ -22,6 +25,15 @@ public sealed partial class MessagesPage : Page
         SendMessage();
     }
 
+#if WINDOWS
+    private void EmojiButton_Click(object sender, RoutedEventArgs e)
+    {
+        MessageTextBox.Focus(FocusState.Programmatic);
+        // Defer so the TextBox has focus before the emoji panel opens.
+        DispatcherQueue.TryEnqueue(() =>
+            CoreInputView.GetForCurrentView().TryShow(CoreInputViewKind.Emoji));
+    }
+#endif
     private void MessageTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
     {
         if (e.Key is not Windows.System.VirtualKey.Enter)
@@ -58,11 +70,11 @@ public sealed partial class MessagesPage : Page
     private void SendMessage()
     {
         if (!string.IsNullOrWhiteSpace(MessageTextBox.Text))
-            {
-                ViewModel.SendMessage(MessageTextBox.Text);
-                MessageTextBox.Text = string.Empty;
-            }
+        {
+            ViewModel.SendMessage(MessageTextBox.Text);
+            MessageTextBox.Text = string.Empty;
         }
+    }
 
     private void NewMessageButton_Click(object sender, RoutedEventArgs e)
     {

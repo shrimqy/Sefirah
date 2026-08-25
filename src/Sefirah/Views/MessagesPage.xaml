@@ -13,6 +13,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:Sefirah.Data.Models.Messages"
     xmlns:vm="using:Sefirah.ViewModels"
+    xmlns:win="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     Background="Transparent"
     mc:Ignorable="d">
 
@@ -584,52 +585,80 @@
                     TextWrapping="Wrap" />
             </Grid>
 
-            <!--  SIM selection and Send button  -->
+            <!--  SIM selection, Emoji, and Send  -->
             <Grid
                 Grid.Row="3"
                 Padding="20,4,20,12"
                 Visibility="{x:Bind ViewModel.ShouldShowComposeUI, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <!--  SIM selection  -->
-                <ComboBox
-                    x:Name="TheComboBox"
+                <StackPanel
                     Grid.Column="0"
-                    x:Load="{x:Bind ViewModel.ActiveDevice.PhoneNumbers.Count, Mode=OneWay, Converter={StaticResource GreaterThanOneToBooleanConverter}}"
-                    ItemsSource="{x:Bind ViewModel.ActiveDevice.PhoneNumbers, Mode=OneWay}"
-                    SelectedItem="{x:Bind ViewModel.SelectedPhoneNumber, Mode=TwoWay}">
+                    VerticalAlignment="Bottom"
+                    Orientation="Horizontal"
+                    Spacing="4">
+                    <!--  Emoji button -->
+                    <win:Button
+                        x:Name="EmojiButton"
+                        Width="36"
+                        Height="36"
+                        Padding="0"
+                        VerticalAlignment="Bottom"
+                        AutomationProperties.Name="{helpers:ResourceString Name=Emoji}"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Click="EmojiButton_Click"
+                        ToolTipService.ToolTip="{helpers:ResourceString Name=Emoji}">
+                        <FontIcon
+                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                            FontSize="16"
+                            Glyph="&#xE76E;" />
+                    </win:Button>
 
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate x:DataType="models:PhoneNumber">
-                            <StackPanel Orientation="Horizontal">
-                                <Grid>
-                                    <FontIcon FontSize="14" Glyph="{x:Bind SubscriptionId, Converter={StaticResource SubscriptionToIconConverter}}" />
-                                    <FontIcon
+                    <!--  SIM selection  -->
+                    <ComboBox
+                        x:Name="TheComboBox"
+                        x:Load="{x:Bind ViewModel.ActiveDevice.PhoneNumbers.Count, Mode=OneWay, Converter={StaticResource GreaterThanOneToBooleanConverter}}"
+                        ItemsSource="{x:Bind ViewModel.ActiveDevice.PhoneNumbers, Mode=OneWay}"
+                        SelectedItem="{x:Bind ViewModel.SelectedPhoneNumber, Mode=TwoWay}">
+
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="models:PhoneNumber">
+                                <StackPanel Orientation="Horizontal">
+                                    <Grid>
+                                        <FontIcon FontSize="14" Glyph="{x:Bind SubscriptionId, Converter={StaticResource SubscriptionToIconConverter}}" />
+                                        <FontIcon
+                                            Margin="6,0,0,0"
+                                            FontSize="14"
+                                            Glyph="&#xED2A;" />
+                                    </Grid>
+                                    <TextBlock
                                         Margin="6,0,0,0"
                                         FontSize="14"
-                                        Glyph="&#xED2A;" />
-                                </Grid>
-                                <TextBlock
-                                    Margin="6,0,0,0"
-                                    FontSize="14"
-                                    Text="{x:Bind Number}"
-                                    Visibility="{Binding IsDropDownOpen, ElementName=TheComboBox, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                                        Text="{x:Bind Number}"
+                                        Visibility="{Binding IsDropDownOpen, ElementName=TheComboBox, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
 
                 <!--  Send button  -->
                 <Button
                     x:Name="SendButton"
-                    Grid.Column="2"
+                    Grid.Column="1"
+                    Width="36"
+                    Height="36"
+                    Padding="0"
                     VerticalAlignment="Bottom"
-                    AutomationProperties.Name="Send message"
-                    Click="SendButton_Click">
+                    AutomationProperties.Name="{helpers:ResourceString Name=SendButton}"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Click="SendButton_Click"
+                    ToolTipService.ToolTip="{helpers:ResourceString Name=SendButton}">
                     <SymbolIcon Symbol="Send" />
                 </Button>
             </Grid>

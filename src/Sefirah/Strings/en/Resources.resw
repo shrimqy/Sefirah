@@ -382,6 +382,9 @@ page.</value>
   <data name="MessagePlaceholder" xml:space="preserve">
     <value>Type a message</value>
   </data>
+  <data name="Emoji" xml:space="preserve">
+    <value>Emoji</value>
+  </data>
   <data name="Apps" xml:space="preserve">
     <value>Apps</value>
   </data>
