@@ -78,13 +78,20 @@ public sealed partial class MessagesViewModel : BaseViewModel
 
     private async void InitializeAsync()
     {
-        if (ActiveDevice is not null)
+        try
         {
-            await LoadConversationsForActiveDevice();
+            if (ActiveDevice is not null)
+            {
+                await LoadConversationsForActiveDevice();
+            }
+            else
+            {
+                await dispatcher.EnqueueAsync(() => Conversations.Clear());
+            }
         }
-        else
+        catch (Exception ex)
         {
-            await dispatcher.EnqueueAsync(() => Conversations.Clear());
+            Logger.Error($"Error initializing messages for device: {ActiveDevice?.Id}", ex);
         }
     }
 
@@ -117,19 +124,25 @@ public sealed partial class MessagesViewModel : BaseViewModel
     {
         if (SelectedConversation is null || ActiveDevice is null) return;
 
-        var dbMessages = await smsFeature.LoadMessagesForConversation(ActiveDevice.Id, SelectedConversation.ThreadId);
-        if (dbMessages.Count > 0)
+        try
         {
-            MessageGroups.Clear();
-            MessageIds.Clear();
+            var dbMessages = await smsFeature.LoadMessagesForConversation(ActiveDevice.Id, SelectedConversation.ThreadId);
+            if (dbMessages.Count > 0)
+            {
+                MessageGroups.Clear();
+                MessageIds.Clear();
 
-            var sortedMessages = dbMessages.OrderBy(m => m.Timestamp).ToList();
-            MessageIds.AddRange(sortedMessages.Select(m => m.UniqueId));
-            BuildMessageGroups(sortedMessages);
+                var sortedMessages = dbMessages.OrderBy(m => m.Timestamp).ToList();
+                MessageIds.AddRange(sortedMessages.Select(m => m.UniqueId));
+                BuildMessageGroups(sortedMessages);
+            }
+
+            await smsFeature.RequestThreadHistory(ActiveDevice, SelectedConversation.ThreadId);
         }
-
-        // Request thread history from device
-        await smsFeature.RequestThreadHistory(ActiveDevice, SelectedConversation.ThreadId);
+        catch (Exception ex)
+        {
+            Logger.Error($"Error loading messages for conversation {SelectedConversation.ThreadId}", ex);
+        }
     }
 
     public void SendMessage(string messageText)
