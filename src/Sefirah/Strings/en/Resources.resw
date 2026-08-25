@@ -669,9 +669,6 @@ input keyevent 66</value>
   <data name="ActionName" xml:space="preserve">
     <value>Action name</value>
   </data>
-  <data name="ExecutablePath" xml:space="preserve">
-    <value>Executable path</value>
-  </data>
   <data name="Arguments" xml:space="preserve">
     <value>Arguments</value>
   </data>
@@ -680,9 +677,6 @@ input keyevent 66</value>
   </data>
   <data name="EnterActionName" xml:space="preserve">
     <value>Enter action name</value>
-  </data>
-  <data name="PathToExecutable" xml:space="preserve">
-    <value>Path to executable</value>
   </data>
   <data name="CommandLineArguments" xml:space="preserve">
     <value>Command line arguments (optional)</value>
@@ -1090,5 +1084,5 @@ input text %pwd%</value>
   </data>
   <data name="RemoveAllStorageMountsDescription" xml:space="preserve">
     <value>Unmount and clear all device storage registered by the app</value>
-   </data>
+  </data>
 </root>
