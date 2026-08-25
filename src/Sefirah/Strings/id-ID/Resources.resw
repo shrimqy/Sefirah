@@ -382,6 +382,9 @@ page.</value>
   <data name="MessagePlaceholder" xml:space="preserve">
     <value>Type a message</value>
   </data>
+  <data name="Emoji" xml:space="preserve">
+    <value>Emoji</value>
+  </data>
   <data name="Apps" xml:space="preserve">
     <value>Apps</value>
   </data>
@@ -666,9 +669,6 @@ input keyevent 66</value>
   <data name="ActionName" xml:space="preserve">
     <value>Action name</value>
   </data>
-  <data name="ExecutablePath" xml:space="preserve">
-    <value>Executable path</value>
-  </data>
   <data name="Arguments" xml:space="preserve">
     <value>Arguments</value>
   </data>
@@ -677,9 +677,6 @@ input keyevent 66</value>
   </data>
   <data name="EnterActionName" xml:space="preserve">
     <value>Enter action name</value>
-  </data>
-  <data name="PathToExecutable" xml:space="preserve">
-    <value>Path to executable</value>
   </data>
   <data name="CommandLineArguments" xml:space="preserve">
     <value>Command line arguments (optional)</value>
@@ -1085,5 +1082,5 @@ input keyevent 66</value>
   </data>
   <data name="RemoveAllStorageMountsDescription" xml:space="preserve">
     <value>Unmount and clear all device storage registered by the app</value>
-   </data>
+  </data>
 </root>
