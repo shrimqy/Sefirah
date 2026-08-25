@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -154,7 +154,19 @@
     <value>Speicherort festlegen</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
-    <value>Remote storage location</value>
+    <value>Remote-Speicherort</value>
+  </data>
+  <data name="StorageMount" xml:space="preserve">
+    <value>Storage mount</value>
+  </data>
+  <data name="StorageMountDescription" xml:space="preserve">
+    <value>How device storage is mounted in the file manager. Auto picks GVfs on GNOME and sshfs on KDE. Change applies on the next connection.</value>
+  </data>
+  <data name="GVfs" xml:space="preserve">
+    <value>GVfs</value>
+  </data>
+  <data name="Sshfs" xml:space="preserve">
+    <value>sshfs</value>
   </data>
   <data name="ShowClipboardToast" xml:space="preserve">
     <value>Zwischenablagen-Benachrichtigung anzeigen</value>
@@ -175,10 +187,10 @@
     <value>Deaktiviert</value>
   </data>
   <data name="NotificationFilterFeed.Content" xml:space="preserve">
-    <value>Notification feed</value>
+    <value>Benachrichtigungs-Feed</value>
   </data>
   <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
-    <value>Notification feed + toast</value>
+    <value>Benachrichtigungs-Feed + Pop-up</value>
   </data>
   <data name="AvailableDevices.Title" xml:space="preserve">
     <value>Verfügbare Geräte</value>
@@ -209,6 +221,15 @@
   </data>
   <data name="ThemeDescription" xml:space="preserve">
     <value>Wählen Sie Ihr Standard-App-Design</value>
+  </data>
+  <data name="BackdropMaterial" xml:space="preserve">
+    <value>Backdrop material</value>
+  </data>
+  <data name="BackdropMaterialMica" xml:space="preserve">
+    <value>Mica</value>
+  </data>
+  <data name="BackdropMaterialAcrylic" xml:space="preserve">
+    <value>Acrylic</value>
   </data>
   <data name="Default" xml:space="preserve">
     <value>Standard</value>
@@ -336,6 +357,12 @@
   <data name="PhysicalKeyboard" xml:space="preserve">
     <value>Bildschirmtastatur deaktivieren</value>
   </data>
+  <data name="ScrcpyClipboardAutosync" xml:space="preserve">
+    <value>Clipboard autosync</value>
+  </data>
+  <data name="ScrcpyClipboardAutosyncDescription" xml:space="preserve">
+    <value>If on, app adds `--no-clipboard-autosync` flag. Consider leaving it off if you use the app's own clipboard sync.</value>
+  </data>
   <data name="Bitrate" xml:space="preserve">
     <value>Bitrate</value>
   </data>
@@ -353,6 +380,9 @@
   </data>
   <data name="MessagePlaceholder" xml:space="preserve">
     <value>Eine Nachricht schreiben</value>
+  </data>
+  <data name="Emoji" xml:space="preserve">
+    <value>Emoji</value>
   </data>
   <data name="Apps" xml:space="preserve">
     <value>Apps</value>
@@ -478,13 +508,18 @@
     <value>Deinstallieren</value>
   </data>
   <data name="UnlockDeviceHelpTitle" xml:space="preserve">
-    <value>Shell-Befehle - Hilfe</value>
+    <value>Unlock commands help</value>
   </data>
   <data name="UnlockDeviceHelpDescription" xml:space="preserve">
-    <value>Die Shell-Befehle im Textfeld werden ausgeführt, bevor scrcpy gestartet wird. Geben Sie Befehle ein, die auf Ihrem Gerät funktionieren, getrennt durch Zeile. Verwenden Sie %pwd% als Platzhalter für Ihr Passwort, wenn Sie danach gefragt werden müssen.</value>
+    <value>Commands run in order before launching scrcpy. Set a delay in milliseconds after each command if your device needs time to react. Use 0 for no delay. Use %pwd% as a placeholder to be prompted for your password.</value>
   </data>
   <data name="UnlockDeviceHelpExample" xml:space="preserve">
     <value>Beispiel:</value>
+  </data>
+  <data name="UnlockDeviceHelpExampleCommands" xml:space="preserve">
+    <value>input keyevent 224
+input text %pwd%
+input keyevent 66</value>
   </data>
   <data name="PinnedApps" xml:space="preserve">
     <value>Angeheftete Apps</value>
@@ -540,6 +575,18 @@
   <data name="ShowBadgeDescription" xml:space="preserve">
     <value>Benachrichtigungszeichen in der Taskleiste anzeigen</value>
   </data>
+  <data name="LowBatteryAlerts" xml:space="preserve">
+    <value>Low battery alerts</value>
+  </data>
+  <data name="LowBatteryAlertsDescription" xml:space="preserve">
+    <value>Show a notification when this device reaches or drops below the selected battery percentage</value>
+  </data>
+  <data name="LowBatteryThreshold" xml:space="preserve">
+    <value>Low battery threshold</value>
+  </data>
+  <data name="LowBatteryThresholdDescription" xml:space="preserve">
+    <value>Choose the battery percentage that triggers the alert for this device</value>
+  </data>
   <data name="IgnoreDuringDoNotDisturb" xml:space="preserve">
     <value>Ignorieren während "Nicht stören"</value>
   </data>
@@ -552,6 +599,66 @@
   <data name="AddAction" xml:space="preserve">
     <value>Aktion hinzufügen</value>
   </data>
+  <data name="Reorder" xml:space="preserve">
+    <value>Drag to reorder</value>
+  </data>
+  <data name="Run" xml:space="preserve">
+    <value>Run</value>
+  </data>
+  <data name="Power" xml:space="preserve">
+    <value>Power</value>
+  </data>
+  <data name="Sleep" xml:space="preserve">
+    <value>Sleep</value>
+  </data>
+  <data name="Hibernate" xml:space="preserve">
+    <value>Hibernate</value>
+  </data>
+  <data name="Restart" xml:space="preserve">
+    <value>Restart</value>
+  </data>
+  <data name="Shutdown" xml:space="preserve">
+    <value>Shutdown</value>
+  </data>
+  <data name="Lock" xml:space="preserve">
+    <value>Lock</value>
+  </data>
+  <data name="LogOff" xml:space="preserve">
+    <value>Log off</value>
+  </data>
+  <data name="Link" xml:space="preserve">
+    <value>Link</value>
+  </data>
+  <data name="EnterLink" xml:space="preserve">
+    <value>https://example.com</value>
+  </data>
+  <data name="RunPath" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="EnterRunPath" xml:space="preserve">
+    <value>File, folder, or application path</value>
+  </data>
+  <data name="ActionIcon" xml:space="preserve">
+    <value>Icon</value>
+  </data>
+  <data name="BrowseCustomIcon" xml:space="preserve">
+    <value>Browse image</value>
+  </data>
+  <data name="ChangeIcon" xml:space="preserve">
+    <value>Change…</value>
+  </data>
+  <data name="SearchIcons" xml:space="preserve">
+    <value>Search icons</value>
+  </data>
+  <data name="UseBuiltInIcon" xml:space="preserve">
+    <value>Use built-in</value>
+  </data>
+  <data name="AskForConfirmation" xml:space="preserve">
+    <value>Ask for confirmation</value>
+  </data>
+  <data name="PowerKind" xml:space="preserve">
+    <value>Power option</value>
+  </data>
   <data name="Edit" xml:space="preserve">
     <value>Bearbeiten</value>
   </data>
@@ -560,9 +667,6 @@
   </data>
   <data name="ActionName" xml:space="preserve">
     <value>Aktionsname</value>
-  </data>
-  <data name="ExecutablePath" xml:space="preserve">
-    <value>Ausführbarer Pfad</value>
   </data>
   <data name="Arguments" xml:space="preserve">
     <value>Argumente</value>
@@ -573,14 +677,17 @@
   <data name="EnterActionName" xml:space="preserve">
     <value>Aktionsname eingeben</value>
   </data>
-  <data name="PathToExecutable" xml:space="preserve">
-    <value>Pfad zur ausführbaren Datei</value>
-  </data>
   <data name="CommandLineArguments" xml:space="preserve">
     <value>Kommandozeilenargumente (optional)</value>
   </data>
   <data name="EnterPassword" xml:space="preserve">
     <value>Passwort eingeben</value>
+  </data>
+  <data name="EnterPasswordDescription" xml:space="preserve">
+    <value>Enter the device unlock password to continue.</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
   </data>
   <data name="Reply" xml:space="preserve">
     <value>Antworten</value>
@@ -606,6 +713,18 @@
   <data name="UnlockDeviceBeforeLaunch" xml:space="preserve">
     <value>Gerät entsperren, bevor scrcpy gestartet wird</value>
   </data>
+  <data name="UnlockCommandsHeader" xml:space="preserve">
+    <value>Unlock commands</value>
+  </data>
+  <data name="NewUnlockCommand" xml:space="preserve">
+    <value>New command</value>
+  </data>
+  <data name="PasswordCacheTimeout" xml:space="preserve">
+    <value>Password cache timeout</value>
+  </data>
+  <data name="PasswordCacheTimeoutDescription" xml:space="preserve">
+    <value>When set to 0, you'll be prompted for password every time. When set to a value greater than 0, your password will be cached for the specified number of minutes and reused automatically.</value>
+  </data>
   <data name="Save" xml:space="preserve">
     <value>Speichern</value>
   </data>
@@ -623,6 +742,15 @@
   </data>
   <data name="FileTransferNotification.Completed" xml:space="preserve">
     <value>Dateiübertragung abgeschlossen</value>
+  </data>
+  <data name="FileTransferNotification.Failed" xml:space="preserve">
+    <value>File transfer failed</value>
+  </data>
+  <data name="FileTransferNotification.FailedTo" xml:space="preserve">
+    <value>Transfer to {0} failed</value>
+  </data>
+  <data name="FileTransferNotification.FailedFrom" xml:space="preserve">
+    <value>Transfer from {0} failed</value>
   </data>
   <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
     <value>Von {1} wurde {0} empfangen</value>
@@ -652,6 +780,15 @@
     <value>input keyevent 26
 input keyevent 66
 input text %pwd%</value>
+  </data>
+  <data name="UnlockCommandPlaceholder" xml:space="preserve">
+    <value>input keyevent 26</value>
+  </data>
+  <data name="MicrosecondsLabel" xml:space="preserve">
+    <value>ms</value>
+  </data>
+  <data name="Delay" xml:space="preserve">
+    <value>Delay</value>
   </data>
   <data name="FileDropCaption" xml:space="preserve">
     <value>Zu sendende Dateien ablegen</value>
@@ -743,6 +880,12 @@ input text %pwd%</value>
   <data name="ClipboardNotification.Title" xml:space="preserve">
     <value>Clipboard received</value>
   </data>
+  <data name="BatteryNotification.Title" xml:space="preserve">
+    <value>Low battery</value>
+  </data>
+  <data name="BatteryNotification.Text" xml:space="preserve">
+    <value>{0} is at {1}% battery.</value>
+  </data>
   <data name="OpenInBrowser" xml:space="preserve">
     <value>Open in browser</value>
   </data>
@@ -764,6 +907,12 @@ input text %pwd%</value>
   <data name="StartScreenMirroring" xml:space="preserve">
     <value>Start screen mirroring</value>
   </data>
+  <data name="Connect" xml:space="preserve">
+    <value>Connect</value>
+  </data>
+  <data name="Disconnect" xml:space="preserve">
+    <value>Disconnect</value>
+  </data>
   <data name="PreviousTrack" xml:space="preserve">
     <value>Previous track</value>
   </data>
@@ -782,11 +931,32 @@ input text %pwd%</value>
   <data name="RefreshApps" xml:space="preserve">
     <value>Refresh apps</value>
   </data>
+  <data name="InstallApp" xml:space="preserve">
+    <value>Install app</value>
+  </data>
   <data name="ContextMenu" xml:space="preserve">
     <value>Context menu</value>
   </data>
   <data name="ShareFiles" xml:space="preserve">
     <value>Share files</value>
+  </data>
+  <data name="SendFiles" xml:space="preserve">
+    <value>Send files</value>
+  </data>
+  <data name="BrowseFiles" xml:space="preserve">
+    <value>Browse files</value>
+  </data>
+  <data name="BrowseFilesTooltip" xml:space="preserve">
+    <value>Right-click to open the SFTP link and copy it to the clipboard</value>
+  </data>
+  <data name="DeviceActions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="PlaySound" xml:space="preserve">
+    <value>Play sound</value>
+  </data>
+  <data name="PlaySoundDescription" xml:space="preserve">
+    <value>A sound will play on this device for 20 seconds</value>
   </data>
   <data name="ReceiveClipboard" xml:space="preserve">
     <value>Receive clipboard</value>
@@ -877,5 +1047,41 @@ input text %pwd%</value>
   </data>
   <data name="CallAudioRouteToPc" xml:space="preserve">
     <value>Transfer to PC</value>
+  </data>
+  <data name="FlexDisplay" xml:space="preserve">
+    <value>Flex display</value>
+  </data>
+  <data name="VideoBitratePlaceholder" xml:space="preserve">
+    <value>8M</value>
+  </data>
+  <data name="VideoBitrateToolTip" xml:space="preserve">
+    <value>Format: 8M, 8000000</value>
+  </data>
+  <data name="AudioBitratePlaceholder" xml:space="preserve">
+    <value>128K</value>
+  </data>
+  <data name="AudioBitrateToolTip" xml:space="preserve">
+    <value>Format: 128K, 128000</value>
+  </data>
+  <data name="CropPlaceholder" xml:space="preserve">
+    <value>No crop</value>
+  </data>
+  <data name="CropToolTip" xml:space="preserve">
+    <value>Format: 1224:1440:0:0</value>
+  </data>
+  <data name="VirtualDisplaySizePlaceholder" xml:space="preserve">
+    <value>Device default</value>
+  </data>
+  <data name="VirtualDisplaySizeToolTip" xml:space="preserve">
+    <value>Format: 1920x1080</value>
+  </data>
+  <data name="VideoBitrateMbps" xml:space="preserve">
+    <value>Mbps</value>
+  </data>
+  <data name="RemoveAllStorageMounts" xml:space="preserve">
+    <value>Remove all storage mounts</value>
+  </data>
+  <data name="RemoveAllStorageMountsDescription" xml:space="preserve">
+    <value>Unmount and clear all device storage registered by the app</value>
   </data>
 </root>
