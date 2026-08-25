@@ -381,6 +381,9 @@
   <data name="MessagePlaceholder" xml:space="preserve">
     <value>メッセージを入力</value>
   </data>
+  <data name="Emoji" xml:space="preserve">
+    <value>Emoji</value>
+  </data>
   <data name="Apps" xml:space="preserve">
     <value>アプリ</value>
   </data>
@@ -665,9 +668,6 @@ input keyevent 66</value>
   <data name="ActionName" xml:space="preserve">
     <value>アクション名</value>
   </data>
-  <data name="ExecutablePath" xml:space="preserve">
-    <value>実行パス</value>
-  </data>
   <data name="Arguments" xml:space="preserve">
     <value>引数</value>
   </data>
@@ -676,9 +676,6 @@ input keyevent 66</value>
   </data>
   <data name="EnterActionName" xml:space="preserve">
     <value>アクション名を入力</value>
-  </data>
-  <data name="PathToExecutable" xml:space="preserve">
-    <value>実行パス</value>
   </data>
   <data name="CommandLineArguments" xml:space="preserve">
     <value>コマンドライン引数 (任意)</value>
@@ -1086,5 +1083,5 @@ input text %pwd%</value>
   </data>
   <data name="RemoveAllStorageMountsDescription" xml:space="preserve">
     <value>Unmount and clear all device storage registered by the app</value>
-   </data>
+  </data>
 </root>
