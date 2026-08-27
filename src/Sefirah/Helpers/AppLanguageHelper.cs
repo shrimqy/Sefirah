@@ -4,6 +4,7 @@
 using System.Globalization;
 using Sefirah.Data.Items;
 using Windows.Globalization;
+using Windows.System.UserProfile;
 
 namespace Sefirah.Helpers;
 
@@ -63,16 +64,50 @@ public static class AppLanguageHelper
 		var index = appLanguages.IndexOf(appLanguages.FirstOrDefault(dl => dl.Name == current.Name) ?? appLanguages.First());
 
 		// Set the system default language as the first item in the Languages collection
-		var systemLanguage = new AppLanguageItem(CultureInfo.InstalledUICulture.Name, systemDefault: true);
-		if (appLanguages.Select(lang => lang.Name.Contains(systemLanguage.Name)).Any())
-			appLanguages[0] = systemLanguage;
-		else
-			appLanguages[0] = new("en-US", systemDefault: true);
+		var systemCulture = GetSystemCulture();
+		appLanguages[0] = IsSupported(appLanguages, systemCulture)
+			? new AppLanguageItem(systemCulture.Name, systemDefault: true)
+			: new AppLanguageItem("en-US", systemDefault: true);
 
 		// Initialize the list
 		SupportedLanguages = new(appLanguages);
 		PreferredLanguage = SupportedLanguages[index];
 	}
+
+	/// <summary>
+	/// Gets the culture the app falls back to when no language override is set.
+	/// </summary>
+	/// <remarks>
+	/// <see cref="GlobalizationPreferences"/> reports the display language the user picked in Windows.
+	/// <see cref="CultureInfo.InstalledUICulture"/> is wrong here because it reports en-US inside a
+	/// packaged app, and <see cref="CultureInfo.CurrentUICulture"/> follows this app's own override.
+	/// </remarks>
+	private static CultureInfo GetSystemCulture()
+	{
+		var preferred = GlobalizationPreferences.Languages.FirstOrDefault();
+		if (string.IsNullOrEmpty(preferred))
+			return CultureInfo.CurrentUICulture;
+
+		try
+		{
+			return new CultureInfo(preferred);
+		}
+		catch (CultureNotFoundException)
+		{
+			return CultureInfo.CurrentUICulture;
+		}
+	}
+
+	/// <summary>
+	/// Determines whether the app ships resources for the given culture.
+	/// </summary>
+	/// <remarks>
+	/// Manifest languages can be neutral, e.g. "cs" covers "cs-CZ", so both forms are matched.
+	/// </remarks>
+	private static bool IsSupported(IEnumerable<AppLanguageItem> languages, CultureInfo culture)
+		=> languages.Any(language =>
+			language.Code.Equals(culture.Name, StringComparison.OrdinalIgnoreCase) ||
+			language.Code.Equals(culture.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase));
 
 	/// <summary>
 	/// Attempts to change the preferred language code by index.
