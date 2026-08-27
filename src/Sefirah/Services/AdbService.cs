@@ -30,6 +30,9 @@ public class AdbService(
     private const string SefirahAndroidPackageId = "com.castle.sefirah";
     private const string WorkerNiceName = "sefirah_worker";
 
+    private const string DeviceIdCommand =
+        $"cat /storage/emulated/0/Android/data/{SefirahAndroidPackageId}/files/device_info.txt";
+
     // adbd needs a moment to restart and start listening on 5555 after a tcpip switch
     private static readonly TimeSpan TcpipSettleDelay = TimeSpan.FromSeconds(2);
 
@@ -950,13 +953,49 @@ public class AdbService(
         }
     }
 
+    /// <summary>
+    /// The device id is read from a file the app writes on its first run, because the desktop cannot
+    /// see the app's own ANDROID_ID over adb. A device that showed up before the app wrote that file
+    /// keeps an unusable id, so ask the device again rather than giving up on the match.
+    /// </summary>
+    private async Task<AdbDevice?> ResolveAdbDeviceAsync(PairedDevice device)
+    {
+        if (device.ConnectedAdbDevices.FirstOrDefault() is { } known) return known;
+
+        foreach (var candidate in AdbDevices.Where(d => d.IsOnline && d.DeviceData is not null).ToList())
+        {
+            try
+            {
+                var id = (await ShellAsync(candidate, DeviceIdCommand)).Trim();
+                if (string.IsNullOrEmpty(id) || id != device.Id) continue;
+
+                logger.Info($"Re-resolved adb device {candidate.Serial} as {device.Name}");
+                candidate.AndroidId = id;
+                return candidate;
+            }
+            catch (Exception ex)
+            {
+                logger.Debug($"Could not read the device id from {candidate.Serial}: {ex.Message}");
+            }
+        }
+
+        return null;
+    }
+
     /// <summary>Starts the worker via adb shell if it isn't already running.</summary>
     public async Task TryStartWorkerAsync(PairedDevice device, string command)
     {
-        if (device.ConnectedAdbDevices.FirstOrDefault() is not { } adbDevice)
+        if (await ResolveAdbDeviceAsync(device) is not { } adbDevice)
+        {
+            logger.Warn($"No adb device matches {device.Name}, the worker cannot be started over adb");
             return;
+        }
 
-        if (adbDevice.DeviceData is null || adbDevice.State is not DeviceState.Online) return;
+        if (adbDevice.DeviceData is null || adbDevice.State is not DeviceState.Online)
+        {
+            logger.Warn($"Adb device {adbDevice.Serial} is not online, the worker cannot be started");
+            return;
+        }
 
         try
         {
