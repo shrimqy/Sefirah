@@ -1,0 +1,1091 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About" xml:space="preserve">
+    <value>Informazioni</value>
+  </data>
+  <data name="General" xml:space="preserve">
+    <value>Generale</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Impostazioni</value>
+  </data>
+  <data name="PrivacyPolicy" xml:space="preserve">
+    <value>Informativa sulla privacy</value>
+  </data>
+  <data name="SupportDevelopment" xml:space="preserve">
+    <value>Sostieni lo sviluppo</value>
+  </data>
+  <data name="OpenLogs" xml:space="preserve">
+    <value>Apri i log</value>
+  </data>
+  <data name="GitHubRepository" xml:space="preserve">
+    <value>Repository GitHub</value>
+  </data>
+  <data name="AndroidGitHubRepository" xml:space="preserve">
+    <value>Repository GitHub Android</value>
+  </data>
+  <data name="Feedback" xml:space="preserve">
+    <value>Feedback</value>
+  </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>Notifiche</value>
+  </data>
+  <data name="ThirdPartyLibraries" xml:space="preserve">
+    <value>Librerie di terze parti</value>
+  </data>
+  <data name="SaveLocation" xml:space="preserve">
+    <value>Percorso di salvataggio</value>
+  </data>
+  <data name="RemoteStorageLocation" xml:space="preserve">
+    <value>Percorso di archiviazione remota</value>
+  </data>
+  <data name="StorageMount" xml:space="preserve">
+    <value>Montaggio archiviazione</value>
+  </data>
+  <data name="StorageMountDescription" xml:space="preserve">
+    <value>Come viene montata l'archiviazione del dispositivo nel file manager. Auto sceglie GVfs su GNOME e sshfs su KDE. La modifica viene applicata alla connessione successiva.</value>
+  </data>
+  <data name="GVfs" xml:space="preserve">
+    <value>GVfs</value>
+  </data>
+  <data name="Sshfs" xml:space="preserve">
+    <value>sshfs</value>
+  </data>
+  <data name="ShowClipboardToast" xml:space="preserve">
+    <value>Mostra notifica popup per gli appunti</value>
+  </data>
+  <data name="ClipboardFiles" xml:space="preserve">
+    <value>Aggiungi i file ricevuti agli appunti</value>
+  </data>
+  <data name="GeneralSettings" xml:space="preserve">
+    <value>Impostazioni generali</value>
+  </data>
+  <data name="ShowNotificationToast" xml:space="preserve">
+    <value>Mostra notifiche popup</value>
+  </data>
+  <data name="IgnoreWindowsApps" xml:space="preserve">
+    <value>Ignora le notifiche remote delle app Windows attive</value>
+  </data>
+  <data name="NotificationFilterDisabled.Content" xml:space="preserve">
+    <value>Disattivate</value>
+  </data>
+  <data name="NotificationFilterFeed.Content" xml:space="preserve">
+    <value>Feed delle notifiche</value>
+  </data>
+  <data name="NotificationFilterToastFeed.Content" xml:space="preserve">
+    <value>Feed delle notifiche + popup</value>
+  </data>
+  <data name="AvailableDevices.Title" xml:space="preserve">
+    <value>Dispositivi disponibili</value>
+  </data>
+  <data name="AvailableDevices.Subtitle" xml:space="preserve">
+    <value>I dispositivi Android che eseguono l'app nella stessa rete verranno mostrati qui sotto</value>
+  </data>
+  <data name="StartupOption" xml:space="preserve">
+    <value>Opzione di avvio</value>
+  </data>
+  <data name="StartupOptionDescription" xml:space="preserve">
+    <value>Scegli come avviare l'app all'accensione di Windows</value>
+  </data>
+  <data name="StartupOptionMinimized.Content" xml:space="preserve">
+    <value>Avvia ridotta a icona</value>
+  </data>
+  <data name="StartupOptionMaximized.Content" xml:space="preserve">
+    <value>Avvia ingrandita</value>
+  </data>
+  <data name="StartupOptionSystemTray.Content" xml:space="preserve">
+    <value>Avvia nell'area di notifica</value>
+  </data>
+  <data name="StartupOptionDisabled.Content" xml:space="preserve">
+    <value>Disattivata</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Tema</value>
+  </data>
+  <data name="ThemeDescription" xml:space="preserve">
+    <value>Scegli il tema predefinito dell'app</value>
+  </data>
+  <data name="BackdropMaterial" xml:space="preserve">
+    <value>Materiale di sfondo</value>
+  </data>
+  <data name="BackdropMaterialMica" xml:space="preserve">
+    <value>Mica</value>
+  </data>
+  <data name="BackdropMaterialAcrylic" xml:space="preserve">
+    <value>Acrilico</value>
+  </data>
+  <data name="Default" xml:space="preserve">
+    <value>Predefinito</value>
+  </data>
+  <data name="ThemeLight.Content" xml:space="preserve">
+    <value>Chiaro</value>
+  </data>
+  <data name="ThemeDark.Content" xml:space="preserve">
+    <value>Scuro</value>
+  </data>
+  <data name="RemoveDeviceDialogTitle" xml:space="preserve">
+    <value>Rimuovi dispositivo</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Rimuovi</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Annulla</value>
+  </data>
+  <data name="OnboardingWelcome.Title" xml:space="preserve">
+    <value>Benvenuto in Sefirah</value>
+  </data>
+  <data name="OnboardingWelcome.Subtitle" xml:space="preserve">
+    <value>Per iniziare, scarica e installa l'app companion dalla relativa pagina
+GitHub.</value>
+  </data>
+  <data name="OnboardingWelcomeGetStarted" xml:space="preserve">
+    <value>Inizia</value>
+  </data>
+  <data name="OnboardingSkip" xml:space="preserve">
+    <value>Salta per ora</value>
+  </data>
+  <data name="OnboardingDevice.Title" xml:space="preserve">
+    <value>Connetti il tuo dispositivo</value>
+  </data>
+  <data name="OnboardingDevice.Subtitle" xml:space="preserve">
+    <value>Scansiona il codice QR o esegui l'associazione direttamente dai dispositivi rilevati qui sotto</value>
+  </data>
+  <data name="ConnectionRequest.Title" xml:space="preserve">
+    <value>Richiesta di connessione del dispositivo</value>
+  </data>
+  <data name="ConnectionRequest.Subtitle" xml:space="preserve">
+    <value>Verifica che il codice corrisponda su entrambi i dispositivi:</value>
+  </data>
+  <data name="ConnectionRequestRejectButton" xml:space="preserve">
+    <value>Rifiuta</value>
+  </data>
+  <data name="NotificationsClearButton" xml:space="preserve">
+    <value>Cancella tutto</value>
+  </data>
+  <data name="ConnectionRequestAcceptButton" xml:space="preserve">
+    <value>Accetta</value>
+  </data>
+  <data name="NoDevicesFound" xml:space="preserve">
+    <value>Nessun dispositivo trovato</value>
+  </data>
+  <data name="OpenLinksInBrowser" xml:space="preserve">
+    <value>Apri i link nel browser</value>
+  </data>
+  <data name="Connected.Text" xml:space="preserve">
+    <value>Connesso</value>
+  </data>
+  <data name="Disconnected.Text" xml:space="preserve">
+    <value>Disconnesso</value>
+  </data>
+  <data name="ShowHideWindow" xml:space="preserve">
+    <value>Mostra/Nascondi finestra</value>
+  </data>
+  <data name="Exit" xml:space="preserve">
+    <value>Esci</value>
+  </data>
+  <data name="SelectLocation" xml:space="preserve">
+    <value>Seleziona percorso</value>
+  </data>
+  <data name="RemoveDeviceDialogSubtitle" xml:space="preserve">
+    <value>Vuoi davvero rimuovere '{0}'? L'azione non può essere annullata.</value>
+  </data>
+  <data name="AppSpecificSettings" xml:space="preserve">
+    <value>Impostazioni per app</value>
+  </data>
+  <data name="SendButton" xml:space="preserve">
+    <value>Invia</value>
+  </data>
+  <data name="ReplyPlaceholder" xml:space="preserve">
+    <value>Scrivi una risposta</value>
+  </data>
+  <data name="FileTransferNotificationAction.OpenFile" xml:space="preserve">
+    <value>Apri file</value>
+  </data>
+  <data name="FileTransferNotificationAction.OpenFolder" xml:space="preserve">
+    <value>Apri cartella</value>
+  </data>
+  <data name="NotificationFilterButton" xml:space="preserve">
+    <value>Disattiva le notifiche di {0}</value>
+  </data>
+  <data name="SubmitBugReport" xml:space="preserve">
+    <value>Segnala un bug</value>
+  </data>
+  <data name="SubmitFeatureRequest" xml:space="preserve">
+    <value>Richiesta di funzionalità</value>
+  </data>
+  <data name="IgnoreNotificationDuringDnd" xml:space="preserve">
+    <value>Non mostrare le notifiche popup quando il telefono è in Non disturbare</value>
+  </data>
+  <data name="Devices.Title" xml:space="preserve">
+    <value>Dispositivi</value>
+  </data>
+  <data name="Pin" xml:space="preserve">
+    <value>Fissa</value>
+  </data>
+  <data name="Unpin" xml:space="preserve">
+    <value>Rimuovi</value>
+  </data>
+  <data name="VideoSettings" xml:space="preserve">
+    <value>Impostazioni video</value>
+  </data>
+  <data name="AudioSettings" xml:space="preserve">
+    <value>Impostazioni audio</value>
+  </data>
+  <data name="OpenApp" xml:space="preserve">
+    <value>Apri nell'app</value>
+  </data>
+  <data name="ScreenOff" xml:space="preserve">
+    <value>Mantieni spento lo schermo del dispositivo durante il mirroring</value>
+  </data>
+  <data name="PhysicalKeyboard" xml:space="preserve">
+    <value>Disabilita la tastiera su schermo</value>
+  </data>
+  <data name="ScrcpyClipboardAutosync" xml:space="preserve">
+    <value>Sincronizzazione automatica degli appunti</value>
+  </data>
+  <data name="ScrcpyClipboardAutosyncDescription" xml:space="preserve">
+    <value>Se attivo, l'app aggiunge il flag `--no-clipboard-autosync`. Valuta di lasciarlo disattivato se usi la sincronizzazione degli appunti dell'app.</value>
+  </data>
+  <data name="Bitrate" xml:space="preserve">
+    <value>Bitrate</value>
+  </data>
+  <data name="Resolution" xml:space="preserve">
+    <value>Risoluzione</value>
+  </data>
+  <data name="Buffer" xml:space="preserve">
+    <value>Buffer</value>
+  </data>
+  <data name="Messages" xml:space="preserve">
+    <value>Messaggi</value>
+  </data>
+  <data name="EmptyMessages" xml:space="preserve">
+    <value>Inizia una nuova conversazione o selezionane una per rispondere</value>
+  </data>
+  <data name="MessagePlaceholder" xml:space="preserve">
+    <value>Scrivi un messaggio</value>
+  </data>
+  <data name="Apps" xml:space="preserve">
+    <value>App</value>
+  </data>
+  <data name="NewMessage" xml:space="preserve">
+    <value>Nuovo messaggio</value>
+  </data>
+  <data name="SearchMessages" xml:space="preserve">
+    <value>Cerca nei messaggi</value>
+  </data>
+  <data name="AddressInputPlaceholder" xml:space="preserve">
+    <value>A</value>
+  </data>
+  <data name="RemoveAddress" xml:space="preserve">
+    <value>Rimuovi indirizzo</value>
+  </data>
+  <data name="CopyMessage" xml:space="preserve">
+    <value>Copia messaggio</value>
+  </data>
+  <data name="NoApps" xml:space="preserve">
+    <value>Nessuna app trovata</value>
+  </data>
+  <data name="AdditionalArguments" xml:space="preserve">
+    <value>Argomenti aggiuntivi</value>
+  </data>
+  <data name="AdbDeviceOffline" xml:space="preserve">
+    <value>Il dispositivo ADB è offline</value>
+  </data>
+  <data name="AdbDeviceOfflineDescription" xml:space="preserve">
+    <value>Collega il dispositivo tramite USB con il debug USB attivo, quindi riprova.</value>
+  </data>
+  <data name="Dismiss" xml:space="preserve">
+    <value>Ignora</value>
+  </data>
+  <data name="ScrcpyNotFound" xml:space="preserve">
+    <value>Scrcpy non trovato</value>
+  </data>
+  <data name="ScrcpyNotFoundDescription" xml:space="preserve">
+    <value>Seleziona la cartella in cui si trova scrcpy</value>
+  </data>
+  <data name="SearchApps" xml:space="preserve">
+    <value>Cerca app</value>
+  </data>
+  <data name="DisableVideoForwarding" xml:space="preserve">
+    <value>Disabilita l'inoltro video</value>
+  </data>
+  <data name="VideoCodec" xml:space="preserve">
+    <value>Codec video</value>
+  </data>
+  <data name="FrameRate" xml:space="preserve">
+    <value>Frequenza fotogrammi</value>
+  </data>
+  <data name="Crop" xml:space="preserve">
+    <value>Ritaglio</value>
+  </data>
+  <data name="Display" xml:space="preserve">
+    <value>Schermo</value>
+  </data>
+  <data name="VirtualDisplaySize" xml:space="preserve">
+    <value>Dimensione dello schermo virtuale</value>
+  </data>
+  <data name="DisplayOrientation" xml:space="preserve">
+    <value>Orientamento dello schermo</value>
+  </data>
+  <data name="RotationAngle" xml:space="preserve">
+    <value>Angolo di rotazione</value>
+  </data>
+  <data name="AudioOutputMode" xml:space="preserve">
+    <value>Uscita audio</value>
+  </data>
+  <data name="ForwardMicrophone" xml:space="preserve">
+    <value>Inoltra il microfono</value>
+  </data>
+  <data name="AudioOutputBuffer" xml:space="preserve">
+    <value>Buffer di uscita audio</value>
+  </data>
+  <data name="AudioCodec" xml:space="preserve">
+    <value>Codec audio</value>
+  </data>
+  <data name="AdbSettings" xml:space="preserve">
+    <value>Impostazioni ADB</value>
+  </data>
+  <data name="AutoConnect" xml:space="preserve">
+    <value>Connessione automatica</value>
+  </data>
+  <data name="Both" xml:space="preserve">
+    <value>Entrambi</value>
+  </data>
+  <data name="DesktopDevice" xml:space="preserve">
+    <value>Dispositivo desktop</value>
+  </data>
+  <data name="RemoteDevice" xml:space="preserve">
+    <value>Dispositivo remoto</value>
+  </data>
+  <data name="SelectDevice" xml:space="preserve">
+    <value>Seleziona un dispositivo</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Avvia</value>
+  </data>
+  <data name="ScrcpyDevicePreference" xml:space="preserve">
+    <value>Preferenza dispositivo</value>
+  </data>
+  <data name="AskEverytime" xml:space="preserve">
+    <value>Chiedi ogni volta</value>
+  </data>
+  <data name="Auto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
+  <data name="ScrcpyErrorTitle" xml:space="preserve">
+    <value>Avvio di scrcpy non riuscito</value>
+  </data>
+  <data name="CopyError" xml:space="preserve">
+    <value>Copia errore</value>
+  </data>
+  <data name="DeviceName" xml:space="preserve">
+    <value>Nome dispositivo</value>
+  </data>
+  <data name="EnableVirtualDisplay" xml:space="preserve">
+    <value>Abilita schermo virtuale</value>
+  </data>
+  <data name="Uninstall" xml:space="preserve">
+    <value>Disinstalla</value>
+  </data>
+  <data name="UnlockDeviceHelpTitle" xml:space="preserve">
+    <value>Guida ai comandi di sblocco</value>
+  </data>
+  <data name="UnlockDeviceHelpDescription" xml:space="preserve">
+    <value>I comandi vengono eseguiti in ordine prima di avviare scrcpy. Imposta un ritardo in millisecondi dopo ogni comando se il dispositivo ha bisogno di tempo per reagire. Usa 0 per nessun ritardo. Usa %pwd% come segnaposto per farti richiedere la password.</value>
+  </data>
+  <data name="UnlockDeviceHelpExample" xml:space="preserve">
+    <value>Esempio:</value>
+  </data>
+  <data name="UnlockDeviceHelpExampleCommands" xml:space="preserve">
+    <value>input keyevent 224
+input text %pwd%
+input keyevent 66</value>
+  </data>
+  <data name="PinnedApps" xml:space="preserve">
+    <value>App fissate</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Azioni</value>
+  </data>
+  <data name="ActionsDescription" xml:space="preserve">
+    <value>Configura azioni personalizzate e comandi eseguibili</value>
+  </data>
+  <data name="AdbNoDevice" xml:space="preserve">
+    <value>Nessun dispositivo ADB connesso</value>
+  </data>
+  <data name="AdbNoDeviceSubtitle" xml:space="preserve">
+    <value>Attiva ADB e collega il dispositivo tramite USB o Wi-Fi per vederlo qui.</value>
+  </data>
+  <data name="ClipboardSettings" xml:space="preserve">
+    <value>Impostazioni appunti</value>
+  </data>
+  <data name="DeviceSettings" xml:space="preserve">
+    <value>Impostazioni dispositivo</value>
+  </data>
+  <data name="NotificationSettings" xml:space="preserve">
+    <value>Impostazioni notifiche</value>
+  </data>
+  <data name="ScreenMirrorSettings" xml:space="preserve">
+    <value>Impostazioni mirroring dello schermo</value>
+  </data>
+  <data name="OpenLinksInBrowserDescription" xml:space="preserve">
+    <value>Apri automaticamente nel browser predefinito i link presenti negli appunti</value>
+  </data>
+  <data name="ShowClipboardToastDescription" xml:space="preserve">
+    <value>Mostra notifiche popup per le modifiche agli appunti</value>
+  </data>
+  <data name="ClipboardFilesDescription" xml:space="preserve">
+    <value>Abilita la sincronizzazione dei file tramite gli appunti</value>
+  </data>
+  <data name="AutoConnectDescription" xml:space="preserve">
+    <value>Connetti automaticamente ad ADB quando il dispositivo si connette</value>
+  </data>
+  <data name="SyncClipboardChanges" xml:space="preserve">
+    <value>Sincronizza le modifiche agli appunti con questo dispositivo</value>
+  </data>
+  <data name="ConfigureNotificationSettings" xml:space="preserve">
+    <value>Configura le impostazioni delle notifiche</value>
+  </data>
+  <data name="DisplayToastNotifications" xml:space="preserve">
+    <value>Mostra le notifiche popup su questo PC</value>
+  </data>
+  <data name="ShowBadge" xml:space="preserve">
+    <value>Mostra badge</value>
+  </data>
+  <data name="ShowBadgeDescription" xml:space="preserve">
+    <value>Mostra il badge delle notifiche sulla barra delle applicazioni</value>
+  </data>
+  <data name="LowBatteryAlerts" xml:space="preserve">
+    <value>Avvisi di batteria scarica</value>
+  </data>
+  <data name="LowBatteryAlertsDescription" xml:space="preserve">
+    <value>Mostra una notifica quando questo dispositivo raggiunge o scende sotto la percentuale di batteria selezionata</value>
+  </data>
+  <data name="LowBatteryThreshold" xml:space="preserve">
+    <value>Soglia di batteria scarica</value>
+  </data>
+  <data name="LowBatteryThresholdDescription" xml:space="preserve">
+    <value>Scegli la percentuale di batteria che attiva l'avviso per questo dispositivo</value>
+  </data>
+  <data name="IgnoreDuringDoNotDisturb" xml:space="preserve">
+    <value>Ignora durante Non disturbare</value>
+  </data>
+  <data name="IgnoreDuringDoNotDisturbDescription" xml:space="preserve">
+    <value>Non mostrare le notifiche quando Non disturbare è attivo</value>
+  </data>
+  <data name="ConnectionPreference" xml:space="preserve">
+    <value>Preferenza di connessione</value>
+  </data>
+  <data name="AddAction" xml:space="preserve">
+    <value>Aggiungi azione</value>
+  </data>
+  <data name="Reorder" xml:space="preserve">
+    <value>Trascina per riordinare</value>
+  </data>
+  <data name="Run" xml:space="preserve">
+    <value>Esegui</value>
+  </data>
+  <data name="Power" xml:space="preserve">
+    <value>Alimentazione</value>
+  </data>
+  <data name="Sleep" xml:space="preserve">
+    <value>Sospensione</value>
+  </data>
+  <data name="Hibernate" xml:space="preserve">
+    <value>Ibernazione</value>
+  </data>
+  <data name="Restart" xml:space="preserve">
+    <value>Riavvia</value>
+  </data>
+  <data name="Shutdown" xml:space="preserve">
+    <value>Arresta</value>
+  </data>
+  <data name="Lock" xml:space="preserve">
+    <value>Blocca</value>
+  </data>
+  <data name="LogOff" xml:space="preserve">
+    <value>Disconnetti</value>
+  </data>
+  <data name="Link" xml:space="preserve">
+    <value>Link</value>
+  </data>
+  <data name="EnterLink" xml:space="preserve">
+    <value>https://example.com</value>
+  </data>
+  <data name="RunPath" xml:space="preserve">
+    <value>Percorso</value>
+  </data>
+  <data name="EnterRunPath" xml:space="preserve">
+    <value>Percorso di un file, una cartella o un'applicazione</value>
+  </data>
+  <data name="ActionIcon" xml:space="preserve">
+    <value>Icona</value>
+  </data>
+  <data name="BrowseCustomIcon" xml:space="preserve">
+    <value>Sfoglia immagine</value>
+  </data>
+  <data name="ChangeIcon" xml:space="preserve">
+    <value>Cambia…</value>
+  </data>
+  <data name="SearchIcons" xml:space="preserve">
+    <value>Cerca icone</value>
+  </data>
+  <data name="UseBuiltInIcon" xml:space="preserve">
+    <value>Usa integrata</value>
+  </data>
+  <data name="AskForConfirmation" xml:space="preserve">
+    <value>Chiedi conferma</value>
+  </data>
+  <data name="PowerKind" xml:space="preserve">
+    <value>Opzione di alimentazione</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Modifica</value>
+  </data>
+  <data name="NoActionsConfigured" xml:space="preserve">
+    <value>Nessuna azione configurata</value>
+  </data>
+  <data name="ActionName" xml:space="preserve">
+    <value>Nome azione</value>
+  </data>
+  <data name="ExecutablePath" xml:space="preserve">
+    <value>Percorso dell'eseguibile</value>
+  </data>
+  <data name="Arguments" xml:space="preserve">
+    <value>Argomenti</value>
+  </data>
+  <data name="StartInDirectory" xml:space="preserve">
+    <value>Directory di avvio</value>
+  </data>
+  <data name="EnterActionName" xml:space="preserve">
+    <value>Inserisci il nome dell'azione</value>
+  </data>
+  <data name="PathToExecutable" xml:space="preserve">
+    <value>Percorso dell'eseguibile</value>
+  </data>
+  <data name="CommandLineArguments" xml:space="preserve">
+    <value>Argomenti della riga di comando (facoltativo)</value>
+  </data>
+  <data name="EnterPassword" xml:space="preserve">
+    <value>Inserisci la password</value>
+  </data>
+  <data name="EnterPasswordDescription" xml:space="preserve">
+    <value>Inserisci la password di sblocco del dispositivo per continuare.</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Reply" xml:space="preserve">
+    <value>Rispondi</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Indietro</value>
+  </data>
+  <data name="Browse" xml:space="preserve">
+    <value>Sfoglia</value>
+  </data>
+  <data name="EnterAddressesAndCompose" xml:space="preserve">
+    <value>Inserisci gli indirizzi sopra e scrivi il messaggio qui sotto</value>
+  </data>
+  <data name="UseTcpIpMode" xml:space="preserve">
+    <value>Usa la modalità TCP/IP</value>
+  </data>
+  <data name="UseTcpIpModeDescription" xml:space="preserve">
+    <value>Abilita le connessioni ADB wireless</value>
+  </data>
+  <data name="WorkingDirectory" xml:space="preserve">
+    <value>Directory di lavoro (facoltativo)</value>
+  </data>
+  <data name="UnlockDeviceBeforeLaunch" xml:space="preserve">
+    <value>Sblocca il dispositivo prima di avviare scrcpy</value>
+  </data>
+  <data name="UnlockCommandsHeader" xml:space="preserve">
+    <value>Comandi di sblocco</value>
+  </data>
+  <data name="NewUnlockCommand" xml:space="preserve">
+    <value>Nuovo comando</value>
+  </data>
+  <data name="PasswordCacheTimeout" xml:space="preserve">
+    <value>Timeout della cache della password</value>
+  </data>
+  <data name="PasswordCacheTimeoutDescription" xml:space="preserve">
+    <value>Se impostato a 0, la password verrà richiesta ogni volta. Se impostato a un valore maggiore di 0, la password verrà memorizzata per il numero di minuti indicato e riutilizzata automaticamente.</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Salva</value>
+  </data>
+  <data name="FileTransferNotification.Receiving" xml:space="preserve">
+    <value>Ricezione da {0}</value>
+  </data>
+  <data name="FileTransferNotification.Sending" xml:space="preserve">
+    <value>Invio a {0}</value>
+  </data>
+  <data name="FileTransferNotification.ReceivingBulk" xml:space="preserve">
+    <value>Ricezione di {0} file da {1}</value>
+  </data>
+  <data name="FileTransferNotification.SendingBulk" xml:space="preserve">
+    <value>Invio di {0} file a {1}</value>
+  </data>
+  <data name="FileTransferNotification.Completed" xml:space="preserve">
+    <value>Trasferimento file completato</value>
+  </data>
+  <data name="FileTransferNotification.Failed" xml:space="preserve">
+    <value>Trasferimento file non riuscito</value>
+  </data>
+  <data name="FileTransferNotification.FailedTo" xml:space="preserve">
+    <value>Trasferimento verso {0} non riuscito</value>
+  </data>
+  <data name="FileTransferNotification.FailedFrom" xml:space="preserve">
+    <value>Trasferimento da {0} non riuscito</value>
+  </data>
+  <data name="FileTransferNotification.CompletedSingle" xml:space="preserve">
+    <value>Ricevuto {0} da {1}</value>
+  </data>
+  <data name="FileTransferNotification.CompletedBulk" xml:space="preserve">
+    <value>Ricevuti {0} file da {1}</value>
+  </data>
+  <data name="FileTransferNotification.SentSingle" xml:space="preserve">
+    <value>Inviato {0} a {1}</value>
+  </data>
+  <data name="FileTransferNotification.SentBulk" xml:space="preserve">
+    <value>Inviati {0} file a {1}</value>
+  </data>
+  <data name="FileTransferNotificationAction.Cancel" xml:space="preserve">
+    <value>Annulla</value>
+  </data>
+  <data name="NoPairedDevices" xml:space="preserve">
+    <value>Nessun dispositivo associato</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Aggiungi</value>
+  </data>
+  <data name="HostnamePlaceholder" xml:space="preserve">
+    <value>Inserisci nome host o indirizzo IP</value>
+  </data>
+  <data name="UnlockCommandsPlaceholder" xml:space="preserve">
+    <value>input keyevent 26
+input keyevent 66
+input text %pwd%</value>
+  </data>
+  <data name="UnlockCommandPlaceholder" xml:space="preserve">
+    <value>input keyevent 26</value>
+  </data>
+  <data name="MicrosecondsLabel" xml:space="preserve">
+    <value>ms</value>
+  </data>
+  <data name="Delay" xml:space="preserve">
+    <value>Ritardo</value>
+  </data>
+  <data name="FileDropCaption" xml:space="preserve">
+    <value>Rilascia i file per inviarli</value>
+  </data>
+  <data name="DeviceAddresses" xml:space="preserve">
+    <value>Indirizzi del dispositivo</value>
+  </data>
+  <data name="ManageAddressesAndPriority" xml:space="preserve">
+    <value>Gestisci gli indirizzi e la priorità di connessione</value>
+  </data>
+  <data name="StorageAccess" xml:space="preserve">
+    <value>Mostra il dispositivo in Esplora file</value>
+  </data>
+  <data name="StorageAccessDescription" xml:space="preserve">
+    <value>Abilita o disabilita l'accesso all'archiviazione di questo dispositivo in Esplora file</value>
+  </data>
+  <data name="AudioSilent" xml:space="preserve">
+    <value>Silenzioso</value>
+  </data>
+  <data name="AudioVibrate" xml:space="preserve">
+    <value>Vibrazione</value>
+  </data>
+  <data name="AudioRing" xml:space="preserve">
+    <value>Suoneria</value>
+  </data>
+  <data name="AudioMedia" xml:space="preserve">
+    <value>Contenuti multimediali</value>
+  </data>
+  <data name="AudioNotification" xml:space="preserve">
+    <value>Notifica</value>
+  </data>
+  <data name="AudioCall" xml:space="preserve">
+    <value>Chiamata</value>
+  </data>
+  <data name="AudioAlarm" xml:space="preserve">
+    <value>Sveglia</value>
+  </data>
+  <data name="AdbSettingsDescription" xml:space="preserve">
+    <value>Configura la connessione ADB</value>
+  </data>
+  <data name="ScreenMirrorSettingsDescription" xml:space="preserve">
+    <value>Configura i flag di scrcpy e le opzioni di mirroring dello schermo</value>
+  </data>
+  <data name="MediaSessionDescription" xml:space="preserve">
+    <value>Sincronizza le informazioni di riproduzione multimediale con questo dispositivo</value>
+  </data>
+  <data name="AudioControl" xml:space="preserve">
+    <value>Controllo del dispositivo audio</value>
+  </data>
+  <data name="MediaSession" xml:space="preserve">
+    <value>Sessione di riproduzione multimediale</value>
+  </data>
+  <data name="AudioControlDescription" xml:space="preserve">
+    <value>Consenti il controllo del dispositivo audio con questo dispositivo</value>
+  </data>
+  <data name="ClipboardIncludeImagesDescription" xml:space="preserve">
+    <value>Abilita la sincronizzazione delle immagini tramite gli appunti</value>
+  </data>
+  <data name="ClipboardIncludeImages" xml:space="preserve">
+    <value>Includi le immagini nel monitoraggio degli appunti</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Lingua</value>
+  </data>
+  <data name="LanguageDescription" xml:space="preserve">
+    <value>Scegli la lingua di visualizzazione preferita</value>
+  </data>
+  <data name="UseSystemSetting" xml:space="preserve">
+    <value>Usa l'impostazione di sistema</value>
+  </data>
+  <data name="ScrcpyLocation" xml:space="preserve">
+    <value>Percorso di scrcpy</value>
+  </data>
+  <data name="AdbLocation" xml:space="preserve">
+    <value>Percorso di ADB</value>
+  </data>
+  <data name="CallMissed" xml:space="preserve">
+    <value>Chiamata persa</value>
+  </data>
+  <data name="UpdateNotification.Title" xml:space="preserve">
+    <value>Aggiornamento disponibile</value>
+  </data>
+  <data name="UpdateNotification.Action" xml:space="preserve">
+    <value>Scarica aggiornamento</value>
+  </data>
+  <data name="UpdateNotification.Subtitle" xml:space="preserve">
+    <value>È disponibile una nuova versione</value>
+  </data>
+  <data name="ClipboardNotification.Title" xml:space="preserve">
+    <value>Appunti ricevuti</value>
+  </data>
+  <data name="BatteryNotification.Title" xml:space="preserve">
+    <value>Batteria scarica</value>
+  </data>
+  <data name="BatteryNotification.Text" xml:space="preserve">
+    <value>{0} è al {1}% di batteria.</value>
+  </data>
+  <data name="OpenInBrowser" xml:space="preserve">
+    <value>Apri nel browser</value>
+  </data>
+  <data name="PhoneFrameScrollTip" xml:space="preserve">
+    <value>Scorri sull'anteprima del telefono per cambiare il dispositivo attivo</value>
+  </data>
+  <data name="AddAppShortcut" xml:space="preserve">
+    <value>Aggiungi collegamento</value>
+  </data>
+  <data name="RemoveAppShortcut" xml:space="preserve">
+    <value>Rimuovi collegamento</value>
+  </data>
+  <data name="DeviceAudio" xml:space="preserve">
+    <value>Audio del dispositivo</value>
+  </data>
+  <data name="DndToggle" xml:space="preserve">
+    <value>Attiva/disattiva Non disturbare</value>
+  </data>
+  <data name="StartScreenMirroring" xml:space="preserve">
+    <value>Avvia il mirroring dello schermo</value>
+  </data>
+  <data name="Connect" xml:space="preserve">
+    <value>Connetti</value>
+  </data>
+  <data name="Disconnect" xml:space="preserve">
+    <value>Disconnetti</value>
+  </data>
+  <data name="PreviousTrack" xml:space="preserve">
+    <value>Traccia precedente</value>
+  </data>
+  <data name="PlayOrPause" xml:space="preserve">
+    <value>Riproduci o metti in pausa</value>
+  </data>
+  <data name="NextTrack" xml:space="preserve">
+    <value>Traccia successiva</value>
+  </data>
+  <data name="MediaVolume" xml:space="preserve">
+    <value>Volume multimediale</value>
+  </data>
+  <data name="SendNotificationReply" xml:space="preserve">
+    <value>Invia risposta alla notifica</value>
+  </data>
+  <data name="RefreshApps" xml:space="preserve">
+    <value>Aggiorna app</value>
+  </data>
+  <data name="InstallApp" xml:space="preserve">
+    <value>Installa app</value>
+  </data>
+  <data name="ContextMenu" xml:space="preserve">
+    <value>Menu contestuale</value>
+  </data>
+  <data name="ShareFiles" xml:space="preserve">
+    <value>Condividi file</value>
+  </data>
+  <data name="SendFiles" xml:space="preserve">
+    <value>Invia file</value>
+  </data>
+  <data name="BrowseFiles" xml:space="preserve">
+    <value>Sfoglia file</value>
+  </data>
+  <data name="BrowseFilesTooltip" xml:space="preserve">
+    <value>Fai clic con il tasto destro per aprire il link SFTP e copiarlo negli appunti</value>
+  </data>
+  <data name="DeviceActions" xml:space="preserve">
+    <value>Azioni</value>
+  </data>
+  <data name="PlaySound" xml:space="preserve">
+    <value>Riproduci suono</value>
+  </data>
+  <data name="PlaySoundDescription" xml:space="preserve">
+    <value>Sul dispositivo verrà riprodotto un suono per 20 secondi</value>
+  </data>
+  <data name="ReceiveClipboard" xml:space="preserve">
+    <value>Ricevi appunti</value>
+  </data>
+  <data name="SendClipboard" xml:space="preserve">
+    <value>Invia appunti</value>
+  </data>
+  <data name="ReceiveMediaSessions" xml:space="preserve">
+    <value>Ricevi sessioni multimediali</value>
+  </data>
+  <data name="SendMediaSessions" xml:space="preserve">
+    <value>Invia sessioni multimediali</value>
+  </data>
+  <data name="SecondaryCallOnHold" xml:space="preserve">
+    <value>In attesa. Seleziona per riprendere</value>
+  </data>
+  <data name="CallLogDisabled.Description" xml:space="preserve">
+    <value>Abilita la sincronizzazione del registro chiamate per questo dispositivo dal telefono.</value>
+  </data>
+  <data name="BluetoothCallingUnsupported" xml:space="preserve">
+    <value>Le chiamate via Bluetooth non sono supportate</value>
+  </data>
+  <data name="BluetoothCallingUnavailable.Description" xml:space="preserve">
+    <value>Collega o abilita un adattatore Bluetooth sul PC per continuare.</value>
+  </data>
+  <data name="BluetoothDisabled.Description" xml:space="preserve">
+    <value>Abilita il Bluetooth per continuare.</value>
+  </data>
+  <data name="BluetoothPairing.Title" xml:space="preserve">
+    <value>Associa il dispositivo mobile e il PC</value>
+  </data>
+  <data name="BluetoothPairing.Description" xml:space="preserve">
+    <value>Assicurati che il dispositivo sia nelle vicinanze e abbia il Bluetooth attivo.</value>
+  </data>
+  <data name="BluetoothPairingAction" xml:space="preserve">
+    <value>Associa dispositivo</value>
+  </data>
+  <data name="BluetoothRegistrationFailed.Description" xml:space="preserve">
+    <value>Rimuovi l'associazione del dispositivo dalle altre app e riprova.</value>
+  </data>
+  <data name="TryAgain" xml:space="preserve">
+    <value>Riprova</value>
+  </data>
+  <data name="SearchContacts" xml:space="preserve">
+    <value>Cerca contatti</value>
+  </data>
+  <data name="BluetoothRegistrationFailed.Title" xml:space="preserve">
+    <value>Registrazione non riuscita</value>
+  </data>
+  <data name="BluetoothCallingUnavailable.Title" xml:space="preserve">
+    <value>Le chiamate via Bluetooth non sono disponibili</value>
+  </data>
+  <data name="BluetoothDisabled.Title" xml:space="preserve">
+    <value>Il Bluetooth è disattivato</value>
+  </data>
+  <data name="Calls" xml:space="preserve">
+    <value>Chiamate</value>
+  </data>
+  <data name="Unmute" xml:space="preserve">
+    <value>Riattiva microfono</value>
+  </data>
+  <data name="Resume" xml:space="preserve">
+    <value>Riprendi</value>
+  </data>
+  <data name="Mute" xml:space="preserve">
+    <value>Disattiva microfono</value>
+  </data>
+  <data name="Hold" xml:space="preserve">
+    <value>Metti in attesa</value>
+  </data>
+  <data name="End" xml:space="preserve">
+    <value>Termina</value>
+  </data>
+  <data name="CallOnHold" xml:space="preserve">
+    <value>In attesa</value>
+  </data>
+  <data name="CallIncoming" xml:space="preserve">
+    <value>Chiamata in arrivo</value>
+  </data>
+  <data name="CallDialing" xml:space="preserve">
+    <value>Composizione</value>
+  </data>
+  <data name="CallConnecting" xml:space="preserve">
+    <value>Connessione</value>
+  </data>
+  <data name="CallAudioRouteToPhone" xml:space="preserve">
+    <value>Trasferisci al telefono</value>
+  </data>
+  <data name="CallAudioRouteToPc" xml:space="preserve">
+    <value>Trasferisci al PC</value>
+  </data>
+  <data name="FlexDisplay" xml:space="preserve">
+    <value>Schermo flessibile</value>
+  </data>
+  <data name="VideoBitratePlaceholder" xml:space="preserve">
+    <value>8M</value>
+  </data>
+  <data name="VideoBitrateToolTip" xml:space="preserve">
+    <value>Formato: 8M, 8000000</value>
+  </data>
+  <data name="AudioBitratePlaceholder" xml:space="preserve">
+    <value>128K</value>
+  </data>
+  <data name="AudioBitrateToolTip" xml:space="preserve">
+    <value>Formato: 128K, 128000</value>
+  </data>
+  <data name="CropPlaceholder" xml:space="preserve">
+    <value>Nessun ritaglio</value>
+  </data>
+  <data name="CropToolTip" xml:space="preserve">
+    <value>Formato: 1224:1440:0:0</value>
+  </data>
+  <data name="VirtualDisplaySizePlaceholder" xml:space="preserve">
+    <value>Valore predefinito del dispositivo</value>
+  </data>
+  <data name="VirtualDisplaySizeToolTip" xml:space="preserve">
+    <value>Formato: 1920x1080</value>
+  </data>
+  <data name="VideoBitrateMbps" xml:space="preserve">
+    <value>Mbps</value>
+  </data>
+  <data name="RemoveAllStorageMounts" xml:space="preserve">
+    <value>Rimuovi tutti i montaggi di archiviazione</value>
+  </data>
+  <data name="RemoveAllStorageMountsDescription" xml:space="preserve">
+    <value>Smonta ed elimina tutte le archiviazioni dei dispositivi registrate dall'app</value>
+   </data>
+</root>
