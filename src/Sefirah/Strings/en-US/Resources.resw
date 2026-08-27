@@ -301,6 +301,21 @@ page.</value>
   <data name="Exit" xml:space="preserve">
     <value>Exit</value>
   </data>
+  <data name="ConnectManually" xml:space="preserve">
+    <value>Connect by address</value>
+  </data>
+  <data name="ConnectManuallyDescription" xml:space="preserve">
+    <value>Type the address shown on the other device. Use this when discovery cannot reach it, for instance over a VPN.</value>
+  </data>
+  <data name="ThisDeviceAddress" xml:space="preserve">
+    <value>This PC is reachable at {0}. Type the other device's address to pair without discovery.</value>
+  </data>
+  <data name="InvalidAddress" xml:space="preserve">
+    <value>That is not a valid address</value>
+  </data>
+  <data name="ConnectingToAddress" xml:space="preserve">
+    <value>Connecting to {0} on port {1}…</value>
+  </data>
   <data name="SelectLocation" xml:space="preserve">
     <value>Select location</value>
   </data>
