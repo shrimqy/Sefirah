@@ -31,6 +31,7 @@ public class SftpFeature(
         logger.Info($"Mounting SFTP for {device.Name}, IP: {device.Address}, Port: {info.Port}, Username: {info.Username}");
 
         _sessions[device.Id] = new DeviceSession(device.Address, info);
+        SessionChanged?.Invoke(this, device);
 
         var preferSshfs = ShouldPreferSshfs();
         if (preferSshfs)
@@ -107,6 +108,13 @@ public class SftpFeature(
             logger.Error($"Failed to browse device {device.Name} via SFTP URI", ex);
         }
     }
+
+    public event EventHandler<PairedDevice>? SessionChanged;
+
+    public SftpSession? GetSession(string deviceId)
+        => _sessions.TryGetValue(deviceId, out var session)
+            ? new SftpSession(session.Host, session.Info.Port, session.Info.Username, session.Info.Password, session.Info.Paths, session.Info.PathNames)
+            : null;
 
     public Task RemoveAll()
     {

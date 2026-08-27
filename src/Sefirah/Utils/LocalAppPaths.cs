@@ -6,6 +6,7 @@ public static class LocalAppPaths
     public const string DeviceSettingsFileName = "settings.json";
     public const string DeviceIconsFolderName = "Icons";
     public const string ClipboardFolderName = "Clipboard";
+    public const string ClipboardHistoryFolderName = "ClipboardHistory";
     public const string UserSettingsFileName = "user_settings.json";
 
     private static readonly TimeSpan TemporaryFileMaxAge = TimeSpan.FromHours(24);
@@ -38,6 +39,25 @@ public static class LocalAppPaths
             ? ".png"
             : extension[0] == '.' ? extension : $".{extension}";
         return Path.Combine(GetClipboardFolder(), $"clipboard_{Guid.NewGuid():N}{ext}");
+    }
+
+    /// <summary>
+    /// Clipboard images live in the temporary folder, which is pruned daily. History entries need to
+    /// outlive that, so their images are kept here instead.
+    /// </summary>
+    public static string GetClipboardHistoryFolder()
+    {
+        var path = Path.Combine(LocalFolder, ClipboardHistoryFolderName);
+        Directory.CreateDirectory(path);
+        return path;
+    }
+
+    public static string CreateClipboardHistoryFilePath(string? extension)
+    {
+        var ext = string.IsNullOrWhiteSpace(extension)
+            ? ".png"
+            : extension[0] == '.' ? extension : $".{extension}";
+        return Path.Combine(GetClipboardHistoryFolder(), $"clipboard_{Guid.NewGuid():N}{ext}");
     }
 
     public static void PruneTemporaryFolder()

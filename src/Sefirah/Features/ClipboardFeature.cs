@@ -1,4 +1,5 @@
 using CommunityToolkit.WinUI;
+using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Models;
 using Sefirah.Utils;
 using Windows.ApplicationModel.DataTransfer;
@@ -13,7 +14,8 @@ public class ClipboardFeature(
     ISessionManager sessionManager,
     IPlatformNotificationHandler platformNotificationHandler,
     IDeviceManager deviceManager,
-    IFileTransferService fileTransferService) : IClipboardFeature
+    IFileTransferService fileTransferService,
+    ClipboardRepository clipboardRepository) : IClipboardFeature
 {
     private readonly DispatcherQueue dispatcher = App.MainWindow.DispatcherQueue;
     private bool isMonitoring = false;
@@ -35,6 +37,8 @@ public class ClipboardFeature(
     };
     
     private bool isInternalUpdate; // To track if the clipboard change came from the remote device
+
+    public event EventHandler<PairedDevice>? HistoryChanged;
 
     public Task InitializeAsync()
     {
@@ -233,6 +237,8 @@ public class ClipboardFeature(
 
     public async Task SetContentAsync(object content, PairedDevice sourceDevice)
     {
+        await RecordHistoryAsync(content, sourceDevice);
+
         if (!sourceDevice.DeviceSettings.ClipboardReceive) return;
 
         await dispatcher.EnqueueAsync(async () =>
@@ -290,6 +296,39 @@ public class ClipboardFeature(
                 dispatcher.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () => isInternalUpdate = false);
             }
         });
+    }
+
+    /// <summary>
+    /// Keeps what the device copied. Android has no clipboard history to ask for, so unless an item
+    /// is recorded here as it arrives, the previous one is gone for good.
+    /// </summary>
+    private async Task RecordHistoryAsync(object content, PairedDevice sourceDevice)
+    {
+        try
+        {
+            switch (content)
+            {
+                case string text when !string.IsNullOrWhiteSpace(text):
+                    await clipboardRepository.SaveAsync(sourceDevice.Id, "text/plain", text, isImage: false);
+                    break;
+
+                case StorageFile file when SupportedImageFileTypes.ContainsKey(file.FileType.TrimStart('.').ToLowerInvariant()):
+                    // The incoming copy sits in the temporary folder, which is pruned after a day
+                    var kept = LocalAppPaths.CreateClipboardHistoryFilePath(file.FileType);
+                    File.Copy(file.Path, kept, overwrite: true);
+                    await clipboardRepository.SaveAsync(sourceDevice.Id, file.ContentType, kept, isImage: true);
+                    break;
+
+                default:
+                    return;
+            }
+
+            HistoryChanged?.Invoke(this, sourceDevice);
+        }
+        catch (Exception ex)
+        {
+            logger.Warn($"Failed to record clipboard history: {ex.Message}", ex);
+        }
     }
 
     private static async Task<StorageFile?> CreateClipboardImageFileAsync(string base64Content, string mimeType)
