@@ -122,6 +122,7 @@ public class DatabaseContext
         db.CreateTable<AttachmentEntity>();
         db.CreateTable<CallLogEntity>();
         db.CreateTable<NotificationEntity>();
+        db.CreateTable<ClipboardEntity>();
     }
 
     public static void DropAllTables(SQLiteConnection db)

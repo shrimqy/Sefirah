@@ -1,0 +1,202 @@
+﻿<Page
+    x:Class="Sefirah.Views.FilesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:Sefirah.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:Sefirah.Helpers"
+    xmlns:local="using:Sefirah.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:Sefirah.Data.Models"
+    xmlns:vm="using:Sefirah.ViewModels"
+    x:Name="FilesPageRoot"
+    Background="Transparent"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+        <DataTemplate x:Key="FileItemTemplate" x:DataType="models:RemoteFileItem">
+            <Grid
+                Padding="4,6"
+                ColumnSpacing="12"
+                Background="Transparent"
+                IsRightTapEnabled="True"
+                ToolTipService.ToolTip="{x:Bind Name}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Grid.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem
+                            Click="OpenItemClick"
+                            DataContext="{x:Bind}"
+                            Text="{helpers:ResourceString Name=FilesOpen}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE8E5;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem
+                            Click="DownloadItemClick"
+                            DataContext="{x:Bind}"
+                            IsEnabled="{x:Bind IsFile}"
+                            Text="{helpers:ResourceString Name=FilesDownload}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE896;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem
+                            Click="RenameItemClick"
+                            DataContext="{x:Bind}"
+                            Text="{helpers:ResourceString Name=FilesRename}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE8AC;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem
+                            Click="DeleteItemClick"
+                            DataContext="{x:Bind}"
+                            Text="{helpers:ResourceString Name=Remove}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE74D;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </Grid.ContextFlyout>
+
+                <FontIcon
+                    Grid.Column="0"
+                    FontSize="18"
+                    Glyph="{x:Bind Glyph}" />
+
+                <TextBlock
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    Text="{x:Bind Name}"
+                    TextTrimming="CharacterEllipsis" />
+
+                <TextBlock
+                    Grid.Column="2"
+                    MinWidth="90"
+                    VerticalAlignment="Center"
+                    HorizontalTextAlignment="Right"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="{x:Bind SizeText}" />
+
+                <TextBlock
+                    Grid.Column="3"
+                    MinWidth="130"
+                    VerticalAlignment="Center"
+                    HorizontalTextAlignment="Right"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="{x:Bind LastModifiedText}" />
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid Padding="24,16,24,16" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  Path and actions  -->
+        <Grid Grid.Row="0" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button
+                Grid.Column="0"
+                Command="{x:Bind ViewModel.GoUpCommand}"
+                IsEnabled="{x:Bind ViewModel.CanGoUp, Mode=OneWay}"
+                ToolTipService.ToolTip="{helpers:ResourceString Name=FilesGoUp}">
+                <FontIcon FontSize="14" Glyph="&#xE74A;" />
+            </Button>
+
+            <BreadcrumbBar
+                x:Name="PathBreadcrumbBar"
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                ItemsSource="{x:Bind ViewModel.PathSegments, Mode=OneWay}" />
+
+            <StackPanel
+                Grid.Column="2"
+                Orientation="Horizontal"
+                Spacing="8">
+                <Button
+                    Command="{x:Bind ViewModel.NewFolderCommand}"
+                    ToolTipService.ToolTip="{helpers:ResourceString Name=FilesNewFolder}">
+                    <FontIcon FontSize="14" Glyph="&#xE8F4;" />
+                </Button>
+                <Button
+                    Command="{x:Bind ViewModel.UploadCommand}"
+                    ToolTipService.ToolTip="{helpers:ResourceString Name=FilesUpload}">
+                    <FontIcon FontSize="14" Glyph="&#xE898;" />
+                </Button>
+                <Button
+                    Command="{x:Bind ViewModel.RefreshCommand}"
+                    ToolTipService.ToolTip="{helpers:ResourceString Name=FilesRefresh}">
+                    <FontIcon FontSize="14" Glyph="&#xE72C;" />
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!--  Volume picker, only worth showing when the device exposes more than one  -->
+        <ComboBox
+            Grid.Row="1"
+            MinWidth="200"
+            ItemsSource="{x:Bind ViewModel.Volumes, Mode=OneWay}"
+            SelectedIndex="{x:Bind ViewModel.SelectedVolumeIndex, Mode=TwoWay}"
+            Visibility="{x:Bind ViewModel.HasMultipleVolumes, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+        <Grid Grid.Row="2">
+            <ListView
+                x:Name="FilesListView"
+                IsItemClickEnabled="True"
+                ItemClick="FilesListView_ItemClick"
+                ItemTemplate="{StaticResource FileItemTemplate}"
+                ItemsSource="{x:Bind ViewModel.Items}"
+                SelectionMode="Single">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+
+            <TextBlock
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                MaxWidth="420"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
+                TextAlignment="Center"
+                TextWrapping="Wrap"
+                Visibility="{x:Bind ViewModel.HasStatus, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+            <ProgressRing
+                Width="32"
+                Height="32"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
+        </Grid>
+
+        <ProgressBar
+            Grid.Row="2"
+            VerticalAlignment="Top"
+            IsIndeterminate="True"
+            Visibility="{x:Bind ViewModel.IsBusy, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+    </Grid>
+</Page>

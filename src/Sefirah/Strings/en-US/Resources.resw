@@ -358,6 +358,117 @@ page.</value>
   <data name="Apps" xml:space="preserve">
     <value>Apps</value>
   </data>
+  <data name="ConnectManually" xml:space="preserve">
+    <value>Connect by address</value>
+  </data>
+  <data name="ConnectManuallyDescription" xml:space="preserve">
+    <value>Type the address shown on the other device. Use this when discovery cannot reach it, for instance over a VPN.</value>
+  </data>
+  <data name="ThisDeviceAddress" xml:space="preserve">
+    <value>This PC is reachable at {0}. Type the other device's address to pair without discovery.</value>
+  </data>
+  <data name="InvalidAddress" xml:space="preserve">
+    <value>That is not a valid address</value>
+  </data>
+  <data name="ConnectingToAddress" xml:space="preserve">
+    <value>Connecting to {0} on port {1}…</value>
+  </data>
+  <data name="Files" xml:space="preserve">
+    <value>Files</value>
+  </data>
+  <data name="Photos" xml:space="preserve">
+    <value>Photos</value>
+  </data>
+  <data name="ClipboardHistory" xml:space="preserve">
+    <value>Clipboard</value>
+  </data>
+  <data name="ClipboardHistorySubtitle" xml:space="preserve">
+    <value>What the device has copied since Sefirah started keeping track. Click an item to put it back on the Windows clipboard.</value>
+  </data>
+  <data name="ClipboardCopy" xml:space="preserve">
+    <value>Copy to clipboard</value>
+  </data>
+  <data name="ClipboardEmpty" xml:space="preserve">
+    <value>Nothing here yet. Copy something on the device and it shows up.</value>
+  </data>
+  <data name="ClipboardNoDevice" xml:space="preserve">
+    <value>Connect a device to see what it copies</value>
+  </data>
+  <data name="ClipboardImageMissing" xml:space="preserve">
+    <value>The stored image is gone</value>
+  </data>
+  <data name="ClipboardClearTitle" xml:space="preserve">
+    <value>Clear history</value>
+  </data>
+  <data name="ClipboardClearSubtitle" xml:space="preserve">
+    <value>Remove every stored clipboard item for this device? This cannot be undone.</value>
+  </data>
+  <data name="PhotosRecent" xml:space="preserve">
+    <value>Recent pictures on the device</value>
+  </data>
+  <data name="PhotosOpen" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="PhotosCopy" xml:space="preserve">
+    <value>Copy to clipboard</value>
+  </data>
+  <data name="PhotosSave" xml:space="preserve">
+    <value>Save to PC</value>
+  </data>
+  <data name="PhotosEmpty" xml:space="preserve">
+    <value>No pictures found on the device</value>
+  </data>
+  <data name="PhotosUnavailable" xml:space="preserve">
+    <value>Connect a device and turn on Storage access for it in the Android app to see its pictures</value>
+  </data>
+  <data name="PhotosDisconnected" xml:space="preserve">
+    <value>Can't reach the device. Pictures come back on their own when it returns.</value>
+  </data>
+  <data name="PhotosDeleteTitle" xml:space="preserve">
+    <value>Delete picture</value>
+  </data>
+  <data name="PhotosDeleteSubtitle" xml:space="preserve">
+    <value>Delete '{0}' from the device? It goes to the device recycle bin.</value>
+  </data>
+  <data name="FilesOpen" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="FilesDownload" xml:space="preserve">
+    <value>Save to PC</value>
+  </data>
+  <data name="FilesRename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="FilesUpload" xml:space="preserve">
+    <value>Send a file to this folder</value>
+  </data>
+  <data name="FilesNewFolder" xml:space="preserve">
+    <value>New folder</value>
+  </data>
+  <data name="FilesRefresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="FilesGoUp" xml:space="preserve">
+    <value>Up one folder</value>
+  </data>
+  <data name="FilesCreate" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="FilesDisconnected" xml:space="preserve">
+    <value>Can't reach the device. It may have left the network; this page reconnects on its own when it comes back.</value>
+  </data>
+  <data name="FilesEmptyFolder" xml:space="preserve">
+    <value>This folder is empty</value>
+  </data>
+  <data name="FilesUnavailable" xml:space="preserve">
+    <value>Connect a device and turn on Storage access for it in the Android app to browse its files</value>
+  </data>
+  <data name="FilesDeleteTitle" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="FilesDeleteSubtitle" xml:space="preserve">
+    <value>Are you sure you want to delete '{0}' from the device? This action cannot be undone.</value>
+  </data>
   <data name="NewMessage" xml:space="preserve">
     <value>New message</value>
   </data>

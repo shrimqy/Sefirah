@@ -113,6 +113,7 @@ public static class AppLifecycleHelper
                 .AddSingleton<SmsRepository>()
                 .AddSingleton<CallLogRepository>()
                 .AddSingleton<NotificationRepository>()
+                .AddSingleton<ClipboardRepository>()
 
                 // Platform-specific services
                 .AddPlatformServices()
@@ -143,6 +144,9 @@ public static class AppLifecycleHelper
                 .AddSingleton<MainPageViewModel>()
                 .AddSingleton<DevicesViewModel>()
                 .AddSingleton<AppsViewModel>()
+                .AddSingleton<FilesViewModel>()
+                .AddSingleton<PhotosViewModel>()
+                .AddSingleton<ClipboardViewModel>()
                 .AddSingleton<MessagesViewModel>()
                 .AddSingleton<CallsPageViewModel>()
                 )

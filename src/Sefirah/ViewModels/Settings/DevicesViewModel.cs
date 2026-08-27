@@ -16,6 +16,7 @@ public partial class DevicesViewModel : ObservableObject
     private SmsRepository SmsRepository { get; } = Ioc.Default.GetRequiredService<SmsRepository>();
     private CallLogRepository CallLogRepository { get; } = Ioc.Default.GetRequiredService<CallLogRepository>();
     private NotificationRepository NotificationRepository { get; } = Ioc.Default.GetRequiredService<NotificationRepository>();
+    private ClipboardRepository ClipboardRepository { get; } = Ioc.Default.GetRequiredService<ClipboardRepository>();
     #endregion
     
     public ObservableCollection<PairedDevice> PairedDevices => DeviceManager.PairedDevices;
@@ -91,6 +92,7 @@ public partial class DevicesViewModel : ObservableObject
                 ContactRepository.DeleteAllContactsForDevice(deviceId);
                 CallLogRepository.DeleteAllCallLogsForDevice(deviceId);
                 NotificationRepository.RemoveNotificationsForDevice(deviceId);
+                ClipboardRepository.DeleteAllForDevice(deviceId);
             });
         }
         catch (Exception ex)

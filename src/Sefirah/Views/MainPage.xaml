@@ -219,6 +219,36 @@
                                 <FontIcon Glyph="&#xED35;" />
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
+
+                        <NavigationViewItem
+                            x:Name="FilesNavigationItem"
+                            Content="{helpers:ResourceString Name=Files}"
+                            Tag="Files"
+                            Visibility="{x:Bind ViewModel.Device, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}">
+                            <NavigationViewItem.Icon>
+                                <FontIcon Glyph="&#xE8B7;" />
+                            </NavigationViewItem.Icon>
+                        </NavigationViewItem>
+
+                        <NavigationViewItem
+                            x:Name="PhotosNavigationItem"
+                            Content="{helpers:ResourceString Name=Photos}"
+                            Tag="Photos"
+                            Visibility="{x:Bind ViewModel.Device, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}">
+                            <NavigationViewItem.Icon>
+                                <FontIcon Glyph="&#xEB9F;" />
+                            </NavigationViewItem.Icon>
+                        </NavigationViewItem>
+
+                        <NavigationViewItem
+                            x:Name="ClipboardNavigationItem"
+                            Content="{helpers:ResourceString Name=ClipboardHistory}"
+                            Tag="Clipboard"
+                            Visibility="{x:Bind ViewModel.Device, Converter={StaticResource EmptyObjectToVisibilityConverter}, Mode=OneWay}">
+                            <NavigationViewItem.Icon>
+                                <FontIcon Glyph="&#xE8C8;" />
+                            </NavigationViewItem.Icon>
+                        </NavigationViewItem>
                     </NavigationView.MenuItems>
 
                     <NavigationView.FooterMenuItems>
