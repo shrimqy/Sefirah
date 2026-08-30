@@ -180,7 +180,20 @@ public class NetworkService(
 
             logger.Debug($"Processing message: {(messageString.Length > 100 ? string.Concat(messageString.AsSpan(0, 100), "...") : messageString)}");
 
-            var socketMessage = JsonMessageSerializer.DeserializeMessage(messageString);
+            SocketMessage? socketMessage;
+            try
+            {
+                socketMessage = JsonMessageSerializer.DeserializeMessage(messageString);
+            }
+            catch (JsonException ex)
+            {
+                // A peer running a different version can send message types this build does not know.
+                // Skipping the single message keeps the rest of the batch usable, whereas letting the
+                // exception escape discards every message parsed so far along with the remaining ones.
+                logger.Warn($"Skipping unrecognized message: {ex.Message}");
+                continue;
+            }
+
             if (socketMessage is not null)
             {
                 messages.Add(socketMessage);
