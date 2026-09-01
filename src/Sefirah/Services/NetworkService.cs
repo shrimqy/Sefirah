@@ -86,7 +86,11 @@ public class NetworkService(
         if (device.IsConnected)
         {
             await SendDeviceInfo(device);
-            await adbService.TryConnectTcp(device.Address, device.Model);
+
+            if (device.DeviceSettings.AdbAutoConnect)
+            {
+                await adbService.TryConnectTcp(device.Address, device.Model);
+            }
         }
     }
 
