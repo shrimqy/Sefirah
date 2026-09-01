@@ -30,6 +30,12 @@ public class AdbService(
     private const string SefirahAndroidPackageId = "com.castle.sefirah";
     private const string WorkerNiceName = "sefirah_worker";
 
+    private const string DeviceIdCommand =
+        $"cat /storage/emulated/0/Android/data/{SefirahAndroidPackageId}/files/device_info.txt";
+
+    // adbd needs a moment to restart and start listening on 5555 after a tcpip switch
+    private static readonly TimeSpan TcpipSettleDelay = TimeSpan.FromSeconds(2);
+
     public AdbClient AdbClient => adbClient;
 
     public List<ScrcpyPreferenceItem> DisplayOrientationOptions { get; } =
@@ -705,29 +711,19 @@ public class AdbService(
                 return true;
             }
 
+            // The device is not listening on 5555, so we need an authorized session to switch it back
+            // to TCP/IP mode. A USB cable gives us one, otherwise fall back to the endpoints the device
+            // advertises over mDNS, which is how it comes back after a reboot without being plugged in.
             var usbDevice = AdbDevices.FirstOrDefault(d => d.Type is DeviceType.USB && d.IsOnline && d.Model == model);
-            if (usbDevice is null) return false;
-            
-            // If connection failed, try to enable TCP/IP mode using ADB if USB is connected
-            var tcpipEnabled = await EnableTcpipMode(usbDevice.Serial);
-            if (!tcpipEnabled)
+            if (usbDevice is not null)
             {
-                logger.Error("Failed to enable TCP/IP mode");
-                return false;
+                if (await EnableTcpipMode(usbDevice.Serial) && await RetryWirelessConnection(host))
+                    return true;
+
+                logger.Warn($"Could not switch {host} to TCP/IP mode over USB device {usbDevice.Serial}");
             }
 
-            await Task.Delay(200);
-
-            // Retry the connection after enabling TCP/IP mode
-            result = await ConnectWireless(host);
-            if (result)
-            {
-                logger.Info($"Successfully connected to {host} after enabling TCP/IP mode");
-                return true;
-            }
-
-            logger.Error("TCP/IP connection still failed after enabling TCP/IP mode");
-            return false;
+            return await TryConnectOverMdns(host);
         }
         catch (Exception ex)
         {
@@ -737,26 +733,129 @@ public class AdbService(
     }
 
     /// <summary>
-    /// Enables TCP/IP mode by restarting ADB with tcpip 5555 command
+    /// Gives the device time to restart adbd on port 5555 and retries the wireless connection.
+    /// </summary>
+    private async Task<bool> RetryWirelessConnection(string host)
+    {
+        await Task.Delay(TcpipSettleDelay);
+        var result = await ConnectWireless(host);
+        if (result)
+        {
+            logger.Info($"Successfully connected to {host} after enabling TCP/IP mode");
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Falls back to the endpoints the device advertises over mDNS. A device that has been paired before
+    /// re-announces itself as <c>_adb-tls-connect._tcp</c> on a random port after every reboot, so connecting
+    /// there gives us the authorized session needed to switch it back to port 5555.
+    /// </summary>
+    private async Task<bool> TryConnectOverMdns(string host)
+    {
+        var services = await GetMdnsServicesAsync();
+
+        var candidates = services
+            // host:5555 has already been tried by the caller
+            .Where(s => !s.Endpoint.Equals($"{host}:5555", StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(s => s.Endpoint.StartsWith($"{host}:", StringComparison.OrdinalIgnoreCase))
+            .ThenByDescending(s => s.Service.Contains("tls-connect", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        if (candidates.Count is 0)
+        {
+            logger.Warn($"No mDNS adb service found for {host}, the device has to be authorized manually");
+            return false;
+        }
+
+        foreach (var candidate in candidates)
+        {
+            logger.Info($"Trying mDNS endpoint {candidate.Endpoint} ({candidate.Service}) for {host}");
+            if (!await ConnectWireless(candidate.Host, candidate.Port)) continue;
+
+            if (!await EnableTcpipMode(candidate.Endpoint))
+            {
+                logger.Warn($"Failed to enable TCP/IP mode through {candidate.Endpoint}");
+                continue;
+            }
+
+            if (await RetryWirelessConnection(host)) return true;
+        }
+
+        logger.Error($"TCP/IP connection to {host} still failed after trying {candidates.Count} mDNS endpoint(s)");
+        return false;
+    }
+
+    /// <summary>
+    /// Runs <c>adb mdns services</c> and returns the adb endpoints currently advertised on the network.
+    /// </summary>
+    private async Task<List<MdnsService>> GetMdnsServicesAsync()
+    {
+        var result = await RunAdbCommandAsync("mdns services");
+        if (result is not { ExitCode: 0 }) return [];
+
+        List<MdnsService> services = [];
+        foreach (var line in result.Value.Output.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            // "<instance>\t<service>\t<ip>:<port>". The header line carries no tabs and is skipped here.
+            var columns = line.Split('\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (columns.Length < 3) continue;
+
+            var separator = columns[2].LastIndexOf(':');
+            if (separator <= 0 || !int.TryParse(columns[2][(separator + 1)..], out var port)) continue;
+
+            services.Add(new MdnsService(columns[0], columns[1], columns[2][..separator], port));
+        }
+
+        return services;
+    }
+
+    /// <summary>
+    /// An adb endpoint advertised over mDNS, as reported by <c>adb mdns services</c>.
+    /// </summary>
+    private readonly record struct MdnsService(string Instance, string Service, string Host, int Port)
+    {
+        public string Endpoint => $"{Host}:{Port}";
+    }
+
+    /// <summary>
+    /// Enables TCP/IP mode by running <c>adb -s &lt;serial&gt; tcpip 5555</c> on a device we can already reach.
     /// </summary>
     private async Task<bool> EnableTcpipMode(string serialId)
     {
+        logger.Info($"Enabling TCP/IP mode on {serialId}");
+        var result = await RunAdbCommandAsync($"-s {serialId} tcpip 5555");
+        if (result is null) return false;
+
+        if (!string.IsNullOrWhiteSpace(result.Value.Error))
+        {
+            logger.Warn($"ADB tcpip command error: {result.Value.Error}");
+        }
+
+        // Restart our ADB client to pick up the changes
+        await RestartAdbClient();
+
+        return result.Value.ExitCode == 0;
+    }
+
+    /// <summary>
+    /// Runs the configured adb executable and captures its output.
+    /// </summary>
+    private async Task<(int ExitCode, string Output, string Error)?> RunAdbCommandAsync(string arguments)
+    {
+        var adbPath = userSettingsService.GeneralSettingsService.AdbPath;
+        if (string.IsNullOrEmpty(adbPath))
+        {
+            logger.Error("ADB path not configured");
+            return null;
+        }
+
         try
         {
-            string adbPath = userSettingsService.GeneralSettingsService.AdbPath;
-            if (string.IsNullOrEmpty(adbPath))
-            {
-                logger.Error("ADB path not configured");
-                return false;
-            }
-
-            logger.Info($"Enabling TCP/IP mode using ADB at: {adbPath}");
-            
-            // Runs "adb -s <serial> tcpip 5555" to enable TCP/IP mode on the specified device
             var processInfo = new ProcessStartInfo
             {
                 FileName = adbPath,
-                Arguments = $"-s {serialId} tcpip 5555",
+                Arguments = arguments,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -767,27 +866,20 @@ public class AdbService(
             if (process is null)
             {
                 logger.Error("Failed to start ADB process");
-                return false;
+                return null;
             }
 
+            // Drain both pipes before waiting, a full buffer would otherwise deadlock the process
+            var outputTask = process.StandardOutput.ReadToEndAsync();
+            var errorTask = process.StandardError.ReadToEndAsync();
             await process.WaitForExitAsync();
-            var output = await process.StandardOutput.ReadToEndAsync();
-            var error = await process.StandardError.ReadToEndAsync();
-            
-            if (!string.IsNullOrEmpty(error))
-            {
-                logger.Warn($"ADB tcpip command error: {error}");
-            }
 
-            // Restart our ADB client to pick up the changes
-            await RestartAdbClient();
-            
-            return process.ExitCode == 0;
+            return (process.ExitCode, await outputTask, await errorTask);
         }
         catch (Exception ex)
         {
-            logger.Error($"Failed to enable TCP/IP mode: {ex.Message}", ex);
-            return false;
+            logger.Error($"Failed to run adb {arguments}: {ex.Message}", ex);
+            return null;
         }
     }
 
@@ -861,13 +953,49 @@ public class AdbService(
         }
     }
 
+    /// <summary>
+    /// The device id is read from a file the app writes on its first run, because the desktop cannot
+    /// see the app's own ANDROID_ID over adb. A device that showed up before the app wrote that file
+    /// keeps an unusable id, so ask the device again rather than giving up on the match.
+    /// </summary>
+    private async Task<AdbDevice?> ResolveAdbDeviceAsync(PairedDevice device)
+    {
+        if (device.ConnectedAdbDevices.FirstOrDefault() is { } known) return known;
+
+        foreach (var candidate in AdbDevices.Where(d => d.IsOnline && d.DeviceData is not null).ToList())
+        {
+            try
+            {
+                var id = (await ShellAsync(candidate, DeviceIdCommand)).Trim();
+                if (string.IsNullOrEmpty(id) || id != device.Id) continue;
+
+                logger.Info($"Re-resolved adb device {candidate.Serial} as {device.Name}");
+                candidate.AndroidId = id;
+                return candidate;
+            }
+            catch (Exception ex)
+            {
+                logger.Debug($"Could not read the device id from {candidate.Serial}: {ex.Message}");
+            }
+        }
+
+        return null;
+    }
+
     /// <summary>Starts the worker via adb shell if it isn't already running.</summary>
     public async Task TryStartWorkerAsync(PairedDevice device, string command)
     {
-        if (device.ConnectedAdbDevices.FirstOrDefault() is not { } adbDevice)
+        if (await ResolveAdbDeviceAsync(device) is not { } adbDevice)
+        {
+            logger.Warn($"No adb device matches {device.Name}, the worker cannot be started over adb");
             return;
+        }
 
-        if (adbDevice.DeviceData is null || adbDevice.State is not DeviceState.Online) return;
+        if (adbDevice.DeviceData is null || adbDevice.State is not DeviceState.Online)
+        {
+            logger.Warn($"Adb device {adbDevice.Serial} is not online, the worker cannot be started");
+            return;
+        }
 
         try
         {

@@ -19,6 +19,17 @@ public interface ISftpFeature : IFeature
     /// </summary>
     Task BrowseUriAsync(PairedDevice device);
 
+    /// <summary>
+    /// Raised when a device announces an SFTP endpoint. The device generates fresh credentials every
+    /// time its server restarts, so anything holding a connection has to rebuild it.
+    /// </summary>
+    event EventHandler<PairedDevice>? SessionChanged;
+
+    /// <summary>
+    /// Returns the SFTP endpoint the device is currently serving, or null when it has not announced one.
+    /// </summary>
+    SftpSession? GetSession(string deviceId);
+
     void Remove(string deviceId);
 
     Task RemoveAll();

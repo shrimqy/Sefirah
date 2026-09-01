@@ -25,6 +25,8 @@ public class NetworkService(
 
     private static readonly IEnumerable<int> PORT_RANGE = Enumerable.Range(5150, 20); // 5150 to 5169
 
+    private static readonly TimeSpan ReconnectInterval = TimeSpan.FromSeconds(30);
+
     private readonly ConcurrentDictionary<Guid, StringBuilder> connectionBuffers = [];
     private readonly ConcurrentDictionary<Guid, DeviceAuth> deviceAuths = [];
     private readonly HashSet<string> connectingDeviceIds = [];
@@ -66,6 +68,7 @@ public class NetworkService(
                     ServerPort = port;
                     isRunning = true;
                     logger.Info($"Server started on port: {port}");
+                    StartReconnectLoop();
                     return;
                 }
                 server.Dispose();
@@ -184,7 +187,20 @@ public class NetworkService(
 
             logger.Debug($"Processing message: {(messageString.Length > 100 ? string.Concat(messageString.AsSpan(0, 100), "...") : messageString)}");
 
-            var socketMessage = JsonMessageSerializer.DeserializeMessage(messageString);
+            SocketMessage? socketMessage;
+            try
+            {
+                socketMessage = JsonMessageSerializer.DeserializeMessage(messageString);
+            }
+            catch (JsonException ex)
+            {
+                // A peer running a different version can send message types this build does not know.
+                // Skipping the single message keeps the rest of the batch usable, whereas letting the
+                // exception escape discards every message parsed so far along with the remaining ones.
+                logger.Warn($"Skipping unrecognized message: {ex.Message}");
+                continue;
+            }
+
             if (socketMessage is not null)
             {
                 messages.Add(socketMessage);
@@ -632,6 +648,41 @@ public class NetworkService(
                 connectingDeviceIds.Remove(deviceId);
             }
         }
+    }
+
+    /// <summary>
+    /// Discovery runs on UDP broadcast and mDNS, and neither crosses a VPN tunnel. With no announcement
+    /// arriving, nothing would ever trigger a reconnect, so paired devices that have a known address
+    /// are retried on a timer instead of waiting to be found.
+    /// </summary>
+    private void StartReconnectLoop()
+    {
+        _ = Task.Run(async () =>
+        {
+            using var timer = new PeriodicTimer(ReconnectInterval);
+            while (await timer.WaitForNextTickAsync())
+            {
+                try
+                {
+                    // PairedDevices is bound to the UI, so it is only safe to walk on its own thread
+                    await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+                    {
+                        foreach (var device in PairedDevices)
+                        {
+                            if (device.IsConnectedOrConnecting) continue;
+                            if (device.GetEnabledAddresses().Count == 0) continue;
+
+                            logger.Debug($"Retrying {device.Name} on its known addresses");
+                            Connect(device);
+                        }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    logger.Warn($"Reconnect sweep failed: {ex.Message}", ex);
+                }
+            }
+        });
     }
 
     public void Connect(PairedDevice device)

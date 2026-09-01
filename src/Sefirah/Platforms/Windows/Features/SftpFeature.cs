@@ -52,6 +52,7 @@ public class SftpFeature(
         if (string.IsNullOrEmpty(device.Address)) return;
 
         _sessions[device.Id] = (device.Address, info);
+        SessionChanged?.Invoke(this, device);
 
         if (!device.DeviceSettings.StorageAccess) return;
         if (!StorageProviderSyncRootManager.IsSupported()) return;
@@ -170,6 +171,13 @@ public class SftpFeature(
             });
         }
     }
+
+    public event EventHandler<PairedDevice>? SessionChanged;
+
+    public SftpSession? GetSession(string deviceId)
+        => _sessions.TryGetValue(deviceId, out var session)
+            ? new SftpSession(session.Host, session.Info.Port, session.Info.Username, session.Info.Password, session.Info.Paths, session.Info.PathNames)
+            : null;
 
     public async Task RemoveAll()
     {

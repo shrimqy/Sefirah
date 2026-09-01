@@ -6,6 +6,17 @@ namespace Sefirah.Helpers;
 
 public static class NetworkHelper
 {
+    /// <summary>
+    /// 169.254.0.0/16 is what Windows hands to an adapter whose DHCP failed. Announcing those, or
+    /// putting them in the pairing QR, only makes the other device work through timeouts before it
+    /// reaches the address that actually routes.
+    /// </summary>
+    private static bool IsLinkLocal(IPAddress address)
+    {
+        var octets = address.GetAddressBytes();
+        return octets[0] == 169 && octets[1] == 254;
+    }
+
     public static List<IPAddressInfo> GetAllValidAddresses()
     {
         var addresses = new List<IPAddressInfo>();
@@ -19,8 +30,9 @@ public static class NetworkHelper
 
                 foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
                 {
-                    if (ip.Address.AddressFamily is AddressFamily.InterNetwork && 
-                        !IPAddress.IsLoopback(ip.Address))
+                    if (ip.Address.AddressFamily is AddressFamily.InterNetwork &&
+                        !IPAddress.IsLoopback(ip.Address) &&
+                        !IsLinkLocal(ip.Address))
                     {
                         addresses.Add(new IPAddressInfo(
                             Address: ip.Address,
