@@ -1,4 +1,4 @@
-﻿<Page
+<Page
     x:Class="Sefirah.Views.AppsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -141,18 +141,21 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <TextBlock
+        <AutoSuggestBox
+            x:Name="AppSearchBox"
             Grid.Row="0"
             Grid.Column="0"
-            Margin="16,16,0,0"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Center"
-            FontSize="24"
-            FontWeight="SemiBold"
-            Text="Apps" />
+            Margin="16,12,8,12"
+            HorizontalAlignment="Stretch"
+            ItemTemplate="{StaticResource SearchSuggestionTemplate}"
+            PlaceholderText="{helpers:ResourceString Name=SearchApps}"
+            QueryIcon="Find"
+            QuerySubmitted="AppSearchBox_QuerySubmitted"
+            SuggestionChosen="AppSearchBox_SuggestionChosen"
+            TextChanged="AppSearchBox_TextChanged"
+            UpdateTextOnSelect="False" />
 
         <Button
             Grid.Row="0"
@@ -172,7 +175,7 @@
         <Button
             Grid.Row="0"
             Grid.Column="2"
-            Margin="0,12"
+            Margin="0,12,16,12"
             Padding="12,8"
             HorizontalAlignment="Right"
             AutomationProperties.Name="{helpers:ResourceString Name=RefreshApps}"
@@ -183,25 +186,10 @@
             <FontIcon FontSize="16" Glyph="&#xE72C;" />
         </Button>
 
-        <AutoSuggestBox
-            x:Name="AppSearchBox"
-            Grid.Row="0"
-            Grid.Column="3"
-            MinWidth="250"
-            Margin="6,12,16,12"
-            HorizontalAlignment="Right"
-            ItemTemplate="{StaticResource SearchSuggestionTemplate}"
-            PlaceholderText="{helpers:ResourceString Name=SearchApps}"
-            QueryIcon="Find"
-            QuerySubmitted="AppSearchBox_QuerySubmitted"
-            SuggestionChosen="AppSearchBox_SuggestionChosen"
-            TextChanged="AppSearchBox_TextChanged"
-            UpdateTextOnSelect="False" />
-
         <ScrollViewer
             Grid.Row="1"
             Grid.Column="0"
-            Grid.ColumnSpan="4"
+            Grid.ColumnSpan="3"
             Padding="0,0,20,0"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
@@ -254,7 +242,7 @@
         <ProgressRing
             Grid.Row="1"
             Grid.Column="0"
-            Grid.ColumnSpan="4"
+            Grid.ColumnSpan="3"
             Width="50"
             Height="50"
             HorizontalAlignment="Center"
@@ -264,7 +252,7 @@
         <TextBlock
             Grid.Row="1"
             Grid.Column="0"
-            Grid.ColumnSpan="4"
+            Grid.ColumnSpan="3"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Style="{StaticResource BodyTextBlockStyle}"

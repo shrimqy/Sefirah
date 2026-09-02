@@ -48,6 +48,11 @@ public partial class App : Application
             MainWindow = builder.Window;
             MainWindow.AppWindow.Title = "Sefirah";
             MainWindow.SetWindowIcon();
+            if (MainWindow.AppWindow.Presenter is OverlappedPresenter presenter)
+            {
+                presenter.PreferredMinimumWidth = 360;
+                presenter.PreferredMinimumHeight = 400;
+            }
 #if WINDOWS
             WindowHandle = WindowNative.GetWindowHandle(MainWindow);
             MainWindow.ExtendsContentIntoTitleBar = true;

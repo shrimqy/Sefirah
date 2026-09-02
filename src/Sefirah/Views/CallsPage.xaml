@@ -58,24 +58,49 @@
         </Style>
     </Page.Resources>
 
-    <Grid>
+    <Grid SizeChanged="Page_SizeChanged">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition x:Name="HistoryColumn" Width="2*" />
+            <ColumnDefinition x:Name="DialerColumn" Width="*" />
         </Grid.ColumnDefinitions>
 
         <!-- Call history -->
-        <Grid Grid.Column="0" RowSpacing="8" BorderBrush="{ThemeResource CardStrokeColorDefault}" BorderThickness="0,0,1,0">
+        <Grid x:Name="HistoryPane" Grid.Column="0" RowSpacing="8" BorderBrush="{ThemeResource CardStrokeColorDefault}" BorderThickness="0,0,1,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <TextBlock
-                Text="Calls"
-                FontSize="24"
-                FontWeight="SemiBold"
-                Margin="16,16,0,0"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <AutoSuggestBox
+                    x:Name="ContactSearchBox"
+                    Margin="16,12,8,12"
+                    VerticalAlignment="Center"
+                    ItemTemplate="{StaticResource ContactSearchSuggestionTemplate}"
+                    PlaceholderText="{helpers:ResourceString Name=SearchContacts}"
+                    QueryIcon="Find"
+                    UpdateTextOnSelect="False"
+                    TextChanged="ContactSearch_TextChanged"
+                    QuerySubmitted="ContactSearch_QuerySubmitted" />
+                <Button
+                    x:Name="OpenDialerButton"
+                    Grid.Column="1"
+                    Margin="0,12,16,12"
+                    Padding="12,8"
+                    VerticalAlignment="Center"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Visibility="Collapsed"
+                    Click="OpenDialerButton_Click"
+                    AutomationProperties.Name="{helpers:ResourceString Name=Dialer}"
+                    ToolTipService.ToolTip="{helpers:ResourceString Name=Dialer}">
+                    <FontIcon FontSize="16" Glyph="&#xE80B;" />
+                </Button>
+            </Grid>
 
             <Grid Grid.Row="1"> 
                 <ProgressRing
@@ -156,7 +181,28 @@
         </Grid>
 
         <!-- Call panel -->
-        <Grid Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid
+            x:Name="DialerPane"
+            Grid.Column="1"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+            <Button
+                x:Name="DialerBackButton"
+                Width="40"
+                Height="36"
+                Margin="8,8,0,0"
+                Padding="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Background="Transparent"
+                BorderThickness="0"
+                Visibility="Collapsed"
+                Click="DialerBackButton_Click"
+                AutomationProperties.Name="{helpers:ResourceString Name=Back}"
+                ToolTipService.ToolTip="{helpers:ResourceString Name=Back}"
+                Canvas.ZIndex="1">
+                <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE76B;" />
+            </Button>
             <TextBlock
                 Text="{helpers:ResourceString Name=BluetoothCallingUnsupported}"
                 TextWrapping="Wrap"
@@ -267,16 +313,6 @@
                 Margin="20"
                 VerticalAlignment="Stretch"
                 Visibility="{x:Bind ViewModel.ShowDialer, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
-
-                <AutoSuggestBox
-                    x:Name="ContactSearchBox"
-                    VerticalAlignment="Top"
-                    ItemTemplate="{StaticResource ContactSearchSuggestionTemplate}"
-                    PlaceholderText="{helpers:ResourceString Name=SearchContacts}"
-                    UpdateTextOnSelect="False"
-                    TextChanged="ContactSearch_TextChanged"
-                    QuerySubmitted="ContactSearch_QuerySubmitted"
-                    SuggestionChosen="ContactSearch_SuggestionChosen" />
 
                 <StackPanel VerticalAlignment="Center" Spacing="12">
                     <Grid Width="68" Height="68" HorizontalAlignment="Center">

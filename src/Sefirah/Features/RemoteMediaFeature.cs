@@ -43,48 +43,48 @@ public class RemoteMediaFeature : IRemoteMediaFeature
 
     private static async Task HandlePlaybackInfo(PairedDevice device, PlaybackInfo session)
     {
-        var existing = device.RemotePlaybackSessions.FirstOrDefault(s => s.Source == session.Source);
+        var mediaSession = device.RemotePlaybackSessions.FirstOrDefault(s => s.Source == session.Source);
             
-        if (existing is not null)
+        if (mediaSession is not null)
         {
-            await existing.UpdateFrom(session);
+            await mediaSession.UpdateFrom(session);
         }
         else
         {
-            var newSession = new MediaSession();
-            await newSession.UpdateFrom(session);
-            device.RemotePlaybackSessions.Add(newSession);
+            mediaSession = new MediaSession();
+            await mediaSession.UpdateFrom(session);
+            device.RemotePlaybackSessions.Add(mediaSession);
         }
+
+        if (device.LastPlayingSession is null || session.IsPlaying)
+            device.LastPlayingSession = mediaSession;
     }
 
     private static void HandlePlaybackUpdate(PairedDevice device, PlaybackInfo session)
     {
-        var existing = device.RemotePlaybackSessions.FirstOrDefault(s => s.Source == session.Source);
-        if (existing is not null)
-        {
-            existing.IsPlaying = session.IsPlaying;
-            if (session.Position.HasValue)
-            {
-                existing.Position = session.Position.Value;
-            }
-        }
+        var mediaSession = device.RemotePlaybackSessions.FirstOrDefault(s => s.Source == session.Source);
+        if (mediaSession is null)
+            return;
+
+        mediaSession.IsPlaying = session.IsPlaying;
+        if (session.Position.HasValue)
+            mediaSession.Position = session.Position.Value;
+
+        if (device.LastPlayingSession is null || session.IsPlaying)
+            device.LastPlayingSession = mediaSession;
     }
 
     private static void HandleTimelineUpdate(PairedDevice device, PlaybackInfo session)
     {
         var existing = device.RemotePlaybackSessions.FirstOrDefault(s => s.Source == session.Source);
         if (existing is not null && session.Position.HasValue)
-        {
             existing.Position = session.Position.Value;
-        }
     }
 
     private static void HandleRemovedSession(PairedDevice device, PlaybackInfo session)
     {
         var sessionToRemove = device.RemotePlaybackSessions.FirstOrDefault(s => s.Source == session.Source);
         if (sessionToRemove is not null)
-        {
             device.RemotePlaybackSessions.Remove(sessionToRemove);
-        }
     }
 }

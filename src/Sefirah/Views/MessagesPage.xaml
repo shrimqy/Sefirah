@@ -1,4 +1,4 @@
-﻿<Page
+<Page
     x:Class="Sefirah.Views.MessagesPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -142,58 +142,32 @@
         </DataTemplate>
     </Page.Resources>
 
-    <SplitView
-        x:Name="MessagesSplitView"
-        CompactPaneLength="48"
-        DisplayMode="Inline"
-        IsPaneOpen="True"
-        OpenPaneLength="420"
-        PaneBackground="Transparent">
+    <Grid SizeChanged="Page_SizeChanged">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="ThreadsColumn" Width="420" />
+            <ColumnDefinition x:Name="DetailColumn" Width="*" />
+        </Grid.ColumnDefinitions>
 
         <!--  Left panel - Message threads list  -->
-        <SplitView.Pane>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+        <Grid
+            x:Name="ThreadsPane"
+            Grid.Column="0"
+            BorderBrush="{ThemeResource CardStrokeColorDefault}"
+            BorderThickness="0,0,1,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-                    <TextBlock
-                        Grid.Column="0"
-                        Margin="16,16,0,0"
-                        FontSize="24"
-                        FontWeight="SemiBold"
-                        Text="{helpers:ResourceString Name=Messages}" />
-
-                    <Button
-                        x:Name="NewMessageButton"
-                        Grid.Column="1"
-                        Width="38"
-                        Height="38"
-                        Margin="8,12,16,12"
-                        Padding="0"
-                        VerticalAlignment="Center"
-                        AutomationProperties.Name="{helpers:ResourceString Name=NewMessage}"
-                        Click="NewMessageButton_Click"
-                        CornerRadius="19"
-                        Style="{ThemeResource AccentButtonStyle}"
-                        ToolTipService.ToolTip="{helpers:ResourceString Name=NewMessage}">
-                        <FontIcon FontSize="17" Glyph="&#xE932;" />
-                    </Button>
-                </Grid>
-
-                <!--  Search Box  -->
                 <AutoSuggestBox
                     x:Name="MessagesSearchBox"
-                    Grid.Row="1"
-                    Margin="16,0,16,12"
+                    Margin="16,12,8,12"
                     VerticalAlignment="Center"
                     AutomationProperties.Name="Messages AutoSuggestBox"
                     ItemTemplate="{StaticResource ConversationSearchSuggestionTemplate}"
@@ -204,20 +178,34 @@
                     TextChanged="SearchBox_TextChanged"
                     UpdateTextOnSelect="False" />
 
-                <ListView
-                    x:Name="MessagesList"
-                    Grid.Row="2"
-                    Margin="0,8,0,0"
-                    IsItemClickEnabled="True"
-                    ItemClick="MessagesList_ItemClick"
-                    ItemTemplate="{StaticResource MessageItemTemplate}"
-                    ItemsSource="{x:Bind ViewModel.Conversations, Mode=OneWay}"
-                    SelectionMode="None" />
+                <Button
+                    x:Name="NewMessageButton"
+                    Grid.Column="1"
+                    Margin="0,12,16,12"
+                    Padding="12,8"
+                    VerticalAlignment="Center"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    AutomationProperties.Name="{helpers:ResourceString Name=NewMessage}"
+                    Click="NewMessageButton_Click"
+                    ToolTipService.ToolTip="{helpers:ResourceString Name=NewMessage}">
+                    <FontIcon FontSize="16" Glyph="&#xE932;" />
+                </Button>
             </Grid>
-        </SplitView.Pane>
+
+            <ListView
+                x:Name="MessagesList"
+                Grid.Row="1"
+                Margin="0,8,0,0"
+                IsItemClickEnabled="True"
+                ItemClick="MessagesList_ItemClick"
+                ItemTemplate="{StaticResource MessageItemTemplate}"
+                ItemsSource="{x:Bind ViewModel.Conversations, Mode=OneWay}"
+                SelectionMode="None" />
+        </Grid>
 
         <!--  Right panel - Message content  -->
-        <Grid BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}" BorderThickness="1,0,0,0">
+        <Grid x:Name="DetailPane" Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -268,66 +256,86 @@
             </StackPanel>
 
             <!--  Message header  -->
-            <Grid Grid.Row="0" Padding="20,12,20,0">
+            <Grid Grid.Row="0" Padding="8,12,20,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0" Visibility="{x:Bind ViewModel.SelectedConversation, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}">
+                <Grid Grid.Row="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <controls:ContactAvatar
-                        Grid.Column="0"
-                        Width="48"
-                        Height="48"
-                        Margin="0,0,12,0"
-                        VerticalAlignment="Top"
-                        ImageProvider="{x:Bind ViewModel.SelectedConversation.AvatarStream, Mode=OneWay}"
-                        Initials="{x:Bind ViewModel.SelectedConversation.Initials, Mode=OneWay}"
-                        PlaceholderColorHex="{x:Bind ViewModel.SelectedConversation.PlaceholderColorHex, Mode=OneWay}"
-                        IsGroup="{x:Bind ViewModel.SelectedConversation.IsGroup, Mode=OneWay}" />
+                    <Button
+                        x:Name="ConversationBackButton"
+                        Margin="0,0,4,0"
+                        Padding="12,8"
+                        VerticalAlignment="Center"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Visibility="Collapsed"
+                        Click="ConversationBackButton_Click"
+                        AutomationProperties.Name="{helpers:ResourceString Name=Back}"
+                        ToolTipService.ToolTip="{helpers:ResourceString Name=Back}">
+                        <FontIcon FontSize="16" FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE76B;" />
+                    </Button>
 
-                    <!--  Name and Address  -->
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock
-                            FontSize="18"
-                            FontWeight="SemiBold"
-                            IsTextSelectionEnabled="True"
-                            Text="{x:Bind ViewModel.SelectedConversation.DisplayName, Mode=OneWay, FallbackValue=''}"
-                            TextWrapping="Wrap" />
-                        <TextBlock
-                            FontSize="14"
-                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                            IsTextSelectionEnabled="True"
-                            Text="{x:Bind ViewModel.SelectedConversation.SubtitleAddress, Mode=OneWay, FallbackValue=''}"
-                            TextWrapping="Wrap" />
-                    </StackPanel>
-                </Grid>
+                    <Grid
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Visibility="{x:Bind ViewModel.SelectedConversation, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                <!--  New conversation address input  -->
-                <Grid
-                    Grid.Row="0"
-                    Margin="0,16"
-                    Visibility="{x:Bind ViewModel.IsNewConversation, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <controls:ContactAvatar
+                            Grid.Column="0"
+                            Width="36"
+                            Height="36"
+                            Margin="0,0,12,0"
+                            VerticalAlignment="Center"
+                            ImageProvider="{x:Bind ViewModel.SelectedConversation.AvatarStream, Mode=OneWay}"
+                            Initials="{x:Bind ViewModel.SelectedConversation.Initials, Mode=OneWay}"
+                            PlaceholderColorHex="{x:Bind ViewModel.SelectedConversation.PlaceholderColorHex, Mode=OneWay}"
+                            IsGroup="{x:Bind ViewModel.SelectedConversation.IsGroup, Mode=OneWay}" />
+
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock
+                                FontSize="16"
+                                FontWeight="SemiBold"
+                                IsTextSelectionEnabled="True"
+                                Text="{x:Bind ViewModel.SelectedConversation.DisplayName, Mode=OneWay, FallbackValue=''}"
+                                TextTrimming="CharacterEllipsis" />
+                            <TextBlock
+                                FontSize="12"
+                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                IsTextSelectionEnabled="True"
+                                Text="{x:Bind ViewModel.SelectedConversation.SubtitleAddress, Mode=OneWay, FallbackValue=''}"
+                                TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                    </Grid>
+
                     <AutoSuggestBox
                         x:Name="AddressInput"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
                         AutomationProperties.Name="New conversation address input"
                         ItemTemplate="{StaticResource ContactSearchSuggestionTemplate}"
                         PlaceholderText="{helpers:ResourceString Name=AddressInputPlaceholder}"
                         QuerySubmitted="AddressInput_QuerySubmitted"
                         SuggestionChosen="AddressInput_SuggestionChosen"
                         TextChanged="AddressInput_TextChanged"
-                        UpdateTextOnSelect="False" />
+                        UpdateTextOnSelect="False"
+                        Visibility="{x:Bind ViewModel.IsNewConversation, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
                 </Grid>
 
                 <!--  Address list  -->
                 <ListView
                     Grid.Row="1"
-                    Margin="0,8,0,0"
+                    Margin="48,8,0,0"
                     ItemsSource="{x:Bind ViewModel.NewConversationRecipients, Mode=OneWay}"
                     Visibility="{x:Bind ViewModel.IsNewConversation, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <ListView.ItemTemplate>
@@ -663,5 +671,5 @@
                 </Button>
             </Grid>
         </Grid>
-    </SplitView>
+    </Grid>
 </Page>

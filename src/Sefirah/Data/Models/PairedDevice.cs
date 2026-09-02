@@ -177,6 +177,13 @@ public partial class PairedDevice : BaseRemoteDevice
 
     public ObservableCollection<MediaSession> RemotePlaybackSessions { get; } = [];
 
+    private MediaSession? lastPlayingSession;
+    public MediaSession? LastPlayingSession
+    {
+        get => lastPlayingSession;
+        set => SetProperty(ref lastPlayingSession, value);
+    }
+
     private bool isActiveDevice;
     public bool IsActiveDevice
     {

@@ -18,7 +18,12 @@ public sealed partial class MessagesPage : Page
         InitializeComponent();
         ViewModel = Ioc.Default.GetRequiredService<MessagesViewModel>();
         DataContext = ViewModel;
+        Loaded += (_, _) => UpdatePaneLayout();
     }
+
+    private const double TwoPaneMinWidth = 720;
+    private const double WideThreadsWidth = 420;
+    private bool _showDetail;
 
     private void SendButton_Click(object sender, RoutedEventArgs e)
     {
@@ -79,6 +84,7 @@ public sealed partial class MessagesPage : Page
     private void NewMessageButton_Click(object sender, RoutedEventArgs e)
     {
         ViewModel.StartNewConversation();
+        ShowConversationDetail();
     }
 
     private void CopyMessage_Click(object sender, RoutedEventArgs e)
@@ -110,12 +116,49 @@ public sealed partial class MessagesPage : Page
             ViewModel.SelectedConversation = conversation;
             sender.Text = string.Empty;
             sender.ItemsSource = null;
+            ShowConversationDetail();
         }
     }
 
     private void MessagesList_ItemClick(object sender, ItemClickEventArgs e)
     {
         ViewModel.SelectedConversation = e.ClickedItem as Conversation;
+        ShowConversationDetail();
+    }
+
+    private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
+        => UpdatePaneLayout();
+
+    private void ConversationBackButton_Click(object sender, RoutedEventArgs e)
+    {
+        _showDetail = false;
+        UpdatePaneLayout();
+    }
+
+    private void ShowConversationDetail()
+    {
+        _showDetail = true;
+        UpdatePaneLayout();
+    }
+
+    private void UpdatePaneLayout()
+    {
+        var narrow = ActualWidth > 0 && ActualWidth < TwoPaneMinWidth;
+        ConversationBackButton.Visibility = narrow && _showDetail ? Visibility.Visible : Visibility.Collapsed;
+
+        if (!narrow)
+        {
+            ThreadsColumn.Width = new GridLength(WideThreadsWidth);
+            DetailColumn.Width = new GridLength(1, GridUnitType.Star);
+            ThreadsPane.Visibility = Visibility.Visible;
+            DetailPane.Visibility = Visibility.Visible;
+            return;
+        }
+
+        ThreadsPane.Visibility = _showDetail ? Visibility.Collapsed : Visibility.Visible;
+        DetailPane.Visibility = _showDetail ? Visibility.Visible : Visibility.Collapsed;
+        ThreadsColumn.Width = _showDetail ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
+        DetailColumn.Width = _showDetail ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
     }
 
     private void AddressInput_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
