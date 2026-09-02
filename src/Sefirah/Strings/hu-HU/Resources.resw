@@ -147,6 +147,12 @@
   <data name="Notifications" xml:space="preserve">
     <value>Üzenetek</value>
   </data>
+  <data name="OpenPane" xml:space="preserve">
+    <value>Open pane</value>
+  </data>
+  <data name="ClosePane" xml:space="preserve">
+    <value>Close pane</value>
+  </data>
   <data name="ThirdPartyLibraries" xml:space="preserve">
     <value>Harmadik felű könyvtárak</value>
   </data>
@@ -1084,5 +1090,8 @@ input text %pwd%</value>
   </data>
   <data name="RemoveAllStorageMountsDescription" xml:space="preserve">
     <value>Unmount and clear all device storage registered by the app</value>
+  </data>
+  <data name="Dialer" xml:space="preserve">
+    <value>Dialer</value>
   </data>
 </root>
