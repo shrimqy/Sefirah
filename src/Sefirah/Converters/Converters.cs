@@ -432,6 +432,26 @@ internal sealed partial class GreaterThanOneToBooleanConverter : IValueConverter
     }
 }
 
+internal sealed partial class GreaterThanOneToVisibilityConverter : IValueConverter
+{
+    public bool Inverse { get; set; }
+
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        bool isGreaterThanOne = value is int count && count > 1;
+
+        if (Inverse)
+            return isGreaterThanOne ? Visibility.Collapsed : Visibility.Visible;
+        else
+            return isGreaterThanOne ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}
+
 internal sealed partial class SubscriptionToIconConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)

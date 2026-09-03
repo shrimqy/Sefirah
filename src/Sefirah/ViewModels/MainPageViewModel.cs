@@ -23,7 +23,15 @@ public sealed partial class MainPageViewModel : BaseViewModel
     #region Properties
     public ObservableCollection<PairedDevice> PairedDevices => DeviceManager.PairedDevices;
 
-    public PairedDevice? Device => DeviceManager.ActiveDevice;
+    public PairedDevice? Device
+    {
+        get => DeviceManager.ActiveDevice;
+        set
+        {
+            if (value is not null)
+                DeviceManager.ActiveDevice = value;
+        }
+    }
 
     [ObservableProperty]
     public partial bool LoadingScrcpy { get; set; } = false;

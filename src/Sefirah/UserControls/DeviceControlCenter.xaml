@@ -17,6 +17,8 @@
             <converters:RingerModeToIconConverter x:Key="RingerModeToIconConverter" />
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" Inverse="True" />
+            <converters:GreaterThanOneToVisibilityConverter x:Key="GreaterThanOneToVisibilityConverter" />
+            <converters:GreaterThanOneToVisibilityConverter x:Key="InverseGreaterThanOneToVisibilityConverter" Inverse="True" />
             <wctconverters:BoolToObjectConverter
                 x:Key="BoolToDndButtonStyleConverter"
                 FalseValue="{StaticResource DefaultButtonStyle}"
@@ -35,6 +37,12 @@
                 <Setter Property="HorizontalContentAlignment" Value="Center" />
                 <Setter Property="Background" Value="{ThemeResource ControlFillColorDefaultBrush}" />
                 <Setter Property="BorderBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}" />
+            </Style>
+
+        <Style x:Key="DeviceNameComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource DefaultComboBoxStyle}">
+            <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="FontWeight" Value="SemiBold" />
             </Style>
 
             <Storyboard x:Key="FadeInAnimation" x:Name="FadeInStoryboard">
@@ -133,7 +141,15 @@
                 <TextBlock
                     FontWeight="SemiBold"
                     Text="{x:Bind ViewModel.Device.Name, Mode=OneWay}"
-                    Visibility="{x:Bind ViewModel.Device.Name, Mode=OneWay, Converter={StaticResource EmptyObjectToVisibilityConverter}}" />
+                    Visibility="{x:Bind ViewModel.PairedDevices.Count, Mode=OneWay, Converter={StaticResource InverseGreaterThanOneToVisibilityConverter}}" />
+
+                <ComboBox
+                    Margin="-8,0,0,0"
+                    DisplayMemberPath="Name"
+                    ItemsSource="{x:Bind ViewModel.PairedDevices, Mode=OneWay}"
+                    SelectedItem="{x:Bind ViewModel.Device, Mode=TwoWay}"
+                    Style="{StaticResource DeviceNameComboBoxStyle}"
+                    Visibility="{x:Bind ViewModel.PairedDevices.Count, Mode=OneWay, Converter={StaticResource GreaterThanOneToVisibilityConverter}}" />
 
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <Button
