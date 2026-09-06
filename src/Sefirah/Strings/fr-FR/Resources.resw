@@ -707,12 +707,6 @@ texte d'entrée %pwd%
   <data name="EnterAddressesAndCompose" xml:space="preserve">
     <value>Entrez les adresses ci-dessus et composez votre message ci-dessous</value>
   </data>
-  <data name="UseTcpIpMode" xml:space="preserve">
-    <value>Utiliser le mode TCP/IP</value>
-  </data>
-  <data name="UseTcpIpModeDescription" xml:space="preserve">
-    <value>Activer les connexions ADB sans fil</value>
-  </data>
   <data name="WorkingDirectory" xml:space="preserve">
     <value>Répertoire de travail (facultatif)</value>
   </data>

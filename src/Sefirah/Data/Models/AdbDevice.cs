@@ -53,7 +53,6 @@ public partial class AdbDevice : ObservableObject
             if (SetProperty(ref state, value))
             {
                 OnPropertyChanged(nameof(IsOnline));
-                IsConnected = value is DeviceState.Online;
             }
         }
     }
@@ -77,13 +76,6 @@ public partial class AdbDevice : ObservableObject
     {
         get => deviceData;
         set => SetProperty(ref deviceData, value);
-    }
-
-    private bool isConnected;
-    public bool IsConnected
-    {
-        get => isConnected;
-        set => SetProperty(ref isConnected, value);
     }
 
     public string TypeIconGlyph => Type is DeviceType.WIFI ? "\uECF1" : "\uE88E";

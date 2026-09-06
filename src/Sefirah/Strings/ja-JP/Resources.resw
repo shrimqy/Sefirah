@@ -707,12 +707,6 @@ input keyevent 66</value>
   <data name="EnterAddressesAndCompose" xml:space="preserve">
     <value>上記にアドレスを入力し、下記にメッセージを入力してください</value>
   </data>
-  <data name="UseTcpIpMode" xml:space="preserve">
-    <value>TCP/IP モードを使用する</value>
-  </data>
-  <data name="UseTcpIpModeDescription" xml:space="preserve">
-    <value>ワイヤレス ADB 接続を有効化</value>
-  </data>
   <data name="WorkingDirectory" xml:space="preserve">
     <value>作業ディレクトリ (任意)</value>
   </data>

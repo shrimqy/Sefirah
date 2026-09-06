@@ -229,23 +229,45 @@ public partial class PairedDevice : BaseRemoteDevice
         deviceSettings = userSettingsService.GetDeviceSettings(deviceId);
     }
 
+    public bool IsMatchingAdbDevice(AdbDevice adbDevice)
+    {
+        if (adbDevice is null || !adbDevice.IsOnline) return false;
+
+        // 1. Match by AndroidId
+        if (!string.IsNullOrEmpty(adbDevice.AndroidId))
+            return adbDevice.AndroidId == Id;
+
+        // 2. Match by IP Address (for Wi-Fi ADB devices whose serial is <IP>:<PORT>)
+        var adbHost = adbDevice.Serial.Split(':')[0];
+        if (!string.IsNullOrEmpty(Address) && adbHost == Address)
+            return true;
+
+        if (Addresses.Any(a => !string.IsNullOrEmpty(a.Address) && adbHost == a.Address))
+            return true;
+
+        // 3. Match by Model (normalizing underscores to spaces and case-insensitive)
+        if (!string.IsNullOrEmpty(adbDevice.Model) && !string.IsNullOrEmpty(Model))
+        {
+            var cleanAdbModel = adbDevice.Model.Replace('_', ' ').Trim();
+            var cleanDeviceModel = Model.Replace('_', ' ').Trim();
+            if (cleanDeviceModel.Equals(cleanAdbModel, StringComparison.OrdinalIgnoreCase) ||
+                cleanDeviceModel.Contains(cleanAdbModel, StringComparison.OrdinalIgnoreCase) ||
+                cleanAdbModel.Contains(cleanDeviceModel, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public bool HasAdbConnection
     {
         get
         {
             try
             {
-                return adbService?.AdbDevices.Any(adbDevice => 
-                    adbDevice.IsOnline && 
-                    (
-                        (!string.IsNullOrEmpty(adbDevice.AndroidId) && adbDevice.AndroidId == Id) ||
-                        (string.IsNullOrEmpty(adbDevice.AndroidId) && 
-                         !string.IsNullOrEmpty(adbDevice.Model) && 
-                         !string.IsNullOrEmpty(Model) &&
-                         (Model.Equals(adbDevice.Model, StringComparison.OrdinalIgnoreCase) ||
-                          Model.Contains(adbDevice.Model, StringComparison.OrdinalIgnoreCase) ||
-                          adbDevice.Model.Contains(Model, StringComparison.OrdinalIgnoreCase)))
-                    )) ?? false;
+                return adbService?.AdbDevices.Any(IsMatchingAdbDevice) ?? false;
             }
             catch
             {
@@ -269,16 +291,7 @@ public partial class PairedDevice : BaseRemoteDevice
                 ConnectedAdbDevices.Clear();
 
                 var devices = adbService.AdbDevices
-                    .Where(adbDevice => adbDevice.IsOnline && 
-                        (
-                            (!string.IsNullOrEmpty(adbDevice.AndroidId) && adbDevice.AndroidId == Id) ||
-                            (string.IsNullOrEmpty(adbDevice.AndroidId) && 
-                                !string.IsNullOrEmpty(adbDevice.Model) && 
-                                !string.IsNullOrEmpty(Model) &&
-                                (Model.Equals(adbDevice.Model, StringComparison.OrdinalIgnoreCase) ||
-                                Model.Contains(adbDevice.Model, StringComparison.OrdinalIgnoreCase) ||
-                                adbDevice.Model.Contains(Model, StringComparison.OrdinalIgnoreCase)))
-                        ))
+                    .Where(IsMatchingAdbDevice)
                     .ToList();
 
                 ConnectedAdbDevices.AddRange(devices);

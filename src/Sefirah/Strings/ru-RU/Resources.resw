@@ -707,12 +707,6 @@ input keyevent 66</value>
   <data name="EnterAddressesAndCompose" xml:space="preserve">
     <value>Введите адрес выше и напишите сообщение ниже</value>
   </data>
-  <data name="UseTcpIpMode" xml:space="preserve">
-    <value>Использовать TCP/IP режим</value>
-  </data>
-  <data name="UseTcpIpModeDescription" xml:space="preserve">
-    <value>Включить беспроводную отладку ADB</value>
-  </data>
   <data name="WorkingDirectory" xml:space="preserve">
     <value>Рабочая папка (необязательно)</value>
   </data>

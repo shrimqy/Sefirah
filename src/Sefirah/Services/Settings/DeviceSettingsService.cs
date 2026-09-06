@@ -311,12 +311,6 @@ internal sealed partial class DeviceSettingsService(string deviceId) : BaseDevic
         set => Set(value);
     }
 
-    public bool AdbTcpipModeEnabled
-    {
-        get => Get(false);
-        set => Set(value);
-    }
-
     public bool AdbAutoConnect
     {
         get => Get(true);

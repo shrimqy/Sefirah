@@ -196,10 +196,16 @@ public class AdbService(
                 if (existingDevice != null) return;
                 AdbDevices.Add(connectedDevice);
             });
-            logger.Info($"Device connected: {connectedDevice.Model} ({connectedDevice.Serial})");
-
             _ = Task.Run(async () => await DiscoverCodecOptionsForDevice(connectedDevice));
             _ = Task.Run(async () => await GrantSensitiveNotificationAsync(connectedDevice));
+            if (connectedDevice.Type is DeviceType.USB)
+            {
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(2000);
+                    await AutoSetupWirelessAdbAsync(connectedDevice);
+                });
+            }
         }
         catch (Exception ex)
         {
@@ -257,6 +263,10 @@ public class AdbService(
 
             _ = Task.Run(async () => await DiscoverCodecOptionsForDevice(deviceInfo));
             _ = Task.Run(async () => await GrantSensitiveNotificationAsync(deviceInfo));
+            if (deviceInfo.Type is DeviceType.USB)
+            {
+                _ = Task.Run(async () => await AutoSetupWirelessAdbAsync(deviceInfo));
+            }
         }
         else
         {
@@ -288,33 +298,22 @@ public class AdbService(
 
         await App.MainWindow.DispatcherQueue.EnqueueAsync(async() =>
         {
-            var adbDevices = new List<AdbDevice>();
+            List<AdbDevice> adbDevices = [];
             foreach (var device in devices)
             {
-                AdbDevice adbDevice;
                 if (device.State is DeviceState.Online)
                 {
                     // Get full device info including AndroidId for online devices
-                    adbDevice = await GetFullDeviceInfoAsync(device);
+                    var adbDevice = await GetFullDeviceInfoAsync(device);
                     AdbDevices.Add(adbDevice);
                     
                     // Discover codec options for this device
                     _ = Task.Run(async () => await DiscoverCodecOptionsForDevice(adbDevice));
                     _ = Task.Run(async () => await GrantSensitiveNotificationAsync(adbDevice));
-                }
-                else
-                {
-                    // Create basic device info for non-online devices
-                    adbDevice = new AdbDevice
+                    if (adbDevice.Type is DeviceType.USB)
                     {
-                        Serial = device.Serial,
-                        Model = device.Model ?? "Unknown",
-                        State = device.State,
-                        Type = device.Serial.Contains(':') || device.Serial.Contains("tcp") ? DeviceType.WIFI : DeviceType.USB,
-                        DeviceData = device,
-                        AndroidId = ""
-                    };
-                    AdbDevices.Add(adbDevice);
+                        _ = Task.Run(async () => await AutoSetupWirelessAdbAsync(adbDevice));
+                    }
                 }
             }
         });
@@ -349,17 +348,31 @@ public class AdbService(
                 logger.Error($"Error getting Android ID for {deviceData.Serial}", ex);
             }
 
-            // Look for paired devices with matching model
+            // Look for paired devices with matching IP or model
             if (string.IsNullOrEmpty(androidId))
             {
                 var deviceModel = fullDeviceData.Model;
-
                 var pairedDevices = deviceManager.PairedDevices;
+
+                // First try matching by IP (for Wi-Fi ADB devices where Serial is <IP>:<PORT>)
+                var adbHost = fullDeviceData.Serial.Split(':')[0];
                 var matchingDevice = pairedDevices.FirstOrDefault(pd =>
-                    !string.IsNullOrEmpty(pd.Model) &&
-                    (pd.Model.Equals(deviceModel, StringComparison.OrdinalIgnoreCase) ||
-                     pd.Model.Contains(deviceModel, StringComparison.OrdinalIgnoreCase) ||
-                     deviceModel.Contains(pd.Model, StringComparison.OrdinalIgnoreCase)));
+                    (!string.IsNullOrEmpty(pd.Address) && adbHost == pd.Address) ||
+                    pd.Addresses.Any(a => !string.IsNullOrEmpty(a.Address) && adbHost == a.Address));
+
+                // Fall back to normalized model matching
+                if (matchingDevice is null && !string.IsNullOrEmpty(deviceModel))
+                {
+                    var cleanAdbModel = deviceModel.Replace('_', ' ').Trim();
+                    matchingDevice = pairedDevices.FirstOrDefault(pd =>
+                    {
+                        if (string.IsNullOrEmpty(pd.Model)) return false;
+                        var cleanPdModel = pd.Model.Replace('_', ' ').Trim();
+                        return cleanPdModel.Equals(cleanAdbModel, StringComparison.OrdinalIgnoreCase) ||
+                               cleanPdModel.Contains(cleanAdbModel, StringComparison.OrdinalIgnoreCase) ||
+                               cleanAdbModel.Contains(cleanPdModel, StringComparison.OrdinalIgnoreCase);
+                    });
+                }
 
                 if (matchingDevice is not null)
                 {
@@ -561,17 +574,19 @@ public class AdbService(
 
     public async Task<bool> ConnectWireless(string host, int port=5555)
     {
-        if (string.IsNullOrEmpty(host)) return false;
+        if (string.IsNullOrWhiteSpace(host)) return false;
+
+        var cleanHost = host.Trim();
 
         try
         {
-            var result = await adbClient.ConnectAsync(host, port);
-            logger.Info($"adb wireless connection: {result}");
+            var result = await adbClient.ConnectAsync(cleanHost, port);
+            logger.Info($"adb wireless connection ({cleanHost}:{port}): {result}");
             return IsAdbConnectOrPairSuccess(result);
         }
         catch (SocketException ex) when (ex.SocketErrorCode is SocketError.ConnectionRefused)
         {
-            logger.Debug($"ADB server is not accepting connections while connecting wireless device {host}:{port}");
+            logger.Debug($"ADB server is not accepting connections while connecting wireless device {cleanHost}:{port}");
             return false;
         }
         catch (Exception ex)
@@ -675,37 +690,48 @@ public class AdbService(
         var pairedDevice = deviceManager.PairedDevices.FirstOrDefault(d => d.Id == deviceId);
         if (pairedDevice is null) return null;
 
-        return AdbDevices.FirstOrDefault(adbDevice =>
-            adbDevice.IsOnline &&
-            (
-                (!string.IsNullOrEmpty(adbDevice.AndroidId) && adbDevice.AndroidId == deviceId) ||
-                (string.IsNullOrEmpty(adbDevice.AndroidId) &&
-                 !string.IsNullOrEmpty(adbDevice.Model) &&
-                 !string.IsNullOrEmpty(pairedDevice.Model) &&
-                 (pairedDevice.Model.Equals(adbDevice.Model, StringComparison.OrdinalIgnoreCase) ||
-                  pairedDevice.Model.Contains(adbDevice.Model, StringComparison.OrdinalIgnoreCase) ||
-                  adbDevice.Model.Contains(pairedDevice.Model, StringComparison.OrdinalIgnoreCase)))
-            ));
+        return AdbDevices.FirstOrDefault(adbDevice => pairedDevice.IsMatchingAdbDevice(adbDevice));
     }
 
     /// <summary>
-    /// Tries to connect to the dev
+    /// Tries to connect to the device over TCP/IP wirelessly. If connection fails and USB is plugged in, enables TCP/IP mode and retries.
     /// </summary>
     /// <param name="host">The host to connect to</param>
     /// <param name="model">The model of the device to connect to</param>
     public async Task<bool> TryConnectTcp(string host, string model)
     {
+        if (string.IsNullOrWhiteSpace(host)) return false;
+
+        const int port = 5555;
+        var cleanHost = host.Trim();
+
         try
         {
-            logger.Info($"Trying to connect to adb device: {host}");
-            var result = await ConnectWireless(host);
+            logger.Info($"Trying to connect to adb device: {cleanHost}:{port}");
+            var result = await ConnectWireless(cleanHost, port);
             if (result)
             {
-                logger.Info($"Connected to adb device: {host}");
+                logger.Info($"Connected to adb device: {cleanHost}:{port}");
                 return true;
             }
 
-            var usbDevice = AdbDevices.FirstOrDefault(d => d.Type is DeviceType.USB && d.IsOnline && d.Model == model);
+            var cleanTargetModel = model?.Replace('_', ' ').Trim();
+            var usbDevice = AdbDevices.FirstOrDefault(d => d.Type is DeviceType.USB && d.IsOnline &&
+                (!string.IsNullOrEmpty(cleanTargetModel) &&
+                 (!string.IsNullOrEmpty(d.Model) &&
+                  (d.Model.Replace('_', ' ').Trim().Equals(cleanTargetModel, StringComparison.OrdinalIgnoreCase) ||
+                   d.Model.Replace('_', ' ').Trim().Contains(cleanTargetModel, StringComparison.OrdinalIgnoreCase) ||
+                   cleanTargetModel.Contains(d.Model.Replace('_', ' ').Trim(), StringComparison.OrdinalIgnoreCase)))));
+
+            if (usbDevice is null)
+            {
+                var onlineUsb = AdbDevices.Where(d => d.Type is DeviceType.USB && d.IsOnline).ToList();
+                if (onlineUsb.Count == 1)
+                {
+                    usbDevice = onlineUsb[0];
+                }
+            }
+
             if (usbDevice is null) return false;
             
             // If connection failed, try to enable TCP/IP mode using ADB if USB is connected
@@ -716,28 +742,30 @@ public class AdbService(
                 return false;
             }
 
-            await Task.Delay(200);
-
-            // Retry the connection after enabling TCP/IP mode
-            result = await ConnectWireless(host);
-            if (result)
+            // Retry wireless connection with backoff to allow adbd time to restart on port 5555
+            for (int attempt = 1; attempt <= 3; attempt++)
             {
-                logger.Info($"Successfully connected to {host} after enabling TCP/IP mode");
-                return true;
+                await Task.Delay(500 * attempt);
+                result = await ConnectWireless(cleanHost, port);
+                if (result)
+                {
+                    logger.Info($"Successfully connected to {cleanHost}:{port} after enabling TCP/IP mode (attempt {attempt})");
+                    return true;
+                }
             }
 
-            logger.Error("TCP/IP connection still failed after enabling TCP/IP mode");
+            logger.Error($"TCP/IP connection still failed after enabling TCP/IP mode for {cleanHost}:{port}");
             return false;
         }
         catch (Exception ex)
         {
-            logger.Error($"Error in TryConnectTcp for {host}: {ex.Message}", ex);
+            logger.Error($"Error in TryConnectTcp for {cleanHost}:{port}: {ex.Message}", ex);
             return false;
         }
     }
 
     /// <summary>
-    /// Enables TCP/IP mode by restarting ADB with tcpip 5555 command
+    /// Enables TCP/IP mode on a device by running "adb -s <serial> tcpip 5555"
     /// </summary>
     private async Task<bool> EnableTcpipMode(string serialId)
     {
@@ -779,9 +807,6 @@ public class AdbService(
                 logger.Warn($"ADB tcpip command error: {error}");
             }
 
-            // Restart our ADB client to pick up the changes
-            await RestartAdbClient();
-            
             return process.ExitCode == 0;
         }
         catch (Exception ex)
@@ -791,31 +816,78 @@ public class AdbService(
         }
     }
 
-    /// <summary>
-    /// Restarts the ADB client to pick up TCP/IP mode changes
-    /// </summary>
-    private async Task RestartAdbClient()
+    private async Task AutoSetupWirelessAdbAsync(AdbDevice usbDevice)
     {
         try
         {
-            logger.Info("Restarting ADB client");
-            var wasMonitoring = IsMonitoring;
-            if (wasMonitoring)
-            {
-                await CleanupAsync();
-            }
-            await Task.Delay(200);
+            if (usbDevice?.DeviceData is null || usbDevice.State is not DeviceState.Online) return;
 
-            if (wasMonitoring)
+            var adbPath = userSettingsService.GeneralSettingsService.AdbPath;
+            if (string.IsNullOrEmpty(adbPath)) return;
+
+            // Find device IP: first check paired devices
+            string targetIp = string.Empty;
+            var pairedDevice = deviceManager.PairedDevices.FirstOrDefault(pd => pd.IsMatchingAdbDevice(usbDevice));
+            if (pairedDevice is not null)
             {
-                await StartAsync();
+                if (!pairedDevice.DeviceSettings.AdbAutoConnect)
+                {
+                    logger.Debug($"AdbAutoConnect disabled for {usbDevice.Serial}, skipping auto wireless setup");
+                    return;
+                }
+
+                if (!string.IsNullOrEmpty(pairedDevice.Address))
+                {
+                    targetIp = pairedDevice.Address;
+                }
             }
-            logger.Info("ADB client restarted successfully");
+
+            // If not found from paired device, query IP directly from Android via adb shell
+            if (string.IsNullOrEmpty(targetIp))
+            {
+                targetIp = await GetDeviceIpAddressAsync(usbDevice.DeviceData);
+            }
+
+            if (string.IsNullOrEmpty(targetIp))
+            {
+                logger.Debug($"Could not determine IP address for USB device {usbDevice.Serial}");
+                return;
+            }
+
+            // Check if already connected over Wi-Fi
+            if (AdbDevices.Any(d => d.Type is DeviceType.WIFI && d.IsOnline && d.Serial.Split(':')[0] == targetIp))
+            {
+                logger.Debug($"Wireless ADB already connected for {targetIp}");
+                return;
+            }
+
+            logger.Info($"Auto-configuring wireless ADB for USB device {usbDevice.Serial} at {targetIp}");
+            await TryConnectTcp(targetIp, usbDevice.Model);
         }
         catch (Exception ex)
         {
-            logger.Error($"Failed to restart ADB client: {ex.Message}", ex);
+            logger.Warn($"AutoSetupWirelessAdbAsync encountered an issue: {ex.Message}");
         }
+    }
+
+    private async Task<string> GetDeviceIpAddressAsync(DeviceData deviceData)
+    {
+        try
+        {
+            var receiver = new ConsoleOutputReceiver();
+            await adbClient.ExecuteShellCommandAsync(deviceData, "ip -o -4 addr show wlan0", receiver);
+            var output = receiver.ToString();
+            var match = Regex.Match(output, @"inet\s+([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)");
+            if (match.Success && !match.Groups[1].Value.StartsWith("169.254."))
+            {
+                return match.Groups[1].Value;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Debug($"Could not query Wi-Fi IP address from device shell: {ex.Message}");
+        }
+        return string.Empty;
     }
 
     public Task DisconnectDeviceAsync(AdbDevice device)

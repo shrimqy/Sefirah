@@ -31,13 +31,6 @@
                     </wuc:SettingsCard.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind ViewModel.AdbAutoConnect, Mode=TwoWay}" />
                 </wuc:SettingsCard>
-
-                <wuc:SettingsCard Description="{helpers:ResourceString Name=UseTcpIpModeDescription}" Header="{helpers:ResourceString Name=UseTcpIpMode}">
-                    <wuc:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xE968;" />
-                    </wuc:SettingsCard.HeaderIcon>
-                    <ToggleSwitch IsOn="{x:Bind ViewModel.AdbTcpipModeEnabled, Mode=TwoWay}" />
-                </wuc:SettingsCard>
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

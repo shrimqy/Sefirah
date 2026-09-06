@@ -708,12 +708,6 @@ input keyevent 66</value>
   <data name="EnterAddressesAndCompose" xml:space="preserve">
     <value>请在上方输入地址并在下方撰写您的留言</value>
   </data>
-  <data name="UseTcpIpMode" xml:space="preserve">
-    <value>使用 TCP/IP 模式</value>
-  </data>
-  <data name="UseTcpIpModeDescription" xml:space="preserve">
-    <value>启用 ADB 无线调试</value>
-  </data>
   <data name="WorkingDirectory" xml:space="preserve">
     <value>工作目录（可选）</value>
   </data>

@@ -594,12 +594,6 @@
   <data name="EnterAddressesAndCompose" xml:space="preserve">
     <value>Zadejte výše adresy a níže napište zprávu</value>
   </data>
-  <data name="UseTcpIpMode" xml:space="preserve">
-    <value>Použít režim TCP/IP</value>
-  </data>
-  <data name="UseTcpIpModeDescription" xml:space="preserve">
-    <value>Povolit bezdrátová ADB připojení</value>
-  </data>
   <data name="WorkingDirectory" xml:space="preserve">
     <value>Pracovní adresář (volitelné)</value>
   </data>

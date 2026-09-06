@@ -372,7 +372,7 @@ public class ScreenMirrorService(
         string? selectedDeviceSerial = null;
         var devicePreferenceType = deviceSettings.ScrcpyDevicePreference;
 
-        var pairedDevices = devices.Where(d => d is not null && d.Model == device.Model).ToList();
+        var pairedDevices = devices.Where(device.IsMatchingAdbDevice).ToList();
         if (pairedDevices.Count > 0)
         {
             switch (devicePreferenceType)
@@ -382,21 +382,35 @@ public class ScreenMirrorService(
                     break;
                 case ScrcpyDevicePreferenceType.Tcpip:
                     selectedDeviceSerial = pairedDevices.FirstOrDefault(d => d.Type is DeviceType.WIFI)?.Serial;
+                    if (string.IsNullOrEmpty(selectedDeviceSerial) && !string.IsNullOrEmpty(device.Address))
+                    {
+                        if (await adbService.TryConnectTcp(device.Address, device.Model))
+                        {
+                            selectedDeviceSerial = device.Address.Contains(':') ? device.Address : $"{device.Address}:5555";
+                        }
+                    }
                     break;
                 case ScrcpyDevicePreferenceType.Auto:
-                    // prioritize USB first to check if the auto tcpip is enabled
+                    // Prioritize USB if connected, otherwise use Wi-Fi
                     var usbDevice = pairedDevices.FirstOrDefault(d => d.Type is DeviceType.USB);
                     if (usbDevice is not null)
                     {
-                        if (deviceSettings.AdbTcpipModeEnabled)
-                        {
-                            argBuilder.Add("--tcpip");
-                        }
                         selectedDeviceSerial = usbDevice.Serial;
                     }
                     else
                     {
-                        selectedDeviceSerial = pairedDevices.FirstOrDefault(d => d.Type is DeviceType.WIFI)?.Serial;
+                        var wifiDev = pairedDevices.FirstOrDefault(d => d.Type is DeviceType.WIFI);
+                        if (wifiDev is not null)
+                        {
+                            selectedDeviceSerial = wifiDev.Serial;
+                        }
+                        else if (!string.IsNullOrEmpty(device.Address))
+                        {
+                            if (await adbService.TryConnectTcp(device.Address, device.Model))
+                            {
+                                selectedDeviceSerial = device.Address.Contains(':') ? device.Address : $"{device.Address}:5555";
+                            }
+                        }
                     }
                     break;
                 case ScrcpyDevicePreferenceType.AskEverytime:
@@ -409,19 +423,21 @@ public class ScreenMirrorService(
                     break;
             }
         }
-        else if (deviceSettings.AdbTcpipModeEnabled && device.Session is not null)
+        else if (!string.IsNullOrEmpty(device.Address))
         {
+            // No ADB devices matched currently, try to connect via TCP over Wi-Fi
             if (await adbService.TryConnectTcp(device.Address, device.Model))
             {
-                selectedDeviceSerial = $"{device.Address}:5555";
+                selectedDeviceSerial = device.Address.Contains(':') ? device.Address : $"{device.Address}:5555";
             }
         }
-        else if (devices.Any(d => d.IsOnline && !string.IsNullOrEmpty(d.Serial)))
+
+        if (string.IsNullOrEmpty(selectedDeviceSerial) && devices.Any(d => d.IsOnline && !string.IsNullOrEmpty(d.Serial)))
         {
             // If no paired devices found, show dialog to select from online devices
             selectedDeviceSerial = await ShowDeviceSelectionDialog(devices.Where(d => d.IsOnline).ToList());
         }
-        else
+        else if (string.IsNullOrEmpty(selectedDeviceSerial))
         {
             logger.Warn("No online devices found from adb");
             await dispatcher.EnqueueAsync(async () =>
