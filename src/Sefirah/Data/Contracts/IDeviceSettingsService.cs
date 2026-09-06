@@ -260,11 +260,6 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     bool AudioSync { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether to enable TCP/IP mode for ADB.
-    /// </summary>
-    bool AdbTcpipModeEnabled { get; set; }
-
-    /// <summary>
     /// Gets or sets a value indicating whether to automatically connect via ADB.
     /// </summary>
     bool AdbAutoConnect { get; set; }

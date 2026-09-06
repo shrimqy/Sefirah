@@ -298,14 +298,13 @@ public class AdbService(
 
         await App.MainWindow.DispatcherQueue.EnqueueAsync(async() =>
         {
-            var adbDevices = new List<AdbDevice>();
+            List<AdbDevice> adbDevices = [];
             foreach (var device in devices)
             {
-                AdbDevice adbDevice;
                 if (device.State is DeviceState.Online)
                 {
                     // Get full device info including AndroidId for online devices
-                    adbDevice = await GetFullDeviceInfoAsync(device);
+                    var adbDevice = await GetFullDeviceInfoAsync(device);
                     AdbDevices.Add(adbDevice);
                     
                     // Discover codec options for this device
@@ -316,21 +315,7 @@ public class AdbService(
                         _ = Task.Run(async () => await AutoSetupWirelessAdbAsync(adbDevice));
                     }
                 }
-                else
-                {
-                    // Create basic device info for non-online devices
-                    adbDevice = new AdbDevice
-                    {
-                        Serial = device.Serial,
-                        Model = device.Model ?? "Unknown",
-                        State = device.State,
-                        Type = device.Serial.Contains(':') || device.Serial.Contains("tcp") ? DeviceType.WIFI : DeviceType.USB,
-                        DeviceData = device,
-                        AndroidId = ""
-                    };
-                    AdbDevices.Add(adbDevice);
                 }
-            }
         });
     }
     
@@ -591,15 +576,6 @@ public class AdbService(
         if (string.IsNullOrWhiteSpace(host)) return false;
 
         var cleanHost = host.Trim();
-        if (cleanHost.Contains(':'))
-        {
-            var parts = cleanHost.Split(':');
-            cleanHost = parts[0];
-            if (parts.Length > 1 && int.TryParse(parts[1], out var parsedPort))
-            {
-                port = parsedPort;
-            }
-        }
 
         try
         {
@@ -725,17 +701,8 @@ public class AdbService(
     {
         if (string.IsNullOrWhiteSpace(host)) return false;
 
-        int port = 5555;
+        const int port = 5555;
         var cleanHost = host.Trim();
-        if (cleanHost.Contains(':'))
-        {
-            var parts = cleanHost.Split(':');
-            cleanHost = parts[0];
-            if (parts.Length > 1 && int.TryParse(parts[1], out var parsedPort))
-            {
-                port = parsedPort;
-            }
-        }
 
         try
         {
@@ -933,33 +900,6 @@ public class AdbService(
             logger.Debug($"Could not query IP address from device shell: {ex.Message}");
         }
         return string.Empty;
-    }
-
-    /// <summary>
-    /// Restarts the ADB client to pick up TCP/IP mode changes
-    /// </summary>
-    private async Task RestartAdbClient()
-    {
-        try
-        {
-            logger.Info("Restarting ADB client");
-            var wasMonitoring = IsMonitoring;
-            if (wasMonitoring)
-            {
-                await CleanupAsync();
-            }
-            await Task.Delay(200);
-
-            if (wasMonitoring)
-            {
-                await StartAsync();
-            }
-            logger.Info("ADB client restarted successfully");
-        }
-        catch (Exception ex)
-        {
-            logger.Error($"Failed to restart ADB client: {ex.Message}", ex);
-        }
     }
 
     public Task DisconnectDeviceAsync(AdbDevice device)

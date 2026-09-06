@@ -701,12 +701,6 @@ input keyevent 66</value>
   <data name="EnterAddressesAndCompose" xml:space="preserve">
     <value>Geben Sie oben Adressen ein und verfassen Sie Ihre Nachricht darunter</value>
   </data>
-  <data name="UseTcpIpMode" xml:space="preserve">
-    <value>TCP/IP-Modus verwenden</value>
-  </data>
-  <data name="UseTcpIpModeDescription" xml:space="preserve">
-    <value>Aktiviere drahtlose ADB-Verbindungen</value>
-  </data>
   <data name="WorkingDirectory" xml:space="preserve">
     <value>Arbeitsverzeichnis (optional)</value>
   </data>

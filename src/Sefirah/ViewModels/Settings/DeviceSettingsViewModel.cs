@@ -637,19 +637,6 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
 
     #region ADB Settings
 
-    public bool AdbTcpipModeEnabled
-    {
-        get => DeviceSettings.AdbTcpipModeEnabled;
-        set
-        {
-            if (DeviceSettings.AdbTcpipModeEnabled != value)
-            {
-                DeviceSettings.AdbTcpipModeEnabled = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
     public bool AdbAutoConnect
     {
         get => DeviceSettings.AdbAutoConnect;

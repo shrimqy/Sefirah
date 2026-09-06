@@ -702,12 +702,6 @@ input keyevent 66</value>
   <data name="EnterAddressesAndCompose" xml:space="preserve">
     <value>위에 주소를 입력한 뒤 아래에 메시지를 작성하세요</value>
   </data>
-  <data name="UseTcpIpMode" xml:space="preserve">
-    <value>TCP/IP 모드 사용</value>
-  </data>
-  <data name="UseTcpIpModeDescription" xml:space="preserve">
-    <value>무선 ADB 연결 활성화</value>
-  </data>
   <data name="WorkingDirectory" xml:space="preserve">
     <value>작업 디렉터리 (선택)</value>
   </data>
