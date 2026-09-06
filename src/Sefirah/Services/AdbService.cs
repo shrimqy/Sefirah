@@ -354,10 +354,11 @@ public class AdbService(
                 var deviceModel = fullDeviceData.Model;
                 var pairedDevices = deviceManager.PairedDevices;
 
-                // First try matching by IP prefix (for Wi-Fi ADB devices where Serial is <IP>:<PORT>)
+                // First try matching by IP (for Wi-Fi ADB devices where Serial is <IP>:<PORT>)
+                var adbHost = fullDeviceData.Serial.Split(':')[0];
                 var matchingDevice = pairedDevices.FirstOrDefault(pd =>
-                    (!string.IsNullOrEmpty(pd.Address) && fullDeviceData.Serial.StartsWith(pd.Address)) ||
-                    pd.Addresses.Any(a => !string.IsNullOrEmpty(a.Address) && fullDeviceData.Serial.StartsWith(a.Address)));
+                    (!string.IsNullOrEmpty(pd.Address) && adbHost == pd.Address) ||
+                    pd.Addresses.Any(a => !string.IsNullOrEmpty(a.Address) && adbHost == a.Address));
 
                 // Fall back to normalized model matching
                 if (matchingDevice is null && !string.IsNullOrEmpty(deviceModel))
@@ -854,7 +855,7 @@ public class AdbService(
             }
 
             // Check if already connected over Wi-Fi
-            if (AdbDevices.Any(d => d.Type is DeviceType.WIFI && d.IsOnline && d.Serial.StartsWith(targetIp)))
+            if (AdbDevices.Any(d => d.Type is DeviceType.WIFI && d.IsOnline && d.Serial.Split(':')[0] == targetIp))
             {
                 logger.Debug($"Wireless ADB already connected for {targetIp}");
                 return;

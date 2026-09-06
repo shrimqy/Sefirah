@@ -234,14 +234,15 @@ public partial class PairedDevice : BaseRemoteDevice
         if (adbDevice is null || !adbDevice.IsOnline) return false;
 
         // 1. Match by AndroidId
-        if (!string.IsNullOrEmpty(adbDevice.AndroidId) && adbDevice.AndroidId == Id)
-            return true;
+        if (!string.IsNullOrEmpty(adbDevice.AndroidId))
+            return adbDevice.AndroidId == Id;
 
         // 2. Match by IP Address (for Wi-Fi ADB devices whose serial is <IP>:<PORT>)
-        if (!string.IsNullOrEmpty(Address) && adbDevice.Serial.StartsWith(Address))
+        var adbHost = adbDevice.Serial.Split(':')[0];
+        if (!string.IsNullOrEmpty(Address) && adbHost == Address)
             return true;
 
-        if (Addresses.Any(a => !string.IsNullOrEmpty(a.Address) && adbDevice.Serial.StartsWith(a.Address)))
+        if (Addresses.Any(a => !string.IsNullOrEmpty(a.Address) && adbHost == a.Address))
             return true;
 
         // 3. Match by Model (normalizing underscores to spaces and case-insensitive)
