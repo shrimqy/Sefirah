@@ -315,7 +315,7 @@ public class AdbService(
                         _ = Task.Run(async () => await AutoSetupWirelessAdbAsync(adbDevice));
                     }
                 }
-                }
+            }
         });
     }
     
@@ -875,30 +875,17 @@ public class AdbService(
         try
         {
             var receiver = new ConsoleOutputReceiver();
-            await adbClient.ExecuteShellCommandAsync(deviceData, "ip route", receiver);
+            await adbClient.ExecuteShellCommandAsync(deviceData, "ip -o -4 addr show wlan0", receiver);
             var output = receiver.ToString();
-            var match = Regex.Match(output, @"\bsrc\s+([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)");
-            if (match.Success && !match.Groups[1].Value.StartsWith("127."))
+            var match = Regex.Match(output, @"inet\s+([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)");
+            if (match.Success && !match.Groups[1].Value.StartsWith("169.254."))
             {
                 return match.Groups[1].Value;
-            }
-
-            receiver = new ConsoleOutputReceiver();
-            await adbClient.ExecuteShellCommandAsync(deviceData, "ip -o -4 addr show", receiver);
-            output = receiver.ToString();
-            var ipMatches = Regex.Matches(output, @"inet\s+([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)");
-            foreach (Match m in ipMatches)
-            {
-                var ip = m.Groups[1].Value;
-                if (!ip.StartsWith("127.") && !ip.StartsWith("169.254."))
-                {
-                    return ip;
-                }
             }
         }
         catch (Exception ex)
         {
-            logger.Debug($"Could not query IP address from device shell: {ex.Message}");
+            logger.Debug($"Could not query Wi-Fi IP address from device shell: {ex.Message}");
         }
         return string.Empty;
     }
