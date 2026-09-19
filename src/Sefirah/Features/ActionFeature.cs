@@ -11,8 +11,34 @@ public class ActionFeature(
 {
     public Task InitializeAsync()
     {
+        AddDefaultActions();
         sessionManager.ConnectionStatusChanged += OnConnectionStatusChanged;
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Populates the catalog with the built-in actions the first time it is found empty.
+    /// </summary>
+    private void AddDefaultActions()
+    {
+        if (!generalSettingsService.AddDefaultActions)
+        {
+            return;
+        }
+
+        try
+        {
+            if (generalSettingsService.Actions.Count == 0)
+            {
+                generalSettingsService.SetActions(DefaultActions.Create());
+            }
+
+            generalSettingsService.AddDefaultActions = false;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("Failed to seed default actions", ex);
+        }
     }
 
     private void OnConnectionStatusChanged(object? sender, PairedDevice device)

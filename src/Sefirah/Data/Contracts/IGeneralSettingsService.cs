@@ -47,6 +47,12 @@ public interface IGeneralSettingsService : IBaseSettingsService, INotifyProperty
     List<ActionItem> Actions { get; }
 
     /// <summary>
+    /// Gets or sets whether the built-in default actions still need to be added to the catalog.
+    /// Cleared once they have been (or once an existing catalog was found).
+    /// </summary>
+    bool AddDefaultActions { get; set; }
+
+    /// <summary>
     /// Replaces the full actions list (e.g. after reordering).
     /// </summary>
     void SetActions(IEnumerable<ActionItem> actions);

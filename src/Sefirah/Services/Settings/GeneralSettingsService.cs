@@ -64,6 +64,12 @@ internal sealed partial class GeneralSettingsService : BaseObservableJsonSetting
         private set => Set(value);
     }
 
+    public bool AddDefaultActions
+    {
+        get => Get(true);
+        set => Set(value);
+    }
+
     public void SetActions(IEnumerable<ActionItem> actions)
     {
         ArgumentNullException.ThrowIfNull(actions);
