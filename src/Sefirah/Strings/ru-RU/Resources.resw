@@ -157,7 +157,7 @@
     <value>Сторонние библиотеки</value>
   </data>
   <data name="SaveLocation" xml:space="preserve">
-    <value>Путь сохранения</value>
+    <value>Расположение для сохранения</value>
   </data>
   <data name="RemoteStorageLocation" xml:space="preserve">
     <value>Расположение удаленного хранилища</value>
@@ -229,7 +229,7 @@
     <value>Выберите тему приложения по умолчанию</value>
   </data>
   <data name="BackdropMaterial" xml:space="preserve">
-    <value>Backdrop material</value>
+    <value>Эффект фона</value>
   </data>
   <data name="BackdropMaterialMica" xml:space="preserve">
     <value>Mica</value>
@@ -415,7 +415,7 @@
     <value>Дополнительные аргументы</value>
   </data>
   <data name="AdbDeviceOffline" xml:space="preserve">
-    <value>Adb устройство не в сети</value>
+    <value>ADB устройство не в сети</value>
   </data>
   <data name="AdbDeviceOfflineDescription" xml:space="preserve">
     <value>Подключите устройство через USB с включенной отладкой по USB и повторите попытку.</value>
@@ -469,7 +469,7 @@
     <value>Аудиокодек</value>
   </data>
   <data name="AdbSettings" xml:space="preserve">
-    <value>Настройки Adb</value>
+    <value>Настройки ADB</value>
   </data>
   <data name="AutoConnect" xml:space="preserve">
     <value>Автоматическое подключение</value>
@@ -499,7 +499,7 @@
     <value>Автоматически</value>
   </data>
   <data name="ScrcpyErrorTitle" xml:space="preserve">
-    <value>Не удалось запустить Scrcpy</value>
+    <value>Не удалось запустить scrcpy</value>
   </data>
   <data name="CopyError" xml:space="preserve">
     <value>Скопировать ошибку</value>
@@ -582,10 +582,10 @@ input keyevent 66</value>
     <value>Показывать значок уведомления на панели задач</value>
   </data>
   <data name="LowBatteryAlerts" xml:space="preserve">
-    <value>Low battery alerts</value>
+    <value>Оповещения о низком заряде</value>
   </data>
   <data name="LowBatteryAlertsDescription" xml:space="preserve">
-    <value>Show a notification when this device reaches or drops below the selected battery percentage</value>
+    <value>Показывать уведомление, когда уровень заряда батареи этого устройства достигнет или упадет ниже выбранного процента</value>
   </data>
   <data name="LowBatteryThreshold" xml:space="preserve">
     <value>Low battery threshold</value>
@@ -860,10 +860,10 @@ input text %pwd%</value>
     <value>Как в системе</value>
   </data>
   <data name="ScrcpyLocation" xml:space="preserve">
-    <value>Местоположение Scrcpy</value>
+    <value>Расположение scrcpy</value>
   </data>
   <data name="AdbLocation" xml:space="preserve">
-    <value>Местоположение Adb</value>
+    <value>Расположение ADB</value>
   </data>
   <data name="CallMissed" xml:space="preserve">
     <value>Missed call</value>
@@ -893,7 +893,7 @@ input text %pwd%</value>
     <value>Scroll on the phone preview to change the active device</value>
   </data>
   <data name="AddAppShortcut" xml:space="preserve">
-    <value>Add shortcut</value>
+    <value>Создать ярлык</value>
   </data>
   <data name="RemoveAppShortcut" xml:space="preserve">
     <value>Remove shortcut</value>
@@ -941,10 +941,10 @@ input text %pwd%</value>
     <value>Share files</value>
   </data>
   <data name="SendFiles" xml:space="preserve">
-    <value>Send files</value>
+    <value>Отправить файлы</value>
   </data>
   <data name="BrowseFiles" xml:space="preserve">
-    <value>Browse files</value>
+    <value>Просмотр файлов</value>
   </data>
   <data name="BrowseFilesTooltip" xml:space="preserve">
     <value>Right-click to open the SFTP link and copy it to the clipboard</value>
@@ -962,7 +962,7 @@ input text %pwd%</value>
     <value>Receive clipboard</value>
   </data>
   <data name="SendClipboard" xml:space="preserve">
-    <value>Send clipboard</value>
+    <value>Отправить в буфер обмена</value>
   </data>
   <data name="ReceiveMediaSessions" xml:space="preserve">
     <value>Receive media sessions</value>
@@ -1013,7 +1013,7 @@ input text %pwd%</value>
     <value>Bluetooth is turned off</value>
   </data>
   <data name="Calls" xml:space="preserve">
-    <value>Calls</value>
+    <value>Звонки</value>
   </data>
   <data name="Unmute" xml:space="preserve">
     <value>Unmute</value>
@@ -1079,10 +1079,10 @@ input text %pwd%</value>
     <value>Mbps</value>
   </data>
   <data name="RemoveAllStorageMounts" xml:space="preserve">
-    <value>Remove all storage mounts</value>
+    <value>Удалить все смонтированные хранилища</value>
   </data>
   <data name="RemoveAllStorageMountsDescription" xml:space="preserve">
-    <value>Unmount and clear all device storage registered by the app</value>
+    <value>Размонтировать и очистить все хранилища устройств, зарегистрированные приложением</value>
   </data>
   <data name="Dialer" xml:space="preserve">
     <value>Dialer</value>
