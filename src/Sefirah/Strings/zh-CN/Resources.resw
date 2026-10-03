@@ -419,7 +419,7 @@
     <value>Adb 设备已离线</value>
   </data>
   <data name="AdbDeviceOfflineDescription" xml:space="preserve">
-    <value>连接 USB 设备请启用 USB 调试后重试</value>
+    <value>连接 USB 设备请启用 USB 调试后重试。</value>
   </data>
   <data name="Dismiss" xml:space="preserve">
     <value>忽视</value>
@@ -470,7 +470,7 @@
     <value>音频编码</value>
   </data>
   <data name="AdbSettings" xml:space="preserve">
-    <value>ADB 设置</value>
+    <value>Adb 设置</value>
   </data>
   <data name="AutoConnect" xml:space="preserve">
     <value>自动连接</value>
@@ -500,7 +500,7 @@
     <value>自动</value>
   </data>
   <data name="ScrcpyErrorTitle" xml:space="preserve">
-    <value>scrcpy 启动失败</value>
+    <value>Scrcpy 启动失败</value>
   </data>
   <data name="CopyError" xml:space="preserve">
     <value>复制失败</value>
@@ -541,7 +541,7 @@ input keyevent 66</value>
     <value>ADB 设备未连接</value>
   </data>
   <data name="AdbNoDeviceSubtitle" xml:space="preserve">
-    <value>Turn on ADB and connect your device via USB or Wi-Fi to see it here</value>
+    <value>打开 ADB 并通过 USB 或 Wi-Fi 连接您的设备以查看。</value>
   </data>
   <data name="ClipboardSettings" xml:space="preserve">
     <value>粘贴板设置</value>
@@ -718,7 +718,7 @@ input keyevent 66</value>
     <value>Unlock commands</value>
   </data>
   <data name="NewUnlockCommand" xml:space="preserve">
-    <value>New command</value>
+    <value>新命令</value>
   </data>
   <data name="PasswordCacheTimeout" xml:space="preserve">
     <value>Password cache timeout</value>
@@ -903,7 +903,7 @@ input text %pwd%</value>
     <value>Device audio</value>
   </data>
   <data name="DndToggle" xml:space="preserve">
-    <value>Toggle Do not disturb</value>
+    <value>切换勿扰模式</value>
   </data>
   <data name="StartScreenMirroring" xml:space="preserve">
     <value>Start screen mirroring</value>
@@ -1056,36 +1056,36 @@ input text %pwd%</value>
     <value>8M</value>
   </data>
   <data name="VideoBitrateToolTip" xml:space="preserve">
-    <value>Format: 8M, 8000000</value>
+    <value>格式： 8M, 8000000</value>
   </data>
   <data name="AudioBitratePlaceholder" xml:space="preserve">
     <value>128K</value>
   </data>
   <data name="AudioBitrateToolTip" xml:space="preserve">
-    <value>Format: 128K, 128000</value>
+    <value>格式：128K，128 000</value>
   </data>
   <data name="CropPlaceholder" xml:space="preserve">
-    <value>No crop</value>
+    <value>没有裁剪</value>
   </data>
   <data name="CropToolTip" xml:space="preserve">
-    <value>Format: 1224:1440:0:0</value>
+    <value>格式： 1224:1440:0:0</value>
   </data>
   <data name="VirtualDisplaySizePlaceholder" xml:space="preserve">
-    <value>Device default</value>
+    <value>设备默认</value>
   </data>
   <data name="VirtualDisplaySizeToolTip" xml:space="preserve">
-    <value>Format: 1920x1080</value>
+    <value>格式：1920x1080</value>
   </data>
   <data name="VideoBitrateMbps" xml:space="preserve">
     <value>Mbps</value>
   </data>
   <data name="RemoveAllStorageMounts" xml:space="preserve">
-    <value>Remove all storage mounts</value>
+    <value>移除所有存储挂载</value>
   </data>
   <data name="RemoveAllStorageMountsDescription" xml:space="preserve">
-    <value>Unmount and clear all device storage registered by the app</value>
+    <value>卸载并清除应用程序注册的所有设备存储</value>
   </data>
   <data name="Dialer" xml:space="preserve">
-    <value>Dialer</value>
+    <value>拨号</value>
   </data>
 </root>
