@@ -4,17 +4,9 @@ namespace Sefirah.Data.Contracts;
 
 public interface IFileTransferService
 {
-    /// <summary>
-    /// Receives files from a remote device.
-    /// </summary>
-    Task ReceiveFiles(FileTransferInfo data, PairedDevice device);
+    Task<StorageFile?> Receive(FileTransferSession session, PairedDevice device, bool silent = false);
 
-    /// <summary>
-    /// Sends files to a remote device.
-    /// </summary>
-    Task SendFiles(StorageFile[] files, PairedDevice device, bool isClipboard = false);
-
-    event EventHandler<(PairedDevice device, StorageFile data)> FileReceived;
+    Task Send(StorageFile[] files, PairedDevice device, bool silent = false);
 
     void SendFilesWithPicker(IReadOnlyList<IStorageItem> storageItems);
     void CancelAllTransfers();

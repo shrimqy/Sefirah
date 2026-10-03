@@ -92,8 +92,17 @@ public class MessageHandler(
                     await sftpFeature.Mount(device, sftpServerInfo);
                     break;
 
-                case FileTransferInfo fileTransfer:
-                    await fileTransferService.ReceiveFiles(fileTransfer, device);
+                case ShareTransfer share:
+                    var sharedFile = await fileTransferService.Receive(share.Transfer, device, silent: false);
+                    if (sharedFile is not null && device.DeviceSettings.ClipboardFiles)
+                        await clipboardFeature.SetContentAsync(sharedFile, device);
+                    break;
+
+                case ClipboardTransfer clipboardTransfer:
+                    var clipboardFile = await fileTransferService.Receive(clipboardTransfer.Transfer, device, silent: true);
+                    if (clipboardFile is not null)
+                        await clipboardFeature.SetContentAsync(clipboardFile, device);
+                    break;
                     break;
 
                 case DeviceInfo deviceInfo:

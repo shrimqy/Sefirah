@@ -39,13 +39,7 @@ public class ClipboardFeature(
     public Task InitializeAsync()
     {
         sessionManager.ConnectionStatusChanged += OnConnectionStatusChanged;
-        fileTransferService.FileReceived += OnFileReceived;
         return Task.CompletedTask;
-    }
-
-    private async void OnFileReceived(object? sender, (PairedDevice device, StorageFile data) e)
-    {
-        await SetContentAsync(e.data, e.device);
     }
 
     private void OnConnectionStatusChanged(object? sender, PairedDevice device)
@@ -200,7 +194,7 @@ public class ClipboardFeature(
     {
         var metadata = new FileMetadata($"sefirah_clipboard_image.{fileType}", mimeType, (long)(await file.GetBasicPropertiesAsync()).Size);
 
-        devices.ForEach(d => fileTransferService.SendFiles([file], d, true));
+        devices.ForEach(d => fileTransferService.Send([file], d, silent: true));
     }
 
     private static async Task HandleSmallImageTransfer(Stream stream, string mimeType, List<PairedDevice> devices)

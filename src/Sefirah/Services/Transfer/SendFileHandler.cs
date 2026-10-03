@@ -9,12 +9,13 @@ namespace Sefirah.Services.Transfer;
 
 public partial class SendFileHandler(
     StorageFile[] storageFiles,
-    List<FileMetadata> files,
+    IReadOnlyList<FileMetadata> files,
     PairedDevice device,
     byte[] expectedClientCert,
     Action<ServerInfo> sendTransferMessage,
     ILogger logger,
-    IPlatformNotificationHandler notificationHandler) : ITcpServerProvider, IDisposable
+    IPlatformNotificationHandler notificationHandler,
+    bool silent = false) : ITcpServerProvider, IDisposable
 {
     private Server? server;
     private ServerInfo? serverInfo;
@@ -84,19 +85,22 @@ public partial class SendFileHandler(
             }
 
             // Show completion notification
-            if (IsBulkTransfer)
+            if (!silent)
             {
-                notificationHandler.ShowCompletedFileTransferNotification(
-                    "FileTransferNotification.Completed".GetLocalizedResource(),
-                    string.Format("FileTransferNotification.SentBulk".GetLocalizedResource(), files.Count, device.Name),
-                    TransferId.ToString());
-            }
-            else
-            {
-                notificationHandler.ShowCompletedFileTransferNotification(
-                    "FileTransferNotification.Completed".GetLocalizedResource(),
-                    string.Format("FileTransferNotification.SentSingle".GetLocalizedResource(), files[0].FileName, device.Name),
-                    TransferId.ToString());
+                if (IsBulkTransfer)
+                {
+                    notificationHandler.ShowCompletedFileTransferNotification(
+                        "FileTransferNotification.Completed".GetLocalizedResource(),
+                        string.Format("FileTransferNotification.SentBulk".GetLocalizedResource(), files.Count, device.Name),
+                        TransferId.ToString());
+                }
+                else
+                {
+                    notificationHandler.ShowCompletedFileTransferNotification(
+                        "FileTransferNotification.Completed".GetLocalizedResource(),
+                        string.Format("FileTransferNotification.SentSingle".GetLocalizedResource(), files[0].FileName, device.Name),
+                        TransferId.ToString());
+                }
             }
 
             logger.Debug("All files transferred successfully");
@@ -104,15 +108,19 @@ public partial class SendFileHandler(
         catch (OperationCanceledException)
         {
             logger.Info($"File transfer to {device.Name} cancelled");
-            _ = notificationHandler.RemoveNotificationsByTagAndGroup(TransferId.ToString(), Constants.Notification.FileTransferGroup);
+            if (!silent)
+                _ = notificationHandler.RemoveNotificationsByTagAndGroup(TransferId.ToString(), Constants.Notification.FileTransferGroup);
         }
         catch (Exception ex)
         {
             logger.Warn($"File transfer to {device.Name} failed: {ex.Message}");
-            notificationHandler.ShowCompletedFileTransferNotification(
-                "FileTransferNotification.Failed".GetLocalizedResource(),
-                string.Format("FileTransferNotification.FailedTo".GetLocalizedResource(), device.Name),
-                TransferId.ToString());
+            if (!silent)
+            {
+                notificationHandler.ShowCompletedFileTransferNotification(
+                    "FileTransferNotification.Failed".GetLocalizedResource(),
+                    string.Format("FileTransferNotification.FailedTo".GetLocalizedResource(), device.Name),
+                    TransferId.ToString());
+            }
         }
     }
 
@@ -154,6 +162,7 @@ public partial class SendFileHandler(
 
     private void ShowProgressNotification()
     {
+        if (silent) return;
         var now = Environment.TickCount64;
         if (lastNotificationUpdateTimestamp != 0 && now - lastNotificationUpdateTimestamp < 500)
             return;

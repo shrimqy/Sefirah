@@ -21,7 +21,8 @@ namespace Sefirah.Data.Models;
 [JsonDerivedType(typeof(DeviceInfo), nameof(DeviceInfo))]
 [JsonDerivedType(typeof(Disconnect), nameof(Disconnect))]
 [JsonDerivedType(typeof(DndState), nameof(DndState))]
-[JsonDerivedType(typeof(FileTransferInfo), nameof(FileTransferInfo))]
+[JsonDerivedType(typeof(ClipboardTransfer), nameof(ClipboardTransfer))]
+[JsonDerivedType(typeof(ShareTransfer), nameof(ShareTransfer))]
 [JsonDerivedType(typeof(MediaAction), nameof(MediaAction))]
 [JsonDerivedType(typeof(NotificationAction), nameof(NotificationAction))]
 [JsonDerivedType(typeof(NotificationInfo), nameof(NotificationInfo))]
@@ -273,11 +274,22 @@ public class NotificationReply : SocketMessage
     public required string ReplyText { get; set; }
 }
 
-public class FileTransferInfo : SocketMessage
+public class FileTransferSession
 {
     public required List<FileMetadata> Files { get; set; }
 
     public required ServerInfo ServerInfo { get; set; }
+}
+
+public class ShareTransfer : SocketMessage
+{
+    public required FileTransferSession Transfer { get; set; }
+}
+
+public class ClipboardTransfer : SocketMessage
+{
+    public required FileTransferSession Transfer { get; set; }
+}
 
     public bool IsClipboard { get; set; }
 }

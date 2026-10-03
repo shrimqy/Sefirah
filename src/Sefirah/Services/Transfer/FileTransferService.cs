@@ -23,8 +23,6 @@ public class FileTransferService(
     
     private string StorageLocation => userSettingsService.GeneralSettingsService.ReceivedFilesPath;
 
-    public event EventHandler<(PairedDevice device, StorageFile data)>? FileReceived;
-
     public void CancelAllTransfers()
     {
         foreach (var handler in activeHandlers.Values)
@@ -59,25 +57,25 @@ public class FileTransferService(
 
     #region Receive
 
-    public async Task ReceiveFiles(FileTransferInfo data, PairedDevice device)
+    public async Task<StorageFile?> Receive(FileTransferSession session, PairedDevice device, bool silent = false)
     {
         if (device.Certificate is null || device.Certificate.Length == 0)
         {
             logger.Error("Cannot receive files: device has no pinned certificate. Re-pair the device.");
-            return;
+            return null;
         }
 
-        var savePath = data.IsClipboard
+        var savePath = silent
             ? LocalAppPaths.GetClipboardFolder()
             : StorageLocation;
 
         var handler = new ReceiveFileHandler(
-            data.Files,
-            data.ServerInfo,
+            session.Files,
+            session.ServerInfo,
             device,
             device.Certificate,
             savePath,
-            data.IsClipboard,
+            silent,
             logger,
             notificationHandler);
 
@@ -86,12 +84,7 @@ public class FileTransferService(
             var transferId = await handler.ConnectAsync();
             activeHandlers[transferId] = handler;
 
-            var file = await handler.ReceiveAsync();
-
-            if (file is not null && (data.IsClipboard || device.DeviceSettings.ClipboardFiles))
-            {
-                FileReceived?.Invoke(this, (device, file));
-            }
+            return await handler.ReceiveAsync();
         }
         finally
         {
@@ -133,7 +126,7 @@ public class FileTransferService(
             {
                 foreach (var device in selectedDevices)
                 {
-                    await SendFiles(files, device);
+                    await Send(files, device);
                 }
             });
         }
@@ -143,7 +136,7 @@ public class FileTransferService(
         }
     }
 
-    public async Task SendFiles(StorageFile[] files, PairedDevice device, bool isClipboard = false)
+    public async Task Send(StorageFile[] files, PairedDevice device, bool silent = false)
     {
         if (device.Certificate is null || device.Certificate.Length == 0)
         {
@@ -151,21 +144,23 @@ public class FileTransferService(
             return;
         }
 
-        var fileMetadataList = await Task.WhenAll(files.Select(file => file.ToFileMetadata()));
+        var metadata = await Task.WhenAll(files.Select(file => file.ToFileMetadata()));
 
         var handler = new SendFileHandler(
             files,
-            fileMetadataList.ToList(),
+            metadata,
             device,
             device.Certificate,
-            serverInfo => device.SendMessage(new FileTransferInfo
+            serverInfo =>
             {
-                Files = [.. fileMetadataList],
-                ServerInfo = serverInfo,
-                IsClipboard = isClipboard
-            }),
+                var session = new FileTransferSession { Files = [.. metadata], ServerInfo = serverInfo };
+                device.SendMessage(silent
+                    ? new ClipboardTransfer { Transfer = session }
+                    : new ShareTransfer { Transfer = session });
+            },
             logger,
-            notificationHandler);
+            notificationHandler,
+            silent);
 
         try
         {

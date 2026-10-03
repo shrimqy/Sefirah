@@ -13,7 +13,7 @@ public partial class ReceiveFileHandler(
     PairedDevice device,
     byte[] expectedCert,
     string storageLocation,
-    bool isClipboard,
+    bool silent,
     ILogger logger,
     IPlatformNotificationHandler notificationHandler) : ITcpClientProvider, IDisposable
 {
@@ -83,7 +83,7 @@ public partial class ReceiveFileHandler(
                     await transferCompletionSource.Task;
                 }
 
-                string fullPath = isClipboard
+                string fullPath = silent
                     ? LocalAppPaths.CreateClipboardFilePath(Path.GetExtension(fileMetadata.FileName))
                     : Path.Combine(storageLocation, fileMetadata.FileName);
                 Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
@@ -110,7 +110,7 @@ public partial class ReceiveFileHandler(
                 CleanupFileStream();
             }
 
-            if (!isClipboard)
+            if (!silent)
             {
                 if (IsBulkTransfer)
                 {
@@ -135,14 +135,14 @@ public partial class ReceiveFileHandler(
         catch (OperationCanceledException)
         {
             logger.Info($"File transfer from {device.Name} cancelled");
-            if (!isClipboard)
+            if (!silent)
                 _ = notificationHandler.RemoveNotificationsByTagAndGroup(TransferId.ToString(), Constants.Notification.FileTransferGroup);
             CleanupFailedFile();
         }
         catch (Exception ex)
         {
             logger.Warn($"File transfer from {device.Name} failed: {ex.Message}");
-            if (!isClipboard)
+            if (!silent)
             {
                 notificationHandler.ShowCompletedFileTransferNotification(
                     "FileTransferNotification.Failed".GetLocalizedResource(),
@@ -164,7 +164,7 @@ public partial class ReceiveFileHandler(
 
     private void ShowProgressNotification()
     {
-        if (isClipboard) return;
+        if (silent) return;
 
         var now = Environment.TickCount64;
         if (lastNotificationUpdateTimestamp != 0 && now - lastNotificationUpdateTimestamp < 500)
