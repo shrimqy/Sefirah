@@ -55,7 +55,7 @@ public sealed partial class SystemTrayService : ISystemTrayService
         trayIcon?.LeftClicked -= OnTrayIconLeftClicked;
         trayIcon?.RightClicked -= OnTrayIconRightClicked;
         trayIcon?.LeftDoubleClicked -= OnTrayIconDoubleClicked;
-        trayIcon?.Destroy();
+        trayIcon?.Dispose();
         trayIcon = null;
 
         trayFlyout?.Dispose();

@@ -14,7 +14,7 @@
     <PackageVersion Include="CommunityToolkit.WinUI.Converters" Version="8.2.251219" />
     <PackageVersion Include="CommunityToolkit.WinUI.Extensions" Version="8.2.251219" />
     <PackageVersion Include="CommunityToolkit.WinUI.Controls.Segmented" Version="8.2.251219" />
-    <PackageVersion Include="DesktopFlyouts.WinUI" Version="1.4.0" />
+    <PackageVersion Include="DesktopFlyouts.WinUI" Version="1.5.0" />
     <PackageVersion Include="libphonenumber-csharp" Version="9.0.29" />
     <PackageVersion Include="MeaMod.DNS" Version="1.0.71" />
     <PackageVersion Include="Microsoft.WindowsAppSDK" Version="2.0.1" />
