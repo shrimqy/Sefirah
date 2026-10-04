@@ -408,6 +408,42 @@
   <data name="CopyMessage" xml:space="preserve">
     <value>Nachricht kopieren</value>
   </data>
+  <data name="Today" xml:space="preserve">
+    <value>Today</value>
+  </data>
+  <data name="Yesterday" xml:space="preserve">
+    <value>Yesterday</value>
+  </data>
+  <data name="MessagePhoto" xml:space="preserve">
+    <value>Photo</value>
+  </data>
+  <data name="MessageVideo" xml:space="preserve">
+    <value>Video</value>
+  </data>
+  <data name="MessageAudio" xml:space="preserve">
+    <value>Audio</value>
+  </data>
+  <data name="MessageAttachment" xml:space="preserve">
+    <value>Attachment</value>
+  </data>
+  <data name="AttachFile" xml:space="preserve">
+    <value>Attach</value>
+  </data>
+  <data name="MessageAttachDropCaption" xml:space="preserve">
+    <value>Drop files to attach</value>
+  </data>
+  <data name="RemoveAttachment" xml:space="preserve">
+    <value>Remove attachment</value>
+  </data>
+  <data name="OpenAttachment" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="OpenWith" xml:space="preserve">
+    <value>Open with...</value>
+  </data>
+  <data name="ShowInFolder" xml:space="preserve">
+    <value>Show in folder</value>
+  </data>
   <data name="NoApps" xml:space="preserve">
     <value>Keine Apps gefunden</value>
   </data>
@@ -903,6 +939,12 @@ input text %pwd%</value>
   </data>
   <data name="DndToggle" xml:space="preserve">
     <value>Toggle Do not disturb</value>
+  </data>
+  <data name="BluetoothOn" xml:space="preserve">
+    <value>Bluetooth is on</value>
+  </data>
+  <data name="BluetoothOff" xml:space="preserve">
+    <value>Bluetooth is off</value>
   </data>
   <data name="StartScreenMirroring" xml:space="preserve">
     <value>Start screen mirroring</value>
