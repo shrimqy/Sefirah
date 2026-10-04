@@ -1,0 +1,150 @@
+<UserControl
+    x:Class="Sefirah.UserControls.MessageAttachmentView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:Sefirah.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:Sefirah.Helpers"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" Inverse="True" />
+
+        <MenuFlyout x:Key="AttachmentContextFlyout">
+            <MenuFlyoutItem
+                Click="OnOpenWithClick"
+                Text="{helpers:ResourceString Name=OpenWith}">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE8A7;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem
+                Click="OnShowInFolderClick"
+                Text="{helpers:ResourceString Name=ShowInFolder}">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE838;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+        </MenuFlyout>
+
+        <Style x:Key="ChromeLessButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ContentPresenter
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Button
+            x:Name="PreviewButton"
+            Click="OnClicked"
+            ContextFlyout="{StaticResource AttachmentContextFlyout}"
+            Style="{StaticResource ChromeLessButtonStyle}"
+            ToolTipService.ToolTip="{helpers:ResourceString Name=OpenAttachment}"
+            Visibility="{x:Bind Attachment.HasPreview, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid>
+                <Border CornerRadius="12">
+                    <Image
+                        MaxWidth="360"
+                        MaxHeight="480"
+                        Stretch="Uniform"
+                        Source="{x:Bind Attachment.PreviewImage, Mode=OneWay}" />
+                </Border>
+                <Border
+                    Width="40"
+                    Height="40"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="#99000000"
+                    CornerRadius="20"
+                    Visibility="{x:Bind Attachment.ShowPlayOverlay, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <FontIcon
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                        FontSize="16"
+                        Foreground="White"
+                        Glyph="&#xE768;" />
+                </Border>
+                <ProgressRing
+                    Width="32"
+                    Height="32"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    IsActive="{x:Bind Attachment.IsLoading, Mode=OneWay}"
+                    Visibility="{x:Bind Attachment.IsLoading, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            </Grid>
+        </Button>
+
+        <Button
+            x:Name="PlaceholderButton"
+            Click="OnClicked"
+            ContextFlyout="{StaticResource AttachmentContextFlyout}"
+            Style="{StaticResource ChromeLessButtonStyle}"
+            ToolTipService.ToolTip="{helpers:ResourceString Name=OpenAttachment}"
+            Visibility="{x:Bind Attachment.ShowPlaceholder, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border
+                MinWidth="220"
+                MaxWidth="280"
+                Padding="12,10"
+                Background="{ThemeResource ControlFillColorDefaultBrush}"
+                CornerRadius="8">
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Width="36" Height="36">
+                        <FontIcon
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                            FontSize="18"
+                            Glyph="{x:Bind Attachment.PlaceholderGlyph, Mode=OneWay}"
+                            Visibility="{x:Bind Attachment.IsLoading, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                        <ProgressRing
+                            Width="22"
+                            Height="22"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            IsActive="{x:Bind Attachment.IsLoading, Mode=OneWay}"
+                            Visibility="{x:Bind Attachment.IsLoading, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    </Grid>
+
+                    <StackPanel
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Spacing="1">
+                        <TextBlock
+                            MaxLines="1"
+                            Text="{x:Bind Attachment.DisplayTitle, Mode=OneWay}"
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="NoWrap" />
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="{x:Bind Attachment.PlaceholderLabel, Mode=OneWay}"
+                            Visibility="{x:Bind Attachment.ShowTypeCaption, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Button>
+    </Grid>
+</UserControl>

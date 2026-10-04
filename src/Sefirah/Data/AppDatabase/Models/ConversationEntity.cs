@@ -25,27 +25,13 @@ public class ConversationEntity
 
     public long TimeStamp { get; set; }
 
+    public long Checksum { get; set; }
+
     [Ignore]
     public List<string> Addresses { get; set; } = [];
 
     #region Helpers
     public static string GetKey(string deviceId, long threadId) => $"{deviceId}:{threadId}";
-
-    public static ConversationEntity FromMessage(ConversationInfo thread, string deviceId)
-    {
-        var latestMessage = thread.Messages.OrderByDescending(m => m.Timestamp).First();
-        return new ConversationEntity
-        {
-            Key = GetKey(deviceId, thread.ThreadId),
-            DeviceId = deviceId,
-            ThreadId = thread.ThreadId,
-            AddressesJson = JsonSerializer.Serialize(thread.Recipients),
-            HasRead = thread.Messages.Any(m => m.Read),
-            TimeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-            LastMessageTimestamp = latestMessage.Timestamp,
-            LastMessage = latestMessage.Body
-        };
-    }
 
     internal Conversation ToConversation(ContactRepository contactRepository)
     {
@@ -68,6 +54,7 @@ public class ConversationEntity
             LastMessage = LastMessage ?? string.Empty,
             LastMessageTimestamp = LastMessageTimestamp,
             HasRead = HasRead,
+            Checksum = Checksum,
         };
     }
     #endregion

@@ -6,6 +6,7 @@ public static class LocalAppPaths
     public const string DeviceSettingsFileName = "settings.json";
     public const string DeviceIconsFolderName = "Icons";
     public const string ClipboardFolderName = "Clipboard";
+    public const string AttachmentsFolderName = "Attachments";
     public const string UserSettingsFileName = "user_settings.json";
 
     private static readonly TimeSpan TemporaryFileMaxAge = TimeSpan.FromHours(24);
@@ -28,6 +29,13 @@ public static class LocalAppPaths
     public static string GetClipboardFolder()
     {
         var path = Path.Combine(TemporaryFolder, ClipboardFolderName);
+        Directory.CreateDirectory(path);
+        return path;
+    }
+
+    public static string GetAttachmentsFolder(string deviceId)
+    {
+        var path = Path.Combine(TemporaryFolder, AttachmentsFolderName, deviceId);
         Directory.CreateDirectory(path);
         return path;
     }

@@ -76,8 +76,20 @@ public class MessageHandler(
                     await clipboardFeature.SetContentAsync(clipboard, device);
                     break;
 
-                case ConversationInfo textConversation:
-                    await smsFeature.HandleTextMessage(device.Id, textConversation);
+                case ConversationInfo conversationInfo:
+                    await smsFeature.HandleConversationInfo(device.Id, conversationInfo);
+                    break;
+
+                case MessageList messageList:
+                    await smsFeature.HandleMessageList(device.Id, messageList);
+                    break;
+
+                case MessageIndex messageIndex:
+                    await smsFeature.HandleMessageIndex(device.Id, messageIndex);
+                    break;
+
+                case RemoveConversation removeConversation:
+                    await smsFeature.HandleRemoveConversation(device.Id, removeConversation);
                     break;
 
                 case ContactInfo contactMessage:
@@ -103,6 +115,17 @@ public class MessageHandler(
                     if (clipboardFile is not null)
                         await clipboardFeature.SetContentAsync(clipboardFile, device);
                     break;
+
+                case SmsAttachmentTransfer smsAttachmentTransfer:
+                    StorageFile? attachmentFile = null;
+                    try
+                    {
+                        attachmentFile = await fileTransferService.Receive(smsAttachmentTransfer.Transfer, device, silent: true);
+                    }
+                    finally
+                    {
+                        await smsFeature.HandleAttachmentFile(device.Id, smsAttachmentTransfer.PartId, attachmentFile);
+                    }
                     break;
 
                 case DeviceInfo deviceInfo:

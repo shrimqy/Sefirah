@@ -6,11 +6,12 @@ namespace Sefirah.Data.AppDatabase;
 
 public class DatabaseContext
 {
-    private const int CurrentSchemaVersion = 5;
+    private const int CurrentSchemaVersion = 6;
 
     private static readonly IMigration[] Migrations = 
     [
         new SchemaVersion2Migration(),
+        new SchemaVersion6Migration(),
     ];
 
     public SQLiteConnection Database { get; private set; }

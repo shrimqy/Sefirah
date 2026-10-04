@@ -18,12 +18,18 @@ namespace Sefirah.Data.Models;
 [JsonDerivedType(typeof(ClipboardInfo), nameof(ClipboardInfo))]
 [JsonDerivedType(typeof(ContactInfo), nameof(ContactInfo))]
 [JsonDerivedType(typeof(ConversationInfo), nameof(ConversationInfo))]
+[JsonDerivedType(typeof(ConversationsRequest), nameof(ConversationsRequest))]
 [JsonDerivedType(typeof(DeviceInfo), nameof(DeviceInfo))]
 [JsonDerivedType(typeof(Disconnect), nameof(Disconnect))]
 [JsonDerivedType(typeof(DndState), nameof(DndState))]
 [JsonDerivedType(typeof(ClipboardTransfer), nameof(ClipboardTransfer))]
 [JsonDerivedType(typeof(ShareTransfer), nameof(ShareTransfer))]
+[JsonDerivedType(typeof(SmsAttachmentRequest), nameof(SmsAttachmentRequest))]
+[JsonDerivedType(typeof(SmsAttachmentTransfer), nameof(SmsAttachmentTransfer))]
 [JsonDerivedType(typeof(MediaAction), nameof(MediaAction))]
+[JsonDerivedType(typeof(MessageIndex), nameof(MessageIndex))]
+[JsonDerivedType(typeof(MessageList), nameof(MessageList))]
+[JsonDerivedType(typeof(MessagesRequest), nameof(MessagesRequest))]
 [JsonDerivedType(typeof(NotificationAction), nameof(NotificationAction))]
 [JsonDerivedType(typeof(NotificationInfo), nameof(NotificationInfo))]
 [JsonDerivedType(typeof(NotificationReply), nameof(NotificationReply))]
@@ -32,12 +38,12 @@ namespace Sefirah.Data.Models;
 [JsonDerivedType(typeof(BluetoothPairingResult), nameof(BluetoothPairingResult))]
 [JsonDerivedType(typeof(PlaySound), nameof(PlaySound))]
 [JsonDerivedType(typeof(PlaybackInfo), nameof(PlaybackInfo))]
+[JsonDerivedType(typeof(RemoveConversation), nameof(RemoveConversation))]
 [JsonDerivedType(typeof(RequestApplicationList), nameof(RequestApplicationList))]
 [JsonDerivedType(typeof(RequestWorkerLaunch), nameof(RequestWorkerLaunch))]
 [JsonDerivedType(typeof(RingerModeState), nameof(RingerModeState))]
 [JsonDerivedType(typeof(SftpServerInfo), nameof(SftpServerInfo))]
 [JsonDerivedType(typeof(TextMessage), nameof(TextMessage))]
-[JsonDerivedType(typeof(ThreadRequest), nameof(ThreadRequest))]
 [JsonDerivedType(typeof(UdpBroadcast), nameof(UdpBroadcast))]
 public class SocketMessage;
 
@@ -157,15 +163,56 @@ public class AudioDeviceInfo : SocketMessage
     public bool IsSelected { get; set; }
 }
 
+/// <summary>New/changed thread row: recipients, checksum, and tip message for the sidebar.</summary>
 public class ConversationInfo : SocketMessage
 {
-    public required ConversationInfoType InfoType { get; set; }
-
     public required long ThreadId { get; set; }
 
     public List<string> Recipients { get; set; } = [];
 
+    public long Checksum { get; set; }
+
+    public required TextMessage Message { get; set; }
+}
+
+/// <summary>Message bodies. MessageIds is the full thread inventory on Open only.</summary>
+public class MessageList : SocketMessage
+{
+    public required long ThreadId { get; set; }
+
+    public required MessageListKind Kind { get; set; }
+
     public List<TextMessage> Messages { get; set; } = [];
+
+    /// <summary>Full thread inventory on Open only, newest first.</summary>
+    public List<long>? MessageIds { get; set; }
+
+    /// <summary>Thread checksum after this change; New only.</summary>
+    public long? Checksum { get; set; }
+}
+
+/// <summary>Authoritative message-id set for a thread after a delete, plus checksum.</summary>
+public class MessageIndex : SocketMessage
+{
+    public required long ThreadId { get; set; }
+
+    public List<long> MessageIds { get; set; } = [];
+
+    public long Checksum { get; set; }
+}
+
+/// <summary>Thread removed on the phone.</summary>
+public class RemoveConversation : SocketMessage
+{
+    public required long ThreadId { get; set; }
+}
+
+/// <summary>Desktop -> phone: null MessageIds = Open (tip page + index); set = History bodies for these ids.</summary>
+public class MessagesRequest : SocketMessage
+{
+    public required long ThreadId { get; set; }
+
+    public List<long>? MessageIds { get; set; }
 }
 
 public class TextMessage : SocketMessage
@@ -173,8 +220,6 @@ public class TextMessage : SocketMessage
     public long UniqueId { get; set; }
 
     public List<string> Addresses { get; set; } = [];
-
-    public long ThreadId { get; set; }
 
     public required string Body { get; set; }
 
@@ -188,25 +233,35 @@ public class TextMessage : SocketMessage
 
     public List<SmsAttachment>? Attachments { get; set; } = null;
 
-    public bool IsTextMessage { get; set; } = false;
-
-    public bool HasMultipleRecipients { get; set; } = false;
+    /// <summary>Desktop outbound UniqueId; set on phone tips after sent-intent maps Telephony _id.</summary>
+    public long? TempId { get; set; }
 }
 
 public class SmsAttachment
 {
-    public string? Id { get; set; }
-    public string? MimeType { get; set; }
+    public string FileName { get; set; } = string.Empty;
+    public string MimeType { get; set; } = string.Empty;
+    public string? Thumbnail { get; set; }
+    public long PartId { get; set; } = -1;
     public string? Base64EncodedFile { get; set; }
 }
 
-public class ThreadRequest : SocketMessage
+public class SmsAttachmentRequest : SocketMessage
 {
-    public required long ThreadId { get; set; }
+    public long PartId { get; set; }
+}
 
-    public long RangeStartTimestamp { get; set; } = -1;
+/// <summary>Desktop → phone on connect: known thread ids + checksums for cheap tip sync.</summary>
+public class ConversationsRequest : SocketMessage
+{
+    public List<ThreadInfo> KnownThreads { get; set; } = [];
+}
 
-    public long NumberToRequest { get; set; } = -1;
+public class ThreadInfo
+{
+    public long ThreadId { get; set; }
+
+    public long Checksum { get; set; }
 }
 
 public class ContactInfo : SocketMessage
@@ -291,7 +346,11 @@ public class ClipboardTransfer : SocketMessage
     public required FileTransferSession Transfer { get; set; }
 }
 
-    public bool IsClipboard { get; set; }
+public class SmsAttachmentTransfer : SocketMessage
+{
+    public required FileTransferSession Transfer { get; set; }
+
+    public long PartId { get; set; }
 }
 
 public class SftpServerInfo : SocketMessage

@@ -1,6 +1,9 @@
+using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml.Input;
 using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
+using Sefirah.UserControls;
+using Sefirah.Utils;
 using Sefirah.ViewModels;
 using Windows.ApplicationModel.DataTransfer;
 #if WINDOWS
@@ -21,10 +24,33 @@ public sealed partial class MessagesPage : Page
         Loaded += (_, _) => UpdatePaneLayout();
     }
 
+    private ScrollViewer? messagesScrollViewer;
+
+    private void MessagesListView_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (messagesScrollViewer is not null)
+            return;
+
+        messagesScrollViewer = MessagesListView.FindDescendant<ScrollViewer>(x => x.Name == "ScrollViewer");
+        messagesScrollViewer?.ViewChanged += MessagesScrollViewer_ViewChanged;
+    }
+
+    private async void MessagesScrollViewer_ViewChanged(object? sender, ScrollViewerViewChangedEventArgs e)
+    {
+#if WINDOWS
+        if (MessagesListView.ItemsPanelRoot is ItemsStackPanel { FirstVisibleIndex: 0 })
+#else
+        // ItemsStackPanel.FirstVisibleIndex is unimplemented on Uno Skia/WASM:
+        // https://platform.uno/docs/articles/implemented/microsoft-ui-xaml-controls-itemsstackpanel.html
+        if (sender is ScrollViewer { VerticalOffset: < 200 })
+#endif
+            await ViewModel.LoadOlderMessages();
+    }
+
     private const double TwoPaneMinWidth = 720;
     private const double WideThreadsWidth = 420;
-    private bool _showDetail;
 
+    private bool _showDetail;
     private void SendButton_Click(object sender, RoutedEventArgs e)
     {
         SendMessage();
@@ -72,13 +98,79 @@ public sealed partial class MessagesPage : Page
         MessageTextBox.SelectionStart = start + 1;
     }
 
-    private void SendMessage()
+    private async void SendMessage()
     {
-        if (!string.IsNullOrWhiteSpace(MessageTextBox.Text))
+        if (!string.IsNullOrWhiteSpace(MessageTextBox.Text) || ViewModel.StagedAttachments.Count > 0)
         {
-            ViewModel.SendMessage(MessageTextBox.Text);
+            await ViewModel.SendMessage(MessageTextBox.Text);
             MessageTextBox.Text = string.Empty;
         }
+    }
+
+    private async void AttachButton_Click(object sender, RoutedEventArgs e)
+    {
+        var files = await PickerHelper.PickMultipleFilesAsync(
+        [
+            ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp",
+            ".mp4", ".3gp",
+            ".mp3", ".m4a", ".aac", ".ogg"
+        ]);
+        if (files.Count > 0)
+            await ViewModel.AddFiles(files);
+    }
+
+    private void Composer_DragOver(object sender, DragEventArgs e)
+    {
+        if (!ViewModel.ShouldShowComposeUI || !e.DataView.Contains(StandardDataFormats.StorageItems))
+            return;
+
+        e.AcceptedOperation = DataPackageOperation.Copy;
+        e.DragUIOverride.Caption = "MessageAttachDropCaption".GetLocalizedResource();
+        e.Handled = true;
+    }
+
+    private async void Composer_Drop(object sender, DragEventArgs e)
+    {
+        if (!ViewModel.ShouldShowComposeUI || !e.DataView.Contains(StandardDataFormats.StorageItems))
+            return;
+
+        e.Handled = true;
+        var items = await e.DataView.GetStorageItemsAsync();
+        var files = items.OfType<StorageFile>().ToList();
+        if (files.Count > 0)
+            await ViewModel.AddFiles(files);
+    }
+
+    private void RemoveStagedAttachment_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is StagedAttachment attachment)
+        {
+            ViewModel.RemoveStagedAttachment(attachment);
+        }
+    }
+
+    private async void PrefetchGif_Handler(object sender, RoutedEventArgs e)
+    {
+        if (sender is MessageAttachmentView { Attachment: { } attachment })
+            await ViewModel.PrefetchGifAsync(attachment);
+    }
+
+    private async void OpenAttachment_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MessageAttachmentView { Attachment: { } attachment })
+            await ViewModel.OpenAttachment(attachment);
+    }
+
+    private async void OpenAttachmentWith_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MessageAttachmentView { Attachment: { } attachment })
+            await ViewModel.OpenAttachmentWith(attachment);
+    }
+
+    private async void ShowAttachmentInFolder_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MessageAttachmentView { Attachment: { } attachment })
+            await ViewModel.ShowAttachmentInFolder(attachment);
     }
 
     private void NewMessageButton_Click(object sender, RoutedEventArgs e)
@@ -107,17 +199,13 @@ public sealed partial class MessagesPage : Page
 
     private void SearchBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
     {
-    }
+        if (args.ChosenSuggestion is not Conversation conversation)
+            return;
 
-    private void SearchBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
-    {
-        if (args.SelectedItem is Conversation conversation)
-        {
-            ViewModel.SelectedConversation = conversation;
-            sender.Text = string.Empty;
-            sender.ItemsSource = null;
-            ShowConversationDetail();
-        }
+        ViewModel.SelectedConversation = conversation;
+        sender.Text = string.Empty;
+        sender.ItemsSource = null;
+        ShowConversationDetail();
     }
 
     private void MessagesList_ItemClick(object sender, ItemClickEventArgs e)
@@ -161,16 +249,6 @@ public sealed partial class MessagesPage : Page
         DetailColumn.Width = _showDetail ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
     }
 
-    private void AddressInput_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
-    {
-        if (args.SelectedItem is Contact contact)
-        {
-            ViewModel.AddAddress(contact);
-            sender.Text = string.Empty;
-            sender.ItemsSource = null;
-        }
-    }
-
     private void RemoveAddressButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button button && button.Tag is Contact address)
@@ -189,11 +267,10 @@ public sealed partial class MessagesPage : Page
 
     private void AddressInput_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
     {
-        var address = args.QueryText;
-        if (!string.IsNullOrWhiteSpace(address))
-        {
-            ViewModel.AddAddress(new Contact(address));
-        }
+        if (args.ChosenSuggestion is Contact contact)
+            ViewModel.AddAddress(contact);
+        else if (!string.IsNullOrWhiteSpace(args.QueryText))
+            ViewModel.AddAddress(new Contact(args.QueryText));
 
         sender.Text = string.Empty;
         sender.ItemsSource = null;

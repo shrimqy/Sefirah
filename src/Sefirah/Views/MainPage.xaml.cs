@@ -171,16 +171,22 @@ public sealed partial class MainPage : Page
 
     private async void Page_Drop(object sender, DragEventArgs e)
     {
-        // Check if the dropped data contains files
+        if (ShouldDeferFileDropToMessages())
+            return;
+
         if (e.DataView.Contains(StandardDataFormats.StorageItems))
             ViewModel.SendFiles(await e.DataView.GetStorageItemsAsync());
     }
 
     private void Grid_DragOver(object sender, DragEventArgs e)
     {
-        if (ViewModel.PairedDevices.Count == 0) return;
+        if (ViewModel.PairedDevices.Count == 0 || ShouldDeferFileDropToMessages())
+            return;
 
         e.AcceptedOperation = DataPackageOperation.Copy;
         e.DragUIOverride.Caption = "FileDropCaption".GetLocalizedResource();
     }
+
+    private bool ShouldDeferFileDropToMessages() =>
+        ContentFrame.Content is MessagesPage { ViewModel.ShouldShowComposeUI: true };
 }

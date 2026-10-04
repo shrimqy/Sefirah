@@ -61,12 +61,11 @@ public enum NotificationInfoType
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
-public enum ConversationInfoType
+public enum MessageListKind
 {
-    Active,
-    ActiveUpdated,
-    Removed,
-    New
+    Open,
+    History,
+    New,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]

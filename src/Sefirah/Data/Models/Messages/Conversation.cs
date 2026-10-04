@@ -12,6 +12,7 @@ public partial class Conversation : ObservableObject
 
     public List<Contact> Contacts { get; set; } = [];
 
+    // Group presentation follows the conversation's resolved participants.
     public bool IsGroup => Contacts.Count > 1;
 
     public Contact? PrimaryContact => Contacts.Count == 1 ? Contacts[0] : null;
@@ -59,12 +60,22 @@ public partial class Conversation : ObservableObject
         set => SetProperty(ref hasRead, value);
     }
 
+    public long Checksum { get; set; }
+
+    // Phone inventory for this session. Null means unknown; empty means no messages.
+    public ThreadMessageIndex? MessageIndex { get; set; }
+
+    public bool IsTemporaryThread => ThreadId < 0;
+
     public void UpdateFrom(Conversation other)
     {
         LastMessage = other.LastMessage;
         LastMessageTimestamp = other.LastMessageTimestamp;
         HasRead = other.HasRead;
+        Checksum = other.Checksum;
         Contacts = other.Contacts;
+        if (other.MessageIndex is not null)
+            MessageIndex = other.MessageIndex.Clone();
         OnPropertyChanged(nameof(DisplayName));
         OnPropertyChanged(nameof(SubtitleAddress));
         OnPropertyChanged(nameof(AvatarStream));

@@ -1,6 +1,7 @@
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Models;
 using Sefirah.Data.Models.Messages;
+using Sefirah.Utils;
 using SQLite;
 
 namespace Sefirah.Data.AppDatabase.Models;
@@ -33,18 +34,18 @@ public class MessageEntity
     public string Address { get; set; } = string.Empty;
 
     [Ignore]
-    public List<SmsAttachment> Attachments { get; set; } = [];
+    public List<AttachmentEntity> AttachmentEntities { get; set; } = [];
 
     #region Helpers
-    public static string GetKey(string deviceId, long uniqueId) => $"{deviceId}:{uniqueId}";
+    public static string GetKey(string deviceId, long threadId, long uniqueId) => $"{deviceId}:{threadId}:{uniqueId}";
 
-    public static MessageEntity FromMessage(TextMessage message, string deviceId) => new()
+    public static MessageEntity FromMessage(TextMessage message, string deviceId, long threadId) => new()
     {
-        Key = GetKey(deviceId, message.UniqueId),
-        ConversationKey = ConversationEntity.GetKey(deviceId, message.ThreadId),
+        Key = GetKey(deviceId, threadId, message.UniqueId),
+        ConversationKey = ConversationEntity.GetKey(deviceId, threadId),
         DeviceId = deviceId,
         UniqueId = message.UniqueId,
-        ThreadId = message.ThreadId,
+        ThreadId = threadId,
         Body = message.Body,
         Timestamp = message.Timestamp,
         Read = message.Read,
@@ -67,7 +68,19 @@ public class MessageEntity
             Read = Read,
             SubscriptionId = SubscriptionId,
             MessageType = MessageType,
-            Attachments = Attachments,
+            Attachments = [.. AttachmentEntities.Select(a =>
+            {
+                var fullPath = AttachmentStorage.GetPathIfExists(DeviceId, UniqueId, a.PartId, a.FileName, a.MimeType);
+                var thumbPath = AttachmentStorage.GetThumbnailPathIfExists(DeviceId, UniqueId, a.PartId, a.FileName);
+                return new MessageAttachment
+                {
+                    FileName = a.FileName,
+                    MimeType = a.MimeType,
+                    PartId = a.PartId,
+                    FilePath = fullPath,
+                    PreviewPath = thumbPath
+                };
+            })],
             Participant = participant,
         };
     }
