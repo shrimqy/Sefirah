@@ -67,6 +67,10 @@ public class MessageHandler(
                     await App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.DndEnabled = dndStatus.IsEnabled);
                     break;
 
+                case BluetoothState bluetoothState:
+                    await App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.BluetoothEnabled = bluetoothState.IsEnabled);
+                    break;
+
                 case AudioStreamState audioStream:
                     await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
                         device.UpdateStreamLevel(audioStream.StreamType, audioStream.Level));

@@ -12,6 +12,7 @@ namespace Sefirah.Data.Models;
 [JsonDerivedType(typeof(AudioDeviceInfo), nameof(AudioDeviceInfo))]
 [JsonDerivedType(typeof(AudioStreamState), nameof(AudioStreamState))]
 [JsonDerivedType(typeof(BatteryState), nameof(BatteryState))]
+[JsonDerivedType(typeof(BluetoothState), nameof(BluetoothState))]
 [JsonDerivedType(typeof(CallInfo), nameof(CallInfo))]
 [JsonDerivedType(typeof(CallLogInfo), nameof(CallLogInfo))]
 [JsonDerivedType(typeof(ClearNotifications), nameof(ClearNotifications))]
@@ -113,6 +114,11 @@ public class RingerModeState : SocketMessage
 }
 
 public class DndState : SocketMessage
+{
+    public bool IsEnabled { get; set; }
+}
+
+public class BluetoothState : SocketMessage
 {
     public bool IsEnabled { get; set; }
 }

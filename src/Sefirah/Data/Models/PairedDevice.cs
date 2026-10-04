@@ -151,6 +151,13 @@ public partial class PairedDevice : BaseRemoteDevice
         set => SetProperty(ref dndEnabled, value);
     }
 
+    private bool bluetoothEnabled;
+    public bool BluetoothEnabled
+    {
+        get => bluetoothEnabled;
+        set => SetProperty(ref bluetoothEnabled, value);
+    }
+
     private bool isPlayingSound;
     public bool IsPlayingSound
     {

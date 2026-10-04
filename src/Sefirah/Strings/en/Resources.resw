@@ -941,6 +941,12 @@ input text %pwd%</value>
   <data name="DndToggle" xml:space="preserve">
     <value>Toggle Do not disturb</value>
   </data>
+  <data name="BluetoothOn" xml:space="preserve">
+    <value>Bluetooth is on</value>
+  </data>
+  <data name="BluetoothOff" xml:space="preserve">
+    <value>Bluetooth is off</value>
+  </data>
   <data name="StartScreenMirroring" xml:space="preserve">
     <value>Start screen mirroring</value>
   </data>

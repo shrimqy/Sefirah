@@ -20,11 +20,20 @@
             <converters:GreaterThanOneToVisibilityConverter x:Key="GreaterThanOneToVisibilityConverter" />
             <converters:GreaterThanOneToVisibilityConverter x:Key="InverseGreaterThanOneToVisibilityConverter" Inverse="True" />
             <wctconverters:BoolToObjectConverter
-                x:Key="BoolToDndButtonStyleConverter"
+                x:Key="BoolToButtonStyleConverter"
                 FalseValue="{StaticResource DefaultButtonStyle}"
                 TrueValue="{StaticResource AccentButtonStyle}" />
             <wctconverters:BoolToObjectConverter x:Key="BoolToConnectedOpacityConverter" FalseValue="0.4" TrueValue="1.0" />
-            <wctconverters:EmptyObjectToObjectConverter
+            <wctconverters:BoolToObjectConverter
+                x:Key="BoolToForegroundConverter"
+                FalseValue="{ThemeResource TextFillColorDisabledBrush}"
+                TrueValue="{ThemeResource TextFillColorPrimaryBrush}" />
+            <wctconverters:BoolToObjectConverter
+                x:Key="BoolToBluetoothStateTextConverter"
+                FalseValue="{helpers:ResourceString Name=BluetoothOff}"
+                TrueValue="{helpers:ResourceString Name=BluetoothOn}" />
+
+        <wctconverters:EmptyObjectToObjectConverter
                 x:Key="EmptyObjectToOpacityConverter"
                 EmptyValue="1.0"
                 NotEmptyValue="0.0" />
@@ -228,6 +237,14 @@
                             </Flyout>
                         </Button.Flyout>
                     </Button>
+                    <FontIcon
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        AutomationProperties.Name="{x:Bind ViewModel.Device.BluetoothEnabled, Mode=OneWay, Converter={StaticResource BoolToBluetoothStateTextConverter}}"
+                        Foreground="{x:Bind ViewModel.Device.BluetoothEnabled, Mode=OneWay, Converter={StaticResource BoolToForegroundConverter}}"
+                        Glyph="&#xE702;"
+                        Opacity="{x:Bind ViewModel.Device.IsConnected, Mode=OneWay, Converter={StaticResource BoolToConnectedOpacityConverter}}"
+                        ToolTipService.ToolTip="{x:Bind ViewModel.Device.BluetoothEnabled, Mode=OneWay, Converter={StaticResource BoolToBluetoothStateTextConverter}}" />
                     <StackPanel
                         VerticalAlignment="Center"
                         Orientation="Horizontal"
@@ -282,7 +299,7 @@
                                             Padding="8,4"
                                             AutomationProperties.Name="{helpers:ResourceString Name=DndToggle}"
                                             Command="{x:Bind ViewModel.ToggleDndCommand}"
-                                            Style="{x:Bind ViewModel.Device.DndEnabled, Converter={StaticResource BoolToDndButtonStyleConverter}, Mode=OneWay}">
+                                            Style="{x:Bind ViewModel.Device.DndEnabled, Converter={StaticResource BoolToButtonStyleConverter}, Mode=OneWay}">
                                             <FontIcon Glyph="&#xECE4;" />
                                         </Button>
                                         <Button
@@ -292,7 +309,7 @@
                                             Padding="8,4"
                                             AutomationProperties.Name="{helpers:ResourceString Name=PlaySound}"
                                             Command="{x:Bind ViewModel.TogglePlaySoundCommand}"
-                                            Style="{x:Bind ViewModel.Device.IsPlayingSound, Converter={StaticResource BoolToDndButtonStyleConverter}, Mode=OneWay}"
+                                            Style="{x:Bind ViewModel.Device.IsPlayingSound, Converter={StaticResource BoolToButtonStyleConverter}, Mode=OneWay}"
                                             ToolTipService.ToolTip="{helpers:ResourceString Name=PlaySoundDescription}">
                                             <Grid>
                                                 <FontIcon Margin="-6,0,0,0" Glyph="&#xE8EA;" />
