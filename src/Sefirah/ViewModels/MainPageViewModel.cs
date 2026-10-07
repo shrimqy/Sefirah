@@ -220,7 +220,7 @@ public sealed partial class MainPageViewModel : BaseViewModel
 
     public async Task BrowseFiles()
     {
-        if (Device is null || !Device.IsConnected)
+        if (Device is null)
             return;
 
         await SftpFeature.BrowseAsync(Device);

@@ -99,17 +99,9 @@ public class SftpFeature(
 
     public async Task BrowseAsync(PairedDevice device)
     {
-        if (!_sessions.TryGetValue(device.Id, out var session))
-        {
-            return;
-        }
-
         try
         {
-            // Prefer the cloud sync folder only while the sync provider is actively running.
-            var syncRoots = GetSyncRootsForDevice(device.Id)
-                .Where(r => syncProviderPool.Has(r.Id))
-                .ToList();
+            var syncRoots = GetSyncRootsForDevice(device.Id).ToList();
             if (syncRoots.Count > 0)
             {
                 var folderPath = syncRoots.Count == 1
@@ -120,7 +112,10 @@ public class SftpFeature(
                 return;
             }
 
-            // Fallback when storage sync isn't connected (or never registered).
+            // Fallback when storage sync isn't registered
+            if (!_sessions.TryGetValue(device.Id, out var session))
+                return;
+
             await LaunchSftpUriAsync(session);
         }
         catch (Exception ex)
