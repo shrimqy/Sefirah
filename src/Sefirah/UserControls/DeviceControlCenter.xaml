@@ -357,6 +357,18 @@
                                                 <TextBlock VerticalAlignment="Center" Text="{helpers:ResourceString Name=BrowseFiles}" />
                                             </StackPanel>
                                         </Button>
+                                        <Button
+                                            HorizontalAlignment="Stretch"
+                                            HorizontalContentAlignment="Left"
+                                            Padding="12,8"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Click="OpenDeviceSettingsAction_Click">
+                                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                                <FontIcon Glyph="&#xE713;" />
+                                                <TextBlock VerticalAlignment="Center" Text="{helpers:ResourceString Name=DeviceSettings}" />
+                                            </StackPanel>
+                                        </Button>
                                     </StackPanel>
                                 </StackPanel>
                             </Flyout>

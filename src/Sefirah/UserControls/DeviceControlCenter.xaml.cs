@@ -98,6 +98,13 @@ public sealed partial class DeviceControlCenter : UserControl
         await ViewModel.BrowseFilesViaUri();
     }
 
+    private void OpenDeviceSettingsAction_Click(object sender, RoutedEventArgs e)
+    {
+        DeviceActionsFlyout.Hide();
+        if (ViewModel.Device is null) return;
+        App.OpenDeviceSettingsWindow(ViewModel.Device);
+    }
+
     private void PhoneFrame_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
     {
         var pointerPoint = e.GetCurrentPoint(PhoneFrameGrid);
