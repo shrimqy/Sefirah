@@ -24,7 +24,7 @@ public class SftpReadWriteService(
         }
 
         logger.Debug($"Create File {relativeFile}");
-        PathMapper.EnsureSubDirectoriesExist(serverFile);
+        EnsureRemoteParentExists(serverFile);
 
         using (var sourceStream = await FileHelper.WaitUntilUnlocked(sourceFileInfo.OpenRead, logger))
         {
@@ -136,6 +136,23 @@ public class SftpReadWriteService(
         client.DeleteDirectory(serverDirectory);
 
         DeleteDirectoryIfEmpty(serverDirectory);
+    }
+
+    /// <summary>Creates any missing parent directories of <paramref name="serverPath"/> on the remote.</summary>
+    private void EnsureRemoteParentExists(string serverPath)
+    {
+        var separatorIndex = serverPath.LastIndexOf('/');
+        if (separatorIndex <= 0)
+        {
+            return;
+        }
+        var parent = serverPath[..separatorIndex];
+        if (client.Exists(parent))
+        {
+            return;
+        }
+        EnsureRemoteParentExists(parent);
+        client.CreateDirectory(parent);
     }
 
     private void DeleteDirectoryIfEmpty(string serverPath)
