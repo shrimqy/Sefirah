@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
-using System.Threading.Channels;
 using Sefirah.Platforms.Windows.RemoteStorage.Abstractions;
+using Sefirah.Platforms.Windows.RemoteStorage.Worker;
 using Vanara.InteropServices;
 using Vanara.PInvoke;
 using static Vanara.PInvoke.Ole32;
@@ -12,7 +12,7 @@ namespace Sefirah.Platforms.Windows.RemoteStorage.Shell.Commands;
 
 [ComVisible(true), Guid("9e2e55ac-bcb2-432f-b29a-d2c6fbbc244b")]
 public class DownloadCommand(
-    ChannelWriter<ShellCommand> commandWriter,
+    ShellCommandRouter router,
     ILogger logger) : IExplorerCommand, IExplorerCommandState, IObjectWithSite
 {
     public HRESULT GetTitle(IShellItemArray psiItemArray, out string? ppszName)
@@ -85,7 +85,7 @@ public class DownloadCommand(
                 var rawFullPath = pShellItem.Item.GetDisplayName(SIGDN.SIGDN_FILESYSPATH);
                 logger.Debug($"Download Command received for {rawFullPath}");
 
-                commandWriter.TryWrite(new ShellCommand
+                router.TryWrite(new ShellCommand
                 {
                     Kind = ShellCommandKind.Download,
                     FullPath = rawFullPath,

@@ -10,6 +10,8 @@ namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
 public sealed partial class ShellCommandQueue(
     ISyncProviderContextAccessor contextAccessor,
     ChannelReader<ShellCommand> taskReader,
+    ChannelWriter<ShellCommand> taskWriter,
+    ShellCommandRouter router,
     FileLocker fileLocker,
     PlaceholdersService placeholderService,
     ClientWatcher clientWatcher,
@@ -24,6 +26,7 @@ public sealed partial class ShellCommandQueue(
     public void Start(CancellationToken stoppingToken)
     {
         var cancellationToken = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, _disposeTokenSource.Token).Token;
+        router.Register(RootDirectory, taskWriter);
         _runningTask = Task.Factory.StartNew(async () =>
         {
             while (!cancellationToken.IsCancellationRequested)
@@ -31,11 +34,6 @@ public sealed partial class ShellCommandQueue(
                 var shellCommand = await taskReader.ReadAsync(cancellationToken);
                 try
                 {
-                    if (!shellCommand.FullPath.StartsWith(RootDirectory, StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
                     var relativePath = PathMapper.GetRelativePath(shellCommand.FullPath, RootDirectory);
                     switch (shellCommand.Kind)
                     {
@@ -117,12 +115,14 @@ public sealed partial class ShellCommandQueue(
 
     public Task Stop()
     {
+        router.Unregister(RootDirectory, taskWriter);
         _disposeTokenSource.Cancel();
         return _runningTask ?? Task.CompletedTask;
     }
 
     public void Dispose()
     {
+        router.Unregister(RootDirectory, taskWriter);
         _disposeTokenSource.Cancel();
         _disposeTokenSource.Dispose();
     }

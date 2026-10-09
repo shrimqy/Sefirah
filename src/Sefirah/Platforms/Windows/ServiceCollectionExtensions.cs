@@ -89,16 +89,17 @@ public static class ServiceCollectionExtensions
             .AddSingleton<SyncProviderContextAccessor>()
             .AddSingleton<ISyncProviderContextAccessor>((sp) => sp.GetRequiredService<SyncProviderContextAccessor>())
 
-            .AddSingleton((sp) =>
+            .AddSingleton<ShellCommandRouter>()
+            .AddScoped((sp) =>
                 Channel.CreateUnbounded<ShellCommand>(
                     new UnboundedChannelOptions
                     {
-                        SingleReader = false,
+                        SingleReader = true,
                     }
                 )
             )
-        .AddSingleton((sp) => sp.GetRequiredService<Channel<ShellCommand>>().Reader)
-        .AddSingleton((sp) => sp.GetRequiredService<Channel<ShellCommand>>().Writer)
+        .AddScoped((sp) => sp.GetRequiredService<Channel<ShellCommand>>().Reader)
+        .AddScoped((sp) => sp.GetRequiredService<Channel<ShellCommand>>().Writer)
         .AddScoped<ShellCommandQueue>()
 
             // Sync Provider services

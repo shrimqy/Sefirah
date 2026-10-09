@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
-using System.Threading.Channels;
 using Sefirah.Platforms.Windows.RemoteStorage.Abstractions;
+using Sefirah.Platforms.Windows.RemoteStorage.Worker;
 using Vanara.InteropServices;
 using Vanara.PInvoke;
 using static Vanara.PInvoke.Ole32;
@@ -13,7 +13,7 @@ namespace Sefirah.Platforms.Windows.RemoteStorage.Shell.Commands;
 
 [ComVisible(true), Guid("942952b6-3bdc-4e50-8fe2-8d2d869ca70f")]
 public class SyncCommand(
-    ChannelWriter<ShellCommand> commandWriter,
+    ShellCommandRouter router,
     ILogger logger) : IExplorerCommand, IExplorerCommandState, IObjectWithSite
 {
     public HRESULT GetTitle(IShellItemArray psiItemArray, out string? ppszName)
@@ -66,7 +66,7 @@ public class SyncCommand(
                 var rawFullPath = pShellItem.Item.GetDisplayName(SIGDN.SIGDN_FILESYSPATH);
                 logger.Debug($"Sync Command received for file {rawFullPath}");
 
-                commandWriter.TryWrite(new ShellCommand
+                router.TryWrite(new ShellCommand
                 {
                     Kind = ShellCommandKind.Sync,
                     FullPath = rawFullPath,
