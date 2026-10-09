@@ -2,7 +2,7 @@ using System.Threading.Channels;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
 
-public sealed partial class TaskQueue(ChannelReader<Func<Task>> taskReader) : IDisposable
+public sealed partial class TaskQueue(ChannelReader<Func<Task>> taskReader, ILogger logger) : IDisposable
 {
     private readonly CancellationTokenSource _disposeTokenSource = new();
     private Task? _runningTask = null;
@@ -15,7 +15,15 @@ public sealed partial class TaskQueue(ChannelReader<Func<Task>> taskReader) : ID
             while (!cancellationToken.IsCancellationRequested)
             {
                 var func = await taskReader.ReadAsync(cancellationToken);
-                await func();
+                // A throwing task must not end the loop, or every later sync event for this root is silently dropped
+                try
+                {
+                    await func();
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Sync task failed", ex);
+                }
             }
         });
     }
