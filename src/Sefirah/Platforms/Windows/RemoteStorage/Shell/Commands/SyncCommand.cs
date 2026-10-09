@@ -18,7 +18,7 @@ public class SyncCommand(
 {
     public HRESULT GetTitle(IShellItemArray psiItemArray, out string? ppszName)
     {
-        ppszName = "Sync From Cloud";
+        ppszName = "CloudFilesContextMenu.SyncWithDevice".GetLocalizedResource();
         return HRESULT.S_OK;
     }
 
@@ -42,7 +42,7 @@ public class SyncCommand(
 
     public HRESULT GetState(IShellItemArray psiItemArray, bool fOkToBeSlow, out EXPCMDSTATE pCmdState)
     {
-        pCmdState = EXPCMDSTATE.ECS_ENABLED;
+        pCmdState = (psiItemArray?.GetCount() ?? 0) > 0 ? EXPCMDSTATE.ECS_ENABLED : EXPCMDSTATE.ECS_HIDDEN;
         return HRESULT.S_OK;
     }
 
@@ -68,13 +68,9 @@ public class SyncCommand(
 
                 commandWriter.TryWrite(new ShellCommand
                 {
-                    Kind = ShellCommandKind.Do,
+                    Kind = ShellCommandKind.Sync,
                     FullPath = rawFullPath,
                 });
-
-                //var relativePath = client.GetRelativePath(rawFullPath);
-
-                // TODO: placeholder service createorupdate - but how? 
             }
         }
         catch (Exception ex)

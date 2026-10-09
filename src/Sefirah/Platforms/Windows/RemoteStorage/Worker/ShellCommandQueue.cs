@@ -1,9 +1,8 @@
 using System.Threading.Channels;
 using Sefirah.Platforms.Windows.Helpers;
-using Sefirah.Platforms.Windows.Interop;
 using Sefirah.Platforms.Windows.RemoteStorage.Abstractions;
 using Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
-using static Vanara.PInvoke.CldApi;
+using Sefirah.Platforms.Windows.RemoteStorage.Worker.IO;
 using FileAttributes = System.IO.FileAttributes;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
@@ -13,6 +12,7 @@ public sealed partial class ShellCommandQueue(
     ChannelReader<ShellCommand> taskReader,
     FileLocker fileLocker,
     PlaceholdersService placeholderService,
+    ClientWatcher clientWatcher,
     IRemoteReadWriteService remoteService,
     ILogger logger
 ) : IDisposable
@@ -36,66 +36,83 @@ public sealed partial class ShellCommandQueue(
                         continue;
                     }
 
-                    var state = CloudFilter.GetPlaceholderState(shellCommand.FullPath);                    
-                    // Broken upload, state is just "No State"
-                    logger.Info($"placeholder state {state}");
-                    if (state is CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_NO_STATES ||
-                        state is CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC ||
-                        state is CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER)
+                    var relativePath = PathMapper.GetRelativePath(shellCommand.FullPath, RootDirectory);
+                    switch (shellCommand.Kind)
                     {
-                        var isDirectory = File.GetAttributes(shellCommand.FullPath).HasFlag(FileAttributes.Directory);
-                        var relativePath = PathMapper.GetRelativePath(shellCommand.FullPath, RootDirectory);
-                        using var locker = await fileLocker.Lock(relativePath);
-                        
-                        if (isDirectory)
-                        {
-                            await placeholderService.CreateOrUpdateDirectory(relativePath);
-                        }
-                        else
-                        {
-                            var fileInfo = new FileInfo(shellCommand.FullPath);
-                            if (remoteService.Exists(relativePath))
-                            {
-                                await placeholderService.CreateOrUpdateFile(relativePath);
-                            }
-                            else
-                            {
-                                await remoteService.CreateFile(fileInfo, relativePath);
-                            }
-                            
-                            // Add explicit sync state setting here
-                            try
-                            {
-                                if (!CloudFilter.IsPlaceholder(shellCommand.FullPath))
-                                    CloudFilter.ConvertToPlaceholder(shellCommand.FullPath);
-                                CloudFilter.SetInSyncState(shellCommand.FullPath);
-                            }
-                            catch (Exception ex)
-                            {
-                                logger.Error($"Failed to set sync state for {shellCommand.FullPath}", ex);
-                            }
-                        }
-                    }
-                    else if (state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PARTIALLY_ON_DISK))
-                    {
-                        var isDirectory = File.GetAttributes(shellCommand.FullPath).HasFlag(FileAttributes.Directory);
-                        var relativePath = PathMapper.GetRelativePath(shellCommand.FullPath, RootDirectory);
-                        if (isDirectory)
-                        {
-                            await placeholderService.CreateOrUpdateDirectory(relativePath);
-                        }
-                        else
-                        {
-                            await placeholderService.CreateOrUpdateFile(relativePath);
-                        }
+                        case ShellCommandKind.Sync:
+                            await Sync(relativePath);
+                            break;
+                        case ShellCommandKind.Download:
+                            await Download(relativePath);
+                            break;
                     }
                 }
                 catch (Exception ex)
                 {
-                    logger.Error("Error in handling shell command", ex);
+                    logger.Error($"Error in handling shell command {shellCommand.Kind} for {shellCommand.FullPath}", ex);
                 }
             }
         });
+    }
+
+    private async Task Sync(string relativePath)
+    {
+        if (Directory.Exists(Path.Join(RootDirectory, relativePath)))
+        {
+            if (remoteService.Exists(relativePath))
+            {
+                await SyncDirectory(relativePath);
+            }
+            await clientWatcher.SyncPendingChanges(relativePath);
+            return;
+        }
+
+        using var locker = await fileLocker.Lock(relativePath);
+        await placeholderService.UpdateFile(relativePath);
+    }
+
+    private async Task SyncDirectory(string relativeDirectory)
+    {
+        var clientDirectory = Path.Join(RootDirectory, relativeDirectory);
+        if (File.GetAttributes(clientDirectory).HasFlag(FileAttributes.Offline))
+        {
+            return;
+        }
+
+        foreach (var remoteFile in remoteService.EnumerateFiles(relativeDirectory))
+        {
+            using var locker = await fileLocker.Lock(remoteFile.RelativePath);
+            try
+            {
+                await placeholderService.CreateOrUpdateFile(remoteFile.RelativePath);
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Sync failed for {remoteFile.RelativePath}", ex);
+            }
+        }
+
+        foreach (var remoteDirectory in remoteService.EnumerateDirectories(relativeDirectory))
+        {
+            try
+            {
+                using (await fileLocker.Lock(remoteDirectory.RelativePath))
+                {
+                    await placeholderService.CreateOrUpdateDirectory(remoteDirectory.RelativePath);
+                }
+                await SyncDirectory(remoteDirectory.RelativePath);
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Sync failed for {remoteDirectory.RelativePath}", ex);
+            }
+        }
+    }
+
+    private async Task Download(string relativePath)
+    {
+        using var locker = await fileLocker.Lock(relativePath);
+        placeholderService.Hydrate(relativePath);
     }
 
     public Task Stop()

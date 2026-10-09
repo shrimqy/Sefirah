@@ -8,5 +8,6 @@ public record ShellCommand
 
 public enum ShellCommandKind
 {
-    Do
+    Sync,
+    Download,
 }

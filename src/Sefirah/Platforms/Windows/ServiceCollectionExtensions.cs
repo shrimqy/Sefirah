@@ -69,7 +69,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddCommonClassObjects(this IServiceCollection services) =>
         services
             .AddClassObject<SyncCommand>()
-            .AddClassObject<UploadCommand>();
+            .AddClassObject<DownloadCommand>();
 
     public static IServiceCollection AddLocalClassObjects(this IServiceCollection services) =>
         services
