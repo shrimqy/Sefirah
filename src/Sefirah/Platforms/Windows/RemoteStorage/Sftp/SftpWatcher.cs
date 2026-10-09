@@ -148,14 +148,27 @@ public sealed partial class SftpWatcher(
 
         // Recursively get files from hydrated subdirectories
         var subFiles = directories.Keys
-            .Where(IsHydrated)
-            .SelectMany(FindFiles)
+            .SelectMany(FindFilesOrKnown)
             .ToDictionary(pair => pair.Key, pair => pair.Value);
 
         return directories
             .Concat(files)
             .Concat(subFiles)
             .ToDictionary();
+    }
+
+    /// <summary>Returns the previous entries when the folder can't be read.</summary>
+    private IEnumerable<KeyValuePair<string, DateTime>> FindFilesOrKnown(string relativeDirectory)
+    {
+        try
+        {
+            return IsHydrated(relativeDirectory) ? FindFiles(relativeDirectory) : [];
+        }
+        catch (Exception ex) when (ex is not (SshConnectionException or SshOperationTimeoutException))
+        {
+            logger.Warn($"Unable to read {relativeDirectory}, keeping its previous entries", ex);
+            return [.. _knownFiles.Where(pair => pair.Key.StartsWith(relativeDirectory + "/"))];
+        }
     }
 
     private async Task TryReconnectAsync(CancellationToken cancellationToken)
@@ -206,17 +219,9 @@ public sealed partial class SftpWatcher(
 
     private bool IsHydrated(string relativePath)
     {
-        try
-        {
-            var clientPath = Path.Join(_syncContext.RootDirectory, relativePath);
-            return Path.Exists(clientPath) &&
-                   !File.GetAttributes(clientPath).HasFlag(FileAttributes.Offline);
-        }
-        catch (Exception ex)
-        {
-            logger.Error($"Error checking hydration state for {relativePath}", ex);
-            return false;
-        }
+        var clientPath = Path.Join(_syncContext.RootDirectory, relativePath);
+        return Path.Exists(clientPath) &&
+               !File.GetAttributes(clientPath).HasFlag(FileAttributes.Offline);
     }
 
     public void Dispose()
