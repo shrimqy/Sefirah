@@ -26,24 +26,33 @@ public class SftpReadWriteService(
         logger.Debug($"Create File {relativeFile}");
         EnsureRemoteParentExists(serverFile);
 
-        using (var sourceStream = await FileHelper.WaitUntilUnlocked(sourceFileInfo.OpenRead, logger))
-        {
-            await Task.Factory.FromAsync(client.BeginUploadFile(sourceStream, serverFile), client.EndUploadFile);
-        }
-
-        var sftpFile = client.Get(serverFile);
-        sftpFile.LastWriteTimeUtc = sourceFileInfo.LastWriteTimeUtc;
-        sftpFile.LastAccessTimeUtc = sourceFileInfo.LastAccessTimeUtc;
-        sftpFile.UpdateStatus();
+        await Upload(sourceFileInfo, serverFile);
     }
 
-    public async Task UpdateFile(FileInfo sourceFileInfo, string relativeFile)
-    {
-        var serverFile = GetSftpPath(relativeFile);
+    public Task UpdateFile(FileInfo sourceFileInfo, string relativeFile) =>
+        Upload(sourceFileInfo, GetSftpPath(relativeFile));
 
-        using (var sourceStream = await FileHelper.WaitUntilUnlocked(sourceFileInfo.OpenRead, logger))
+    /// <summary>Uploads to a temporary file, then renames it over <paramref name="serverFile"/>.</summary>
+    private async Task Upload(FileInfo sourceFileInfo, string serverFile)
+    {
+        var separatorIndex = serverFile.LastIndexOf('/');
+        var tempFile = $"{serverFile[..(separatorIndex + 1)]}.{serverFile[(separatorIndex + 1)..]}{SftpConstants.PartialFileSuffix}";
+        try
         {
-            await Task.Factory.FromAsync(client.BeginUploadFile(sourceStream, serverFile), client.EndUploadFile);
+            using (var sourceStream = await FileHelper.WaitUntilUnlocked(sourceFileInfo.OpenRead, logger))
+            {
+                await Task.Factory.FromAsync(client.BeginUploadFile(sourceStream, tempFile), client.EndUploadFile);
+            }
+            client.RenameFile(tempFile, serverFile, isPosix: true);
+        }
+        catch
+        {
+            try
+            {
+                client.DeleteFile(tempFile);
+            }
+            catch (Exception) { }
+            throw;
         }
 
         var sftpFile = client.Get(serverFile);

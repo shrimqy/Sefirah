@@ -140,7 +140,7 @@ public sealed partial class SftpWatcher(
 
         // Get files from current directory
         var files = sftpFiles
-            .Where(sftpFile => sftpFile.IsRegularFile)
+            .Where(sftpFile => sftpFile.IsRegularFile && !sftpFile.Name.EndsWith(SftpConstants.PartialFileSuffix))
             .ToDictionary(
                 file => PathMapper.GetRelativePath(file.FullName, _context.Directory),
                 file => file.LastWriteTimeUtc

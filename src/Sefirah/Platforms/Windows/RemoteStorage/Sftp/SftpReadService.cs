@@ -63,6 +63,7 @@ public class SftpReadService(
         }
         return client.ListDirectory(GetSftpPath(relativeDirectory))
             .Where((sftpFile) => !sftpFile.IsDirectory && sftpFile.IsRegularFile)
+            .Where((sftpFile) => !sftpFile.Name.EndsWith(SftpConstants.PartialFileSuffix))
             .Select(GetRemoteFileInfo)
             .ToArray();
     }
