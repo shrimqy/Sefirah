@@ -212,7 +212,7 @@ public sealed class SyncRootConnector(
                 return;
             }
             // If moving outside of sync directory, treat like a delete
-            if (!newClientPath.StartsWith(_rootDirectory))
+            if (!newClientPath.StartsWith(Path.TrimEndingDirectorySeparator(_rootDirectory) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
             {
                 if (remoteService.IsDirectory(oldRelativePath))
                 {
