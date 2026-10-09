@@ -80,8 +80,13 @@ public partial class ClientWatcher : IDisposable
                         && !fileInfo.Attributes.HasFlag(FileAttributes.Directory)
                         && !state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PARTIALLY_ON_DISK);
 
-                    // Skip already-synced files (hydration also raises Changed), but let dehydrate requests through.
-                    if (state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC) && !isDehydrationRequested)
+                    // A pinned folder, or a pinned online-only file, is an "Always keep on this device" request.
+                    var isHydrationRequested = fileInfo.Attributes.IsPinned() 
+                        && (fileInfo.Attributes.HasFlag(FileAttributes.Directory) 
+                        || fileInfo.Attributes.HasFlag(FileAttributes.Offline));
+
+                    // Skip already-synced files (hydration also raises Changed), but let dehydrate and pin requests through.
+                    if (!CloudFilter.HasLocalChanges(state) && !isDehydrationRequested && !isHydrationRequested)
                     {
                         return;
                     }
@@ -89,47 +94,19 @@ public partial class ClientWatcher : IDisposable
                     var relativePath = PathMapper.GetRelativePath(e.FullPath, RootDirectory);
                     using var locker = await _fileLocker.Lock(relativePath);
 
-                    if (fileInfo.Attributes.IsPinned() && fileInfo.Attributes.HasFlag(FileAttributes.Offline))
+                    if (isHydrationRequested)
                     {
-                        if (fileInfo.Attributes.HasFlag(FileAttributes.Directory))
+                        try
                         {
-                            try
-                            {
-                                _placeholdersService.CreateBulk(relativePath);
-                                var childItems = Directory.EnumerateFiles(e.FullPath, "*", SearchOption.AllDirectories)
-                                    .Where((x) => !FileHelper.IsSystemFile(x))
-                                    .ToArray();
-                                foreach (var childItem in childItems)
-                                {
-                                    try
-                                    {
-                                        CloudFilter.HydratePlaceholder(childItem);
-                                    }
-                                    catch (HFileException)
-                                    {
-                                        _logger.Warn($"Unable to hydrate placeholder for {childItem} - connection may be lost");
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        _logger.Error($"Hydrate file failed: {childItem}", ex);
-                                    }
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.Error($"Error processing directory {e.FullPath}", ex);
-                            }
+                            _placeholdersService.Hydrate(relativePath);
                         }
-                        else
+                        catch (HFileException)
                         {
-                            try
-                            {
-                                CloudFilter.HydratePlaceholder(e.FullPath);
-                            }
-                            catch (HFileException)
-                            {
-                                _logger.Warn($"Unable to hydrate placeholder for {e.FullPath} - connection may be lost");
-                            }
+                            _logger.Warn($"Unable to hydrate placeholder for {e.FullPath} - connection may be lost");
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error($"Hydrate failed: {e.FullPath}", ex);
                         }
                     }
                     else if (isDehydrationRequested)
@@ -152,8 +129,7 @@ public partial class ClientWatcher : IDisposable
                     }
                     else
                     {
-                        await _remoteService.UpdateFile(fileInfo, relativePath);
-                        EnsurePlaceholderSync(e.FullPath);
+                        await _placeholdersService.UpdateFile(relativePath);
                     }
 
                 });
@@ -169,8 +145,7 @@ public partial class ClientWatcher : IDisposable
             await _taskWriter.WriteAsync(async () => {
                 try
                 {
-                    var state = CloudFilter.GetPlaceholderState(e.FullPath);
-                    if (state.HasFlag(CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
+                    if (!CloudFilter.HasLocalChanges(e.FullPath))
                     {
                         return;
                     }
@@ -182,53 +157,21 @@ public partial class ClientWatcher : IDisposable
                 }
 
                 var relativePath = PathMapper.GetRelativePath(e.FullPath, RootDirectory);
-                using var locker = await _fileLocker.Lock(relativePath);
-
-                if (File.GetAttributes(e.FullPath).HasFlag(FileAttributes.Directory))
+                try
                 {
-                    var directoryInfo = new DirectoryInfo(e.FullPath);
-
-                    try
+                    if (File.GetAttributes(e.FullPath).HasFlag(FileAttributes.Directory))
                     {
-                        await _remoteService.CreateDirectory(directoryInfo, relativePath);
+                        await SyncPendingChanges(relativePath);
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        _logger.Error($"Create directory failed: {relativePath}", ex);
-                    }
-
-                    var childItems = Directory.EnumerateFiles(e.FullPath, "*", SearchOption.AllDirectories)
-                        .Where((x) => !FileHelper.IsSystemFile(x))
-                        .ToArray();
-                    foreach (var childItem in childItems)
-                    {
-                        try
-                        {
-                            var fileInfo = new FileInfo(childItem);
-                            var childRelativePath = PathMapper.GetRelativePath(childItem, RootDirectory);
-                            await _remoteService.CreateFile(fileInfo, childRelativePath);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.Error($"Create file failed: {childItem}", ex);
-                            continue;
-                        }
-                        EnsurePlaceholderSync(childItem);
+                        using var locker = await _fileLocker.Lock(relativePath);
+                        await _placeholdersService.UpdateFile(relativePath);
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    var fileInfo = new FileInfo(e.FullPath);
-                    try
-                    {
-                        await _remoteService.CreateFile(fileInfo, relativePath);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Error($"Create file failed: {e.FullPath}", ex);
-                        return;
-                    }
-                    EnsurePlaceholderSync(e.FullPath);
+                    _logger.Error($"Create failed: {e.FullPath}", ex);
                 }
             });
         };
@@ -241,21 +184,70 @@ public partial class ClientWatcher : IDisposable
         return watcher;
     }
 
-    private void EnsurePlaceholderSync(string fullPath)
+    /// <summary>
+    /// Uploads local changes under <paramref name="relativeDirectory"/> and removes in-sync items that are gone from the remote.
+    /// </summary>
+    public async Task SyncPendingChanges(string relativeDirectory)
     {
-        try
+        var directoryInfo = new DirectoryInfo(Path.Join(RootDirectory, relativeDirectory));
+        if (!directoryInfo.Exists || directoryInfo.Attributes.HasFlag(FileAttributes.Offline))
         {
-            if (!CloudFilter.IsPlaceholder(fullPath))
-            {
-                CloudFilter.ConvertToPlaceholder(fullPath);
-            }
-            CloudFilter.SetInSyncState(fullPath);
-            
-            ShellNotify.NotifyUpdate(fullPath);
+            return;
         }
-        catch (Exception ex)
+
+        if (relativeDirectory.Length > 0
+            && CloudFilter.HasLocalChanges(directoryInfo.FullName)
+            && !_remoteService.Exists(relativeDirectory))
         {
-            _logger.Error($"Failed to set in-sync state for {fullPath}", ex);
+            await _remoteService.CreateDirectory(directoryInfo, relativeDirectory);
+        }
+
+        var remoteNames = _remoteService.EnumerateFiles(relativeDirectory).Select(x => x.Name)
+            .Concat(_remoteService.EnumerateDirectories(relativeDirectory).Select(x => x.Name))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        // An empty listing from a dropped connection would look like everything was deleted
+        var canRemove = _remoteService.IsConnected;
+
+        foreach (var entry in directoryInfo.EnumerateFileSystemInfos().ToArray())
+        {
+            var relativePath = PathMapper.GetRelativePath(entry.FullName, RootDirectory);
+            try
+            {
+                if (FileHelper.IsSystemFile(entry.FullName))
+                {
+                    continue;
+                }
+
+                var state = CloudFilter.GetPlaceholderState(entry.FullName);
+                if (state is CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_INVALID)
+                {
+                    continue;
+                }
+
+                if (!CloudFilter.HasLocalChanges(state) && !remoteNames.Contains(entry.Name))
+                {
+                    if (canRemove)
+                    {
+                        using var locker = await _fileLocker.Lock(relativePath);
+                        await _placeholdersService.Delete(relativePath);
+                    }
+                    continue;
+                }
+
+                if (entry is DirectoryInfo)
+                {
+                    await SyncPendingChanges(relativePath);
+                }
+                else if (CloudFilter.HasLocalChanges(state) && !entry.Attributes.HasFlag(FileAttributes.Offline))
+                {
+                    using var locker = await _fileLocker.Lock(relativePath);
+                    await _placeholdersService.UpdateFile(relativePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Failed to sync pending change {relativePath}", ex);
+            }
         }
     }
 

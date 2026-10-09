@@ -80,6 +80,22 @@ public static class CloudFilter
     public static bool IsPlaceholder(HFILE hfile) =>
         GetPlaceholderState(hfile).HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER);
 
+    /// <summary>False when the state can't be read.</summary>
+    public static bool HasLocalChanges(CldApi.CF_PLACEHOLDER_STATE state) =>
+        state is not CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_INVALID
+        && !state.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC);
+
+    public static bool HasLocalChanges(string path) => HasLocalChanges(GetPlaceholderState(path));
+
+    public static void MarkInSync(string path)
+    {
+        if (!IsPlaceholder(path))
+        {
+            ConvertToPlaceholder(path);
+        }
+        SetInSyncState(path);
+    }
+
     public static void ConvertToPlaceholder(string path)
     {
         using var hfile = CreateHFile(path, FileAccess.Write);
@@ -105,8 +121,8 @@ public static class CloudFilter
         HydratePlaceholder(hfile);
     }
 
-    /// <param name="hfile">Needs READ_DATA or WRITE_DAC</param>
-    /// <remarks>Needs READ_DATA or WRITE_DAC</remarks>
+    /// <param name="hfile">An attribute-only handle is enough</param>
+    /// <remarks>Caller needs READ_DATA or WRITE_DAC on the file</remarks>
     public static void HydratePlaceholder(HFILE hfile)
     {
         CldApi.CfHydratePlaceholder(hfile, HydrateFlags: CldApi.CF_HYDRATE_FLAGS.CF_HYDRATE_FLAG_NONE)

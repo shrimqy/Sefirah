@@ -135,7 +135,7 @@ public sealed partial class RemoteWatcher(
             using var locker = await fileLocker.Lock(relativePath);
             try
             {
-                placeholderService.Delete(relativePath);
+                await placeholderService.Delete(relativePath);
             }
             catch (Exception ex)
             {

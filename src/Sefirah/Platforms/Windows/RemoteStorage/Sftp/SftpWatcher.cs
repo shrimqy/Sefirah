@@ -26,7 +26,8 @@ public sealed partial class SftpWatcher(
     public event RemoteChangeHandler? Changed;
     public event RemoteRenameHandler? Renamed;
     public event RemoteDeleteHandler? Deleted;
-    
+    public event RemoteReconnectHandler? Reconnected;
+
     public async void Start(CancellationToken stoppingToken = default)
     {
         ObjectDisposedException.ThrowIf(_cancellationTokenSource.IsCancellationRequested, this);
@@ -173,6 +174,7 @@ public sealed partial class SftpWatcher(
                 {
                     client.Connect();
                     logger.Info("Successfully reconnected to SFTP server");
+                    Reconnected?.Invoke();
                 }
                 catch (Exception ex)
                 {

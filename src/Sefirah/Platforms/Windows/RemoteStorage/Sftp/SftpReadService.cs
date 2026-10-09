@@ -16,6 +16,8 @@ public class SftpReadService(
     protected readonly string[] _relativeDirectoryNames = [".", "..", "#Recycle"];
     protected readonly SftpContext _context = contextAccessor.Context;
 
+    public bool IsConnected => client.IsConnected;
+
     public bool Exists(string relativePath) =>
         client.Exists(GetSftpPath(relativePath));
 

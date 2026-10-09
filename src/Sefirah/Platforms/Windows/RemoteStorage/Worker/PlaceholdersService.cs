@@ -140,11 +140,8 @@ public class PlaceholdersService(
     private SafeCreateInfo GetDirectoryPlaceholderCreateInfo(RemoteDirectoryInfo remoteDirectoryInfo) =>
         new(remoteDirectoryInfo, remoteDirectoryInfo.RelativePath, onDemand: false);
 
-    /// <summary>
-    /// Syncs local placeholder metadata with the remote. Skips if hashes match unless <paramref name="force"/> is set.
-    /// If the file was downloaded, dehydrates it after updating.
-    /// </summary>
-    public async Task UpdateFile(string relativeFile, bool force = false)
+    /// <summary>Syncs a file with the remote; If it's newer on the remote, it's downloaded. Otherwise, it's uploaded.</summary>
+    public async Task UpdateFile(string relativeFile)
     {
         var clientFile = Path.Join(RootDirectory, relativeFile);
         if (!Path.Exists(clientFile))
@@ -154,6 +151,13 @@ public class PlaceholdersService(
         }
         var clientFileInfo = new FileInfo(clientFile);
         var downloaded = !clientFileInfo.Attributes.HasFlag(FileAttributes.Offline);
+
+        // Upload before the exclusive handle is opened below
+        if (downloaded && await TryUploadChanges(relativeFile, clientFileInfo))
+        {
+            return;
+        }
+
         if (clientFileInfo.Attributes.HasFlag(FileAttributes.ReadOnly))
         {
             clientFileInfo.Attributes &= ~FileAttributes.ReadOnly;
@@ -178,22 +182,9 @@ public class PlaceholdersService(
         }
 
         var remoteFileInfo = remoteService.GetFileInfo(relativeFile);
-        var matchesRemote = remoteFileInfo.GetHashCode() == _fileComparer.GetHashCode(clientFileInfo);
-
-        // A downloaded placeholder that isn't in-sync is possibly a local edit and not a remote change,
-        // so don't overwrite it - unless it still matches the remote, in which case it's not a real edit
-        // and we just re-mark it in-sync.
-        if (!force && downloaded && !placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
-        {
-            if (matchesRemote)
-            {
-                CloudFilter.SetInSyncState(hfile);
-            }
-            return;
-        }
 
         // Local matches remote, just make sure it's flagged in-sync.
-        if (!force && matchesRemote)
+        if (MatchesRemote(clientFileInfo, remoteFileInfo))
         {
             if (!placeholderState.HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC))
             {
@@ -224,6 +215,43 @@ public class PlaceholdersService(
         }
     }
 
+    /// <returns>False when there are no local changes or the remote is newer.</returns>
+    private async Task<bool> TryUploadChanges(string relativeFile, FileInfo clientFileInfo)
+    {
+        var clientFile = clientFileInfo.FullName;
+        if (!CloudFilter.HasLocalChanges(clientFile))
+        {
+            return false;
+        }
+
+        if (!remoteService.Exists(relativeFile))
+        {
+            await remoteService.CreateFile(clientFileInfo, relativeFile);
+        }
+        else
+        {
+            var remoteFileInfo = remoteService.GetFileInfo(relativeFile);
+            if (!MatchesRemote(clientFileInfo, remoteFileInfo))
+            {
+                var localWriteTime = FileEqualityComparer.NormalizeToUtcSeconds(clientFileInfo.LastWriteTimeUtc);
+                var remoteWriteTime = FileEqualityComparer.NormalizeToUtcSeconds(remoteFileInfo.LastWriteTimeUtc);
+                if (localWriteTime < remoteWriteTime)
+                {
+                    logger.Info($"Remote copy of {relativeFile} is newer, replacing local changes");
+                    return false;
+                }
+                await remoteService.UpdateFile(clientFileInfo, relativeFile);
+            }
+        }
+
+        CloudFilter.MarkInSync(clientFile);
+        ShellNotify.NotifyUpdate(clientFile);
+        return true;
+    }
+
+    private bool MatchesRemote(FileInfo clientFileInfo, RemoteFileInfo remoteFileInfo) =>
+        remoteFileInfo.GetHashCode() == _fileComparer.GetHashCode(clientFileInfo);
+
     /// <summary>Converts a hydrated non-placeholder directory to a placeholder and marks it in-sync. No-ops on dehydrated dirs.</summary>
     public Task UpdateDirectory(string relativeDirectory)
     {
@@ -234,26 +262,16 @@ public class PlaceholdersService(
             return Task.CompletedTask;
         }
 
-        // Check if the directory is hydrated
-        bool isHydrated = !File.GetAttributes(clientDirectory).HasFlag(FileAttributes.Offline);
-
-        // Only update placeholder state if directory is a hydrated directory
-        if (isHydrated)
+        if (!File.GetAttributes(clientDirectory).HasFlag(FileAttributes.Offline))
         {
-            if (!CloudFilter.IsPlaceholder(clientDirectory))
+            try
             {
-                try
-                {
-                    CloudFilter.ConvertToPlaceholder(clientDirectory);
-                    CloudFilter.SetInSyncState(clientDirectory);
-                }
-                catch (Exception ex)
-                {
-                    logger.Error($"Failed to convert directory to placeholder for {relativeDirectory}", ex);
-                }
-                return Task.CompletedTask;
+                CloudFilter.MarkInSync(clientDirectory);
             }
-            CloudFilter.SetInSyncState(clientDirectory);
+            catch (Exception ex)
+            {
+                logger.Error($"Failed to mark directory in-sync for {relativeDirectory}", ex);
+            }
         }
         return Task.CompletedTask;
     }
@@ -316,15 +334,52 @@ public class PlaceholdersService(
         }
     }
 
-    // for now move the file to the recycle bin
-    public void Delete(string relativePath)
+    /// <summary>Hydrates a file, or every file under a folder. Callers hold the lock.</summary>
+    public void Hydrate(string relativePath)
+    {
+        var clientPath = Path.Join(RootDirectory, relativePath);
+        var attributes = File.GetAttributes(clientPath);
+        if (!attributes.HasFlag(FileAttributes.Directory))
+        {
+            if (attributes.HasFlag(FileAttributes.Offline) && !FileHelper.IsSystemFile(clientPath))
+            {
+                CloudFilter.HydratePlaceholder(clientPath);
+            }
+            return;
+        }
+
+        // Enumerating fetches the placeholders of an unpopulated folder
+        foreach (var entry in Directory.EnumerateFileSystemEntries(clientPath).ToArray())
+        {
+            var entryRelativePath = PathMapper.GetRelativePath(entry, RootDirectory);
+            try
+            {
+                Hydrate(entryRelativePath);
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Hydrate failed for {entryRelativePath}", ex);
+            }
+        }
+    }
+
+    /// <summary>Moves the item to the recycle bin, or re-uploads it if it has local changes.</summary>
+    public async Task Delete(string relativePath)
     {
         var clientPath = Path.Join(RootDirectory, relativePath);
         if (!Path.Exists(clientPath))
         {
             return;
         }
-        var isDirectory = File.GetAttributes(clientPath).HasFlag(FileAttributes.Directory);
+        var attributes = File.GetAttributes(clientPath);
+        var isDirectory = attributes.HasFlag(FileAttributes.Directory);
+
+        if (!isDirectory && !attributes.HasFlag(FileAttributes.Offline) && CloudFilter.HasLocalChanges(clientPath))
+        {
+            await UpdateFile(relativePath);
+            return;
+        }
+
         try
         {
             RecycleBin.MoveToRecycleBin(clientPath);

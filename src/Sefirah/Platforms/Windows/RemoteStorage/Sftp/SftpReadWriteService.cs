@@ -40,23 +40,13 @@ public class SftpReadWriteService(
     public async Task UpdateFile(FileInfo sourceFileInfo, string relativeFile)
     {
         var serverFile = GetSftpPath(relativeFile);
-        // Update only - CreateFile to create!
-        if (!Exists(relativeFile))
-        {
-            return;
-        }
-
-        var sftpFile = client.Get(serverFile);
-        if (sourceFileInfo.LastWriteTimeUtc < sftpFile.LastWriteTimeUtc)
-        {
-            return;
-        }
 
         using (var sourceStream = await FileHelper.WaitUntilUnlocked(sourceFileInfo.OpenRead, logger))
         {
             await Task.Factory.FromAsync(client.BeginUploadFile(sourceStream, serverFile), client.EndUploadFile);
         }
 
+        var sftpFile = client.Get(serverFile);
         sftpFile.LastWriteTimeUtc = sourceFileInfo.LastWriteTimeUtc;
         sftpFile.LastAccessTimeUtc = sourceFileInfo.LastAccessTimeUtc;
         sftpFile.UpdateStatus();

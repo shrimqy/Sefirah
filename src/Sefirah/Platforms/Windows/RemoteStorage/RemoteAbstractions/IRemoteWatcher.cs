@@ -8,9 +8,11 @@ public interface IRemoteWatcher : IDisposable
     event RemoteChangeHandler? Changed;
     event RemoteRenameHandler? Renamed;
     event RemoteDeleteHandler? Deleted;
+    event RemoteReconnectHandler? Reconnected;
 }
 
 public delegate Task RemoteCreateHandler(string relativePath);
 public delegate Task RemoteChangeHandler(string relativePath);
 public delegate Task RemoteRenameHandler(string oldRelativePath, string newRelativePath);
 public delegate Task RemoteDeleteHandler(string relativePath);
+public delegate void RemoteReconnectHandler();

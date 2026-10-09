@@ -1,7 +1,9 @@
+using System.Threading.Channels;
 using Sefirah.Platforms.Windows.Async;
 using Sefirah.Platforms.Windows.Helpers;
 using Sefirah.Platforms.Windows.RemoteStorage.Abstractions;
 using Sefirah.Platforms.Windows.RemoteStorage.Commands;
+using Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
 using Sefirah.Platforms.Windows.RemoteStorage.Worker.IO;
 using static Vanara.PInvoke.CldApi;
 
@@ -10,11 +12,13 @@ namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
 public class SyncProvider(
     ISyncProviderContextAccessor contextAccessor,
     TaskQueue taskQueue,
+    ChannelWriter<Func<Task>> taskWriter,
     ShellCommandQueue shellCommandQueue,
     SyncRootConnector syncProvider,
     PlaceholdersService placeholdersService,
     ClientWatcher clientWatcher,
     RemoteWatcher remoteWatcher,
+    IRemoteWatcher remoteSource,
     ILogger logger
 )
 {
@@ -32,15 +36,15 @@ public class SyncProvider(
             placeholdersService.CreateBulk(string.Empty);
         }
 
-        // update local placeholders with the remote
-        syncProvider.RemoveStalePlaceholders(contextAccessor.Context.RootDirectory);
-
         // Stage 2: Running
         //--------------------------------------------------------------------------------------------
         // The file watcher loop for this sample will run until the user presses Ctrl-C.
         // The file watcher will look for any changes on the files in the client (syncroot) in order
         // to let the cloud know.
         clientWatcher.Start();
+        // Sync changes made while disconnected
+        taskWriter.TryWrite(() => clientWatcher.SyncPendingChanges(string.Empty));
+        remoteSource.Reconnected += () => taskWriter.TryWrite(() => clientWatcher.SyncPendingChanges(string.Empty));
         remoteWatcher.Start(cancellation);
 
         // Run until SIGTERM
