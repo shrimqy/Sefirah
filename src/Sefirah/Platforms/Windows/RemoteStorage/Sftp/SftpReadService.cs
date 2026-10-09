@@ -91,13 +91,20 @@ public class SftpReadService(
     protected string GetSftpPath(string relativePath) =>
         Path.Join(_context.Directory, relativePath).Replace(@"\", "/");
 
+    private string GetRelativeParentDirectory(ISftpFile sftpFile)
+    {
+        var relativePath = PathMapper.GetRelativePath(sftpFile.FullName, _context.Directory);
+        var separatorIndex = relativePath.LastIndexOf('/');
+        return separatorIndex < 0 ? string.Empty : relativePath[..separatorIndex];
+    }
+
     private RemoteDirectoryInfo GetRemoteDirectoryInfo(ISftpFile sftpFile) =>
         new()
         {
             Name = sftpFile.Name,
             Attributes = FileAttributes.Directory,
             RelativePath = PathMapper.GetRelativePath(sftpFile.FullName, _context.Directory),
-            RelativeParentDirectory = PathMapper.GetRelativePath(sftpFile.FullName, _context.Directory).Replace($"/{sftpFile.Name}", ""),
+            RelativeParentDirectory = GetRelativeParentDirectory(sftpFile),
             CreationTimeUtc = sftpFile.LastWriteTimeUtc,
             LastWriteTimeUtc = sftpFile.LastWriteTimeUtc,
             LastAccessTimeUtc = sftpFile.LastAccessTimeUtc,
@@ -110,7 +117,7 @@ public class SftpReadService(
             Length = sftpFile.Length,
             Attributes = FileAttributes.None,
             RelativePath = PathMapper.GetRelativePath(sftpFile.FullName, _context.Directory),
-            RelativeParentDirectory = PathMapper.GetRelativePath(sftpFile.FullName, _context.Directory).Replace($"/{sftpFile.Name}", ""),
+            RelativeParentDirectory = GetRelativeParentDirectory(sftpFile),
             CreationTimeUtc = sftpFile.LastWriteTimeUtc,
             LastWriteTimeUtc = sftpFile.LastWriteTimeUtc,
             LastAccessTimeUtc = sftpFile.LastAccessTimeUtc,
