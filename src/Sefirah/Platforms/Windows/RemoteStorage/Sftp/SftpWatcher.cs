@@ -103,6 +103,14 @@ public sealed partial class SftpWatcher(
                 }
             }
         }
+        catch (OperationCanceledException)
+        {
+            // Stopped while waiting to retry
+        }
+        catch (Exception ex)
+        {
+            logger.Error("SFTP watcher stopped unexpectedly", ex);
+        }
         finally
         {
             _running = false;
