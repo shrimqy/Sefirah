@@ -32,6 +32,8 @@ public class SyncRootRegistrar(
 
     public static bool IsRegistered(string id) => StorageProviderSyncRootManager.GetCurrentSyncRoots().Any((x) => x.Id == id);
 
+    public string GetId(string accountId) => $"{providerOptions.Value.ProviderId}!{WindowsIdentity.GetCurrent().User}!{accountId}";
+
     public StorageProviderSyncRootInfo? Register(RegisterSyncRootCommand command, IStorageFolder directory, SftpContext context)
     {
         // Stage 1: Setup
@@ -40,7 +42,7 @@ public class SyncRootRegistrar(
         var clientDirectory = new DirectoryInfo(command.Directory);
         clientDirectory.Attributes &= ~System.IO.FileAttributes.NotContentIndexed;
 
-        var id = $"{providerOptions.Value.ProviderId}!{WindowsIdentity.GetCurrent().User}!{command.AccountId}";
+        var id = GetId(command.AccountId);
         var contextBuffer = CryptographicBuffer.CreateFromByteArray(StructBytes.ToBytes(context));
 
         var info = new StorageProviderSyncRootInfo
