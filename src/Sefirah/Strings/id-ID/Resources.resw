@@ -1128,4 +1128,10 @@ input keyevent 66</value>
   <data name="Dialer" xml:space="preserve">
     <value>Dialer</value>
   </data>
+  <data name="CloudFilesContextMenu.SyncWithDevice" xml:space="preserve">
+    <value>Sync with device</value>
+  </data>
+  <data name="CloudFilesContextMenu.KeepOnDevice" xml:space="preserve">
+    <value>Keep on this device</value>
+  </data>
 </root>
