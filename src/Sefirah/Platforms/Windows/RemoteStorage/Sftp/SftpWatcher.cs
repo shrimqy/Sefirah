@@ -94,7 +94,16 @@ public sealed partial class SftpWatcher(
                 }
                 catch (SshOperationTimeoutException ex)
                 {
-                    logger.Warn("SFTP operation timed out (connection dropped mid-operation)", ex);
+                    logger.Warn("SFTP operation timed out, reconnecting", ex);
+                    // Reconnected on the next loop, which also syncs changes missed by timed out tasks
+                    try
+                    {
+                        client.Disconnect();
+                    }
+                    catch (Exception disconnectEx)
+                    {
+                        logger.Error("Error disconnecting SFTP client", disconnectEx);
+                    }
                 }
                 catch (Exception ex)
                 {

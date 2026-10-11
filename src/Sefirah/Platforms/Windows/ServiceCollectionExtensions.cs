@@ -137,7 +137,12 @@ public static class ServiceCollectionExtensions
                     contextAccessor.Context.Port,
                     contextAccessor.Context.Username,
                     contextAccessor.Context.Password
-                );
+                )
+                {
+                    // Unanswered requests would otherwise block the sync queue forever
+                    OperationTimeout = TimeSpan.FromSeconds(30),
+                    KeepAliveInterval = TimeSpan.FromSeconds(15),
+                };
                 try
                 {
                     client.Connect();
