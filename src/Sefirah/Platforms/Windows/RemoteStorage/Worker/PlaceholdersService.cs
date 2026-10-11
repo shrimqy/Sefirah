@@ -10,6 +10,7 @@ namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
 public class PlaceholdersService(
     ISyncProviderContextAccessor contextAccessor,
     IRemoteReadWriteService remoteService,
+    FileLocker fileLocker,
     ILogger logger
 )
 {
@@ -172,7 +173,7 @@ public class PlaceholdersService(
         {
             try
             {
-                CloudFilter.ConvertToPlaceholder(hfile);
+                CloudFilter.ConvertToPlaceholder(hfile, relativeFile);
             }
             catch (Exception ex)
             {
@@ -244,7 +245,7 @@ public class PlaceholdersService(
             }
         }
 
-        CloudFilter.MarkInSync(clientFile);
+        CloudFilter.MarkInSync(clientFile, relativeFile);
         ShellNotify.NotifyUpdate(clientFile);
         return true;
     }
@@ -266,7 +267,7 @@ public class PlaceholdersService(
         {
             try
             {
-                CloudFilter.MarkInSync(clientDirectory);
+                CloudFilter.MarkInSync(clientDirectory, relativeDirectory);
             }
             catch (Exception ex)
             {
@@ -397,5 +398,135 @@ public class PlaceholdersService(
             }
             ShellNotify.NotifyDelete(clientPath, isDirectory);
         }
+    }
+
+    /// <summary>
+    /// Applies local renames, uploads local changes under <paramref name="relativeDirectory"/>
+    /// and removes in-sync items that are gone from the remote. Takes its own file locks.
+    /// </summary>
+    /// <param name="movedDirectories">Folders moved on the remote during this walk, as (old, new) paths.</param>
+    public async Task SyncPendingChanges(string relativeDirectory, List<(string Old, string New)>? movedDirectories = null)
+    {
+        movedDirectories ??= [];
+        var directoryInfo = new DirectoryInfo(Path.Join(RootDirectory, relativeDirectory));
+        // Online-only folders have no local contents
+        if (!directoryInfo.Exists || directoryInfo.Attributes.HasFlag(FileAttributes.Offline))
+        {
+            return;
+        }
+
+        // Folder created locally that isn't on the remote yet
+        if (relativeDirectory.Length > 0
+            && CloudFilter.HasLocalChanges(directoryInfo.FullName)
+            && !remoteService.Exists(relativeDirectory))
+        {
+            await remoteService.CreateDirectory(directoryInfo, relativeDirectory);
+        }
+
+        // Names in the remote folder, listed once for the whole loop
+        var remoteNames = remoteService.EnumerateFiles(relativeDirectory).Select(x => x.Name)
+            .Concat(remoteService.EnumerateDirectories(relativeDirectory).Select(x => x.Name))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        // An empty listing from a dropped connection would look like everything was deleted
+        var canRemove = remoteService.IsConnected;
+
+        foreach (var entry in directoryInfo.EnumerateFileSystemInfos().ToArray())
+        {
+            var relativePath = PathMapper.GetRelativePath(entry.FullName, RootDirectory);
+            try
+            {
+                if (FileHelper.IsSystemFile(entry.FullName))
+                {
+                    continue;
+                }
+
+                // Renamed or moved locally while disconnected; the listing above still has the old name
+                if (await TrySyncRename(entry, relativePath, movedDirectories))
+                {
+                    remoteNames.Add(entry.Name);
+                }
+
+                var state = CloudFilter.GetPlaceholderState(entry.FullName);
+                if (state is CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_INVALID)
+                {
+                    continue;
+                }
+
+                // In sync but gone from the remote: deleted there
+                if (!CloudFilter.HasLocalChanges(state) && !remoteNames.Contains(entry.Name))
+                {
+                    if (canRemove)
+                    {
+                        using var locker = await fileLocker.Lock(relativePath);
+                        await Delete(relativePath);
+                    }
+                    continue;
+                }
+
+                if (entry is DirectoryInfo)
+                {
+                    await SyncPendingChanges(relativePath, movedDirectories);
+                }
+                // Downloaded file with local changes: upload it, or take the remote copy if that's newer
+                else if (CloudFilter.HasLocalChanges(state) && !entry.Attributes.HasFlag(FileAttributes.Offline))
+                {
+                    using var locker = await fileLocker.Lock(relativePath);
+                    await UpdateFile(relativePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Failed to sync pending change {relativePath}", ex);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Renames the item on the remote if its placeholder identity (the path it was synced at) differs from where it is now.
+    /// </summary>
+    /// <returns>True if the item was renamed on the remote.</returns>
+    private async Task<bool> TrySyncRename(FileSystemInfo entry, string relativePath, List<(string Old, string New)> movedDirectories)
+    {
+        // Path the item was last synced at; null if it isn't a placeholder
+        var identity = CloudFilter.GetPlaceholderIdentity(entry.FullName);
+        if (identity is null || identity == relativePath)
+        {
+            return false;
+        }
+
+        // Where the item is on the remote now, if a parent folder was already moved there in this walk
+        var oldPath = movedDirectories.Aggregate(identity, (path, moved) =>
+            path.StartsWith(moved.Old + "/") ? moved.New + path[moved.Old.Length..] : path);
+
+        // Rename only if the old path is gone locally, still on the remote, and the new one isn't taken there
+        var renamed = oldPath != relativePath
+            && !Path.Exists(Path.Join(RootDirectory, oldPath))
+            && remoteService.Exists(oldPath)
+            && !remoteService.Exists(relativePath);
+        if (renamed)
+        {
+            using var oldLocker = await fileLocker.Lock(oldPath);
+            using var newLocker = await fileLocker.Lock(relativePath);
+            if (entry is DirectoryInfo)
+            {
+                remoteService.MoveDirectory(oldPath, relativePath);
+                // Lets children inside it be found at their new remote path
+                movedDirectories.Add((oldPath, relativePath));
+            }
+            else
+            {
+                remoteService.MoveFile(oldPath, relativePath);
+            }
+            // Downloaded files are marked in sync by UpdateFile once checked against the remote
+            if (entry is DirectoryInfo || entry.Attributes.HasFlag(FileAttributes.Offline))
+            {
+                CloudFilter.SetInSyncState(entry.FullName);
+            }
+            logger.Info($"Renamed {oldPath} to {relativePath} on the remote");
+        }
+
+        // Renamed above, moved along with a folder, or stale
+        CloudFilter.SetPlaceholderIdentity(entry.FullName, relativePath);
+        return renamed;
     }
 }

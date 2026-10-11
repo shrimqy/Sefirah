@@ -232,6 +232,7 @@ public sealed class SyncRootConnector(
             {
                 remoteService.MoveFile(oldRelativePath, newRelativePath);
             }
+            CloudFilter.SetPlaceholderIdentity(newClientPath, newRelativePath);
         }
         catch (Exception ex)
         {

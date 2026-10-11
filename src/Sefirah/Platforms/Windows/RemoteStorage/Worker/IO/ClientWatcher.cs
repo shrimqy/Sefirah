@@ -3,7 +3,6 @@ using Sefirah.Platforms.Windows.Helpers;
 using Sefirah.Platforms.Windows.Interop;
 using Sefirah.Platforms.Windows.Interop.Extensions;
 using Sefirah.Platforms.Windows.RemoteStorage.Abstractions;
-using Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
 using Vanara.PInvoke;
 using static Vanara.PInvoke.CldApi;
 using FileAttributes = System.IO.FileAttributes;
@@ -16,7 +15,6 @@ public partial class ClientWatcher : IDisposable
     private readonly ISyncProviderContextAccessor _contextAccessor;
     private readonly ChannelWriter<Func<Task>> _taskWriter;
     private readonly FileLocker _fileLocker;
-    private readonly IRemoteReadWriteService _remoteService;
     private readonly PlaceholdersService _placeholdersService;
     private readonly ILogger _logger;
     private readonly FileSystemWatcher _watcher;
@@ -27,7 +25,6 @@ public partial class ClientWatcher : IDisposable
         ISyncProviderContextAccessor contextAccessor,
         ChannelWriter<Func<Task>> taskWriter,
         FileLocker fileLocker,
-        IRemoteReadWriteService remoteService,
         PlaceholdersService placeholdersService,
         ILogger logger
     )
@@ -35,7 +32,6 @@ public partial class ClientWatcher : IDisposable
         _contextAccessor = contextAccessor;
         _taskWriter = taskWriter;
         _fileLocker = fileLocker;
-        _remoteService = remoteService;
         _placeholdersService = placeholdersService;
         _logger = logger;
         _watcher = CreateWatcher();
@@ -161,7 +157,7 @@ public partial class ClientWatcher : IDisposable
                 {
                     if (File.GetAttributes(e.FullPath).HasFlag(FileAttributes.Directory))
                     {
-                        await SyncPendingChanges(relativePath);
+                        await _placeholdersService.SyncPendingChanges(relativePath);
                     }
                     else
                     {
@@ -182,73 +178,6 @@ public partial class ClientWatcher : IDisposable
         };
 
         return watcher;
-    }
-
-    /// <summary>
-    /// Uploads local changes under <paramref name="relativeDirectory"/> and removes in-sync items that are gone from the remote.
-    /// </summary>
-    public async Task SyncPendingChanges(string relativeDirectory)
-    {
-        var directoryInfo = new DirectoryInfo(Path.Join(RootDirectory, relativeDirectory));
-        if (!directoryInfo.Exists || directoryInfo.Attributes.HasFlag(FileAttributes.Offline))
-        {
-            return;
-        }
-
-        if (relativeDirectory.Length > 0
-            && CloudFilter.HasLocalChanges(directoryInfo.FullName)
-            && !_remoteService.Exists(relativeDirectory))
-        {
-            await _remoteService.CreateDirectory(directoryInfo, relativeDirectory);
-        }
-
-        var remoteNames = _remoteService.EnumerateFiles(relativeDirectory).Select(x => x.Name)
-            .Concat(_remoteService.EnumerateDirectories(relativeDirectory).Select(x => x.Name))
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-        // An empty listing from a dropped connection would look like everything was deleted
-        var canRemove = _remoteService.IsConnected;
-
-        foreach (var entry in directoryInfo.EnumerateFileSystemInfos().ToArray())
-        {
-            var relativePath = PathMapper.GetRelativePath(entry.FullName, RootDirectory);
-            try
-            {
-                if (FileHelper.IsSystemFile(entry.FullName))
-                {
-                    continue;
-                }
-
-                var state = CloudFilter.GetPlaceholderState(entry.FullName);
-                if (state is CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_INVALID)
-                {
-                    continue;
-                }
-
-                if (!CloudFilter.HasLocalChanges(state) && !remoteNames.Contains(entry.Name))
-                {
-                    if (canRemove)
-                    {
-                        using var locker = await _fileLocker.Lock(relativePath);
-                        await _placeholdersService.Delete(relativePath);
-                    }
-                    continue;
-                }
-
-                if (entry is DirectoryInfo)
-                {
-                    await SyncPendingChanges(relativePath);
-                }
-                else if (CloudFilter.HasLocalChanges(state) && !entry.Attributes.HasFlag(FileAttributes.Offline))
-                {
-                    using var locker = await _fileLocker.Lock(relativePath);
-                    await _placeholdersService.UpdateFile(relativePath);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"Failed to sync pending change {relativePath}", ex);
-            }
-        }
     }
 
     public void Start()

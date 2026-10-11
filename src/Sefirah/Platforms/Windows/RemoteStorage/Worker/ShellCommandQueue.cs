@@ -2,7 +2,6 @@ using System.Threading.Channels;
 using Sefirah.Platforms.Windows.Helpers;
 using Sefirah.Platforms.Windows.RemoteStorage.Abstractions;
 using Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
-using Sefirah.Platforms.Windows.RemoteStorage.Worker.IO;
 using FileAttributes = System.IO.FileAttributes;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
@@ -14,7 +13,6 @@ public sealed partial class ShellCommandQueue(
     ShellCommandRouter router,
     FileLocker fileLocker,
     PlaceholdersService placeholderService,
-    ClientWatcher clientWatcher,
     IRemoteReadWriteService remoteService,
     ILogger logger
 ) : IDisposable
@@ -61,7 +59,7 @@ public sealed partial class ShellCommandQueue(
             {
                 await SyncDirectory(relativePath);
             }
-            await clientWatcher.SyncPendingChanges(relativePath);
+            await placeholderService.SyncPendingChanges(relativePath);
             return;
         }
 

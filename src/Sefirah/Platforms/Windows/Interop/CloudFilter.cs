@@ -80,6 +80,41 @@ public static class CloudFilter
     public static bool IsPlaceholder(HFILE hfile) =>
         GetPlaceholderState(hfile).HasFlag(CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER);
 
+    /// <summary>Relative path stored as the placeholder's file identity; null if it isn't a placeholder.</summary>
+    public static string? GetPlaceholderIdentity(string path)
+    {
+        using var hfile = CreateHFile(path);
+        // CF_PLACEHOLDER_BASIC_INFO: FileIdentityLength at 24, FileIdentity at 28, identity is at most 4 KB
+        const int identityOffset = 28;
+        using var buffer = new SafeHGlobalHandle(identityOffset + 4096);
+        var hr = CldApi.CfGetPlaceholderInfo(hfile, CldApi.CF_PLACEHOLDER_INFO_CLASS.CF_PLACEHOLDER_INFO_BASIC, buffer, (uint)buffer.Size, out _);
+        if (hr.Failed)
+        {
+            return null;
+        }
+        var pointer = buffer.DangerousGetHandle();
+        var identityLength = Marshal.ReadInt32(pointer, identityOffset - 4);
+        return Marshal.PtrToStringUni(pointer + identityOffset, identityLength / 2).TrimEnd('\0');
+    }
+
+    /// <remarks>Only the identity is updated; metadata and in-sync state are kept.</remarks>
+    public static void SetPlaceholderIdentity(string path, string relativePath)
+    {
+        using var hfile = CreateHFile(path, FileAccess.Write);
+        using var identity = new SafeCoTaskMemString(relativePath);
+        CldApi.CfUpdatePlaceholder(
+            hfile,
+            IntPtr.Zero,
+            identity,
+            identity.Size,
+            null,
+            0,
+            CldApi.CF_UPDATE_FLAGS.CF_UPDATE_FLAG_NONE,
+            IntPtr.Zero,
+            IntPtr.Zero
+        ).ThrowIfFailed("Update placeholder identity failed");
+    }
+
     /// <summary>False when the state can't be read.</summary>
     public static bool HasLocalChanges(CldApi.CF_PLACEHOLDER_STATE state) =>
         state is not CldApi.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_INVALID
@@ -87,29 +122,30 @@ public static class CloudFilter
 
     public static bool HasLocalChanges(string path) => HasLocalChanges(GetPlaceholderState(path));
 
-    public static void MarkInSync(string path)
+    public static void MarkInSync(string path, string relativePath)
     {
         if (!IsPlaceholder(path))
         {
-            ConvertToPlaceholder(path);
+            ConvertToPlaceholder(path, relativePath);
         }
         SetInSyncState(path);
     }
 
-    public static void ConvertToPlaceholder(string path)
+    public static void ConvertToPlaceholder(string path, string relativePath)
     {
         using var hfile = CreateHFile(path, FileAccess.Write);
-        ConvertToPlaceholder(hfile);
+        ConvertToPlaceholder(hfile, relativePath);
     }
 
     /// <param name="hfile">Needs write</param>
-    /// <remarks>Needs write</remarks>
-    public static void ConvertToPlaceholder(HFILE hfile)
+    /// <param name="relativePath">Stored as the file identity</param>
+    public static void ConvertToPlaceholder(HFILE hfile, string relativePath)
     {
+        using var identity = new SafeCoTaskMemString(relativePath);
         CldApi.CfConvertToPlaceholder(
             hfile,
-            FileIdentity: default,
-            FileIdentityLength: 0,
+            identity,
+            identity.Size,
             CldApi.CF_CONVERT_FLAGS.CF_CONVERT_FLAG_NONE,
             out var _
         ).ThrowIfFailed("Convert to placeholder failed");

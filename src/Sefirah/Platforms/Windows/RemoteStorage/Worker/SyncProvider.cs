@@ -43,8 +43,8 @@ public class SyncProvider(
         // to let the cloud know.
         clientWatcher.Start();
         // Sync changes made while disconnected
-        taskWriter.TryWrite(() => clientWatcher.SyncPendingChanges(string.Empty));
-        remoteSource.Reconnected += () => taskWriter.TryWrite(() => clientWatcher.SyncPendingChanges(string.Empty));
+        taskWriter.TryWrite(() => placeholdersService.SyncPendingChanges(string.Empty));
+        remoteSource.Reconnected += () => taskWriter.TryWrite(() => placeholdersService.SyncPendingChanges(string.Empty));
         remoteWatcher.Start(cancellation);
 
         // Run until SIGTERM
