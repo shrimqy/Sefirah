@@ -14,5 +14,6 @@ public class AttachmentEntity
 
     public string MimeType { get; set; } = string.Empty;
 
+    [Indexed]
     public long PartId { get; set; } = -1;
 }
