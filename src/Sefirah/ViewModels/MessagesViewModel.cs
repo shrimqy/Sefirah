@@ -182,9 +182,8 @@ public sealed partial class MessagesViewModel : BaseViewModel
             if (!ReferenceEquals(SelectedConversation, conversation) || ActiveDevice?.Id != device.Id)
                 return;
 
-            reachedCacheStart = messages.Count == 0;
+            reachedCacheStart = messages.Count < SmsRepository.PageSize;
             AddMessages(messages);
-            AppendQueuedToGroups(device.Id, conversation.ThreadId);
         }
         catch (Exception ex)
         {
@@ -220,11 +219,10 @@ public sealed partial class MessagesViewModel : BaseViewModel
             if (!ReferenceEquals(SelectedConversation, conversation) || ActiveDevice?.Id != device.Id)
                 return;
 
+            if (!device.IsConnected && messages.Count < SmsRepository.PageSize)
+                reachedCacheStart = true;
             if (messages.Count == 0)
-            {
-                reachedCacheStart = !device.IsConnected;
                 return;
-            }
 
             foreach (var message in messages)
                 if (MessageIds.Add(message.UniqueId))
