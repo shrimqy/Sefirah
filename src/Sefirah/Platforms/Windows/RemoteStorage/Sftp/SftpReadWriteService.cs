@@ -66,6 +66,7 @@ public class SftpReadWriteService(
         var oldServerFile = GetSftpPath(oldRelativeFile);
         var newServerFile = GetSftpPath(newRelativeFile);
 
+        EnsureRemoteParentExists(newServerFile);
         var sftpFile = client.Get(oldServerFile);
         sftpFile.MoveTo(newServerFile);
     }
@@ -105,6 +106,7 @@ public class SftpReadWriteService(
         var oldServerDirectory = GetSftpPath(oldRelativeDirectory);
         var newServerDirectory = GetSftpPath(newRelativeDirectory);
         logger.Debug($"Move Directory {oldServerDirectory} -> {newServerDirectory}");
+        EnsureRemoteParentExists(newServerDirectory);
         var sftpFile = client.Get(oldServerDirectory);
         sftpFile.MoveTo(newServerDirectory);
     }

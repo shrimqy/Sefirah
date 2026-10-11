@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using System.Threading.Channels;
+using System.Runtime.InteropServices;
 using Sefirah.Platforms.Windows.Helpers;
 using Sefirah.Platforms.Windows.Interop;
 using Sefirah.Platforms.Windows.Interop.SyncRoot;
@@ -7,13 +7,11 @@ using Sefirah.Platforms.Windows.RemoteStorage.Abstractions;
 using Sefirah.Platforms.Windows.RemoteStorage.RemoteAbstractions;
 using Vanara.PInvoke;
 using static Vanara.PInvoke.CldApi;
-using FileAttributes = System.IO.FileAttributes;
 
 namespace Sefirah.Platforms.Windows.RemoteStorage.Worker;
 
 public sealed class SyncRootConnector(
     ISyncProviderContextAccessor contextAccessor,
-    ChannelWriter<Func<Task>> taskWriter,
     FileLocker fileLocker,
     IRemoteReadWriteService remoteService,
     ILogger logger
@@ -42,18 +40,21 @@ public sealed class SyncRootConnector(
                 FetchData = (in callbackInfo, in callbackParameters) => FetchData(callbackInfo, callbackParameters),
                 CancelFetchData = CancelFetchData,
                 OnCloseCompletion = OnCloseCompletion,
-                OnRenameCompletion = (in callbackInfo, in callbackParameters) =>
+                OnRename = (in callbackInfo, in callbackParameters) =>
                 {
-                    var volumeDosName = callbackInfo.VolumeDosName;
-                    var oldPath = callbackParameters.RenameCompletion.SourcePath;
-                    var newPath = callbackInfo.NormalizedPath;
-                    taskWriter.TryWrite(() => OnRenameCompletion(volumeDosName, oldPath, newPath));
-                },
-                OnDeleteCompletion = (in callbackInfo, in callbackParameters) =>
+                    var info = callbackInfo;
+                    var isOwnProcess = IsOwnProcess(callbackInfo);
+                    var sourcePath = ToClientPath(callbackInfo, callbackInfo.NormalizedPath);
+                    var targetPath = ToClientPath(callbackInfo, callbackParameters.Rename.TargetPath);
+                    var isDirectory = callbackParameters.Rename.Flags.HasFlag(CF_CALLBACK_RENAME_FLAGS.CF_CALLBACK_RENAME_FLAG_IS_DIRECTORY);
+                    _ = Task.Run(() => OnRename(info, isOwnProcess, sourcePath, targetPath, isDirectory));
+                },                OnDelete = (in callbackInfo, in callbackParameters) =>
                 {
-                    var volumeDosName = callbackInfo.VolumeDosName;
-                    var path = callbackInfo.NormalizedPath;
-                    taskWriter.TryWrite(() => OnDeleteCompletion(volumeDosName, path));
+                    var info = callbackInfo;
+                    var isOwnProcess = IsOwnProcess(callbackInfo);
+                    var path = ToClientPath(callbackInfo, callbackInfo.NormalizedPath);
+                    var flags = callbackParameters.Delete.Flags;
+                    _ = Task.Run(() => OnDelete(info, isOwnProcess, path, flags));
                 },
             },
             out var connectionKey
@@ -196,85 +197,115 @@ public sealed class SyncRootConnector(
         //logger.Debug("SyncRoot CloseCompletion {path} {flags}", callbackInfo.NormalizedPath, callbackParameters.CloseCompletion.Flags);
     }
 
-    private async Task OnRenameCompletion(string volumeDosName, string oldPath, string newPath)
+    /// <summary>Renames the item on the remote before Windows renames it locally; the local rename fails if this fails.</summary>
+    private async Task OnRename(CF_CALLBACK_INFO callbackInfo, bool isOwnProcess, string sourcePath, string targetPath, bool isDirectory)
     {
-        logger.Info($"SyncRoot Rename {oldPath} -> {newPath}");
-        var oldClientPath = Path.Join(volumeDosName, oldPath[1..]);
-        var oldRelativePath = PathMapper.GetRelativePath(oldClientPath, _rootDirectory);
-        var newClientPath = Path.Join(volumeDosName, newPath[1..]);
-        var newRelativePath = PathMapper.GetRelativePath(newClientPath, _rootDirectory);
-        using var oldLocker = await fileLocker.Lock(oldRelativePath);
-        using var newLocker = await fileLocker.Lock(newRelativePath);
+        var success = true;
+        // Our own renames, e.g. recycling an item deleted on the remote, are already reflected there
+        if (!isOwnProcess && IsInRoot(sourcePath))
+        {
+            try
+            {
+                var oldRelativePath = PathMapper.GetRelativePath(sourcePath, _rootDirectory);
+                using var oldLocker = await fileLocker.Lock(oldRelativePath);
+                if (remoteService.Exists(oldRelativePath))
+                {
+                    // Moved out of the sync root, including to the Recycle Bin
+                    if (!IsInRoot(targetPath))
+                    {
+                        DeleteOnRemote(oldRelativePath, isDirectory);
+                    }
+                    else
+                    {
+                        var newRelativePath = PathMapper.GetRelativePath(targetPath, _rootDirectory);
+                        using var newLocker = await fileLocker.Lock(newRelativePath);
+                        if (isDirectory)
+                        {
+                            remoteService.MoveDirectory(oldRelativePath, newRelativePath);
+                        }
+                        else
+                        {
+                            remoteService.MoveFile(oldRelativePath, newRelativePath);
+                        }
+                        logger.Info($"Renamed {oldRelativePath} to {newRelativePath} on the remote");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Rename on the remote failed: {sourcePath} -> {targetPath}", ex);
+                success = false;
+            }
+        }
+
         try
         {
-            if (!remoteService.Exists(oldRelativePath))
-            {
-                return;
-            }
-            // If moving outside of sync directory, treat like a delete
-            if (!newClientPath.StartsWith(Path.TrimEndingDirectorySeparator(_rootDirectory) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
-            {
-                if (remoteService.IsDirectory(oldRelativePath))
-                {
-                    remoteService.DeleteDirectory(oldRelativePath);
-                }
-                else
-                {
-                    remoteService.DeleteFile(oldRelativePath);
-                }
-                return;
-            }
-            if (File.GetAttributes(newClientPath).HasFlag(FileAttributes.Directory))
-            {
-                remoteService.MoveDirectory(oldRelativePath, newRelativePath);
-            }
-            else
-            {
-                remoteService.MoveFile(oldRelativePath, newRelativePath);
-            }
-            CloudFilter.SetPlaceholderIdentity(newClientPath, newRelativePath);
+            CloudFilter.AckRename(callbackInfo, success);
         }
         catch (Exception ex)
         {
-            logger.Error("Rename server object failed", ex);
+            logger.Error($"Ack rename failed for {sourcePath}", ex);
         }
     }
 
-    private async Task OnDeleteCompletion(string volumeDosName, string path)
+    /// <summary>Deletes the item on the remote before Windows deletes it locally; the local delete fails if this fails.</summary>
+    private async Task OnDelete(CF_CALLBACK_INFO callbackInfo, bool isOwnProcess, string path, CF_CALLBACK_DELETE_FLAGS flags)
     {
-        logger.Debug($"SyncRoot Delete {path}");
-        var clientPath = Path.Join(volumeDosName, path[1..]);
-        // For files created in client, sometimes it's not actually deleted yet. Wait until it's really gone.
-        for (var attempt = 0; attempt < 60 && Path.Exists(clientPath); attempt++)
+        var success = true;
+        // CF_CALLBACK_DELETE_FLAG_IS_UNDELETE: the item is being restored, so nothing to delete on the remote
+        var isUndelete = ((uint)flags & 0x2) != 0;
+        if (!isOwnProcess && !isUndelete)
         {
-            logger.Debug("File has not yet been deleted, waiting before retry");
-            await Task.Delay(500);
+            try
+            {
+                var relativePath = PathMapper.GetRelativePath(path, _rootDirectory);
+                using var locker = await fileLocker.Lock(relativePath);
+                if (remoteService.Exists(relativePath))
+                {
+                    DeleteOnRemote(relativePath, flags.HasFlag(CF_CALLBACK_DELETE_FLAGS.CF_CALLBACK_DELETE_FLAG_IS_DIRECTORY));
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Delete on the remote failed: {path}", ex);
+                success = false;
+            }
         }
-        if (Path.Exists(clientPath))
-        {
-            logger.Warn($"Received delete completion, but file has not been deleted: {clientPath}");
-            return;
-        }
-        var relativePath = PathMapper.GetRelativePath(clientPath, _rootDirectory);
-        using var locker = await fileLocker.Lock(relativePath);
-        if (!remoteService.Exists(relativePath))
-        {
-            return;
-        }
+
         try
         {
-            if (remoteService.IsDirectory(relativePath))
-            {
-                remoteService.DeleteDirectory(relativePath);
-            }
-            else
-            {
-                remoteService.DeleteFile(relativePath);
-            }
+            CloudFilter.AckDelete(callbackInfo, success);
         }
         catch (Exception ex)
         {
-            logger.Error("Delete server object failed", ex);
+            logger.Error($"Ack delete failed for {path}", ex);
         }
+    }
+
+    private void DeleteOnRemote(string relativePath, bool isDirectory)
+    {
+        if (isDirectory)
+        {
+            remoteService.DeleteDirectory(relativePath);
+        }
+        else
+        {
+            remoteService.DeleteFile(relativePath);
+        }
+        logger.Info($"Deleted {relativePath} on the remote");
+    }
+
+    private bool IsInRoot(string path) =>
+        path.StartsWith(Path.TrimEndingDirectorySeparator(_rootDirectory) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
+
+    private static string ToClientPath(in CF_CALLBACK_INFO callbackInfo, string normalizedPath) =>
+        Path.Join(callbackInfo.VolumeDosName, normalizedPath[1..]);
+
+    /// <summary>Whether the operation was started by this process. Read during the callback only.</summary>
+    private static bool IsOwnProcess(in CF_CALLBACK_INFO callbackInfo)
+    {
+        // CF_PROCESS_INFO: ProcessId at 4
+        var processInfo = (IntPtr)callbackInfo.ProcessInfo;
+        return processInfo != IntPtr.Zero && Marshal.ReadInt32(processInfo, 4) == Environment.ProcessId;
     }
 }

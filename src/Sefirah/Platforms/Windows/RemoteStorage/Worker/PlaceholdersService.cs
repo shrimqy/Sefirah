@@ -227,6 +227,12 @@ public class PlaceholdersService(
 
         if (!remoteService.Exists(relativeFile))
         {
+            // Converted before the upload, so a rename meanwhile goes through SyncRootConnector.OnRename, which waits for the caller's lock
+            if (!CloudFilter.IsPlaceholder(clientFile))
+            {
+                using var hfile = await FileHelper.WaitUntilUnlocked(() => CloudFilter.CreateHFileWithOplock(clientFile, FileAccess.Write), logger);
+                CloudFilter.ConvertToPlaceholder(hfile, relativeFile);
+            }
             await remoteService.CreateFile(clientFileInfo, relativeFile);
         }
         else
@@ -381,6 +387,7 @@ public class PlaceholdersService(
             return;
         }
 
+        logger.Info($"Deleted {relativePath} locally, it was deleted on the remote");
         try
         {
             RecycleBin.MoveToRecycleBin(clientPath);
@@ -415,12 +422,24 @@ public class PlaceholdersService(
             return;
         }
 
-        // Folder created locally that isn't on the remote yet
-        if (relativeDirectory.Length > 0
-            && CloudFilter.HasLocalChanges(directoryInfo.FullName)
-            && !remoteService.Exists(relativeDirectory))
+        // Created or renamed locally. Converted before it's created on the remote, so a rename meanwhile goes through SyncRootConnector.OnRename, which waits for this lock
+        if (relativeDirectory.Length > 0 && CloudFilter.HasLocalChanges(directoryInfo.FullName))
         {
-            await remoteService.CreateDirectory(directoryInfo, relativeDirectory);
+            using var locker = await fileLocker.Lock(relativeDirectory);
+            if (!Path.Exists(directoryInfo.FullName))
+            {
+                return;
+            }
+            if (!CloudFilter.IsPlaceholder(directoryInfo.FullName))
+            {
+                CloudFilter.ConvertToPlaceholder(directoryInfo.FullName, relativeDirectory);
+            }
+            if (!remoteService.Exists(relativeDirectory))
+            {
+                await remoteService.CreateDirectory(directoryInfo, relativeDirectory);
+            }
+            CloudFilter.SetInSyncState(directoryInfo.FullName);
+            ShellNotify.NotifyUpdate(directoryInfo.FullName);
         }
 
         // Names in the remote folder, listed once for the whole loop

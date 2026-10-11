@@ -172,6 +172,54 @@ public partial class ClientWatcher : IDisposable
             });
         };
 
+        // Placeholders were already renamed on the remote in SyncRootConnector.OnRename; Windows clears their in-sync state
+        watcher.Renamed += async (sender, e) => {
+            await _taskWriter.WriteAsync(async () => {
+                if (FileHelper.IsSystemFile(e.FullPath))
+                {
+                    return;
+                }
+
+                var relativePath = PathMapper.GetRelativePath(e.FullPath, RootDirectory);
+                try
+                {
+                    // Null for new items, which get their identity when converted below
+                    if (CloudFilter.GetPlaceholderIdentity(e.FullPath) is not null)
+                    {
+                        CloudFilter.SetPlaceholderIdentity(e.FullPath, relativePath);
+                    }
+
+                    var attributes = File.GetAttributes(e.FullPath);
+                    // Online-only: no local content to differ from the remote
+                    if (attributes.HasFlag(FileAttributes.Offline))
+                    {
+                        CloudFilter.SetInSyncState(e.FullPath);
+                        // Explorer keeps showing the old status icon otherwise
+                        ShellNotify.NotifyUpdate(e.FullPath);
+                    }
+                    // Created on the remote if it isn't there yet, then marked in sync
+                    else if (attributes.HasFlag(FileAttributes.Directory))
+                    {
+                        await _placeholdersService.SyncPendingChanges(relativePath);
+                    }
+                    // Uploaded if it differs from or is missing on the remote, then marked in sync
+                    else
+                    {
+                        using var locker = await _fileLocker.Lock(relativePath);
+                        await _placeholdersService.UpdateFile(relativePath);
+                    }
+                }
+                catch (Exception) when (!Path.Exists(e.FullPath))
+                {
+                    // Gone already, e.g. renamed again
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"Rename failed: {e.FullPath}", ex);
+                }
+            });
+        };
+
         watcher.Error += (sender, e) => {
             var ex = e.GetException();
             _logger.Error("Client file watcher error", ex);
