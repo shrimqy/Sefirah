@@ -61,14 +61,21 @@ public class SftpReadWriteService(
         sftpFile.UpdateStatus();
     }
 
-    public void MoveFile(string oldRelativeFile, string newRelativeFile)
-    {
-        var oldServerFile = GetSftpPath(oldRelativeFile);
-        var newServerFile = GetSftpPath(newRelativeFile);
+    public void MoveFile(string oldRelativeFile, string newRelativeFile) =>
+        Move(GetSftpPath(oldRelativeFile), GetSftpPath(newRelativeFile));
 
-        EnsureRemoteParentExists(newServerFile);
-        var sftpFile = client.Get(oldServerFile);
-        sftpFile.MoveTo(newServerFile);
+    private void Move(string oldServerPath, string newServerPath)
+    {
+        EnsureRemoteParentExists(newServerPath);
+        // The device storage ignores case, so renaming to another case of the same name does nothing
+        if (string.Equals(oldServerPath, newServerPath, StringComparison.OrdinalIgnoreCase))
+        {
+            var tempPath = oldServerPath + SftpConstants.PartialFileSuffix;
+            client.RenameFile(oldServerPath, tempPath);
+            client.RenameFile(tempPath, newServerPath);
+            return;
+        }
+        client.RenameFile(oldServerPath, newServerPath);
     }
 
     public void DeleteFile(string relativeFile)
@@ -106,9 +113,7 @@ public class SftpReadWriteService(
         var oldServerDirectory = GetSftpPath(oldRelativeDirectory);
         var newServerDirectory = GetSftpPath(newRelativeDirectory);
         logger.Debug($"Move Directory {oldServerDirectory} -> {newServerDirectory}");
-        EnsureRemoteParentExists(newServerDirectory);
-        var sftpFile = client.Get(oldServerDirectory);
-        sftpFile.MoveTo(newServerDirectory);
+        Move(oldServerDirectory, newServerDirectory);
     }
 
     public void DeleteDirectory(string relativeDirectory)

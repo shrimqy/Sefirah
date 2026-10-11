@@ -72,4 +72,13 @@ public static class FileHelper
 
     public static bool IsSystemDirectory(string path) =>
         SYSTEM_FOLDER_NAMES.Any(x => path.StartsWith(x, StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>Whether the item exists with this exact name; Path.Exists ignores case.</summary>
+    public static bool ExistsWithExactName(string path)
+    {
+        var directory = Path.GetDirectoryName(path);
+        var name = Path.GetFileName(path);
+        return Directory.Exists(directory)
+            && new DirectoryInfo(directory).EnumerateFileSystemInfos(name).Any(x => x.Name == name);
+    }
 }

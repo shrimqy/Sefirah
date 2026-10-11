@@ -374,7 +374,8 @@ public class PlaceholdersService(
     public async Task Delete(string relativePath)
     {
         var clientPath = Path.Join(RootDirectory, relativePath);
-        if (!Path.Exists(clientPath))
+        // A case-only rename on the remote looks like a delete of the old name, which Path.Exists would still find
+        if (!FileHelper.ExistsWithExactName(clientPath))
         {
             return;
         }
@@ -517,11 +518,13 @@ public class PlaceholdersService(
         var oldPath = movedDirectories.Aggregate(identity, (path, moved) =>
             path.StartsWith(moved.Old + "/") ? moved.New + path[moved.Old.Length..] : path);
 
-        // Rename only if the old path is gone locally, still on the remote, and the new one isn't taken there
+        // Rename only if the old path is gone locally, still on the remote, and the new one isn't taken there.
+        // Both sides ignore case, so a case-only rename finds the same item under both names.
+        var isCaseOnly = string.Equals(oldPath, relativePath, StringComparison.OrdinalIgnoreCase);
         var renamed = oldPath != relativePath
-            && !Path.Exists(Path.Join(RootDirectory, oldPath))
+            && (isCaseOnly || !Path.Exists(Path.Join(RootDirectory, oldPath)))
             && remoteService.Exists(oldPath)
-            && !remoteService.Exists(relativePath);
+            && (isCaseOnly || !remoteService.Exists(relativePath));
         if (renamed)
         {
             using var oldLocker = await fileLocker.Lock(oldPath);
