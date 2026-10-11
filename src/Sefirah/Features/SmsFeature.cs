@@ -428,15 +428,28 @@ public class SmsFeature(
 
                 var queued = queuedMessages[index].Message;
                 var previousThreadId = queued.ThreadId;
-                foreach (var attachment in queued.Attachments)
+                // Phone parts keep the order they were sent in; keep our copy under the phone's part id.
+                var sent = confirmed.Attachments ?? [];
+                for (var i = 0; i < queued.Attachments.Count; i++)
                 {
-                    AttachmentStorage.Move(
-                        deviceId, tempId, confirmed.UniqueId,
-                        attachment.PartId, attachment.FileName, attachment.MimeType);
+                    var attachment = queued.Attachments[i];
+                    var localPath = AttachmentStorage.GetPath(
+                        deviceId, tempId, attachment.PartId, attachment.FileName, attachment.MimeType);
+                    if (i >= sent.Count || !string.Equals(sent[i].MimeType, attachment.MimeType, StringComparison.OrdinalIgnoreCase))
+                    {
+                        AttachmentStorage.Delete(localPath);
+                        attachment.FilePath = null;
+                        continue;
+                    }
+
+                    var part = sent[i];
+                    AttachmentStorage.MoveTo(localPath, deviceId, confirmed.UniqueId, part.PartId, part.FileName, part.MimeType);
+                    attachment.PartId = part.PartId;
+                    attachment.FileName = part.FileName;
                     attachment.FilePath = AttachmentStorage.GetPathIfExists(
-                        deviceId, confirmed.UniqueId, attachment.PartId, attachment.FileName, attachment.MimeType);
+                        deviceId, confirmed.UniqueId, part.PartId, part.FileName, part.MimeType);
                     attachment.PreviewPath = AttachmentStorage.GetThumbnailPathIfExists(
-                        deviceId, confirmed.UniqueId, attachment.PartId, attachment.FileName);
+                        deviceId, confirmed.UniqueId, part.PartId, part.FileName);
                 }
 
                 queued.UniqueId = confirmed.UniqueId;

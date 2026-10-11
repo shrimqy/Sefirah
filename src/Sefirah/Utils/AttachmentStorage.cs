@@ -55,19 +55,16 @@ public static class AttachmentStorage
         await source.CopyToAsync(target);
     }
 
-    /// <summary>Rename stored files when an optimistic UniqueId becomes a Telephony _id.</summary>
-    public static void Move(
+    /// <summary>Move a stored file to the path of the given message part.</summary>
+    public static void MoveTo(
+        string sourcePath,
         string deviceId,
-        long fromUniqueId,
-        long toUniqueId,
+        long uniqueId,
         long partId,
         string fileName,
         string mimeType)
     {
-        MoveFile(GetPath(deviceId, fromUniqueId, partId, fileName, mimeType), GetPath(deviceId, toUniqueId, partId, fileName, mimeType));
-        MoveFile(
-            GetThumbnailPath(deviceId, fromUniqueId, partId, fileName),
-            GetThumbnailPath(deviceId, toUniqueId, partId, fileName));
+        MoveFile(sourcePath, GetPath(deviceId, uniqueId, partId, fileName, mimeType));
     }
 
     private static void MoveFile(string source, string dest)
