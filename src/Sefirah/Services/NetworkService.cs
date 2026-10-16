@@ -401,6 +401,9 @@ public class NetworkService(
         pairedDevice.Session = session;
         pairedDevice.Address = address;
 
+        // Reply like Android servers do, so a connecting desktop can verify this server and mark it connected
+        SendAuthenticationMessage(m => SendMessage(session, m));
+
         await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
         {
             pairedDevice.TryAddAddress(address);
@@ -872,6 +875,12 @@ public class NetworkService(
 
     private async Task AuthenticatePairedDeviceServer(Client client, PairedDevice pairedDevice, string address, CancellationToken cancellationToken)
     {
+        // A desktop that connected twice gets a reply on each connection. Once the first has marked the
+        // device connected, ConnectCore has already made the newer client pairedDevice.Client, so the
+        // disconnect below would close the connection being authenticated.
+        if (pairedDevice.IsConnected && pairedDevice.Client == client)
+            return;
+
         if (pairedDevice.IsConnected && pairedDevice.Client is not null)
         {
             logger.Warn($"Device {pairedDevice.Name} is already connected, disconnect the current client");
