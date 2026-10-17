@@ -1028,43 +1028,43 @@ input text %pwd%</value>
     <value>Bluetooth aktivieren, um fortzufahren.</value>
   </data>
   <data name="BluetoothPairing.Title" xml:space="preserve">
-    <value>Mobilgerät und PC verbinden</value>
+    <value>Mobilgerät und PC koppeln</value>
   </data>
   <data name="BluetoothPairing.Description" xml:space="preserve">
     <value>Make sure your device is nearby and has Bluetooth turned on.</value>
   </data>
   <data name="BluetoothPairingAction" xml:space="preserve">
-    <value>Pair device</value>
+    <value>Gerät koppeln</value>
   </data>
   <data name="BluetoothRegistrationFailed.Description" xml:space="preserve">
     <value>Unpair the device from other apps and try again.</value>
   </data>
   <data name="TryAgain" xml:space="preserve">
-    <value>Try again</value>
+    <value>Noch einmal versuchen</value>
   </data>
   <data name="SearchContacts" xml:space="preserve">
-    <value>Search contacts</value>
+    <value>Kontakte durchsuchen</value>
   </data>
   <data name="BluetoothRegistrationFailed.Title" xml:space="preserve">
-    <value>Registration failed</value>
+    <value>Registrierung fehlgeschlagen</value>
   </data>
   <data name="BluetoothCallingUnavailable.Title" xml:space="preserve">
-    <value>Bluetooth calling is not available</value>
+    <value>Bluetooth-Anrufe sind nicht verfügbar</value>
   </data>
   <data name="BluetoothDisabled.Title" xml:space="preserve">
-    <value>Bluetooth is turned off</value>
+    <value>Bluetooth ist ausgeschaltet</value>
   </data>
   <data name="Calls" xml:space="preserve">
-    <value>Calls</value>
+    <value>Anrufe</value>
   </data>
   <data name="Unmute" xml:space="preserve">
-    <value>Unmute</value>
+    <value>Stummschaltung aufheben</value>
   </data>
   <data name="Resume" xml:space="preserve">
-    <value>Resume</value>
+    <value>Fortfahren</value>
   </data>
   <data name="Mute" xml:space="preserve">
-    <value>Mute</value>
+    <value>Stummschalten</value>
   </data>
   <data name="Hold" xml:space="preserve">
     <value>Hold</value>
