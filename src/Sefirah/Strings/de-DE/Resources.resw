@@ -935,16 +935,16 @@ input text %pwd%</value>
     <value>Verknüpfung entfernen</value>
   </data>
   <data name="DeviceAudio" xml:space="preserve">
-    <value>Device audio</value>
+    <value>Geräte-Audio</value>
   </data>
   <data name="DndToggle" xml:space="preserve">
-    <value>Toggle Do not disturb</value>
+    <value>"Bitte nicht stören"-Modus umschalten</value>
   </data>
   <data name="BluetoothOn" xml:space="preserve">
-    <value>Bluetooth is on</value>
+    <value>Bluetooth ist eingeschaltet</value>
   </data>
   <data name="BluetoothOff" xml:space="preserve">
-    <value>Bluetooth is off</value>
+    <value>Bluetooth ist ausgeschaltet</value>
   </data>
   <data name="StartScreenMirroring" xml:space="preserve">
     <value>Bildschirmspiegelung starten</value>
@@ -980,40 +980,40 @@ input text %pwd%</value>
     <value>Kontextmenü</value>
   </data>
   <data name="ShareFiles" xml:space="preserve">
-    <value>Share files</value>
+    <value>Dateien teilen</value>
   </data>
   <data name="SendFiles" xml:space="preserve">
-    <value>Send files</value>
+    <value>Dateien senden</value>
   </data>
   <data name="BrowseFiles" xml:space="preserve">
     <value>Dateien durchsuchen</value>
   </data>
   <data name="BrowseFilesTooltip" xml:space="preserve">
-    <value>Right-click to open the SFTP link and copy it to the clipboard</value>
+    <value>Rechtsklick um den SFTP-Link zu öffnen und in die Zwischenablage zu kopieren</value>
   </data>
   <data name="DeviceActions" xml:space="preserve">
     <value>Aktionen</value>
   </data>
   <data name="PlaySound" xml:space="preserve">
-    <value>Play sound</value>
+    <value>Ton abspielen</value>
   </data>
   <data name="PlaySoundDescription" xml:space="preserve">
-    <value>A sound will play on this device for 20 seconds</value>
+    <value>Ein Ton wird 20 Sekunden lang auf diesem Gerät abgespielt</value>
   </data>
   <data name="ReceiveClipboard" xml:space="preserve">
-    <value>Receive clipboard</value>
+    <value>Zwischenablage empfangen</value>
   </data>
   <data name="SendClipboard" xml:space="preserve">
-    <value>Send clipboard</value>
+    <value>Zwischenablage senden</value>
   </data>
   <data name="ReceiveMediaSessions" xml:space="preserve">
-    <value>Receive media sessions</value>
+    <value>Mediensitzungen empfangen</value>
   </data>
   <data name="SendMediaSessions" xml:space="preserve">
-    <value>Send media sessions</value>
+    <value>Mediensitzungen senden</value>
   </data>
   <data name="SecondaryCallOnHold" xml:space="preserve">
-    <value>On hold. Select to resume</value>
+    <value>Angehalten. Zum Fortsetzen auswählen</value>
   </data>
   <data name="CallLogDisabled.Description" xml:space="preserve">
     <value>Enable call log sync for this device on the phone.</value>
@@ -1037,7 +1037,7 @@ input text %pwd%</value>
     <value>Gerät koppeln</value>
   </data>
   <data name="BluetoothRegistrationFailed.Description" xml:space="preserve">
-    <value>Unpair the device from other apps and try again.</value>
+    <value>Trennen Sie das Gerät von anderen Apps und versuchen Sie es erneut.</value>
   </data>
   <data name="TryAgain" xml:space="preserve">
     <value>Noch einmal versuchen</value>
@@ -1067,22 +1067,22 @@ input text %pwd%</value>
     <value>Stummschalten</value>
   </data>
   <data name="Hold" xml:space="preserve">
-    <value>Hold</value>
+    <value>Warteschleife</value>
   </data>
   <data name="End" xml:space="preserve">
-    <value>End</value>
+    <value>Auflegen</value>
   </data>
   <data name="CallOnHold" xml:space="preserve">
-    <value>On hold</value>
+    <value>In der Warteschleife</value>
   </data>
   <data name="CallIncoming" xml:space="preserve">
     <value>Eingehender Anruf</value>
   </data>
   <data name="CallDialing" xml:space="preserve">
-    <value>Dialing</value>
+    <value>Rufaufbau</value>
   </data>
   <data name="CallConnecting" xml:space="preserve">
-    <value>Connecting</value>
+    <value>Verbindung wird hergestellt</value>
   </data>
   <data name="CallAudioRouteToPhone" xml:space="preserve">
     <value>Zum Telefon übertragen</value>
@@ -1091,7 +1091,7 @@ input text %pwd%</value>
     <value>Zum PC übertragen</value>
   </data>
   <data name="FlexDisplay" xml:space="preserve">
-    <value>Flex display</value>
+    <value>Flex-Bildschirm</value>
   </data>
   <data name="VideoBitratePlaceholder" xml:space="preserve">
     <value>8M</value>
@@ -1106,19 +1106,19 @@ input text %pwd%</value>
     <value>Format: 128K, 128000</value>
   </data>
   <data name="CropPlaceholder" xml:space="preserve">
-    <value>No crop</value>
+    <value>Kein Zuschnitt</value>
   </data>
   <data name="CropToolTip" xml:space="preserve">
     <value>Format: 1224:1440:0:0</value>
   </data>
   <data name="VirtualDisplaySizePlaceholder" xml:space="preserve">
-    <value>Device default</value>
+    <value>Gerätestandard</value>
   </data>
   <data name="VirtualDisplaySizeToolTip" xml:space="preserve">
     <value>Format: 1920x1080</value>
   </data>
   <data name="VideoBitrateMbps" xml:space="preserve">
-    <value>Mbps</value>
+    <value>MBit/s</value>
   </data>
   <data name="RemoveAllStorageMounts" xml:space="preserve">
     <value>Remove all storage mounts</value>
