@@ -79,6 +79,30 @@
                 </Button>
             </Grid>
 
+            <!--  Manual pairing, for networks where discovery cannot reach: VPN tunnels carry unicast but not broadcast  -->
+            <wuc:SettingsCard Header="{helpers:ResourceString Name=ConnectManually}">
+                <wuc:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE968;" />
+                </wuc:SettingsCard.HeaderIcon>
+                <wuc:SettingsCard.Description>
+                    <TextBlock x:Name="LocalAddressText" TextWrapping="Wrap" />
+                </wuc:SettingsCard.Description>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBox
+                        x:Name="ManualAddressBox"
+                        MinWidth="190"
+                        PlaceholderText="192.168.1.10" />
+                    <Button Click="ConnectByAddress_Click" Content="{helpers:ResourceString Name=Connect}" />
+                </StackPanel>
+            </wuc:SettingsCard>
+
+            <TextBlock
+                x:Name="ManualAddressStatus"
+                Margin="4,0,0,8"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                TextWrapping="Wrap" />
+
             <ItemsRepeater ItemsSource="{x:Bind ViewModel.DiscoveredDevices, Mode=OneWay}">
                 <ItemsRepeater.Layout>
                     <StackLayout Orientation="Vertical" Spacing="8" />
