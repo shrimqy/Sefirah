@@ -9,6 +9,8 @@ public interface IDeviceSettingsService : IBaseSettingsService, INotifyPropertyC
     /// </summary>
     string DeviceId { get; }
 
+    bool AllowRemoteBluetoothControl { get; set; }
+
     /// <summary>
     /// Gets or sets a value indicating whether to receive clipboard content from the device.
     /// </summary>

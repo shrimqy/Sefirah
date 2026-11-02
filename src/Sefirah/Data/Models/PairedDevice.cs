@@ -96,7 +96,17 @@ public partial class PairedDevice : BaseRemoteDevice
                 RefreshAddressConnectionStates();
 
                 if (value.IsDisconnected)
+                {
                     IsPlayingSound = false;
+                    ControlNotice = string.Empty;
+                    AudioOutput = null;
+                    RingerMode = -1;
+                    Controls = null;
+                    BluetoothKnown = false;
+                    PendingControlId = null;
+                    PendingControlType = null;
+                }
+                RefreshControls();
             }
         }
     }
@@ -137,11 +147,53 @@ public partial class PairedDevice : BaseRemoteDevice
         set => SetProperty(ref batteryStatus, value);
     }
 
+    private DeviceControls? controls;
+    public DeviceControls? Controls
+    {
+        get => controls;
+        set { SetProperty(ref controls, value); RefreshControls(); }
+    }
+    public bool BluetoothKnown { get; set; }
+    public string? PendingControlId { get; set; }
+    public string? PendingControlType { get; set; }
+    private string controlNotice = string.Empty;
+    public string ControlNotice { get => controlNotice; set => SetProperty(ref controlNotice, value); }
+    public bool CanChangeRinger => IsConnected && RingerMode >= 0 && PendingControlId is null
+        && (Controls is null || Controls is { Version: 1, RingerControl: true });
+    private AudioDeviceInfo? audioOutput;
+    public AudioDeviceInfo? AudioOutput
+    {
+        get => audioOutput;
+        set { SetProperty(ref audioOutput, value); RefreshControls(); }
+    }
+    public bool HasRingerMode => RingerMode >= 0;
+    public bool CanToggleSound => IsConnected && PendingControlId is null &&
+        (HasRingerMode ? CanChangeRinger : AudioOutput is not null);
+    public bool SoundToggleChecked => HasRingerMode ? RingerMode == 2 : AudioOutput?.IsMuted == true;
+    public string SoundControlGlyph => HasRingerMode
+        ? RingerMode switch { 2 => "\uEA8F", 1 => "\uE877", _ => "\uE7ED" }
+        : AudioOutput?.IsMuted == true ? "\uE74F" : "\uE767";
+    public string SoundControlLabel => (HasRingerMode ? "RingerToggle" : "SystemOutputMute").GetLocalizedResource();
+    public bool CanChangeBluetooth => IsConnected && BluetoothKnown && PendingControlId is null
+        && Controls is { Version: 1, BluetoothControl: "direct" or "local" };
+    public string BluetoothHint => Controls?.BluetoothControl switch
+    {
+        "local" => "BluetoothLocalConfirmation".GetLocalizedResource(),
+        "denied" => "BluetoothControlDenied".GetLocalizedResource(),
+        _ when !BluetoothKnown => "BluetoothStateUnknown".GetLocalizedResource(),
+        _ => BluetoothEnabled ? "BluetoothOn".GetLocalizedResource() : "BluetoothOff".GetLocalizedResource()
+    };
+    public void RefreshControls()
+    {
+        foreach (var name in new[] { nameof(CanChangeRinger), nameof(SoundToggleChecked), nameof(CanChangeBluetooth), nameof(BluetoothHint), nameof(HasRingerMode), nameof(CanToggleSound), nameof(SoundControlLabel), nameof(SoundControlGlyph) })
+            OnPropertyChanged(name);
+    }
+
     private int ringerMode = -1;
     public int RingerMode
     {
         get => ringerMode;
-        set => SetProperty(ref ringerMode, value);
+        set { SetProperty(ref ringerMode, value); RefreshControls(); }
     }
 
     private bool dndEnabled;
@@ -155,7 +207,7 @@ public partial class PairedDevice : BaseRemoteDevice
     public bool BluetoothEnabled
     {
         get => bluetoothEnabled;
-        set => SetProperty(ref bluetoothEnabled, value);
+        set { SetProperty(ref bluetoothEnabled, value); RefreshControls(); }
     }
 
     private bool isPlayingSound;

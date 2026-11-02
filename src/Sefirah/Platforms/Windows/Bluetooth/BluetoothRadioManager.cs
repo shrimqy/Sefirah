@@ -43,14 +43,16 @@ public sealed class BluetoothRadioManager(ILogger logger)
         }
     }
 
-    public async Task<bool> TryEnableAsync()
+    public Task<bool> TryEnableAsync() => TrySetEnabledAsync(true);
+
+    public async Task<bool> TrySetEnabledAsync(bool enabled, CancellationToken cancellationToken = default)
     {
         if (!await RefreshAsync() || bluetoothRadio is null)
         {
             return false;
         }
 
-        if (bluetoothRadio.State is RadioState.On)
+        if (bluetoothRadio.State == (enabled ? RadioState.On : RadioState.Off))
         {
             return true;
         }
@@ -58,20 +60,28 @@ public sealed class BluetoothRadioManager(ILogger logger)
         try
         {
             var access = await Radio.RequestAccessAsync();
+            cancellationToken.ThrowIfCancellationRequested();
             if (access is not RadioAccessStatus.Allowed)
             {
                 logger.Debug($"Bluetooth radio access not allowed: {access}");
                 return false;
             }
 
-            var setState = await bluetoothRadio.SetStateAsync(RadioState.On);
+            cancellationToken.ThrowIfCancellationRequested();
+            var setState = await bluetoothRadio.SetStateAsync(enabled ? RadioState.On : RadioState.Off);
             if (setState is not RadioAccessStatus.Allowed)
             {
                 logger.Debug($"Bluetooth radio enable denied: {setState}");
                 return false;
             }
 
-            return bluetoothRadio.State is RadioState.On;
+            // SetStateAsync only accepts a request; wait for its observable final state.
+            for (var attempt = 0; attempt < 25; attempt++)
+            {
+                if (bluetoothRadio.State == (enabled ? RadioState.On : RadioState.Off)) return true;
+                await Task.Delay(200, cancellationToken);
+            }
+            return false;
         }
         catch (Exception ex)
         {

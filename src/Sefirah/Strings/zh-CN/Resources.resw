@@ -1088,4 +1088,14 @@ input text %pwd%</value>
   <data name="Dialer" xml:space="preserve">
     <value>Dialer</value>
   </data>
+  <data name="RingerToggle" xml:space="preserve"><value>切换远端响铃与静音</value></data>
+  <data name="RemoteBluetoothControl" xml:space="preserve"><value>允许此设备控制本机蓝牙</value></data>
+  <data name="RemoteBluetoothControlDescription" xml:space="preserve"><value>蓝牙改变可能断开耳机、键鼠和网络连接。</value></data>
+  <data name="BluetoothLocalConfirmation" xml:space="preserve"><value>请在远端打开 Sefirah，确认蓝牙操作。</value></data>
+  <data name="BluetoothControlDenied" xml:space="preserve"><value>请在远端的设备设置中授权蓝牙控制。</value></data>
+  <data name="BluetoothStateUnknown" xml:space="preserve"><value>蓝牙状态未知或不可用</value></data>
+  <data name="DeviceControlFailed" xml:space="preserve"><value>远端未应用此次更改。</value></data>
+  <data name="DeviceControlPending" xml:space="preserve"><value>正在等待远端确认…</value></data>
+  <data name="DeviceControlUnconfirmed" xml:space="preserve"><value>远端未确认此次更改，请检查连接和权限。</value></data>
+  <data name="SystemOutputMute" xml:space="preserve"><value>切换系统输出静音</value></data>
 </root>

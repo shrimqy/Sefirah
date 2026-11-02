@@ -241,8 +241,57 @@ public sealed partial class MainPageViewModel : BaseViewModel
 
     public void SetRingerMode(int mode)
     {
-        var message = new RingerModeState { Mode = mode };
-        Device!.SendMessage(message);
+        var peer = Device;
+        if (peer is null || !peer.CanChangeRinger || mode is < 0 or > 2 || mode == peer.RingerMode) return;
+        _ = RequestControlAsync(peer, "ringer", mode);
+    }
+
+    public async void ToggleSound()
+    {
+        var peer = Device;
+        if (peer?.CanToggleSound != true) return;
+        if (peer.HasRingerMode) SetRingerMode(peer.RingerMode == 2 ? 0 : 2);
+        else if (peer.AudioOutput is { } output)
+        {
+            var id = Guid.NewGuid().ToString();
+            peer.PendingControlId = id;
+            peer.PendingControlType = "audio";
+            peer.ControlNotice = "DeviceControlPending".GetLocalizedResource();
+            peer.RefreshControls();
+            peer.SendMessage(new AudioAction { ActionType = AudioActionType.ToggleMute, Source = output.DeviceId });
+            await Task.Delay(8000);
+            if (peer.PendingControlId != id) return;
+            peer.PendingControlId = null;
+            peer.PendingControlType = null;
+            peer.ControlNotice = "DeviceControlUnconfirmed".GetLocalizedResource();
+            peer.RefreshControls();
+        }
+    }
+
+    public void ToggleBluetooth()
+    {
+        var peer = Device;
+        if (peer?.CanChangeBluetooth == true)
+            _ = RequestControlAsync(peer, "bluetooth", peer.BluetoothEnabled ? 0 : 1);
+    }
+
+    private static async Task RequestControlAsync(PairedDevice peer, string control, int value)
+    {
+        var id = Guid.NewGuid().ToString();
+        peer.PendingControlId = id;
+        peer.PendingControlType = control;
+        peer.ControlNotice = "DeviceControlPending".GetLocalizedResource();
+        peer.RefreshControls();
+        if (peer.Controls?.Version == 1)
+            peer.SendMessage(new DeviceControlRequest { RequestId = id, Control = control, Value = value });
+        else if (control == "ringer")
+            peer.SendMessage(new RingerModeState { Mode = value });
+        await Task.Delay(TimeSpan.FromSeconds(8));
+        if (peer.PendingControlId != id) return;
+        peer.PendingControlId = null;
+        peer.PendingControlType = null;
+        peer.ControlNotice = "DeviceControlUnconfirmed".GetLocalizedResource();
+        peer.RefreshControls();
     }
 
     public void SetAudioLevel(AudioStreamType streamType, int level)

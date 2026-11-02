@@ -59,8 +59,34 @@ public class MessageHandler(
                     await batteryAlertFeature.HandleBatteryStateAsync(device, batteryStatus);
                     break;
 
+                case DeviceControlRequest request:
+                    await Ioc.Default.GetRequiredService<DeviceControlService>().HandleAsync(device, request);
+                    break;
+
+                case DeviceControlResult result:
+                    await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+                    {
+                        if (device.PendingControlId != result.RequestId) return;
+                        device.PendingControlId = null;
+                        device.PendingControlType = null;
+                        device.ControlNotice = result.Status == "applied" ? string.Empty :
+                            (result.Status == "local" ? "BluetoothLocalConfirmation" : "DeviceControlFailed").GetLocalizedResource();
+                        device.RefreshControls();
+                    });
+                    break;
+
                 case RingerModeState ringerMode:
-                    await App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.RingerMode = ringerMode.Mode);
+                    await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+                    {
+                        device.RingerMode = ringerMode.Mode;
+                        if (device.Controls is null && device.PendingControlType == "ringer")
+                        {
+                            device.PendingControlId = null;
+                            device.PendingControlType = null;
+                            device.ControlNotice = string.Empty;
+                        }
+                        device.RefreshControls();
+                    });
                     break;
 
                 case DndState dndStatus:
@@ -68,7 +94,30 @@ public class MessageHandler(
                     break;
 
                 case BluetoothState bluetoothState:
-                    await App.MainWindow.DispatcherQueue.EnqueueAsync(() => device.BluetoothEnabled = bluetoothState.IsEnabled);
+                    await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+                    {
+                        device.BluetoothKnown = bluetoothState.IsAvailable != false;
+                        device.BluetoothEnabled = bluetoothState.IsEnabled;
+                    });
+                    break;
+
+                case AudioDeviceInfo audioDevice:
+                    await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+                    {
+                        if (audioDevice.IsSelected)
+                        {
+                            device.AudioOutput = audioDevice;
+                            if (device.PendingControlType == "audio")
+                            {
+                                device.PendingControlId = null;
+                                device.PendingControlType = null;
+                                device.ControlNotice = string.Empty;
+                            }
+                            device.RefreshControls();
+                        }
+                        else if (audioDevice.InfoType == AudioInfoType.Removed && device.AudioOutput?.DeviceId == audioDevice.DeviceId)
+                            device.AudioOutput = null;
+                    });
                     break;
 
                 case AudioStreamState audioStream:
@@ -133,6 +182,13 @@ public class MessageHandler(
                     break;
 
                 case DeviceInfo deviceInfo:
+                    await App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+                    {
+                        if (deviceInfo.Controls is not { } controls) return;
+                        device.BluetoothKnown = controls.BluetoothEnabled.HasValue;
+                        if (controls.BluetoothEnabled.HasValue) device.BluetoothEnabled = controls.BluetoothEnabled.Value;
+                        device.Controls = controls;
+                    });
                     await deviceManager.UpdateDeviceInfo(device, deviceInfo);
                     break;
 

@@ -21,6 +21,8 @@ namespace Sefirah.Data.Models;
 [JsonDerivedType(typeof(ConversationInfo), nameof(ConversationInfo))]
 [JsonDerivedType(typeof(ConversationsRequest), nameof(ConversationsRequest))]
 [JsonDerivedType(typeof(DeviceInfo), nameof(DeviceInfo))]
+[JsonDerivedType(typeof(DeviceControlRequest), nameof(DeviceControlRequest))]
+[JsonDerivedType(typeof(DeviceControlResult), nameof(DeviceControlResult))]
 [JsonDerivedType(typeof(Disconnect), nameof(Disconnect))]
 [JsonDerivedType(typeof(DndState), nameof(DndState))]
 [JsonDerivedType(typeof(ClipboardTransfer), nameof(ClipboardTransfer))]
@@ -94,11 +96,14 @@ public class UdpBroadcast : SocketMessage
 
 public class DeviceInfo : SocketMessage
 {
+    public DeviceControls? Controls { get; set; }
     public required string DeviceName { get; set; }
 
     public string? Avatar { get; set; } = null;
 
-    public List<PhoneNumber> PhoneNumbers { get; set; } = [];
+    // A partial DeviceInfo leaves numbers untouched; [] explicitly clears them.
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<PhoneNumber>? PhoneNumbers { get; set; }
 }
 
 public class BatteryState : SocketMessage
@@ -120,6 +125,7 @@ public class DndState : SocketMessage
 
 public class BluetoothState : SocketMessage
 {
+    public bool? IsAvailable { get; set; }
     public bool IsEnabled { get; set; }
 }
 

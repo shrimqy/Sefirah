@@ -1088,4 +1088,14 @@ input text %pwd%</value>
   <data name="Dialer" xml:space="preserve">
     <value>Dialer</value>
   </data>
+  <data name="RingerToggle" xml:space="preserve"><value>Turn ringing on or off</value></data>
+  <data name="RemoteBluetoothControl" xml:space="preserve"><value>Allow this device to control Bluetooth</value></data>
+  <data name="RemoteBluetoothControlDescription" xml:space="preserve"><value>Changing Bluetooth can disconnect headphones, keyboards and network connections.</value></data>
+  <data name="BluetoothLocalConfirmation" xml:space="preserve"><value>Open Sefirah on the target device to confirm the Bluetooth change.</value></data>
+  <data name="BluetoothControlDenied" xml:space="preserve"><value>Enable remote Bluetooth control in the target device settings.</value></data>
+  <data name="BluetoothStateUnknown" xml:space="preserve"><value>Bluetooth state unavailable</value></data>
+  <data name="DeviceControlFailed" xml:space="preserve"><value>The target device did not apply this change.</value></data>
+  <data name="DeviceControlPending" xml:space="preserve"><value>Waiting for the target device…</value></data>
+  <data name="DeviceControlUnconfirmed" xml:space="preserve"><value>The target device did not confirm this change. Check its connection and permissions.</value></data>
+  <data name="SystemOutputMute" xml:space="preserve"><value>Toggle system output mute</value></data>
 </root>

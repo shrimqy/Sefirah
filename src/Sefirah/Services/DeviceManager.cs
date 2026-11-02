@@ -143,7 +143,7 @@ public partial class DeviceManager(
     {
         var existingDevice = await repository.GetPairedDevice(device.Id);
         existingDevice.Name = deviceInfo.DeviceName;
-        existingDevice.PhoneNumbers = deviceInfo.PhoneNumbers;
+        if (deviceInfo.PhoneNumbers is { } numbers) existingDevice.PhoneNumbers = numbers;
         if (!string.IsNullOrEmpty(deviceInfo.Avatar))
         {
             existingDevice.WallpaperBytes = Convert.FromBase64String(deviceInfo.Avatar);
@@ -152,7 +152,7 @@ public partial class DeviceManager(
         await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
         {
             device.Name = deviceInfo.DeviceName;
-            device.PhoneNumbers = deviceInfo.PhoneNumbers;
+            if (deviceInfo.PhoneNumbers is { } updatedNumbers) device.PhoneNumbers = updatedNumbers;
             device.Wallpaper = await existingDevice.WallpaperBytes.ToBitmapAsync();
         });
 

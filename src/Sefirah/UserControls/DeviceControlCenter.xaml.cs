@@ -118,9 +118,18 @@ public sealed partial class DeviceControlCenter : UserControl
     private void PhoneFrame_PointerExited(object sender, PointerRoutedEventArgs e)
         => AnimateOverlay(false);
 
+    private void RingerToggle_Click(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel.Device is not { } peer) return;
+        ViewModel.ToggleSound();
+        if (sender is ToggleButton toggle) toggle.IsChecked = peer.SoundToggleChecked;
+    }
+
+    private void BluetoothToggle_Click(object sender, RoutedEventArgs e) => ViewModel.ToggleBluetooth();
+
     private void RingerModeSegmented_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (sender is Segmented segmented)
+        if (sender is Segmented { IsLoaded: true } segmented)
             ViewModel.SetRingerMode(segmented.SelectedIndex);
     }
 

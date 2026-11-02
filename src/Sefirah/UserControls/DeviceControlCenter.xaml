@@ -1,4 +1,4 @@
-﻿<UserControl
+<UserControl
     x:Class="Sefirah.UserControls.DeviceControlCenter"
     x:Name="Root"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -160,9 +160,19 @@
                     Style="{StaticResource DeviceNameComboBoxStyle}"
                     Visibility="{x:Bind ViewModel.PairedDevices.Count, Mode=OneWay, Converter={StaticResource GreaterThanOneToVisibilityConverter}}" />
 
+                <TextBlock Text="{x:Bind ViewModel.Device.ControlNotice, Mode=OneWay}"
+                           TextWrapping="Wrap" FontSize="12" />
                 <StackPanel Orientation="Horizontal" Spacing="4">
+                    <ToggleButton IsChecked="{x:Bind ViewModel.Device.SoundToggleChecked, Mode=OneWay}"
+                                  IsEnabled="{x:Bind ViewModel.Device.CanToggleSound, Mode=OneWay}"
+                                  Click="RingerToggle_Click" Padding="6"
+                                  AutomationProperties.Name="{x:Bind ViewModel.Device.SoundControlLabel, Mode=OneWay}"
+                                  ToolTipService.ToolTip="{x:Bind ViewModel.Device.SoundControlLabel, Mode=OneWay}">
+                        <FontIcon Glyph="{x:Bind ViewModel.Device.SoundControlGlyph, Mode=OneWay}" />
+                    </ToggleButton>
                     <Button
                         x:Name="AudioButton"
+                        Visibility="{x:Bind ViewModel.Device.HasRingerMode, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
                         Padding="4"
                         AutomationProperties.Name="{helpers:ResourceString Name=DeviceAudio}"
                         Background="Transparent"
@@ -237,14 +247,13 @@
                             </Flyout>
                         </Button.Flyout>
                     </Button>
-                    <FontIcon
-                        VerticalAlignment="Center"
-                        FontSize="14"
-                        AutomationProperties.Name="{x:Bind ViewModel.Device.BluetoothEnabled, Mode=OneWay, Converter={StaticResource BoolToBluetoothStateTextConverter}}"
-                        Foreground="{x:Bind ViewModel.Device.BluetoothEnabled, Mode=OneWay, Converter={StaticResource BoolToForegroundConverter}}"
-                        Glyph="&#xE702;"
-                        Opacity="{x:Bind ViewModel.Device.IsConnected, Mode=OneWay, Converter={StaticResource BoolToConnectedOpacityConverter}}"
-                        ToolTipService.ToolTip="{x:Bind ViewModel.Device.BluetoothEnabled, Mode=OneWay, Converter={StaticResource BoolToBluetoothStateTextConverter}}" />
+                    <Button Click="BluetoothToggle_Click" Padding="6"
+                            IsEnabled="{x:Bind ViewModel.Device.CanChangeBluetooth, Mode=OneWay}"
+                            AutomationProperties.Name="{x:Bind ViewModel.Device.BluetoothHint, Mode=OneWay}"
+                            ToolTipService.ToolTip="{x:Bind ViewModel.Device.BluetoothHint, Mode=OneWay}">
+                        <FontIcon Glyph="&#xE702;"
+                                  Foreground="{x:Bind ViewModel.Device.BluetoothEnabled, Mode=OneWay, Converter={StaticResource BoolToForegroundConverter}}" />
+                    </Button>
                     <StackPanel
                         VerticalAlignment="Center"
                         Orientation="Horizontal"

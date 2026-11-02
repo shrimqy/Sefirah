@@ -1,4 +1,4 @@
-﻿<Page
+<Page
     x:Class="Sefirah.Views.DevicePreferences.DeviceSettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -225,6 +225,11 @@
                     </wuc:SettingsCard.HeaderIcon>
                 </wuc:SettingsCard>
 
+
+                <wuc:SettingsCard Header="{helpers:ResourceString Name=RemoteBluetoothControl}"
+                                  Description="{helpers:ResourceString Name=RemoteBluetoothControlDescription}">
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.AllowRemoteBluetoothControl, Mode=TwoWay}" />
+                </wuc:SettingsCard>
 
                 <!--  Audio Sync Settings  -->
                 <wuc:SettingsCard Description="{helpers:ResourceString Name=AudioControlDescription}" Header="{helpers:ResourceString Name=AudioControl}">
