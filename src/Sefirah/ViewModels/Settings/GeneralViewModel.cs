@@ -14,6 +14,42 @@ public sealed partial class GeneralViewModel : BaseViewModel
     private readonly ISftpFeature SftpFeature = Ioc.Default.GetRequiredService<ISftpFeature>();
     #endregion
 
+    private IGeneralSettingsService PresentationSettings => UserSettingsService.GeneralSettingsService;
+    public string[] PresentationKinds => Sefirah.Data.Models.DevicePresentation.Kinds.Select(value => ("Presentation_" + value).GetLocalizedResource()).ToArray();
+    public string[] PresentationRatios => Sefirah.Data.Models.DevicePresentation.Ratios;
+    public string[] PresentationOrientations => new[] { "portrait", "landscape" }.Select(value => ("Presentation_" + value).GetLocalizedResource()).ToArray();
+    public string PresentationKind { get => ("Presentation_" + PresentationSettings.PresentationKind).GetLocalizedResource(); set { PresentationSettings.PresentationKind = Sefirah.Data.Models.DevicePresentation.Kinds.FirstOrDefault(kind => ("Presentation_" + kind).GetLocalizedResource() == value) ?? "unknown"; OnPropertyChanged(); PublishPresentation(); } }
+    public string PresentationRatio { get => PresentationSettings.PresentationRatio; set { PresentationSettings.PresentationRatio = value; OnPropertyChanged(); PublishPresentation(); } }
+    public string PresentationOrientation { get => ("Presentation_" + PresentationSettings.PresentationOrientation).GetLocalizedResource(); set { PresentationSettings.PresentationOrientation = new[] { "portrait", "landscape" }.FirstOrDefault(direction => ("Presentation_" + direction).GetLocalizedResource() == value) ?? "landscape"; OnPropertyChanged(); PublishPresentation(); } }
+    public bool ShareWallpaperPreview { get => PresentationSettings.ShareWallpaperPreview; set { PresentationSettings.ShareWallpaperPreview = value; OnPropertyChanged(); PublishPresentation(); } }
+    private Sefirah.Data.Models.DevicePresentation? localPresentation;
+    public Sefirah.Data.Models.DevicePresentation? LocalPresentation { get => localPresentation; private set => SetProperty(ref localPresentation, value); }
+    private Microsoft.UI.Xaml.Media.ImageSource? localPreviewImage;
+    public Microsoft.UI.Xaml.Media.ImageSource? LocalPreviewImage { get => localPreviewImage; private set => SetProperty(ref localPreviewImage, value); }
+    private async void PublishPresentation()
+    {
+        var service = Ioc.Default.GetRequiredService<Sefirah.Services.DevicePresentationService>();
+        var preview = await service.GetAsync(null, true);
+        LocalPresentation = preview.Metadata();
+        LocalPreviewImage = await Sefirah.Utils.PresentationImage.Decode(preview.Wallpaper, preview.WallpaperId).ToBitmapAsync();
+        await service.PublishAllAsync();
+    }
+    public void RefreshPresentationPreview() => PublishPresentation();
+    [RelayCommand]
+    public async Task SelectPresentationImage()
+    {
+        var file = await Sefirah.Utils.PickerHelper.PickFileAsync([".jpg", ".jpeg", ".png"]);
+        if (file is null) return;
+        var bytes = await Sefirah.Utils.WallpaperPreviewProvider.CreateThumbnailAsync(file.Path);
+        if (bytes is null) return;
+        var path = Path.Combine(ApplicationData.Current.LocalFolder.Path, "device-preview.jpg");
+        await File.WriteAllBytesAsync(path, bytes);
+        PresentationSettings.PresentationImagePath = path;
+        PublishPresentation();
+    }
+    [RelayCommand]
+    public void UseSystemWallpaper() { PresentationSettings.PresentationImagePath = string.Empty; PublishPresentation(); }
+
     #region Properties
     // Language
     public ObservableCollection<AppLanguageItem> SupportedLanguages => AppLanguageHelper.SupportedLanguages;

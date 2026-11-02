@@ -98,9 +98,7 @@ public class NetworkService(
     {
         try
         {
-            var localDevice = await deviceManager.GetLocalDeviceAsync();
-            var avatar = await UserInformation.GetCurrentUserAvatarAsync();
-            device.SendMessage(new DeviceInfo { DeviceName = localDevice.DeviceName, Avatar = avatar });
+            await Ioc.Default.GetRequiredService<DevicePresentationService>().PublishAsync(device);
         }
         catch (Exception ex)
         {

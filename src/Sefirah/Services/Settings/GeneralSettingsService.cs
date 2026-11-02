@@ -10,6 +10,12 @@ internal sealed partial class GeneralSettingsService : BaseObservableJsonSetting
         RegisterSettingsContext(settingsSharingContext);
     }
 
+    public string PresentationKind { get => Get("computer"); set => Set(value); }
+    public string PresentationOrientation { get => Get("landscape"); set => Set(value); }
+    public string PresentationRatio { get => Get("16:9"); set => Set(value); }
+    public bool ShareWallpaperPreview { get => Get(false); set => Set(value); }
+    public string PresentationImagePath { get => Get(string.Empty); set => Set(value); }
+
     public BackdropMaterialType BackdropMaterial
     {
         get => Get(BackdropMaterialType.Mica);

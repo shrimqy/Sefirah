@@ -50,6 +50,9 @@ public class PairedDeviceEntity
     #region Helpers
     internal async Task<PairedDevice> ToPairedDevice()
     {
+        var presentation = DevicePresentation.Parse(Ioc.Default.GetRequiredService<IUserSettingsService>().GetDeviceSettings(DeviceId).PresentationJson);
+        var validImage = WallpaperBytes is not null && Sefirah.Utils.PresentationImage.IsValid(WallpaperBytes)
+            && Sefirah.Utils.PresentationImage.Id(WallpaperBytes) == presentation?.WallpaperId;
         return new PairedDevice(DeviceId)
         {
             Name = Name,
@@ -57,7 +60,9 @@ public class PairedDeviceEntity
             Certificate = Certificate,
             Addresses = [with(Addresses)],
             PhoneNumbers = PhoneNumbers,
-            Wallpaper = await ImageHelper.ToBitmapAsync(WallpaperBytes),
+            Presentation = presentation,
+            Wallpaper = validImage && presentation?.WallpaperSource is "wallpaper" or "userSelected"
+                ? await ImageHelper.ToBitmapAsync(WallpaperBytes) : null,
             CallsTransportDeviceId = CallsTransportDeviceId,
             BluetoothAddress = BluetoothAddress,
             BluetoothClassicDeviceId = BluetoothClassicDeviceId,

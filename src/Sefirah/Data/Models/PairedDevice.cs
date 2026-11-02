@@ -73,6 +73,13 @@ public partial class PairedDevice : BaseRemoteDevice
 
     public List<PhoneNumber> PhoneNumbers { get; set; } = [];
 
+    private DevicePresentation? presentation;
+    public DevicePresentation? Presentation
+    {
+        get => presentation;
+        set => SetProperty(ref presentation, value);
+    }
+
     private ImageSource? wallpaper;
     public ImageSource? Wallpaper
     {

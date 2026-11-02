@@ -4,6 +4,12 @@ namespace Sefirah.Data.Contracts;
 
 public interface IGeneralSettingsService : IBaseSettingsService, INotifyPropertyChanged
 {
+    string PresentationKind { get; set; }
+    string PresentationOrientation { get; set; }
+    string PresentationRatio { get; set; }
+    bool ShareWallpaperPreview { get; set; }
+    string PresentationImagePath { get; set; }
+
     /// <summary>
     /// Gets or sets the startup option for the application.
     /// </summary>

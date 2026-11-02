@@ -143,21 +143,38 @@ public partial class DeviceManager(
     {
         var existingDevice = await repository.GetPairedDevice(device.Id);
         existingDevice.Name = deviceInfo.DeviceName;
-        existingDevice.PhoneNumbers = deviceInfo.PhoneNumbers;
-        if (!string.IsNullOrEmpty(deviceInfo.Avatar))
+        if (deviceInfo.PhoneNumbers is { } numbers) existingDevice.PhoneNumbers = numbers;
+        var incoming = deviceInfo.Presentation;
+        if (incoming is not null && !incoming.IsValid) return;
+        var presentation = incoming ?? device.Presentation;
+        // Never relabel the legacy desktop account avatar as a wallpaper.
+        if (presentation is null || presentation.WallpaperSource == "none")
+            existingDevice.WallpaperBytes = null;
+        else if (incoming is not null)
         {
-            existingDevice.WallpaperBytes = Convert.FromBase64String(deviceInfo.Avatar);
+            var image = PresentationImage.Decode(incoming.Wallpaper, incoming.WallpaperId);
+            if (image is not null) existingDevice.WallpaperBytes = image;
+            else if (incoming.WallpaperId != device.Presentation?.WallpaperId)
+                existingDevice.WallpaperBytes = null;
         }
+        if (incoming is not null)
+            device.DeviceSettings.PresentationJson = JsonSerializer.Serialize(incoming.Metadata());
 
         await App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
         {
+            device.Presentation = presentation?.Metadata();
             device.Name = deviceInfo.DeviceName;
-            device.PhoneNumbers = deviceInfo.PhoneNumbers;
+            if (deviceInfo.PhoneNumbers is { } updatedNumbers) device.PhoneNumbers = updatedNumbers;
             device.Wallpaper = await existingDevice.WallpaperBytes.ToBitmapAsync();
         });
 
         repository.AddOrUpdateRemoteDevice(existingDevice);
-        
+        if (incoming?.WallpaperId is { } id && incoming.WallpaperSource != "none"
+            && existingDevice.WallpaperBytes is null && incoming.Wallpaper is null)
+        {
+            var local = await GetLocalDeviceAsync();
+            device.SendMessage(new DeviceInfo { DeviceName = local.DeviceName, RequestedWallpaperId = id });
+        }
     }
 
     public async Task<PairedDevice> AddDevice(DiscoveredDevice device)

@@ -13,6 +13,7 @@ public sealed partial class GeneralPage : Page
     {
         InitializeComponent();
         SetupBreadcrumb();
+        Loaded += (_, _) => ViewModel.RefreshPresentationPreview();
     }
 
     private void OnKeyDown(object sender, KeyRoutedEventArgs e)

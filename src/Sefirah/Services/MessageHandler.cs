@@ -133,6 +133,8 @@ public class MessageHandler(
                     break;
 
                 case DeviceInfo deviceInfo:
+                    if (deviceInfo.RequestedWallpaperId is { Length: 64 } requestedId && device.Presentation?.Version == 1)
+                        await Ioc.Default.GetRequiredService<DevicePresentationService>().PublishAsync(device, requestedId);
                     await deviceManager.UpdateDeviceInfo(device, deviceInfo);
                     break;
 

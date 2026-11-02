@@ -1088,4 +1088,20 @@ input text %pwd%</value>
   <data name="Dialer" xml:space="preserve">
     <value>Dialer</value>
   </data>
+  <data name="DevicePresentationTitle" xml:space="preserve"><value>This device on other devices</value></data>
+  <data name="DevicePresentationDescription" xml:space="preserve"><value>Choose its frame, orientation and preview. These settings do not rotate your screen.</value></data>
+  <data name="DevicePresentationKind" xml:space="preserve"><value>Device type</value></data>
+  <data name="DevicePresentationOrientation" xml:space="preserve"><value>Display orientation</value></data>
+  <data name="DevicePresentationRatio" xml:space="preserve"><value>Display ratio</value></data>
+  <data name="ShareWallpaperPreview" xml:space="preserve"><value>Share a wallpaper preview with allowed paired devices</value></data>
+  <data name="ChoosePresentationImage" xml:space="preserve"><value>Choose a preview image</value></data>
+  <data name="UseSystemWallpaper" xml:space="preserve"><value>Use system wallpaper</value></data>
+  <data name="ShareWallpaperWithDevice" xml:space="preserve"><value>Share this computer's wallpaper preview</value></data>
+  <data name="ShareWallpaperWithDeviceDescription" xml:space="preserve"><value>Also enable wallpaper sharing in General. Turning this off clears the preview on upgraded peers.</value></data>
+  <data name="Presentation_unknown" xml:space="preserve"><value>Unknown device</value></data>
+  <data name="Presentation_phone" xml:space="preserve"><value>Phone</value></data>
+  <data name="Presentation_tablet" xml:space="preserve"><value>Tablet</value></data>
+  <data name="Presentation_computer" xml:space="preserve"><value>Computer</value></data>
+  <data name="Presentation_portrait" xml:space="preserve"><value>Portrait</value></data>
+  <data name="Presentation_landscape" xml:space="preserve"><value>Landscape</value></data>
 </root>

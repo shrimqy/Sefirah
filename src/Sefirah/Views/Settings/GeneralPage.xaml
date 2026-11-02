@@ -1,4 +1,4 @@
-﻿<Page
+<Page
     x:Class="Sefirah.Views.Settings.GeneralPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -61,6 +61,18 @@
                         SelectedItem="{x:Bind ViewModel.SelectedBackdropMaterial, Mode=TwoWay}" />
                 </wuc:SettingsCard>
             </win:StackPanel>
+
+            <wuc:SettingsExpander Header="{helpers:ResourceString Name=DevicePresentationTitle}" Description="{helpers:ResourceString Name=DevicePresentationDescription}">
+                <wuc:SettingsExpander.Items>
+                    <controls:DevicePreview Width="120" Height="90" Presentation="{x:Bind ViewModel.LocalPresentation, Mode=OneWay}" PreviewImage="{x:Bind ViewModel.LocalPreviewImage, Mode=OneWay}" />
+                    <ComboBox Header="{helpers:ResourceString Name=DevicePresentationKind}" ItemsSource="{x:Bind ViewModel.PresentationKinds}" SelectedItem="{x:Bind ViewModel.PresentationKind, Mode=TwoWay}" />
+                    <ComboBox Header="{helpers:ResourceString Name=DevicePresentationOrientation}" ItemsSource="{x:Bind ViewModel.PresentationOrientations}" SelectedItem="{x:Bind ViewModel.PresentationOrientation, Mode=TwoWay}" />
+                    <ComboBox Header="{helpers:ResourceString Name=DevicePresentationRatio}" ItemsSource="{x:Bind ViewModel.PresentationRatios}" SelectedItem="{x:Bind ViewModel.PresentationRatio, Mode=TwoWay}" />
+                    <ToggleSwitch Header="{helpers:ResourceString Name=ShareWallpaperPreview}" IsOn="{x:Bind ViewModel.ShareWallpaperPreview, Mode=TwoWay}" />
+                    <Button Content="{helpers:ResourceString Name=ChoosePresentationImage}" Command="{x:Bind ViewModel.SelectPresentationImageCommand}" />
+                    <Button Content="{helpers:ResourceString Name=UseSystemWallpaper}" Command="{x:Bind ViewModel.UseSystemWallpaperCommand}" />
+                </wuc:SettingsExpander.Items>
+            </wuc:SettingsExpander>
 
             <!--  Theme  -->
             <wuc:SettingsCard Description="{helpers:ResourceString Name=ThemeDescription}" Header="{helpers:ResourceString Name=Theme}">

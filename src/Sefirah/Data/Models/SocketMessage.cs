@@ -94,11 +94,15 @@ public class UdpBroadcast : SocketMessage
 
 public class DeviceInfo : SocketMessage
 {
+    public DevicePresentation? Presentation { get; set; }
+    public string? RequestedWallpaperId { get; set; }
     public required string DeviceName { get; set; }
 
     public string? Avatar { get; set; } = null;
 
-    public List<PhoneNumber> PhoneNumbers { get; set; } = [];
+    // A partial DeviceInfo leaves numbers untouched; [] explicitly clears them.
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<PhoneNumber>? PhoneNumbers { get; set; }
 }
 
 public class BatteryState : SocketMessage

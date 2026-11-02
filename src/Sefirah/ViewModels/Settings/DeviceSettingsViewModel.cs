@@ -8,6 +8,17 @@ namespace Sefirah.ViewModels.Settings;
 
 public sealed partial class DeviceSettingsViewModel : BaseViewModel
 {
+    public bool ShareWallpaperPreview
+    {
+        get => DeviceSettings.ShareWallpaperPreview;
+        set
+        {
+            DeviceSettings.ShareWallpaperPreview = value;
+            OnPropertyChanged();
+            _ = Ioc.Default.GetRequiredService<Sefirah.Services.DevicePresentationService>().PublishAsync(Device);
+        }
+    }
+
     #region Display Properties
     public string DisplayPhoneNumbers => string.Join(", ", Device.PhoneNumbers.Select(p => p.Number));
     public string DisplayAddresses => string.Join(", ", Device.GetEnabledAddresses());

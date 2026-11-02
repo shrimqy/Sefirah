@@ -194,6 +194,7 @@ public sealed partial class DeviceControlCenter : UserControl
 
         if (show)
         {
+            if (ViewModel.Device?.Presentation?.Kind is not ("phone" or "tablet")) return;
             PhoneFrameOverlay.Visibility = Visibility.Visible;
             currentOverlayAnimation = FadeInStoryboard;
             FadeInStoryboard.Begin();

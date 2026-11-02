@@ -1088,4 +1088,20 @@ input text %pwd%</value>
   <data name="Dialer" xml:space="preserve">
     <value>Dialer</value>
   </data>
+  <data name="DevicePresentationTitle" xml:space="preserve"><value>此设备在其他设备上的外观</value></data>
+  <data name="DevicePresentationDescription" xml:space="preserve"><value>选择外框、方向与预览；这些设置不会旋转系统屏幕。</value></data>
+  <data name="DevicePresentationKind" xml:space="preserve"><value>设备类型</value></data>
+  <data name="DevicePresentationOrientation" xml:space="preserve"><value>展示方向</value></data>
+  <data name="DevicePresentationRatio" xml:space="preserve"><value>展示比例</value></data>
+  <data name="ShareWallpaperPreview" xml:space="preserve"><value>向允许的配对设备分享壁纸预览</value></data>
+  <data name="ChoosePresentationImage" xml:space="preserve"><value>选择展示图片</value></data>
+  <data name="UseSystemWallpaper" xml:space="preserve"><value>使用系统壁纸</value></data>
+  <data name="ShareWallpaperWithDevice" xml:space="preserve"><value>向此设备分享本机壁纸预览</value></data>
+  <data name="ShareWallpaperWithDeviceDescription" xml:space="preserve"><value>还需在通用设置启用壁纸分享；关闭后将清除新版本接收端的预览。</value></data>
+  <data name="Presentation_unknown" xml:space="preserve"><value>未知设备</value></data>
+  <data name="Presentation_phone" xml:space="preserve"><value>手机</value></data>
+  <data name="Presentation_tablet" xml:space="preserve"><value>平板</value></data>
+  <data name="Presentation_computer" xml:space="preserve"><value>电脑</value></data>
+  <data name="Presentation_portrait" xml:space="preserve"><value>竖向</value></data>
+  <data name="Presentation_landscape" xml:space="preserve"><value>横向</value></data>
 </root>
