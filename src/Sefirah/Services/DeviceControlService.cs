@@ -4,21 +4,8 @@ using Sefirah.Data.Models;
 namespace Sefirah.Services;
 
 /// <summary>Target-side owner for capability publication and opt-in Bluetooth requests.</summary>
-public sealed class DeviceControlService(IDeviceManager devices, ISessionManager sessions) : IFeature
+public sealed class DeviceControlService(IDeviceManager devices)
 {
-    public Task InitializeAsync()
-    {
-        sessions.ConnectionStatusChanged += OnConnectionStatusChanged;
-        return Task.CompletedTask;
-    }
-
-    private async void OnConnectionStatusChanged(object? sender, PairedDevice peer)
-    {
-        if (!peer.IsConnected) return;
-        try { await PublishAsync(peer); }
-        catch (Exception) { /* A dropped connection refreshes on the next connection. */ }
-    }
-
     private int radioSubscribed;
     private readonly SemaphoreSlim gate = new(1, 1);
     private readonly Dictionary<(string Peer, string Id), (string Control, int Value, DeviceControlResult Result)> recent = [];
@@ -55,7 +42,7 @@ public sealed class DeviceControlService(IDeviceManager devices, ISessionManager
 
     public async Task PublishAsync(PairedDevice peer)
     {
-        if (!peer.IsConnected) return;
+        if (!peer.IsConnected || peer.Controls?.Version != 1) return;
         var local = await devices.GetLocalDeviceAsync();
         peer.SendMessage(new DeviceInfo { DeviceName = local.DeviceName, Controls = await GetCapabilitiesAsync(peer) });
     }

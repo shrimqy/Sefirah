@@ -100,7 +100,7 @@ public class NetworkService(
         {
             var localDevice = await deviceManager.GetLocalDeviceAsync();
             var avatar = await UserInformation.GetCurrentUserAvatarAsync();
-            device.SendMessage(new DeviceInfo { DeviceName = localDevice.DeviceName, Avatar = avatar });
+            device.SendMessage(new DeviceInfo { DeviceName = localDevice.DeviceName, Avatar = avatar, Controls = await Ioc.Default.GetRequiredService<DeviceControlService>().GetCapabilitiesAsync(device) });
         }
         catch (Exception ex)
         {

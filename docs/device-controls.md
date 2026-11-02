@@ -24,3 +24,7 @@ DeviceInfo extensions are partial updates: absent phoneNumbers keeps the existin
 list, while [] explicitly clears it. Capability and presentation publishers reuse
 the authenticated connection and existing settings owners; neither creates a new
 transport or device identity.
+
+The initial capability declaration travels in the existing full DeviceInfo packet.
+Later capability-only updates are sent only to v1 peers, because legacy receivers
+may treat an omitted avatar or phone-number list as a replacement.
