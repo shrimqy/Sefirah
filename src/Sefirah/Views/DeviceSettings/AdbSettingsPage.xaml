@@ -14,6 +14,7 @@
     mc:Ignorable="d">
 
     <Page.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Page.Resources>
 
     <ScrollViewer>
@@ -31,6 +32,66 @@
                     </wuc:SettingsCard.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind ViewModel.AdbAutoConnect, Mode=TwoWay}" />
                 </wuc:SettingsCard>
+            </StackPanel>
+
+            <StackPanel Spacing="5">
+                <!--  Wireless ADB pairing, entirely over Wi-Fi, no USB connection needed  -->
+                <TextBlock
+                    Margin="0,8,0,0"
+                    FontWeight="SemiBold"
+                    Text="{helpers:ResourceString Name=PairWirelessAdb}" />
+                <TextBlock
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Text="{helpers:ResourceString Name=PairWirelessAdbDescription}"
+                    TextWrapping="Wrap" />
+
+                <wuc:SettingsCard Header="{helpers:ResourceString Name=HostAddress}">
+                    <TextBox
+                        MinWidth="200"
+                        PlaceholderText="192.168.1.23"
+                        Text="{x:Bind ViewModel.PairHost, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+
+                <wuc:SettingsCard Header="{helpers:ResourceString Name=PairingPort}">
+                    <TextBox
+                        MinWidth="120"
+                        InputScope="Number"
+                        PlaceholderText="37123"
+                        Text="{x:Bind ViewModel.PairPort, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+
+                <wuc:SettingsCard Header="{helpers:ResourceString Name=PairingCode}">
+                    <TextBox
+                        MinWidth="120"
+                        InputScope="Number"
+                        MaxLength="6"
+                        PlaceholderText="123456"
+                        Text="{x:Bind ViewModel.PairingCode, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+
+                <Button
+                    HorizontalAlignment="Left"
+                    Command="{x:Bind ViewModel.PairWirelessAdbCommand}"
+                    Content="{helpers:ResourceString Name=PairButton}" />
+
+                <wuc:SettingsCard Description="{helpers:ResourceString Name=ConnectionPortDescription}" Header="{helpers:ResourceString Name=ConnectionPort}">
+                    <TextBox
+                        MinWidth="120"
+                        InputScope="Number"
+                        PlaceholderText="5555"
+                        Text="{x:Bind ViewModel.ConnectPort, Mode=TwoWay}" />
+                </wuc:SettingsCard>
+
+                <Button
+                    HorizontalAlignment="Left"
+                    Command="{x:Bind ViewModel.ConnectWirelessAdbCommand}"
+                    Content="{helpers:ResourceString Name=ConnectButton}" />
+
+                <TextBlock
+                    Margin="0,4,0,0"
+                    Text="{x:Bind ViewModel.WirelessAdbStatusMessage, Mode=OneWay}"
+                    TextWrapping="Wrap"
+                    Visibility="{x:Bind ViewModel.HasWirelessAdbStatusMessage, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

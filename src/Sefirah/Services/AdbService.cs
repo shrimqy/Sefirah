@@ -596,17 +596,21 @@ public class AdbService(
         }
     }
 
-    public async Task<bool> Pair(AdbDevice device, string pairingCode, string host, int port=5555)
+    public async Task<bool> Pair(string pairingCode, string host, int port)
     {
-        if (string.IsNullOrEmpty(host)) return false;
+        if (string.IsNullOrWhiteSpace(host)) return false;
+
+        var cleanHost = host.Trim();
+
         try
         {
-            var result = await adbClient.PairAsync(host, port, pairingCode);
+            var result = await adbClient.PairAsync(cleanHost, port, pairingCode);
+            logger.Info($"adb pair ({cleanHost}:{port}): {result}");
             return IsAdbConnectOrPairSuccess(result);
         }
         catch (Exception ex)
         {
-            logger.Error($"Error connecting to wireless device {device.Serial}: {ex.Message}", ex);
+            logger.Error($"Error pairing wireless device {cleanHost}:{port}: {ex.Message}", ex);
             return false;
         }
     }

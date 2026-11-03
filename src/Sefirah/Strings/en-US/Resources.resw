@@ -475,6 +475,57 @@ page.</value>
   <data name="AutoConnect" xml:space="preserve">
     <value>Auto connect</value>
   </data>
+  <data name="PairWirelessAdb" xml:space="preserve">
+    <value>Pair wireless ADB</value>
+  </data>
+  <data name="PairWirelessAdbDescription" xml:space="preserve">
+    <value>On your device, open Settings &gt; Developer options &gt; Wireless debugging &gt; Pair device with pairing code, then enter the IP address, pairing port and code shown there.</value>
+  </data>
+  <data name="HostAddress" xml:space="preserve">
+    <value>IP address</value>
+  </data>
+  <data name="PairingPort" xml:space="preserve">
+    <value>Pairing port</value>
+  </data>
+  <data name="PairingCode" xml:space="preserve">
+    <value>Pairing code</value>
+  </data>
+  <data name="ConnectionPort" xml:space="preserve">
+    <value>Connection port</value>
+  </data>
+  <data name="ConnectionPortDescription" xml:space="preserve">
+    <value>Shown next to the IP address on the Wireless debugging screen. Used to connect after pairing, or to reconnect later without re-pairing.</value>
+  </data>
+  <data name="PairButton" xml:space="preserve">
+    <value>Pair</value>
+  </data>
+  <data name="ConnectButton" xml:space="preserve">
+    <value>Connect</value>
+  </data>
+  <data name="WirelessAdbMissingFields" xml:space="preserve">
+    <value>Please fill in all required fields.</value>
+  </data>
+  <data name="WirelessAdbInvalidPort" xml:space="preserve">
+    <value>Port must be a number.</value>
+  </data>
+  <data name="WirelessAdbPairFailed" xml:space="preserve">
+    <value>Pairing failed. Check the IP address, port and code, then try again.</value>
+  </data>
+  <data name="WirelessAdbPairSuccess" xml:space="preserve">
+    <value>Paired successfully.</value>
+  </data>
+  <data name="WirelessAdbPairAndConnectSuccess" xml:space="preserve">
+    <value>Paired and connected successfully.</value>
+  </data>
+  <data name="WirelessAdbPairedButConnectFailed" xml:space="preserve">
+    <value>Paired, but connecting on the connection port failed. Try connecting manually below.</value>
+  </data>
+  <data name="WirelessAdbConnectSuccess" xml:space="preserve">
+    <value>Connected successfully.</value>
+  </data>
+  <data name="WirelessAdbConnectFailed" xml:space="preserve">
+    <value>Connection failed. Make sure wireless debugging is on and the IP address and port are correct.</value>
+  </data>
   <data name="Both" xml:space="preserve">
     <value>Both</value>
   </data>
