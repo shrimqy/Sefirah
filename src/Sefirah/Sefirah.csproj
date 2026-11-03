@@ -163,6 +163,17 @@
     <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100' and '$(SefirahMrmSupportDll)' == '' and Exists('C:\Program Files\Windows Kits\10\bin\$(SefirahMrmSupportSdkVersion)\$(SefirahMrmSupportSdkArch)\mrmsupport.dll')">
         <SefirahMrmSupportDll>C:\Program Files\Windows Kits\10\bin\$(SefirahMrmSupportSdkVersion)\$(SefirahMrmSupportSdkArch)\mrmsupport.dll</SefirahMrmSupportDll>
     </PropertyGroup>
+    <!-- Fallback for machines without the exact SDK above: fall back to the newest Windows Kits version that still ships mrmsupport.dll. -->
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100' and '$(SefirahMrmSupportDll)' == ''">
+        <SefirahMrmSupportSdkFallbackVersion Condition="Exists('C:\Program Files (x86)\Windows Kits\10\bin\10.0.22000.0\$(SefirahMrmSupportSdkArch)\mrmsupport.dll') or Exists('C:\Program Files\Windows Kits\10\bin\10.0.22000.0\$(SefirahMrmSupportSdkArch)\mrmsupport.dll')">10.0.22000.0</SefirahMrmSupportSdkFallbackVersion>
+        <SefirahMrmSupportSdkFallbackVersion Condition="'$(SefirahMrmSupportSdkFallbackVersion)' == '' and (Exists('C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\$(SefirahMrmSupportSdkArch)\mrmsupport.dll') or Exists('C:\Program Files\Windows Kits\10\bin\10.0.19041.0\$(SefirahMrmSupportSdkArch)\mrmsupport.dll'))">10.0.19041.0</SefirahMrmSupportSdkFallbackVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100' and '$(SefirahMrmSupportDll)' == '' and '$(SefirahMrmSupportSdkFallbackVersion)' != '' and Exists('C:\Program Files (x86)\Windows Kits\10\bin\$(SefirahMrmSupportSdkFallbackVersion)\$(SefirahMrmSupportSdkArch)\mrmsupport.dll')">
+        <SefirahMrmSupportDll>C:\Program Files (x86)\Windows Kits\10\bin\$(SefirahMrmSupportSdkFallbackVersion)\$(SefirahMrmSupportSdkArch)\mrmsupport.dll</SefirahMrmSupportDll>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100' and '$(SefirahMrmSupportDll)' == '' and '$(SefirahMrmSupportSdkFallbackVersion)' != '' and Exists('C:\Program Files\Windows Kits\10\bin\$(SefirahMrmSupportSdkFallbackVersion)\$(SefirahMrmSupportSdkArch)\mrmsupport.dll')">
+        <SefirahMrmSupportDll>C:\Program Files\Windows Kits\10\bin\$(SefirahMrmSupportSdkFallbackVersion)\$(SefirahMrmSupportSdkArch)\mrmsupport.dll</SefirahMrmSupportDll>
+    </PropertyGroup>
     <Target Name="IncludeMrmSupportDll" BeforeTargets="PrepareForBuild" Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100' and '$(Platform)' != 'Any CPU'">
         <Error Condition="'$(SefirahMrmSupportDll)' == '' or !Exists('$(SefirahMrmSupportDll)')" Text="Windows SDK mrmsupport.dll was not found. Install the Windows SDK or set SefirahMrmSupportDll." />
         <ItemGroup>

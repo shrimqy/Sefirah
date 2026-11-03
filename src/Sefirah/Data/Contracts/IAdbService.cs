@@ -19,6 +19,8 @@ public interface IAdbService
 
     Task<bool> ConnectWireless(string host, int port = 5555);
 
+    Task<bool> Pair(string pairingCode, string host, int port);
+
     Task StopAsync();
 
     Task<bool> UninstallApp(string deviceId, string appPackage);

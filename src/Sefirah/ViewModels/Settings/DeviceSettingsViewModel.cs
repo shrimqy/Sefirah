@@ -650,6 +650,138 @@ public sealed partial class DeviceSettingsViewModel : BaseViewModel
         }
     }
 
+    private string pairHost = string.Empty;
+    public string PairHost
+    {
+        get => pairHost;
+        set => SetProperty(ref pairHost, value);
+    }
+
+    private string pairPort = string.Empty;
+    public string PairPort
+    {
+        get => pairPort;
+        set => SetProperty(ref pairPort, value);
+    }
+
+    private string pairingCode = string.Empty;
+    public string PairingCode
+    {
+        get => pairingCode;
+        set => SetProperty(ref pairingCode, value);
+    }
+
+    private string connectPort = "5555";
+    public string ConnectPort
+    {
+        get => connectPort;
+        set => SetProperty(ref connectPort, value);
+    }
+
+    private string wirelessAdbStatusMessage = string.Empty;
+    public string WirelessAdbStatusMessage
+    {
+        get => wirelessAdbStatusMessage;
+        set
+        {
+            if (SetProperty(ref wirelessAdbStatusMessage, value))
+            {
+                OnPropertyChanged(nameof(HasWirelessAdbStatusMessage));
+            }
+        }
+    }
+
+    public bool HasWirelessAdbStatusMessage => !string.IsNullOrEmpty(WirelessAdbStatusMessage);
+
+    private bool isWirelessAdbBusy;
+    public bool IsWirelessAdbBusy
+    {
+        get => isWirelessAdbBusy;
+        set => SetProperty(ref isWirelessAdbBusy, value);
+    }
+
+    [RelayCommand]
+    private async Task PairWirelessAdbAsync()
+    {
+        if (IsWirelessAdbBusy) return;
+
+        if (string.IsNullOrWhiteSpace(PairHost) || string.IsNullOrWhiteSpace(PairPort) || string.IsNullOrWhiteSpace(PairingCode))
+        {
+            WirelessAdbStatusMessage = "WirelessAdbMissingFields".GetLocalizedResource();
+            return;
+        }
+
+        if (!int.TryParse(PairPort, out var port))
+        {
+            WirelessAdbStatusMessage = "WirelessAdbInvalidPort".GetLocalizedResource();
+            return;
+        }
+
+        IsWirelessAdbBusy = true;
+        WirelessAdbStatusMessage = string.Empty;
+        try
+        {
+            var paired = await AdbService.Pair(PairingCode.Trim(), PairHost.Trim(), port);
+            if (!paired)
+            {
+                WirelessAdbStatusMessage = "WirelessAdbPairFailed".GetLocalizedResource();
+                return;
+            }
+
+            PairingCode = string.Empty;
+
+            // Pairing establishes trust but Android connects over a separate, stable port
+            // (shown on the device's own Wireless debugging screen), so connect right after.
+            if (int.TryParse(ConnectPort, out var connectPortValue))
+            {
+                var connected = await AdbService.ConnectWireless(PairHost.Trim(), connectPortValue);
+                WirelessAdbStatusMessage = connected
+                    ? "WirelessAdbPairAndConnectSuccess".GetLocalizedResource()
+                    : "WirelessAdbPairedButConnectFailed".GetLocalizedResource();
+            }
+            else
+            {
+                WirelessAdbStatusMessage = "WirelessAdbPairSuccess".GetLocalizedResource();
+            }
+        }
+        finally
+        {
+            IsWirelessAdbBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task ConnectWirelessAdbAsync()
+    {
+        if (IsWirelessAdbBusy) return;
+
+        if (string.IsNullOrWhiteSpace(PairHost) || string.IsNullOrWhiteSpace(ConnectPort))
+        {
+            WirelessAdbStatusMessage = "WirelessAdbMissingFields".GetLocalizedResource();
+            return;
+        }
+
+        if (!int.TryParse(ConnectPort, out var port))
+        {
+            WirelessAdbStatusMessage = "WirelessAdbInvalidPort".GetLocalizedResource();
+            return;
+        }
+
+        IsWirelessAdbBusy = true;
+        WirelessAdbStatusMessage = string.Empty;
+        try
+        {
+            var connected = await AdbService.ConnectWireless(PairHost.Trim(), port);
+            WirelessAdbStatusMessage = connected
+                ? "WirelessAdbConnectSuccess".GetLocalizedResource()
+                : "WirelessAdbConnectFailed".GetLocalizedResource();
+        }
+        finally
+        {
+            IsWirelessAdbBusy = false;
+        }
+    }
+
     #endregion
 
     #region Storage Access Settings
