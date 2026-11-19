@@ -23,6 +23,7 @@ public class MessageHandler(
     IBluetoothPairingService bluetoothPairingService,
     IPlaySoundFeature playSoundFeature,
     IAdbService adbService,
+    IDeviceRemovalService deviceRemovalService,
     ILogger<MessageHandler> logger) : IMessageHandler
 {
     public async void HandleMessageAsync(PairedDevice device, SocketMessage message)
@@ -159,6 +160,14 @@ public class MessageHandler(
 
                 case Disconnect:
                     sessionManager.DisconnectDevice(device, true);
+                    break;
+
+                case PairMessage pairMessage:
+                    // Only ever sent to a device the sender doesn't consider paired: an unpair notice
+                    // (Pair = false) or a pairing request after it forgot this PC (Pair = true).
+                    // Either way it no longer trusts this pairing, so drop it here too.
+                    logger.Info($"{device.Name} no longer considers this PC paired (Pair={pairMessage.Pair}), removing it");
+                    await deviceRemovalService.HandleRemoteUnpairAsync(device);
                     break;
 
                 default:
