@@ -62,6 +62,8 @@ public class DatabaseContext
                 else
                 {
                     RunMigrations(db, migrationsToRun, logger);
+                    // Migrations only touch the tables they change; create any tables added without one
+                    EnsureAllTables(db, logger);
                 }
             }
             else
@@ -74,10 +76,26 @@ public class DatabaseContext
         }
         else
         {
-            CreateAllTables(db);
+            EnsureAllTables(db, logger);
         }
 
         return db;
+    }
+
+    // Creates missing tables and columns; a table whose schema can't be updated in place
+    // (e.g. a changed primary key) falls back to recreating the database
+    private static void EnsureAllTables(SQLiteConnection db, ILogger logger)
+    {
+        try
+        {
+            CreateAllTables(db);
+        }
+        catch (SQLiteException ex)
+        {
+            logger.Error("Existing tables don't match the current schema. Falling back to destructive mode.", ex);
+            DestructiveFallback(db);
+            SetSchemaVersion(db, CurrentSchemaVersion);
+        }
     }
 
     private static void SetSchemaVersion(SQLiteConnection db, int version)
