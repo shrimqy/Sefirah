@@ -63,7 +63,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <UnoIconForegroundFile>Assets\Icons\icon_foreground.svg</UnoIconForegroundFile>
+        <UnoIconForegroundFile>Assets/Icons/icon_foreground.svg</UnoIconForegroundFile>
         <UnoIconBackgroundColor Condition="'$(IsWinAppSdk)' == 'true'">Transparent</UnoIconBackgroundColor>
         <GenerateTestArtifacts>False</GenerateTestArtifacts>
         <AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
