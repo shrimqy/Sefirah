@@ -35,6 +35,12 @@ public interface IAdbService
 
     Task DisconnectDeviceAsync(AdbDevice device);
 
+    /// <summary>
+    /// Turns off wireless ADB on the device: the Android 11+ "Wireless debugging" toggle and TCP mode
+    /// ("adb tcpip"). USB debugging stays on. Drops any wireless ADB link to it.
+    /// </summary>
+    Task DisableWirelessDebuggingAsync(DeviceData device);
+
     Task TryStartWorkerAsync(PairedDevice device, string command);
 
     Task<bool> IsLocked(DeviceData deviceData);

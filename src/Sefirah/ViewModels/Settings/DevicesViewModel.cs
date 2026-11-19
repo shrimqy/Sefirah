@@ -1,5 +1,4 @@
 using Microsoft.UI.Dispatching;
-using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Data.Models;
 
 namespace Sefirah.ViewModels.Settings;
@@ -8,14 +7,8 @@ public partial class DevicesViewModel : ObservableObject
 {
     #region Services
     private readonly DispatcherQueue Dispatcher;
-    private ISessionManager SessionManager { get; } = Ioc.Default.GetRequiredService<ISessionManager>();
     private IDeviceManager DeviceManager { get; } = Ioc.Default.GetRequiredService<IDeviceManager>();
-    private ISftpFeature SftpFeature { get; } = Ioc.Default.GetRequiredService<ISftpFeature>();
-    private RemoteAppRepository RemoteAppRepository { get; } = Ioc.Default.GetRequiredService<RemoteAppRepository>();
-    private ContactRepository ContactRepository { get; } = Ioc.Default.GetRequiredService<ContactRepository>();
-    private SmsRepository SmsRepository { get; } = Ioc.Default.GetRequiredService<SmsRepository>();
-    private CallLogRepository CallLogRepository { get; } = Ioc.Default.GetRequiredService<CallLogRepository>();
-    private NotificationRepository NotificationRepository { get; } = Ioc.Default.GetRequiredService<NotificationRepository>();
+    private IDeviceRemovalService DeviceRemovalService { get; } = Ioc.Default.GetRequiredService<IDeviceRemovalService>();
     #endregion
     
     public ObservableCollection<PairedDevice> PairedDevices => DeviceManager.PairedDevices;
@@ -71,27 +64,7 @@ public partial class DevicesViewModel : ObservableObject
 
         try
         {
-            var deviceId = device.Id;
-
-            // First disconnect if this is the currently connected device
-            if (device.IsConnected)
-            {
-                SessionManager.DisconnectDevice(device);
-            }
-
-                App.CloseDeviceSettingsWindow(deviceId);
-                await DeviceManager.RemoveDevice(device);
-
-            SftpFeature.Remove(deviceId);
-
-            await Task.Run(() =>
-            {
-                RemoteAppRepository.RemoveAllAppsForDevice(deviceId);
-                SmsRepository.DeleteAllDataForDevice(deviceId);
-                ContactRepository.DeleteAllContactsForDevice(deviceId);
-                CallLogRepository.DeleteAllCallLogsForDevice(deviceId);
-                NotificationRepository.RemoveNotificationsForDevice(deviceId);
-            });
+            await DeviceRemovalService.UnpairAsync(device);
         }
         catch (Exception ex)
         {

@@ -120,6 +120,23 @@ public class NetworkService(
         }
     }
 
+    public void Unpair(PairedDevice device)
+    {
+        try
+        {
+            // Send synchronously: SendAsync data still queued when the session closes is dropped
+            var bytes = EncodeMessage(new PairMessage { Pair = false });
+            device.Session?.Send(bytes);
+            device.Client?.Send(bytes);
+        }
+        catch (Exception ex)
+        {
+            logger.Warn($"Failed to tell {device.Name} it was unpaired", ex);
+        }
+
+        DisconnectDevice(device, true);
+    }
+
     public void SendMessage(ServerSession session, SocketMessage message)
     {
         try

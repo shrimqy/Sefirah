@@ -907,9 +907,57 @@ public class AdbService(
         return Task.CompletedTask;
     }
 
+    public async Task DisableWirelessDebuggingAsync(DeviceData device)
+    {
+        if (device.State is not DeviceState.Online) return;
+
+        try
+        {
+            logger.Info($"Turning off wireless debugging on {device.Serial}");
+            // The Android 11+ "Wireless debugging" toggle
+            await adbClient.ExecuteShellCommandAsync(device, "settings put global adb_wifi_enabled 0");
+        }
+        catch (Exception ex)
+        {
+            // Over wireless ADB the link can drop as the setting applies, so an error here is expected
+            logger.Debug($"Wireless debugging off on {device.Serial} ended with: {ex.Message}");
+        }
+
+        // TCP mode ("adb tcpip 5555", which EnableTcpipMode sets up) isn't covered by that toggle.
+        // The "usb:" service ("adb usb") restarts adbd listening on USB only; sent over the ADB
+        // protocol so it doesn't depend on an adb binary path being configured
+        try
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            using var socket = new AdbSocket(adbClient.EndPoint);
+            await socket.SetDeviceAsync(device, cts.Token);
+            await socket.SendAdbRequestAsync("usb:", cts.Token);
+            await socket.ReadAdbResponseAsync(cts.Token);
+        }
+        catch (Exception ex)
+        {
+            logger.Warn($"Could not switch ADB on {device.Serial} to USB only: {ex.Message}", ex);
+        }
+
+        // Clear the now-dead wireless entry from the ADB server
+        if (device.Serial.Contains(':'))
+        {
+            try
+            {
+                await adbClient.DisconnectAsync(device.Serial);
+            }
+            catch (Exception ex)
+            {
+                logger.Debug($"ADB disconnect of {device.Serial} ended with: {ex.Message}");
+            }
+        }
+    }
+
     private async Task GrantSensitiveNotificationAsync(AdbDevice device)
     {
         if (device.DeviceData is null || device.State is not DeviceState.Online) return;
+
+        await GrantWriteSecureSettingsAsync(device);
 
         try
         {
@@ -930,6 +978,34 @@ public class AdbService(
         catch (Exception ex)
         {
             logger.Warn($"Could not grant RECEIVE_SENSITIVE_NOTIFICATIONS on {device.Serial}: {ex.Message}", ex);
+        }
+    }
+
+    /// <summary>
+    /// Lets the Android app turn wireless debugging off itself when it gets unpaired while this PC
+    /// isn't connected over ADB. Only ADB can grant this permission.
+    /// </summary>
+    private async Task GrantWriteSecureSettingsAsync(AdbDevice device)
+    {
+        try
+        {
+            var receiver = new ConsoleOutputReceiver();
+            await adbClient.ExecuteShellCommandAsync(
+                device.DeviceData!,
+                $"dumpsys package {SefirahAndroidPackageId} | grep 'android.permission.WRITE_SECURE_SETTINGS: granted=true'",
+                receiver);
+
+            if (!string.IsNullOrWhiteSpace(receiver.ToString()))
+                return;
+
+            logger.Info($"Granting WRITE_SECURE_SETTINGS on {device.Serial}");
+            await adbClient.ExecuteShellCommandAsync(
+                device.DeviceData!,
+                $"pm grant {SefirahAndroidPackageId} android.permission.WRITE_SECURE_SETTINGS");
+        }
+        catch (Exception ex)
+        {
+            logger.Warn($"Could not grant WRITE_SECURE_SETTINGS on {device.Serial}: {ex.Message}", ex);
         }
     }
 
