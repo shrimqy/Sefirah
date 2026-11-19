@@ -1,3 +1,4 @@
+using System.Net.Sockets;
 using Sefirah.Data.AppDatabase;
 using Sefirah.Data.AppDatabase.Repository;
 using Sefirah.Models;
@@ -155,6 +156,29 @@ public static class AppLifecycleHelper
     public static void HandleAppUnhandledException(Exception? ex)
     {
         Ioc.Default.GetService<ILogger>()?.LogCritical("Unhandled exception {ex}", ex);
+    }
+
+    public static void HandleUnobservedTaskException(UnobservedTaskExceptionEventArgs e)
+    {
+        // NetCoreServer skips EndRead on a socket it has already closed, so the pending
+        // SslStream read of every dropped connection surfaces here; that's expected teardown
+        if (e.Exception.InnerExceptions.All(IsSocketTeardown))
+        {
+            Ioc.Default.GetService<ILogger>()?.LogDebug("Ignoring read cancelled by a closed connection: {message}", e.Exception.InnerException?.Message);
+            e.SetObserved();
+            return;
+        }
+
+        HandleAppUnhandledException(e.Exception);
+    }
+
+    private static bool IsSocketTeardown(Exception ex)
+    {
+        var socketException = ex as SocketException ?? (ex as IOException)?.InnerException as SocketException;
+        return socketException?.SocketErrorCode is SocketError.OperationAborted
+            or SocketError.ConnectionReset
+            or SocketError.ConnectionAborted
+            or SocketError.Shutdown;
     }
 
     public static async Task HandleStartupTaskAsync(bool enable)
