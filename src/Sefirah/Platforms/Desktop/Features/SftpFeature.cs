@@ -61,7 +61,7 @@ public class SftpFeature(
 
         try
         {
-            var path = session.Info.Paths.Count == 1 ? session.Info.Paths[0] : "/";
+            var path = GetBrowsePath(session.Info);
 
             if (session is { Backend: MountBackend.Sshfs, Location: { } mountPoint })
             {
@@ -89,7 +89,7 @@ public class SftpFeature(
 
         try
         {
-            var path = session.Info.Paths.Count == 1 ? session.Info.Paths[0] : "/";
+            var path = GetBrowsePath(session.Info);
             var uri = SftpUriHelper.CreateBrowseUri(
                 session.Host,
                 session.Info.Port,
@@ -265,6 +265,11 @@ public class SftpFeature(
         Directory.CreateDirectory(mountPoint);
         File.SetUnixFileMode(mountPoint, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
     }
+
+    // Android only lets the SFTP user list the storage volumes themselves, not "/" or "/storage",
+    // so open the first volume (internal storage) even when the phone also has an SD card
+    private static string GetBrowsePath(SftpServerInfo info) =>
+        info.Paths.FirstOrDefault(p => !string.IsNullOrEmpty(p)) ?? "/";
 
     private static string CombineMountPath(string mountPoint, string remotePath)
     {

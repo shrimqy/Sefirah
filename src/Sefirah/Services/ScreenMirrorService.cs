@@ -519,7 +519,14 @@ public class ScreenMirrorService(
         {
             if (!string.IsNullOrEmpty(e.Data))
             {
-                logger.Error($"scrcpy error: {e.Data}");
+                // scrcpy and adb write progress and warnings to stderr too, so use scrcpy's own level prefix
+                if (e.Data.StartsWith("ERROR:") || e.Data.StartsWith("FATAL:"))
+                    logger.Error($"scrcpy: {e.Data}");
+                else if (e.Data.StartsWith("WARN:"))
+                    logger.Warn($"scrcpy: {e.Data}");
+                else
+                    logger.Info($"scrcpy: {e.Data}");
+
                 lock (errorOutput)
                 {
                     errorOutput.AppendLine(e.Data);
