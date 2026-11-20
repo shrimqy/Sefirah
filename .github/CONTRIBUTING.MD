@@ -1,10 +1,14 @@
+Please refrain from submitting PRs for the time being. I've been quite busy with a major code overhaul that's been ongoing for months and likely won't be finished anytime soon. Existing bug reports and feature requests may or may not remain relevant after the refactor.
+
+Sorry for the inconvenience, and thanks for your understanding!
+
 # Contribution
 
-Thank you for your interest in contributing to our project! 
+Thank you for your interest in contributing to our project!
 
 # Code Contribution
 
-Pull requests are welcome.
+~~Pull requests are welcome.~~
 
 ## Contribute
 
