@@ -11,6 +11,10 @@
 
 **Sefirah** is designed to enhance your workflow by enabling seamless clipboard and notification sharing between your Windows PC and Android device. It's an alternative to existing solutions, tailored for users who want a straightforward and efficient way to keep their devices in sync.
 
+Please refrain from submitting PRs for the time being. I've been quite busy and have a major code overhaul that's been ongoing for months and likely won't be finished anytime soon. Existing bug reports and feature requests may or may not remain relevant after the refactor.
+
+Sorry for the inconvenience, and thanks for your understanding!
+
 ## Features
 
 - **Clipboard Sharing**: Seamlessly share clipboard content between your Android device and Windows PC, with automatic detection on Android 10+ via Shizuku or desktop ADB.
